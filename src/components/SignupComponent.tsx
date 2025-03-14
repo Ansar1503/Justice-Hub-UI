@@ -1,0 +1,236 @@
+import { useContext, useEffect, useState } from "react";
+import { FcGoogle } from "react-icons/fc";
+import classNames from "classnames";
+import { UserEnum } from "../types/enums/user.enums";
+import { AuthContext } from "../context/AuthContextPovider";
+import { useNavigate } from "react-router-dom";
+import { validateField } from "../utils/validations/SignupFormValidation";
+import axiosinstance from "../utils/api/axios/axios.instance";
+
+function SignupComponent() {
+  const navigate = useNavigate();
+  const { setUserRole, userRole } = useContext(AuthContext);
+  const [signupData, setSignupData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    cpassword: "",
+    role: userRole,
+  });
+  useEffect(()=>{
+    setSignupData((prev)=>({
+      ...prev,
+      role:userRole
+    }))
+  },[userRole])
+  const [validation, setValidation] = useState<Record<string, string>>({});
+
+  function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+
+    setSignupData((prev) => ({ ...prev, [name]: value }));
+
+    setValidation((prev) => ({
+      ...prev,
+      [name]: validateField(name, value, signupData.password),
+    }));
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    const errors: Record<string, string> = {};
+    (Object.keys(signupData) as Array<keyof typeof signupData>).forEach(
+      (field) => {
+        const errorMessage = validateField(
+          field,
+          signupData[field],
+          signupData.password
+        );
+        if (errorMessage) {
+          errors[field] = errorMessage;
+        }
+      }
+    );
+
+    setValidation(errors);
+    if (Object.keys(errors).length <= 0) {
+      try {
+        console.log(signupData)
+        axiosinstance.post(`/${signupData.role}/signup`, signupData);
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-[#FFF2F2] dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
+        {/* Toggle Switch */}
+        <div className="flex items-center justify-center mb-6">
+          <div className="relative w-48 bg-gray-200 dark:bg-gray-700 p-1 rounded-full flex">
+            <button
+              onClick={() => setUserRole(UserEnum.client)}
+              className={classNames(
+                "w-1/2 py-2 text-center text-sm font-semibold rounded-full transition-all",
+                userRole === UserEnum.client
+                  ? "bg-blue-500 text-white dark:bg-blue-400"
+                  : "text-gray-500 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+              )}
+            >
+              Client
+            </button>
+            <button
+              onClick={() => setUserRole(UserEnum.lawyer)}
+              className={classNames(
+                "w-1/2 py-2 text-center text-sm font-semibold rounded-full transition-all",
+                userRole === UserEnum.lawyer
+                  ? "bg-green-500 text-white dark:bg-green-400"
+                  : "text-gray-500 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+              )}
+            >
+              Lawyer
+            </button>
+          </div>
+        </div>
+
+        {/* Heading */}
+        <h2 className="text-xl font-bold text-center text-gray-700 dark:text-gray-200 mb-4">
+          Signup as {userRole === UserEnum.client ? "Client" : "Lawyer"}
+        </h2>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          {/* Name */}
+          <div className="mb-4">
+            <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-1">
+              Name
+            </label>
+            <input
+              onChange={handleInput}
+              type="text"
+              name="name"
+              value={signupData.name}
+              placeholder="Enter your name"
+              className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+            />
+            {validation?.name && (
+              <p className="text-red-500 text-sm">{validation.name}</p>
+            )}
+          </div>
+
+          {/* Email */}
+          <div className="mb-4">
+            <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-1">
+              Email Address
+            </label>
+            <input
+              onChange={handleInput}
+              type="email"
+              name="email"
+              value={signupData.email}
+              placeholder="Enter your email"
+              className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+            />
+            {validation.email && (
+              <p className="text-red-500 text-sm">{validation.email}</p>
+            )}
+          </div>
+
+          {/* Mobile Number */}
+          <div className="mb-4">
+            <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-1">
+              Mobile Number
+            </label>
+            <input
+              onChange={handleInput}
+              type="tel"
+              name="phone"
+              value={signupData.phone}
+              placeholder="Enter your mobile number"
+              className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+            />
+            {validation.phone && (
+              <p className="text-red-500 text-sm">{validation.phone}</p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div className="mb-4">
+            <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-1">
+              Password
+            </label>
+            <input
+              onChange={handleInput}
+              type="password"
+              name="password"
+              value={signupData.password}
+              placeholder="Create a password"
+              className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+            />
+            {validation.password && (
+              <p className="text-red-500 text-sm">{validation.password}</p>
+            )}
+          </div>
+
+          {/* confirm password */}
+          <div className="mb-4">
+            <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-1">
+              confirm password
+            </label>
+            <input
+              onChange={handleInput}
+              type="password"
+              name="cpassword"
+              value={signupData.cpassword}
+              placeholder="confirm password"
+              className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+            />
+            {validation.cpassword && (
+              <p className="text-red-500 text-sm">{validation.cpassword}</p>
+            )}
+          </div>
+
+          {/* Signup Button */}
+          <button
+            type="submit"
+            className="w-full py-2 mt-4 dark:bg-black text-white bg-blue-600 hover:bg-blue-500 dark:hover:bg-gray-800 rounded-lg transition"
+          >
+            Sign Up
+          </button>
+        </form>
+
+        {/* Google Signup */}
+        <div className="flex items-center justify-center my-4">
+          <div className="border-t border-gray-300 dark:border-gray-600 w-full"></div>
+          <span className="px-3 text-gray-500 dark:text-gray-400">OR</span>
+          <div className="border-t border-gray-300 dark:border-gray-600 w-full"></div>
+        </div>
+
+        <button className="w-full flex items-center justify-center gap-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition">
+          <FcGoogle size={20} />
+          <span className="text-gray-700 dark:text-gray-300 font-medium">
+            Sign up with Google
+          </span>
+        </button>
+
+        {/* Bottom Links */}
+        <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p>
+            Already have an account?{" "}
+            <button
+              onClick={() => navigate("/login")}
+              className="text-blue-500 dark:text-blue-400 hover:underline"
+            >
+              Login
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SignupComponent;
