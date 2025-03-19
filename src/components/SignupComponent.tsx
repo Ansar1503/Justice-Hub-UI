@@ -13,17 +13,17 @@ function SignupComponent() {
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
-    phone: "",
+    mobile: "",
     password: "",
     cpassword: "",
     role: userRole,
   });
-  useEffect(()=>{
-    setSignupData((prev)=>({
+  useEffect(() => {
+    setSignupData((prev) => ({
       ...prev,
-      role:userRole
-    }))
-  },[userRole])
+      role: userRole,
+    }));
+  }, [userRole]);
   const [validation, setValidation] = useState<Record<string, string>>({});
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -37,7 +37,7 @@ function SignupComponent() {
     }));
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     e.stopPropagation();
     const errors: Record<string, string> = {};
@@ -57,8 +57,19 @@ function SignupComponent() {
     setValidation(errors);
     if (Object.keys(errors).length <= 0) {
       try {
-        console.log(signupData)
-        axiosinstance.post(`/${signupData.role}/signup`, signupData);
+        const postData = {
+          name: signupData.name,
+          email: signupData.email,
+          password: signupData.password,
+          role: signupData.role,
+          mobile: signupData.mobile,
+        };
+        const response = await axiosinstance.post(
+          `/api/${signupData.role}/signup`,
+          postData
+        );
+        console.log(response.data)
+
       } catch (error) {
         console.log(error)
       }
@@ -66,8 +77,8 @@ function SignupComponent() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#FFF2F2] dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
+    <div className="flex justify-center items-center min-h-screen bg-[#FFF2F2] dark:bg-gray-900 ">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md mt-10 mb-10">
         {/* Toggle Switch */}
         <div className="flex items-center justify-center mb-6">
           <div className="relative w-48 bg-gray-200 dark:bg-gray-700 p-1 rounded-full flex">
@@ -148,7 +159,7 @@ function SignupComponent() {
               onChange={handleInput}
               type="tel"
               name="phone"
-              value={signupData.phone}
+              value={signupData.mobile}
               placeholder="Enter your mobile number"
               className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
             />

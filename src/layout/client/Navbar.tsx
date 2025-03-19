@@ -20,14 +20,14 @@ function Navbar() {
     >
       <div className="flex justify-between items-center">
         {/* Logo */}
-        <div id="logo">
-          <h2 className="text-xl font-semibold">Justice Hub</h2>
+        <div id="logo" onClick={() => navigate('/')}>
+          <h2 className="text-xl font-semibold cursor-pointer">Justice Hub</h2>
         </div>
 
         {/* Desktop Menu */}
         <div id="properties" className="hidden md:flex gap-8 text-lg">
           <ul className="flex gap-8">
-            <li className="hover:underline cursor-pointer">Home</li>
+            <li className="hover:underline cursor-pointer" onClick={()=>navigate("/")}>Home</li>
             <li className="hover:underline cursor-pointer">Services</li>
             <li className="hover:underline cursor-pointer">Lawyers</li>
             <li className="hover:underline cursor-pointer">Blogs</li>
