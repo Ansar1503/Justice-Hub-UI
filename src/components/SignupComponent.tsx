@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import classNames from "classnames";
+import { motion } from "framer-motion";
 import { UserEnum } from "../types/enums/user.enums";
 import { AuthContext } from "../context/AuthContextPovider";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +11,7 @@ import axiosinstance from "../utils/api/axios/axios.instance";
 function SignupComponent() {
   const navigate = useNavigate();
   const { setUserRole, userRole } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
@@ -64,14 +66,14 @@ function SignupComponent() {
           role: signupData.role,
           mobile: signupData.mobile,
         };
-        const response = await axiosinstance.post(
-          `/api/${signupData.role}/signup`,
-          postData
-        );
-        console.log(response.data)
-
+        setLoading(true);
+        const response = await axiosinstance.post(`/api/user/signup`, postData);
+        console.log(response.data?.userData?.email);
+        setLoading(false);
+        navigate("/otp", { state: response.data?.userData?.email });
       } catch (error) {
-        console.log(error)
+        setLoading(false);
+        console.log(error);
       }
     }
   }
@@ -158,13 +160,13 @@ function SignupComponent() {
             <input
               onChange={handleInput}
               type="tel"
-              name="phone"
+              name="mobile"
               value={signupData.mobile}
               placeholder="Enter your mobile number"
               className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
             />
-            {validation.phone && (
-              <p className="text-red-500 text-sm">{validation.phone}</p>
+            {validation.mobile && (
+              <p className="text-red-500 text-sm">{validation.mobile}</p>
             )}
           </div>
 
@@ -204,12 +206,25 @@ function SignupComponent() {
             )}
           </div>
 
-          {/* Signup Button */}
+          {/* Signup Button with Loading Animation */}
           <button
             type="submit"
-            className="w-full py-2 mt-4 dark:bg-black text-white bg-blue-600 hover:bg-blue-500 dark:hover:bg-gray-800 rounded-lg transition"
+            disabled={loading}
+            className="relative w-full py-2 mt-4 text-white bg-blue-600 hover:bg-blue-500 dark:hover:bg-gray-800 rounded-lg transition overflow-hidden"
           >
-            Sign Up
+            {loading ? "Signing Up..." : "Sign Up"}
+            {loading && (
+              <motion.div
+                className="absolute bottom-0 left-0 h-[3px] w-full bg-blue-300"
+                initial={{ x: "-100%" }}
+                animate={{ x: "100%" }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.2,
+                  ease: "linear",
+                }}
+              />
+            )}
           </button>
         </form>
 

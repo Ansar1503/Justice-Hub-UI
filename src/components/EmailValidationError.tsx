@@ -15,6 +15,7 @@ export default function EmailVerificationError() {
     const errorType = searchParams.get("error");
     if (errorType === "expired") setErrorMessage("Your verification link has expired.");
     else if (errorType === "invalid") setErrorMessage("Invalid verification link.");
+    else if (errorType === "invaliduser" ) setErrorMessage(`User NOT Found with the email ${email}`)
   }, [searchParams]);
 
   const handleResend = async () => {

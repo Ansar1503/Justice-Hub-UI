@@ -11,7 +11,7 @@ export function validateField(field: string, value: string, password?: string) {
         if (!emailRegex.test(value)) return "Invalid email format";
         return "";
   
-      case "phone":
+      case "mobile":
         const phoneRegex = /^[0-9]{10}$/; 
         if (!value.trim()) return "Phone number is required";
         if (!phoneRegex.test(value)) return "Enter a valid 10-digit phone number";
