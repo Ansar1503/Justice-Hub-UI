@@ -7,6 +7,7 @@ import { AuthContext } from "../context/AuthContextPovider";
 import { useNavigate } from "react-router-dom";
 import { validateField } from "../utils/validations/SignupFormValidation";
 import axiosinstance from "../utils/api/axios/axios.instance";
+import { toast } from "react-toastify";
 
 function SignupComponent() {
   const navigate = useNavigate();
@@ -74,7 +75,10 @@ function SignupComponent() {
         setLoading(false);
       } catch (error: any) {
         setLoading(false);
-        if (error.response) {
+        // console.log(error);
+        if (error.code === "ERR_NETWORK") {
+          toast.error(error.message);
+        } else if (error.response) {
           if (error.response.data) {
             setError(error.response.data?.message);
           }

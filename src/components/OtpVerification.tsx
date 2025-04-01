@@ -82,10 +82,25 @@ function OtpVerification() {
     }
   };
 
-  const handleResend = () => {
-    alert("OTP resent to your email");
-    setOtp(Array(6).fill(""));
-    inputRefs.current[0]?.focus();
+  const handleResend = async () => {
+    setLoading(true);
+    try {
+      await axiosinstance.post("/api/user/resend-otp", { email });
+      setOtp(Array(6).fill(""));
+      inputRefs.current[0]?.focus();
+      setResendTimer(60);
+      setLoading(false);
+    } catch (error: any) {
+      setLoading(false);
+      console.log(error);
+      if (error.code === "ERR_NETWORK") {
+        toast.error(error.message);
+      } else if (error.response) {
+        if (error.response.data) {
+          setError(error.response.data?.message);
+        }
+      }
+    }
   };
 
   const handleVerify = async () => {
