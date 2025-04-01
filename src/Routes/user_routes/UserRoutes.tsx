@@ -3,7 +3,7 @@ import Home from '../../pages/client/Home'
 import UserLogin from '../../pages/client/UserLogin'
 import UserSignup from '../../pages/client/UserSignup'
 import EmailverificationError from '@/pages/errors/EmailverificationError'
-import Emailverificationsuccesspage from '@/pages/client/emailverificationsuccesspage'
+import Emailverificationsuccesspage from '@/pages/client/Emailverificationsuccesspage'
 import OtpPage from '@/pages/client/OtpPage'
 
 

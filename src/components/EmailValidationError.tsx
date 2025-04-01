@@ -10,12 +10,23 @@ export default function EmailVerificationError() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
-
+  const errorType = searchParams.get("error") || "";
   useEffect(() => {
-    const errorType = searchParams.get("error");
-    if (errorType === "expired") setErrorMessage("Your verification link has expired.");
-    else if (errorType === "invalid") setErrorMessage("Invalid verification link.");
-    else if (errorType === "invaliduser" ) setErrorMessage(`User NOT Found with the email ${email}`)
+    if (errorType === "expired")
+      setErrorMessage("Your verification link has expired.");
+    else if (errorType === "invalid")
+      setErrorMessage("Invalid verification link.");
+    else if (errorType === "invaliduser") {
+      setErrorMessage(`User NOT Found with the email ${email}`);
+    } else if (errorType === "blocked") {
+      setErrorMessage(
+        `user with mail ${email} is blocked. please contact admin`
+      );
+    } else if (errorType === "verified") {
+      setErrorMessage(
+        `user with mail ${email} is already verified. try loging in`
+      );
+    }
   }, [searchParams]);
 
   const handleResend = async () => {
@@ -25,9 +36,9 @@ export default function EmailVerificationError() {
       await fetch("/api/auth/resend-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
-      navigate('/')
+      navigate("/");
       alert("Verification email resent successfully!");
     } catch (error) {
       alert("Failed to resend email. Please try again.");
@@ -40,16 +51,26 @@ export default function EmailVerificationError() {
       <Card className="w-96 shadow-xl h-auto">
         <CardContent className="p-6 text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-200">Email Verification Failed</h2>
+          <h2 className="text-xl font-semibold text-gray-200">
+            Email Verification Failed
+          </h2>
           <p className="text-gray-400 mt-2">{errorMessage}</p>
           <div className="mt-4">
-            {email && (
+            {email && (errorType === "invalid" || errorType === "expired") && (
               <Button onClick={handleResend} disabled={loading}>
                 {loading ? "Resending..." : "Resend Verification Email"}
               </Button>
             )}
           </div>
-          <Button variant="link" className="mt-3 text-blue-600" onClick={() => navigate("/")}>Back to Home</Button>
+          <Button
+            variant="link"
+            className="mt-3 text-blue-600"
+            onClick={() =>
+              errorType === "verified" ? navigate("/login") : navigate("/")
+            }
+          >
+            {errorType === "verified" ? "login" : "Back to Home"}
+          </Button>
         </CardContent>
       </Card>
     </div>

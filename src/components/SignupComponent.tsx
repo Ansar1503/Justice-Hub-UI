@@ -12,6 +12,7 @@ function SignupComponent() {
   const navigate = useNavigate();
   const { setUserRole, userRole } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
@@ -68,12 +69,16 @@ function SignupComponent() {
         };
         setLoading(true);
         const response = await axiosinstance.post(`/api/user/signup`, postData);
-        console.log(response.data?.userData?.email);
+        // console.log(response.data?.userData?.email);
+        navigate(`/otp?email=${response.data.userData.email}`);
         setLoading(false);
-        navigate("/otp", { state: response.data?.userData?.email });
-      } catch (error) {
+      } catch (error: any) {
         setLoading(false);
-        console.log(error);
+        if (error.response) {
+          if (error.response.data) {
+            setError(error.response.data?.message);
+          }
+        }
       }
     }
   }
@@ -226,6 +231,7 @@ function SignupComponent() {
               />
             )}
           </button>
+          <span className="text-red-800">{error}</span>
         </form>
 
         {/* Google Signup */}
