@@ -1,56 +1,92 @@
+import { useAppDispatch } from "@/Redux/Hook";
+import { setUser } from "@/Redux/Auth/Auth.Slice";
+import axiosinstance from "@/utils/api/axios/axios.instance";
+import { validateSigninField } from "@/utils/validations/SigninFormValidation";
+import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { UserEnum } from "../types/enums/user.enums";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContextPovider";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function LoginComponent() {
-const navigate = useNavigate()
-const {setUserRole,userRole}  = useContext(AuthContext)
+  const navigate = useNavigate();
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+  const [validation, setValidation] = useState<Record<string, string>>({});
+  function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setLoginData((prev) => ({ ...prev, [name]: value }));
+    setValidation((prev) => ({
+      ...prev,
+      [name]: validateSigninField(name, value),
+    }));
+  }
+  const dispatch = useAppDispatch();
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    const errors: Record<string, string> = {};
+    (Object.keys(loginData) as Array<keyof typeof loginData>).forEach(
+      (field) => {
+        const errorMessage = validateSigninField(field, loginData[field]);
+        if (errorMessage) {
+          errors[field] = errorMessage;
+        }
+      }
+    );
+    setValidation(errors);
+    if (Object.keys(errors).length <= 0) {
+      try {
+        const postData = {
+          email: loginData.email,
+          password: loginData.password,
+        };
+        const response = await axiosinstance.post(`/api/user/login`, postData);
+        console.log(response.data);
+        const userdata = {
+          ...response.data?.user,
+          token: response.data?.token,
+        };
+        dispatch(setUser(userdata));
+        navigate("/")
+      } catch (error: any) {
+        if (error.code === "ERR_NETWORK") {
+          toast.error(error.message);
+        } else if (error.response) {
+          if (error.response.data) {
+            toast.error(error.response.data?.message);
+          }
+        }
+      }
+    }
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#FFF2F2] dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
-        {/* Tabs */}
-        <div className="flex justify-between mb-6 border-b pb-2">
-          <button
-            onClick={() => setUserRole(UserEnum.client)}
-            className={`text-lg font-semibold pb-2 transition-all ${
-              userRole === "client"
-                ? "border-b-2 border-blue-500 text-blue-500 dark:text-blue-400"
-                : "text-gray-500 dark:text-gray-300"
-            }`}
-          >
-            Client Login
-          </button>
-          <button
-            onClick={() => setUserRole(UserEnum.lawyer)}
-            className={`text-lg font-semibold pb-2 transition-all ${
-              userRole === "lawyer"
-                ? "border-b-2 border-green-500 text-green-500 dark:text-green-400"
-                : "text-gray-500 dark:text-gray-300"
-            }`}
-          >
-            Lawyer Login
-          </button>
-        </div>
-        {/* Heading */}
         <h2 className="text-xl font-bold text-center text-gray-700 dark:text-gray-200 mb-4">
-          Login as {userRole}
+          User Login
         </h2>
 
         {/* Form */}
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-1">
               Email Address
             </label>
             <input
               type="email"
+              name="email"
               placeholder="Enter your email"
+              onChange={handleInput}
+              value={loginData.email}
               className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
               required
             />
+            {validation?.email && (
+              <p className="text-red-500 text-sm">{validation.email}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -59,10 +95,16 @@ const {setUserRole,userRole}  = useContext(AuthContext)
             </label>
             <input
               type="password"
+              name="password"
               placeholder="Enter your password"
+              value={loginData.password}
+              onChange={handleInput}
               className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
               required
             />
+            {validation?.password && (
+              <p className="text-red-500 text-sm">{validation.password}</p>
+            )}
           </div>
 
           <button
@@ -92,8 +134,9 @@ const {setUserRole,userRole}  = useContext(AuthContext)
           <p>
             Don't have an account?{" "}
             <button
-            onClick={()=>navigate('/signup')}
-            className="text-blue-500 dark:text-blue-400 hover:underline">
+              onClick={() => navigate("/signup")}
+              className="text-blue-500 dark:text-blue-400 hover:underline"
+            >
               Sign up
             </button>
           </p>

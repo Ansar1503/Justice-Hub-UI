@@ -4,12 +4,13 @@ import classNames from "classnames";
 import { motion } from "framer-motion";
 import { UserEnum } from "../types/enums/user.enums";
 import { AuthContext } from "../context/AuthContextPovider";
-import { useNavigate } from "react-router-dom";
-import { validateField } from "../utils/validations/SignupFormValidation";
+import { useLocation, useNavigate } from "react-router-dom";
+import { validateSignupField } from "../utils/validations/SignupFormValidation";
 import axiosinstance from "../utils/api/axios/axios.instance";
 import { toast } from "react-toastify";
 
 function SignupComponent() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { setUserRole, userRole } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -22,10 +23,11 @@ function SignupComponent() {
     cpassword: "",
     role: userRole,
   });
+  const { role } = location.state as { role: UserEnum };
   useEffect(() => {
     setSignupData((prev) => ({
       ...prev,
-      role: userRole,
+      role: role ? role : userRole,
     }));
   }, [userRole]);
   const [validation, setValidation] = useState<Record<string, string>>({});
@@ -37,7 +39,7 @@ function SignupComponent() {
 
     setValidation((prev) => ({
       ...prev,
-      [name]: validateField(name, value, signupData.password),
+      [name]: validateSignupField(name, value, signupData.password),
     }));
   }
 
@@ -47,7 +49,7 @@ function SignupComponent() {
     const errors: Record<string, string> = {};
     (Object.keys(signupData) as Array<keyof typeof signupData>).forEach(
       (field) => {
-        const errorMessage = validateField(
+        const errorMessage = validateSignupField(
           field,
           signupData[field],
           signupData.password

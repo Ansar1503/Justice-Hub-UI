@@ -30,11 +30,11 @@ function Hero() {
             <button
               onClick={() => {
                 setUserRole(UserEnum.client);
-                navigate("/login");
+                navigate("/signup", { state: { role: UserEnum.client } });
               }}
               className="px-5 py-2 bg-black text-white hover:bg-gray-800 rounded-lg transition"
             >
-              Login as Client
+              Signup as Client
             </button>
           </div>
         </div>
@@ -52,11 +52,11 @@ function Hero() {
             <button
               onClick={() => {
                 setUserRole(UserEnum.lawyer);
-                navigate("/login");
+                navigate("/signup", { state: { role: UserEnum.lawyer } });
               }}
               className="px-5 py-2 bg-black text-white hover:bg-gray-800 rounded-lg transition"
             >
-              Login as Lawyer
+              Signup as Lawyer
             </button>
           </div>
         </div>

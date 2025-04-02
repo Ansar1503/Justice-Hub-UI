@@ -1,4 +1,4 @@
-export function validateField(field: string, value: string, password?: string) {
+export function validateSignupField(field: string, value: string, password?: string) {
     switch (field) {
       case "name":
         if (!value.trim()) return "Name is required";
