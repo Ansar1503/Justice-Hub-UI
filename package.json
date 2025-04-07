@@ -12,6 +12,7 @@
   "dependencies": {
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.2",
+    "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.6.1",
     "@types/classnames": "^2.3.0",
     "add": "^2.0.6",
@@ -25,6 +26,7 @@
     "justice-hub": "file:",
     "lucide-react": "^0.483.0",
     "node": "^18.20.7",
+    "passport": "^0.7.0",
     "path": "^0.12.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

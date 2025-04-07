@@ -1,11 +1,12 @@
-import { useAppDispatch } from "@/Redux/Hook";
+import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
 import { setUser } from "@/Redux/Auth/Auth.Slice";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 import { validateSigninField } from "@/utils/validations/SigninFormValidation";
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google";
+import { motion } from "framer-motion";
 
 function LoginComponent() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ function LoginComponent() {
     email: "",
     password: "",
   });
+  const { loading } = useAppSelector((state) => state.Auth);
   const [validation, setValidation] = useState<Record<string, string>>({});
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -49,7 +51,9 @@ function LoginComponent() {
           token: response.data?.token,
         };
         dispatch(setUser(userdata));
-        navigate("/")
+        // console.log(userdata.role);
+
+        // navigate(`/${userdata.role}/`);
       } catch (error: any) {
         if (error.code === "ERR_NETWORK") {
           toast.error(error.message);
@@ -109,9 +113,22 @@ function LoginComponent() {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full py-2 mt-4 dark:bg-black text-white bg-blue-600 hover:bg-blue-500 dark:hover:bg-gray-800 rounded-lg transition"
           >
-            Login
+            {loading ? "Loging In..." : "Login"}
+            {loading && (
+              <motion.div
+                className="absolute bottom-0 left-0 h-[3px] w-full bg-slate-300"
+                initial={{ x: "-100%" }}
+                animate={{ x: "100%" }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.2,
+                  ease: "linear",
+                }}
+              />
+            )}
           </button>
         </form>
 
@@ -122,12 +139,18 @@ function LoginComponent() {
           <div className="border-t border-gray-300 dark:border-gray-600 w-full"></div>
         </div>
 
-        <button className="w-full flex items-center justify-center gap-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition">
-          <FcGoogle size={20} />
-          <span className="text-gray-700 dark:text-gray-300 font-medium">
-            Sign in with Google
-          </span>
-        </button>
+        <GoogleLogin
+          theme="filled_blue"
+          shape="pill"
+          onSuccess={(credentialResponse) => {
+            if (credentialResponse) {
+              console.log(credentialResponse);
+            }
+          }}
+          onError={() => {
+            console.log("error occured");
+          }}
+        />
 
         {/* Bottom Links */}
         <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">

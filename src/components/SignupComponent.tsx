@@ -23,11 +23,15 @@ function SignupComponent() {
     cpassword: "",
     role: userRole,
   });
-  const { role } = location.state as { role: UserEnum };
+  let Role: UserEnum;
+  if (location.state) {
+    const { role } = location.state as { role: UserEnum };
+    Role = role;
+  }
   useEffect(() => {
     setSignupData((prev) => ({
       ...prev,
-      role: role ? role : userRole,
+      role: Role ? Role : userRole,
     }));
   }, [userRole]);
   const [validation, setValidation] = useState<Record<string, string>>({});
