@@ -1,5 +1,16 @@
 import { Gender, UserEnum } from "../enums/user.enums";
 
+export type userDataType = {
+  user_id?: string;
+  name: string;
+  email: string;
+  mobile?: string;
+  password?: string;
+  role?: UserEnum;
+  is_verified: boolean;
+  is_blocked: boolean;
+};
+
 export type clientDataType = {
   user_id?: string;
   name: string;

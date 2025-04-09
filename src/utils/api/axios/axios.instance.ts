@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosError } from "axios";
 
 const baseURL = import.meta.env.VITE_AXIOS_API_URL;
 
+
 const axiosinstance: AxiosInstance = axios.create({
   baseURL,
   withCredentials: true,
@@ -24,6 +25,5 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 export default axiosinstance;

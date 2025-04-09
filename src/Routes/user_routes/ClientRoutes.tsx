@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router-dom";
 function ClientRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<ClientProfile />} />
+      <Route index element={<ClientProfile />} />
       <Route path="/sessions" element={<SessionsPage />} />
     </Routes>
   );

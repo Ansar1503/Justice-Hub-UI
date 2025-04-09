@@ -225,7 +225,7 @@ function SignupComponent() {
           <button
             type="submit"
             disabled={loading}
-            className="relative w-full py-2 mt-4 text-white bg-blue-600 hover:bg-blue-500 dark:hover:bg-gray-800 rounded-lg transition overflow-hidden"
+            className="relative w-full py-2 mt-4 text-white dark:bg-black bg-blue-600 hover:bg-blue-500 dark:hover:bg-gray-800 rounded-lg transition overflow-hidden"
           >
             {loading ? "Signing Up..." : "Sign Up"}
             {loading && (

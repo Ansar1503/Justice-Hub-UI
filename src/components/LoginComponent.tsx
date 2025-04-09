@@ -1,12 +1,11 @@
 import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
-import { setUser } from "@/Redux/Auth/Auth.Slice";
-import axiosinstance from "@/utils/api/axios/axios.instance";
 import { validateSigninField } from "@/utils/validations/SigninFormValidation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
 import { motion } from "framer-motion";
+import { loginUser } from "@/Redux/Auth/Auth.thunk";
 
 function LoginComponent() {
   const navigate = useNavigate();
@@ -14,7 +13,10 @@ function LoginComponent() {
     email: "",
     password: "",
   });
-  const { loading } = useAppSelector((state) => state.Auth);
+  const { loading, error, user } = useAppSelector((state) => state.Auth);
+  useEffect(() => {
+    console.log("user in useeffect", user);
+  }, [user]);
   const [validation, setValidation] = useState<Record<string, string>>({});
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -39,29 +41,19 @@ function LoginComponent() {
     );
     setValidation(errors);
     if (Object.keys(errors).length <= 0) {
-      try {
-        const postData = {
-          email: loginData.email,
-          password: loginData.password,
-        };
-        const response = await axiosinstance.post(`/api/user/login`, postData);
-        console.log(response.data);
-        const userdata = {
-          ...response.data?.user,
-          token: response.data?.token,
-        };
-        dispatch(setUser(userdata));
-        // console.log(userdata.role);
+      const postData = {
+        email: loginData.email,
+        password: loginData.password,
+      };
 
-        // navigate(`/${userdata.role}/`);
-      } catch (error: any) {
-        if (error.code === "ERR_NETWORK") {
-          toast.error(error.message);
-        } else if (error.response) {
-          if (error.response.data) {
-            toast.error(error.response.data?.message);
-          }
-        }
+      const result = await dispatch(loginUser(postData));
+
+      if (loginUser.fulfilled.match(result)) {
+        toast.success("login success");
+      } else {
+        toast.error(
+          typeof result.payload === "string" ? result.payload : "Login failed"
+        );
       }
     }
   }
@@ -72,7 +64,6 @@ function LoginComponent() {
         <h2 className="text-xl font-bold text-center text-gray-700 dark:text-gray-200 mb-4">
           User Login
         </h2>
-
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -114,12 +105,18 @@ function LoginComponent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 mt-4 dark:bg-black text-white bg-blue-600 hover:bg-blue-500 dark:hover:bg-gray-800 rounded-lg transition"
+            className={`relative w-full py-2 mt-4 text-white rounded-lg transition overflow-hidden ${
+              loading
+                ? "bg-blue-400 dark:bg-gray-600 cursor-not-allowed"
+                : "bg-blue-700 dark:bg-black hover:bg-blue-500 dark:hover:bg-gray-800"
+            }
+`}
           >
-            {loading ? "Loging In..." : "Login"}
+            {loading ? "Logging In..." : "Login"}
+
             {loading && (
               <motion.div
-                className="absolute bottom-0 left-0 h-[3px] w-full bg-slate-300"
+                className="absolute bottom-0 left-0 h-[3px] w-full bg-blue-300"
                 initial={{ x: "-100%" }}
                 animate={{ x: "100%" }}
                 transition={{
@@ -130,6 +127,9 @@ function LoginComponent() {
               />
             )}
           </button>
+          <div className="text-center mt-2">
+            {error && <span className="text-red-500">{error}</span>}
+          </div>
         </form>
 
         {/* Google Sign-In */}

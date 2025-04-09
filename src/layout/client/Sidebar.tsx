@@ -1,9 +1,27 @@
 import { CalendarSync, ShieldAlert, User, UserPen, Wallet } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
+import { useAppSelector } from "@/Redux/Hook";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const user = useAppSelector((state) => state.Auth.user);
+  const menuItems = [
+    { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
+    { path: `/${user?.role}/sessions`, label: "Sessions", icon: CalendarSync },
+    { path: `/${user?.role}/wallet`, label: "Wallet", icon: Wallet },
+    {
+      path: `/${user?.role}/disputes`,
+      label: "My Disputes",
+      icon: ShieldAlert,
+    },
+    {
+      path: `/${user?.role}/something`,
+      label: "Something",
+      icon: CalendarSync,
+    },
+    { path: `/${user?.role}/saved-cards`, label: "Saved Cards", icon: Wallet },
+  ];
 
   return (
     <>
@@ -50,7 +68,11 @@ export default function Sidebar() {
         className={`
          p bg-neutral-300 dark:bg-slate-800 rounded-lg shadow-lg shadow-slate-300 dark:shadow-black
           md:w-64 w-full md:min-w-64 flex-shrink-0
-          ${isOpen ? "fixed left-0 h-screen w-72 z-20 p-4 pt-16 overflow-y-auto top-0" : "fixed -left-full p-4"} 
+          ${
+            isOpen
+              ? "fixed left-0 h-screen w-72 z-20 p-4 pt-16 overflow-y-auto top-0"
+              : "fixed -left-full p-4"
+          } 
           md:static md:left-0 md:p-4 md:my-4 transition-all duration-300 ease-in-out
         `}
       >
@@ -107,12 +129,3 @@ export default function Sidebar() {
     </>
   );
 }
-
-const menuItems = [
-  { path: "/client/profile", label: "Profile", icon: UserPen },
-  { path: "/client/sessions", label: "Sessions", icon: CalendarSync },
-  { path: "/client/wallet", label: "Wallet", icon: Wallet },
-  { path: "/client/disputes", label: "My Disputes", icon: ShieldAlert },
-  { path: "/client/something", label: "Something", icon: CalendarSync },
-  { path: "/client/saved-cards", label: "Saved Cards", icon: Wallet },
-];

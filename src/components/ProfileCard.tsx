@@ -1,29 +1,27 @@
-import { useAppSelector, useAppDispatch } from "@/Redux/Hook";
+import { useAppSelector } from "@/Redux/Hook";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
-import { CircleUser, User } from "lucide-react";
+import { CircleUser, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
-// Import your update action creators here
-// import { updateUserProfile } from "@/Redux/slices/authSlice";
+import { Skeleton } from "./ui/skeleton";
+import axiosinstance from "@/utils/api/axios/axios.instance";
 
 function ProfileCard() {
-  const dispatch = useAppDispatch();
   const userData = useAppSelector((state) => state.Auth.user);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isEditingBasic, setIsEditingBasic] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
   const [editPassword, setEditPassword] = useState(false);
+  const [showPassword, setshowPassword] = useState(false);
+  const [newMail, setnewMail] = useState(userData?.email || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const [profile, setProfile] = useState({
+  const [BasicInfo, setBasicInfo] = useState({
     name: userData?.name || "",
-    email: userData?.email || "",
     mobile_number: userData?.mobile || "",
-    password: "",
-    role: userData?.role || "",
     image: userData?.image || "",
     dob: userData?.dob || "",
     gender: userData?.gender || "",
@@ -38,17 +36,15 @@ function ProfileCard() {
 
   useEffect(() => {
     if (userData) {
-      setProfile((prev) => ({
+      setBasicInfo((prev) => ({
         ...prev,
         name: userData.name || prev.name,
-        email: userData.email || prev.email,
         mobile_number: userData.mobile || prev.mobile_number,
-        role: userData.role || prev.role,
         image: userData.image || prev.image,
         dob: userData.dob || prev.dob,
         gender: userData.gender || prev.gender,
       }));
-
+      setnewMail((prev) => userData?.email || prev);
       setAddress((prev) => ({
         state: userData.address?.state || prev.state,
         city: userData.address?.city || prev.city,
@@ -58,6 +54,7 @@ function ProfileCard() {
     }
   }, [userData]);
 
+  // handle change
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -90,13 +87,15 @@ function ProfileCard() {
         }
 
         setErrors((prev) => ({ ...prev, image: "" }));
-        setProfile((prev) => ({ ...prev, image: URL.createObjectURL(file) }));
+        setBasicInfo((prev) => ({ ...prev, image: URL.createObjectURL(file) }));
       }
     } else {
       if (["state", "city", "locality", "pincode"].includes(name)) {
         setAddress((prev) => ({ ...prev, [name]: value }));
+      } else if (["name", "mobile_number", "dob", "gender"].includes(name)) {
+        setBasicInfo((prev) => ({ ...prev, [name]: value }));
       } else {
-        setProfile((prev) => ({ ...prev, [name]: value }));
+        setnewMail(value);
       }
     }
     const validationError = ValidateProfileFields(name, value);
@@ -106,6 +105,7 @@ function ProfileCard() {
     }));
   };
 
+  // valid form
   const validateForm = (
     section: "basic" | "address" | "email" | "password"
   ) => {
@@ -114,7 +114,7 @@ function ProfileCard() {
 
     if (section === "basic") {
       ["name", "dob", "gender"].forEach((field) => {
-        const value = profile[field as keyof typeof profile];
+        const value = BasicInfo[field as keyof typeof BasicInfo];
         const error = ValidateProfileFields(field, value as string);
         if (error) {
           newErrors[field] = error;
@@ -131,7 +131,7 @@ function ProfileCard() {
         }
       });
     } else if (section === "email") {
-      const error = ValidateProfileFields("email", profile.email);
+      const error = ValidateProfileFields("email", newMail);
       if (error) {
         newErrors.email = error;
         formIsValid = false;
@@ -153,21 +153,7 @@ function ProfileCard() {
     return formIsValid;
   };
 
-  const handleUpdateBasicInfo = async () => {
-    if (!validateForm("basic")) return;
-
-    setLoading(true);
-    try {
-      console.log("Updating basic info:", profile);
-      setSuccessMessage("Basic information updated successfully!");
-      setIsEditingBasic(false);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    } finally {
-      setLoading(false);
-      setTimeout(() => setSuccessMessage(""), 3000);
-    }
-  };
+  // updating address handling
 
   const handleUpdateAddress = async () => {
     if (!validateForm("address")) return;
@@ -190,7 +176,7 @@ function ProfileCard() {
 
     setLoading(true);
     try {
-      console.log("Sending verification to:", profile.email);
+      console.log("Sending verification to:", newMail);
       setSuccessMessage("Verification email sent!");
     } catch (error) {
       console.error("Error updating email:", error);
@@ -200,12 +186,12 @@ function ProfileCard() {
     }
   };
 
+  // password function handling
   const handleUpdatePassword = async () => {
     if (!validateForm("password")) return;
 
     setLoading(true);
     try {
-      console.log("Updating password");
       setSuccessMessage("Password updated successfully!");
       setEditPassword(false);
       setNewPassword("");
@@ -218,6 +204,49 @@ function ProfileCard() {
     }
   };
 
+  // bbasicInfoSubmit4
+  function handleBasicInfoUpdate(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("basic info submit working... ");
+    const form = e.currentTarget;
+    const formData = new FormData();
+    const fileInput = form.elements.namedItem("image") as HTMLInputElement;
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      formData.append("image", fileInput.files[0]);
+    }
+
+    if (!BasicInfo.name) {
+      setErrors((prev) => ({
+        ...prev,
+        name: "name is required",
+      }));
+      return;
+    }
+
+    formData.append("name", BasicInfo?.name || "");
+    formData.append("mobile_number", BasicInfo?.mobile_number || "");
+    formData.append("dob", BasicInfo?.dob || "");
+    formData.append("gender", BasicInfo?.gender || "");
+    
+  }
+  if (!userData) {
+    return (
+      <div className="w-full max-w-md mx-auto p-4">
+        <Skeleton className="h-10 w-32 mb-4 rounded" />
+        <div className="flex gap-4 items-center mb-4">
+          <Skeleton className="h-24 w-24 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        </div>
+        <Skeleton className="h-10 w-full mb-2" />
+        <Skeleton className="h-10 w-full mb-2" />
+        <Skeleton className="h-10 w-1/2" />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Success Message */}
@@ -228,7 +257,10 @@ function ProfileCard() {
       )}
 
       {/* First Card - Basic Profile Info */}
-      <div className="bg-neutral-300 dark:bg-slate-800 shadow-lg dark:shadow-black rounded-lg p-6 w-full ">
+      <form
+        onSubmit={handleBasicInfoUpdate}
+        className="bg-neutral-300 dark:bg-slate-800 shadow-lg dark:shadow-black rounded-lg p-6 w-full "
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
             Basic Information
@@ -244,14 +276,14 @@ function ProfileCard() {
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
           {/* Profile Picture */}
           <div className="relative">
-            {profile.image ? (
+            {BasicInfo.image ? (
               <img
-                src={profile.image}
+                src={BasicInfo.image}
                 alt="Profile"
                 className="w-24 h-24 rounded-full border-2 border-gray-300 dark:border-gray-600 object-cover"
               />
             ) : (
-              <CircleUser className="w-20 h-20"  />
+              <CircleUser className="w-20 h-20" />
             )}
             {isEditingBasic && (
               <>
@@ -301,7 +333,7 @@ function ProfileCard() {
                 type="text"
                 name="name"
                 disabled={!isEditingBasic}
-                value={profile.name}
+                value={BasicInfo.name}
                 onChange={handleChange}
                 className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
               />
@@ -317,7 +349,7 @@ function ProfileCard() {
                 type="text"
                 name="mobile_number"
                 disabled={!isEditingBasic}
-                value={profile.mobile_number}
+                value={BasicInfo.mobile_number}
                 onChange={handleChange}
                 className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
               />
@@ -335,7 +367,7 @@ function ProfileCard() {
                 type="date"
                 name="dob"
                 disabled={!isEditingBasic}
-                value={profile.dob}
+                value={BasicInfo.dob}
                 onChange={handleChange}
                 className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
               />
@@ -349,7 +381,7 @@ function ProfileCard() {
               </label>
               <select
                 name="gender"
-                value={profile.gender}
+                value={BasicInfo.gender}
                 disabled={!isEditingBasic}
                 onChange={handleChange}
                 className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
@@ -369,14 +401,14 @@ function ProfileCard() {
           <div className="mt-4 flex justify-end">
             <button
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-              onClick={handleUpdateBasicInfo}
               disabled={loading}
+              type="submit"
             >
               {loading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         )}
-      </div>
+      </form>
 
       {/* Personal Information Card */}
       <div className="bg-neutral-300 dark:bg-slate-800 shadow-lg rounded-lg p-6 w-full dark:shadow-black">
@@ -389,16 +421,36 @@ function ProfileCard() {
               Email
             </label>
             <div className="flex items-center gap-2">
-              <input
-                disabled={!editEmail}
-                type="email"
-                name="email"
-                value={profile.email}
-                onChange={handleChange}
-                className="flex-grow p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
-              />
+              {!editEmail ? (
+                <input
+                  disabled={!editEmail}
+                  type="email"
+                  name="email"
+                  value={userData?.email || newMail}
+                  onChange={handleChange}
+                  className="flex-grow p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
+                />
+              ) : (
+                <input
+                  disabled={!editEmail}
+                  type="email"
+                  name="email"
+                  value={newMail}
+                  onChange={handleChange}
+                  className="flex-grow p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
+                />
+              )}
               <button
-                onClick={() => setEditEmail(!editEmail)}
+                onClick={() => {
+                  setEditEmail(!editEmail);
+                  if (editEmail) {
+                    setnewMail(userData?.email || "");
+                    setErrors((prev) => ({
+                      ...prev,
+                      email: "",
+                    }));
+                  }
+                }}
                 className="text-blue-600 hover:underline whitespace-nowrap"
               >
                 {editEmail ? "Cancel" : "Change Email"}
@@ -440,20 +492,29 @@ function ProfileCard() {
             ) : (
               <div className="space-y-2">
                 <div>
-                  <input
-                    type="password"
-                    placeholder="New Password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="New Password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full p-2 pr-10 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setshowPassword(!showPassword)}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300"
+                    >
+                      {showPassword ? <EyeOff /> : <Eye />}
+                    </button>
+                  </div>
                   {errors.password && (
                     <p className="text-red-500 text-sm">{errors.password}</p>
                   )}
                 </div>
                 <div>
                   <input
-                    type="password"
+                    type="text"
                     placeholder="Confirm New Password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
