@@ -13,7 +13,6 @@ function UserRoutes() {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
-        <Route path="/" element={<Home />} />
         <Route path="/login" element={<UserLogin />} />
         <Route path="/signup" element={<UserSignup />} />
         <Route path="/otp" element={<OtpPage />} />
@@ -26,6 +25,7 @@ function UserRoutes() {
           element={<Emailverificationsuccesspage />}
         />
       </Route>
+      <Route path="/" element={<Home />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/client/*" element={<ClientRoutes />} />
       </Route>

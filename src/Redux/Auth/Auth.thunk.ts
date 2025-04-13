@@ -1,6 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosinstance from "@/utils/api/axios/axios.instance";
-import { toast } from "react-toastify";
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",

@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
 import { validateSigninField } from "@/utils/validations/SigninFormValidation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
@@ -13,10 +13,7 @@ function LoginComponent() {
     email: "",
     password: "",
   });
-  const { loading, error, user } = useAppSelector((state) => state.Auth);
-  useEffect(() => {
-    console.log("user in useeffect", user);
-  }, [user]);
+  const { loading, error } = useAppSelector((state) => state.Auth);
   const [validation, setValidation] = useState<Record<string, string>>({});
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;

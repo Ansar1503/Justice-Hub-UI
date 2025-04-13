@@ -17,7 +17,7 @@ export type clientDataType = {
   email: string;
   mobile?: string;
   password?: string;
-  image?: string;
+  profile_image?: string;
   is_verified?: boolean;
   dob?: string;
   address?: AddressType;
