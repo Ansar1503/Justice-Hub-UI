@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
 import { motion } from "framer-motion";
-import { loginUser } from "@/Redux/Auth/Auth.thunk";
+import { useLoginMutation } from "@/hooks/tanstack/mutations";
+import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
 
 function LoginComponent() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ function LoginComponent() {
     email: "",
     password: "",
   });
-  const { loading, error } = useAppSelector((state) => state.Auth);
+
   const [validation, setValidation] = useState<Record<string, string>>({});
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -23,6 +24,16 @@ function LoginComponent() {
       [name]: validateSigninField(name, value),
     }));
   }
+  const {
+    data,
+    isPending,
+    isError,
+    error,
+    failureReason,
+    isSuccess,
+    mutateAsync,
+  } = useLoginMutation();
+
   const dispatch = useAppDispatch();
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,14 +54,10 @@ function LoginComponent() {
         password: loginData.password,
       };
 
-      const result = await dispatch(loginUser(postData));
-
-      if (loginUser.fulfilled.match(result)) {
-        toast.success("login success");
-      } else {
-        toast.error(
-          typeof result.payload === "string" ? result.payload : "Login failed"
-        );
+      try {
+        await mutateAsync(postData);
+      } catch (error: any) {
+        
       }
     }
   }
@@ -101,17 +108,17 @@ function LoginComponent() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={isPending}
             className={`relative w-full py-2 mt-4 text-white rounded-lg transition overflow-hidden ${
-              loading
+              isPending
                 ? "bg-blue-400 dark:bg-gray-600 cursor-not-allowed"
                 : "bg-blue-700 dark:bg-black hover:bg-blue-500 dark:hover:bg-gray-800"
             }
 `}
           >
-            {loading ? "Logging In..." : "Login"}
+            {isPending ? "Logging In..." : "Login"}
 
-            {loading && (
+            {isPending && (
               <motion.div
                 className="absolute bottom-0 left-0 h-[3px] w-full bg-blue-300"
                 initial={{ x: "-100%" }}
@@ -125,7 +132,7 @@ function LoginComponent() {
             )}
           </button>
           <div className="text-center mt-2">
-            {error && <span className="text-red-500">{error}</span>}
+            {isError && <span className="text-red-500">{error.message}</span>}
           </div>
         </form>
 

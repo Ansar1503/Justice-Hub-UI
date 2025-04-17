@@ -2,31 +2,40 @@ import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 import React, { useEffect, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
+import { useFetchClientData } from "@/hooks/tanstack/queries";
+import { clientDataType } from "@/types/types/Client.data.type";
 
-function AddressInfoForm() {
-  const { client: clientData, loading } = useAppSelector(
-    (state) => state.Client
-  );
+function AddressInfoForm({
+  data,
+  isLoading,
+}: {
+  data: clientDataType;
+  isLoading: boolean;
+}) {
+  // const { client: clientData, loading } = useAppSelector(
+  //   (state) => state.Client
+  // );
+
   const dispatch = useAppDispatch();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [address, setAddress] = useState({
-    state: clientData?.address?.state || "",
-    city: clientData?.address?.city || "",
-    locality: clientData?.address?.locality || "",
-    pincode: clientData?.address?.pincode || "",
+    state: data?.address?.state || "",
+    city: data?.address?.city || "",
+    locality: data?.address?.locality || "",
+    pincode: data?.address?.pincode || "",
   });
 
   useEffect(() => {
-    if (clientData) {
+    if (data) {
       setAddress({
-        state: clientData.address?.state || "",
-        city: clientData.address?.city || "",
-        locality: clientData.address?.locality || "",
-        pincode: clientData.address?.pincode || "",
+        state: data.address?.state || "",
+        city: data.address?.city || "",
+        locality: data.address?.locality || "",
+        pincode: data.address?.pincode || "",
       });
     }
-  }, [clientData]);
+  }, [data]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -56,7 +65,6 @@ function AddressInfoForm() {
     }
   };
 
-  // Reusable field skeleton component
   const FieldSkeleton = () => (
     <div className="space-y-2">
       <Skeleton className="h-4 w-24 mb-1" />
@@ -67,7 +75,7 @@ function AddressInfoForm() {
   return (
     <div className="bg-neutral-300 dark:bg-slate-800 shadow-lg rounded-lg p-6 w-full dark:shadow-black">
       <div className="flex justify-between items-center mb-4">
-        {loading ? (
+        {isLoading ? (
           <>
             <Skeleton className="h-7 w-48" />
             <Skeleton className="h-6 w-16" />
@@ -87,9 +95,8 @@ function AddressInfoForm() {
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Locality Field */}
         <div>
-          {loading ? (
+          {isLoading ? (
             <FieldSkeleton />
           ) : (
             <>
@@ -111,9 +118,8 @@ function AddressInfoForm() {
           )}
         </div>
 
-        {/* City Field */}
         <div>
-          {loading ? (
+          {isLoading ? (
             <FieldSkeleton />
           ) : (
             <>
@@ -135,9 +141,8 @@ function AddressInfoForm() {
           )}
         </div>
 
-        {/* State Field */}
         <div>
-          {loading ? (
+          {isLoading ? (
             <FieldSkeleton />
           ) : (
             <>
@@ -159,9 +164,8 @@ function AddressInfoForm() {
           )}
         </div>
 
-        {/* Pincode Field */}
         <div>
-          {loading ? (
+          {isLoading ? (
             <FieldSkeleton />
           ) : (
             <>
@@ -184,18 +188,17 @@ function AddressInfoForm() {
         </div>
       </div>
 
-      {/* Update Button */}
       {isEditingAddress && (
         <div className="mt-6 flex justify-end">
-          {loading ? (
+          {isLoading ? (
             <Skeleton className="h-10 w-32 rounded" />
           ) : (
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md disabled:bg-blue-400"
               onClick={handleUpdateAddress}
-              disabled={typeof loading === "boolean" ? loading : false}
+              disabled={typeof isLoading === "boolean" ? isLoading : false}
             >
-              {loading ? "Updating..." : "Update Address"}
+              {isLoading ? "Updating..." : "Update Address"}
             </button>
           )}
         </div>
@@ -205,4 +208,3 @@ function AddressInfoForm() {
 }
 
 export default AddressInfoForm;
-  

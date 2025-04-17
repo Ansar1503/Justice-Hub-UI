@@ -1,38 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
-import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
-import { updateBasicInfo } from "@/Redux/Client/Client.thunk";
 import { CircleUser } from "lucide-react";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 
-function BasicInfoForm() {
+import { clientDataType } from "@/types/types/Client.data.type";
+
+function BasicInfoForm({
+  data,
+  isLoading,
+}: {
+  data: clientDataType;
+  isLoading: boolean;
+}) {
   const [isEditingBasic, setIsEditingBasic] = useState(false);
-  const { client: clientData, loading } = useAppSelector(
-    (state) => state.Client
-  );
-  
-  const [basicLoading, setBasicLoading] = useState(loading);
-  const dispatch = useAppDispatch();
+  // const { client: clientData, loading } = useAppSelector(
+  //   (state) => state.Client
+  // );
+  // console.log(";datatasd", data);
+  const [basicLoading, setBasicLoading] = useState(false);
+  // const dispatch = useAppDispatch();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [BasicInfo, setBasicInfo] = useState({
-    name: clientData?.name || "",
-    mobile: clientData?.mobile || "",
-    image: clientData?.profile_image || "",
-    dob: clientData?.dob || "",
-    gender: clientData?.gender || "",
+    name: data?.name || "",
+    mobile: data?.mobile || "",
+    image: data?.profile_image || "",
+    dob: data?.dob || "",
+    gender: data?.gender || "",
   });
   // console.log("basic loading", basicLoading);
   useEffect(() => {
-    if (clientData) {
+    if (data) {
       setBasicInfo({
-        dob: clientData?.dob || "",
-        gender: clientData?.gender || "",
-        image: clientData?.profile_image || "",
-        mobile: clientData?.mobile || "",
-        name: clientData?.name || "",
+        dob: data?.dob || "",
+        gender: data?.gender || "",
+        image: data?.profile_image || "",
+        mobile: data?.mobile || "",
+        name: data?.name || "",
       });
     }
-  }, [clientData]);
+  }, [data]);
+
+  useEffect(() => {
+    setBasicLoading(isLoading);
+  }, [isLoading]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -94,7 +104,6 @@ function BasicInfoForm() {
     if (fileInput && fileInput.files && fileInput.files.length > 0) {
       formData.append("image", fileInput.files[0]);
     }
-
     if (!BasicInfo.name) {
       setErrors((prev) => ({
         ...prev,
@@ -108,8 +117,8 @@ function BasicInfoForm() {
     formData.append("dob", BasicInfo?.dob || "");
     formData.append("gender", BasicInfo?.gender || "");
     setBasicLoading(true);
-    dispatch(updateBasicInfo(formData));
-    setBasicLoading(loading as boolean);
+    // dispatch(updateBasicInfo(formData));
+    setBasicLoading(isLoading);
     setIsEditingBasic(false);
   }
 

@@ -1,20 +1,34 @@
-import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
+import { useAppDispatch } from "@/Redux/Hook";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 import { Eye, EyeOff } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Skeleton } from "../ui/skeleton";
+import { changeEmail, sendVerificationMail } from "@/Redux/Client/Client.thunk";
+import { AlertDestructive } from "../ui/custom/AlertDestructive";
+import { ButtonLink } from "../ui/custom/ButtonLink";
+import { toast } from "react-toastify";
+import { clientDataType } from "@/types/types/Client.data.type";
 
-function PersonalInfoForm() {
-  const { client: clientData, loading } = useAppSelector(
-    (state) => state.Client
-  );
+function PersonalInfoForm({
+  data,
+  isLoading,
+}: {
+  data: clientDataType;
+  isLoading: boolean;
+}) {
+  // const { client: data, loading } = useAppSelector(
+  //   (state) => state.Client
+  // );
+  console.log("data", data);
   const dispatch = useAppDispatch();
   const [showPassword, setshowPassword] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
   const [editPassword, setEditPassword] = useState(false);
-  const [newMail, setnewMail] = useState(clientData?.email || "");
+  const [newMail, setnewMail] = useState(data?.email || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // const [formError, setFormError] = useState("")
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -22,6 +36,7 @@ function PersonalInfoForm() {
     e.stopPropagation();
     const { name, value } = e.target;
     setnewMail(value);
+    4300;
 
     const validationError = ValidateProfileFields(name, value);
     setErrors((prev) => ({
@@ -30,13 +45,34 @@ function PersonalInfoForm() {
     }));
   }
 
-  const handleUpdateEmail = async () => {
+  const handleUpdateEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
-      console.log("Sending verification to:", newMail);
+      e.preventDefault();
+      e.stopPropagation();
+      const form = e.currentTarget;
+      const emailInput = form.elements.namedItem("email") as HTMLInputElement;
+      const email = emailInput.value;
+      dispatch(changeEmail(email));
+    } catch (error: any) {
+      setErrors((prev) => ({ ...prev, email: error.message }));
+    }
+  };
+
+  const handleVerifynewEmail = async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!data?.email) return;
+    // console.log("working..");
+    try {
+      setEmailLoading(true);
+      const response = await dispatch(sendVerificationMail(data.email));
+      console.log("this verify mail sending response", response);
+      if (response.payload) {
+        toast.success(response.payload.message);
+      }
+      setEmailLoading(false);
     } catch (error) {
-      console.error("Error updating email:", error);
-    } finally {
-      //   setTimeout(() => setSuccessMessage(""), 3000);
+      console.log("this verify send mail error  resphsne", error);
     }
   };
 
@@ -48,12 +84,9 @@ function PersonalInfoForm() {
       setConfirmPassword("");
     } catch (error) {
       console.error("Error updating password:", error);
-    } finally {
-      //   setTimeout(() => setSuccessMessage(""), 3000);
     }
   };
 
-  // Reusable field skeleton component
   const FieldSkeleton = () => (
     <div className="space-y-2">
       <Skeleton className="h-4 w-24 mb-1" />
@@ -67,7 +100,7 @@ function PersonalInfoForm() {
   return (
     <div className="bg-neutral-300 dark:bg-slate-800 shadow-lg rounded-lg p-6 w-full dark:shadow-black">
       {/* Form Header */}
-      {loading ? (
+      {emailLoading ? (
         <Skeleton className="h-7 w-56 mb-4" />
       ) : (
         <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
@@ -77,24 +110,37 @@ function PersonalInfoForm() {
 
       <div className="flex-grow space-y-4 w-full">
         {/* Email Section */}
-        <div>
-          {loading ? (
+        <form onSubmit={handleUpdateEmail}>
+          {emailLoading ? (
             <FieldSkeleton />
           ) : (
             <>
+              {data && !data?.is_verified && (
+                <div className="flex border rounded-lg mb-3  border-yellow-600">
+                  <AlertDestructive
+                    message="email not verified, please verify your email"
+                    title="email not verified"
+                  />
+                  <div className="mt-3 mr-2" onClick={handleVerifynewEmail}>
+                    <ButtonLink text="Verify Now" />
+                  </div>
+                </div>
+              )}
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Email
               </label>
               <div className="flex items-center gap-2">
                 {!editEmail ? (
-                  <input
-                    disabled={!editEmail}
-                    type="email"
-                    name="email"
-                    value={clientData?.email || newMail}
-                    onChange={handleChange}
-                    className="flex-grow p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
-                  />
+                  <>
+                    <input
+                      disabled={!editEmail}
+                      type="email"
+                      name="email"
+                      value={data?.email || newMail}
+                      onChange={handleChange}
+                      className="flex-grow p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
+                    />
+                  </>
                 ) : (
                   <input
                     disabled={!editEmail}
@@ -106,19 +152,22 @@ function PersonalInfoForm() {
                   />
                 )}
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setEditEmail(!editEmail);
                     if (editEmail) {
-                      setnewMail(clientData?.email || "");
+                      setnewMail(data?.email || "");
                       setErrors((prev) => ({
                         ...prev,
                         email: "",
                       }));
                     }
                   }}
-                  className="text-blue-600 hover:underline whitespace-nowrap"
+                  className={`text-blue-600 hover:underline whitespace-nowrap disabled:text-gray-400 disabled:cursor-not-allowed`}
+                  disabled={data && data.is_verified ? false : true}
                 >
-                  {editEmail ? "Cancel" : "Change Email"}
+                  {editEmail ? "Cancel" : "Change Mail"}
                 </button>
               </div>
             </>
@@ -131,24 +180,24 @@ function PersonalInfoForm() {
           {/* Verification Button */}
           {editEmail && (
             <div className="mt-2">
-              {loading ? (
+              {isLoading ? (
                 <Skeleton className="h-8 w-32 rounded" />
               ) : (
                 <button
+                  type="submit"
                   className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                  onClick={handleUpdateEmail}
-                  disabled={typeof loading === "boolean" ? loading : false}
+                  disabled={typeof isLoading === "boolean" ? isLoading : false}
                 >
-                  {loading ? "Sending..." : "Send Verification"}
+                  {isLoading ? "Sending..." : "Send Verification"}
                 </button>
               )}
             </div>
           )}
-        </div>
+        </form>
 
         {/* Password Section */}
         <div>
-          {loading ? (
+          {isLoading ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between mb-1">
                 <Skeleton className="h-4 w-20" />
@@ -162,15 +211,17 @@ function PersonalInfoForm() {
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Password
                 </label>
-                <button
-                  onClick={() => setEditPassword(!editPassword)}
-                  className="text-blue-600 hover:underline"
-                >
-                  {editPassword ? "Cancel" : "Change Password"}
-                </button>
+                {data && data.is_verified && (
+                  <button
+                    onClick={() => setEditPassword(!editPassword)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {editPassword ? "Cancel" : "Change Password"}
+                  </button>
+                )}
               </div>
 
-              {!editPassword ? (
+              {!editPassword || (data && !data?.is_verified) ? (
                 <div className="p-2 border rounded dark:bg-gray-800">
                   ••••••••••••
                 </div>
@@ -224,9 +275,11 @@ function PersonalInfoForm() {
                     <button
                       className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-blue-400"
                       onClick={handleUpdatePassword}
-                      disabled={typeof loading === "boolean" ? loading : false}
+                      disabled={
+                        typeof isLoading === "boolean" ? isLoading : false
+                      }
                     >
-                      {loading ? "Updating..." : "Update Password"}
+                      {isLoading ? "Updating..." : "Update Password"}
                     </button>
                   </div>
                 </div>
@@ -235,8 +288,7 @@ function PersonalInfoForm() {
           )}
         </div>
 
-        {/* Password Change Form Skeleton */}
-        {loading && editPassword && (
+        {isLoading && editPassword && (
           <div className="space-y-2 mt-2">
             <Skeleton className="h-10 w-full rounded" />
             <Skeleton className="h-10 w-full rounded" />

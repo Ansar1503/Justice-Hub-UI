@@ -1,28 +1,15 @@
 import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
 import { useState, useEffect } from "react";
-import { fetchClientData } from "@/Redux/Client/Client.thunk";
 import BasicInfoForm from "./forms/BasicInfoForm";
 import PersonalInfoForm from "./forms/PersonalInfoForm";
 import AddressInfoForm from "./forms/AddressInfoForm";
+import { useFetchClientData } from "@/hooks/tanstack/queries";
 
 function ProfileCard() {
-  const {
-    client: clientData,
-    loading,
-    error,
-  } = useAppSelector((state) => state.Client);
-  const dispatch = useAppDispatch();
-  const userData = useAppSelector((state) => state.Auth.user);
+  // const userData = useAppSelector((state) => state.Auth.user);
   // console.log("loading", loading);
   const [successMessage, setSuccessMessage] = useState("");
-
-  useEffect(() => {
-    if (userData?.user_id && !clientData) {
-      console.log("client data fetching .....");
-      const result = dispatch(fetchClientData());
-      console.log('fetch reust',result)
-    }
-  }, [userData?.user_id]);
+  const { data, isLoading } = useFetchClientData();
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -33,11 +20,11 @@ function ProfileCard() {
         </div>
       )}
 
-      <BasicInfoForm />
+      <BasicInfoForm data={data?.data} isLoading={isLoading} />
 
-      <PersonalInfoForm />
+      <PersonalInfoForm data={data?.data} isLoading={isLoading} />
 
-      <AddressInfoForm />
+      <AddressInfoForm data={data?.data} isLoading={isLoading} />
     </div>
   );
 }

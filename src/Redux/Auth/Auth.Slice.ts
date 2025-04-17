@@ -1,6 +1,5 @@
 import { userDataType } from "@/types/types/Client.data.type";
 import { createSlice } from "@reduxjs/toolkit";
-import { loginUser } from "./Auth.thunk";
 
 interface AuthState {
   user: userDataType | null;
@@ -32,29 +31,6 @@ const authSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-  },
-  extraReducers(builder) {
-    builder
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        if (action.payload) {
-          const { user, token } = action.payload;
-          state.user = user;
-          state.token = token;
-        }
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        if (typeof action.payload == "string") {
-          state.error = action.payload;
-        } else {
-          state.error = "Login failed";
-        }
-      });
   },
 });
 
