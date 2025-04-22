@@ -1,10 +1,11 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "../../pages/client/Home";
-import UserLogin from "../../pages/client/UserLogin";
-import UserSignup from "../../pages/client/UserSignup";
-import EmailverificationError from "@/pages/errors/EmailverificationError";
-import Emailverificationsuccesspage from "@/pages/client/Emailverificationsuccesspage";
-import OtpPage from "@/pages/client/OtpPage";
+import { lazy } from "react";
+const Home = lazy(()=>import("@/pages/client/Home"))
+const UserLogin = lazy(()=>import("@/pages/client/UserLogin"))
+const UserSignup = lazy(()=>import("@/pages/client/UserSignup"))
+const EmailverificationError = lazy(()=>import("@/pages/errors/EmailverificationError"))
+const Emailverificationsuccesspage = lazy(()=>import("@/pages/client/Emailverificationsuccesspage"))
+const OtpPage = lazy(()=>import("@/pages/client/OtpPage"))
 import ClientRoutes from "./ClientRoutes";
 import PublicRoute from "../ClientPublicRoute";
 import ProtectedRoute from "../ClientProtectedRoute";

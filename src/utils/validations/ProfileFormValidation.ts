@@ -46,10 +46,31 @@ export function ValidateProfileFields(field: string, value: string) {
 
       return "";
 
+    default:
+      return "";
+  }
+}
+
+
+export function validateAddressFields(field: string, value: string): string {
+  switch (field) {
+    case "state":
+      if (!value.trim()) return "State is required.";
+      if (!/^[a-zA-Z\s]+$/.test(value))
+        return "State must contain only letters.";
+      return "";
+
+    case "city":
+      if (!value.trim()) return "City is required.";
+      if (!/^[a-zA-Z\s]+$/.test(value))
+        return "City must contain only letters.";
+      return "";
+
+
+
     case "pincode":
-      const pincodeRegex = /^[0-9]{6}$/;
-      if (!value.trim()) return "Pincode is required";
-      if (!pincodeRegex.test(value)) return "Enter a valid 6-digit pincode";
+      if (!value.trim()) return "Pincode is required.";
+      if (!/^\d{6}$/.test(value)) return "Pincode must be a 6-digit number.";
       return "";
 
     default:

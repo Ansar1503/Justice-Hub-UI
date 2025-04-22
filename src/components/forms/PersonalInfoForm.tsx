@@ -1,13 +1,17 @@
-import { useAppDispatch } from "@/Redux/Hook";
+// import { useAppDispatch } from "@/Redux/Hook";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { Skeleton } from "../ui/skeleton";
-import { changeEmail, sendVerificationMail } from "@/Redux/Client/Client.thunk";
 import { AlertDestructive } from "../ui/custom/AlertDestructive";
 import { ButtonLink } from "../ui/custom/ButtonLink";
-import { toast } from "react-toastify";
 import { clientDataType } from "@/types/types/Client.data.type";
+import { VerifiedBadge } from "../ui/custom/VerifiedBadge";
+import {
+  usesendVerificationMailMutation,
+  useUpdateEmailMutation,
+  useUpdatePasswordMutation,
+} from "@/hooks/tanstack/mutations";
 
 function PersonalInfoForm({
   data,
@@ -19,32 +23,70 @@ function PersonalInfoForm({
   // const { client: data, loading } = useAppSelector(
   //   (state) => state.Client
   // );
-  console.log("data", data);
-  const dispatch = useAppDispatch();
+  // console.log("data", data);
+  // const dispatch = useAppDispatch();
   const [showPassword, setshowPassword] = useState(false);
-  const [emailLoading, setEmailLoading] = useState(false);
+  // const [passwordLoading, setPasswordLoading] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [editPassword, setEditPassword] = useState(false);
   const [newMail, setnewMail] = useState(data?.email || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   // const [formError, setFormError] = useState("")
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { isPending: isUpdatingEmail, mutateAsync: updateEmailAsync } =
+    useUpdateEmailMutation();
+  const { isPending: isUpdatingPassword, mutateAsync: updatePasswordAsync } =
+    useUpdatePasswordMutation();
+  // console.log("errormrs", errors);
+  const {
+    isPending: isSendingVerification,
+    mutateAsync: sendVerificationAsync,
+  } = usesendVerificationMailMutation();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
     e.stopPropagation();
+
     const { name, value } = e.target;
-    setnewMail(value);
-    4300;
+
+    if (name === "email") {
+      setnewMail(value);
+    }
+    if (name === "password") {
+      setNewPassword(value);
+    }
+    if (name === "cpassword") {
+      setConfirmPassword(value);
+    }
+    if (name === "currentPassword") {
+      setCurrentPassword(value);
+    }
 
     const validationError = ValidateProfileFields(name, value);
     setErrors((prev) => ({
       ...prev,
       [name]: validationError,
     }));
+
+    if (
+      (name === "password" && confirmPassword) ||
+      (name === "cpassword" && newPassword)
+    ) {
+      const newPass = name === "password" ? value : newPassword;
+      const confirmPass = name === "cpassword" ? value : confirmPassword;
+      // console.log('new:',newPass,"  confirmed pass:",confirmPass)
+      if (newPass !== confirmPass) {
+        setErrors((prev) => ({
+          ...prev,
+          cpassword: "Passwords don't match",
+        }));
+      }
+    }
   }
 
+  // console.log('errors',errors)
   const handleUpdateEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
@@ -52,7 +94,7 @@ function PersonalInfoForm({
       const form = e.currentTarget;
       const emailInput = form.elements.namedItem("email") as HTMLInputElement;
       const email = emailInput.value;
-      dispatch(changeEmail(email));
+      await updateEmailAsync({ email });
     } catch (error: any) {
       setErrors((prev) => ({ ...prev, email: error.message }));
     }
@@ -62,15 +104,8 @@ function PersonalInfoForm({
     e.preventDefault();
     e.stopPropagation();
     if (!data?.email) return;
-    // console.log("working..");
     try {
-      setEmailLoading(true);
-      const response = await dispatch(sendVerificationMail(data.email));
-      console.log("this verify mail sending response", response);
-      if (response.payload) {
-        toast.success(response.payload.message);
-      }
-      setEmailLoading(false);
+      await sendVerificationAsync({ email: data.email });
     } catch (error) {
       console.log("this verify send mail error  resphsne", error);
     }
@@ -78,12 +113,45 @@ function PersonalInfoForm({
 
   const handleUpdatePassword = async () => {
     try {
-      //   setSuccessMessage("Password updated successfully!");
+      if (!currentPassword) {
+        setErrors((prev) => ({
+          ...prev,
+          currentPassword: "Current password is required",
+        }));
+        return;
+      }
+
+      if (!newPassword) {
+        setErrors((prev) => ({
+          ...prev,
+          password: "New password is required",
+        }));
+        return;
+      }
+
+      if (!confirmPassword) {
+        setErrors((prev) => ({
+          ...prev,
+          cpassword: "Confirm password is required",
+        }));
+        return;
+      }
+
+      const errorsExist =
+        Object.values(errors).filter((val) => val !== "").length > 0;
+      if (errorsExist) return;
+
+      await updatePasswordAsync({
+        currentPassword,
+        password: newPassword,
+      });
       setEditPassword(false);
-      setNewPassword("");
-      setConfirmPassword("");
     } catch (error) {
       console.error("Error updating password:", error);
+    } finally {
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     }
   };
 
@@ -100,7 +168,7 @@ function PersonalInfoForm({
   return (
     <div className="bg-neutral-300 dark:bg-slate-800 shadow-lg rounded-lg p-6 w-full dark:shadow-black">
       {/* Form Header */}
-      {emailLoading ? (
+      {isSendingVerification || isLoading || isUpdatingEmail ? (
         <Skeleton className="h-7 w-56 mb-4" />
       ) : (
         <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
@@ -111,7 +179,7 @@ function PersonalInfoForm({
       <div className="flex-grow space-y-4 w-full">
         {/* Email Section */}
         <form onSubmit={handleUpdateEmail}>
-          {emailLoading ? (
+          {isSendingVerification || isLoading || isUpdatingEmail ? (
             <FieldSkeleton />
           ) : (
             <>
@@ -124,6 +192,11 @@ function PersonalInfoForm({
                   <div className="mt-3 mr-2" onClick={handleVerifynewEmail}>
                     <ButtonLink text="Verify Now" />
                   </div>
+                </div>
+              )}
+              {data && data.is_verified && (
+                <div className="flex justify-end">
+                  <VerifiedBadge />
                 </div>
               )}
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
@@ -177,7 +250,6 @@ function PersonalInfoForm({
             <p className="text-red-500 text-sm mt-1">{errors.email}</p>
           )}
 
-          {/* Verification Button */}
           {editEmail && (
             <div className="mt-2">
               {isLoading ? (
@@ -186,18 +258,21 @@ function PersonalInfoForm({
                 <button
                   type="submit"
                   className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                  disabled={typeof isLoading === "boolean" ? isLoading : false}
+                  disabled={
+                    isLoading || isUpdatingEmail || isSendingVerification
+                  }
                 >
-                  {isLoading ? "Sending..." : "Send Verification"}
+                  {isLoading || isUpdatingEmail
+                    ? "Sending..."
+                    : "Send Verification"}
                 </button>
               )}
             </div>
           )}
         </form>
 
-        {/* Password Section */}
         <div>
-          {isLoading ? (
+          {isLoading || isUpdatingPassword ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between mb-1">
                 <Skeleton className="h-4 w-20" />
@@ -226,21 +301,51 @@ function PersonalInfoForm({
                   ••••••••••••
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {/* New Password Field */}
-                  <div>
-                    <div className="relative w-full">
+                <div className="space-y-4">
+                  {/* Current Password */}
+                  <div className="space-y-1">
+                    <label
+                      htmlFor="currentPassword"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Current Password
+                    </label>
+                    <input
+                      type="password"
+                      name="currentPassword"
+                      placeholder="Current Password"
+                      value={currentPassword}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    {errors.currentPassword && (
+                      <p className="text-red-500 text-sm">
+                        {errors.currentPassword}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* New Password */}
+                  <div className="space-y-1">
+                    <label
+                      htmlFor="password"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      New Password
+                    </label>
+                    <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
+                        name="password"
                         placeholder="New Password"
                         value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                        onChange={handleChange}
                         className="w-full p-2 pr-10 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <button
                         type="button"
                         onClick={() => setshowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-300"
                       >
                         {showPassword ? (
                           <EyeOff size={18} />
@@ -254,32 +359,41 @@ function PersonalInfoForm({
                     )}
                   </div>
 
-                  {/* Confirm Password Field */}
-                  <div>
+                  {/* Confirm New Password */}
+                  <div className="space-y-1">
+                    <label
+                      htmlFor="cpassword"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Confirm New Password
+                    </label>
                     <input
-                      type="text"
+                      type="password"
+                      name="cpassword"
                       placeholder="Confirm New Password"
                       value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onChange={handleChange}
                       className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                    {errors.confirmPassword && (
-                      <p className="text-red-500 text-sm">
-                        {errors.confirmPassword}
-                      </p>
+                    {errors.cpassword && (
+                      <p className="text-red-500 text-sm">{errors.cpassword}</p>
                     )}
                   </div>
 
-                  {/* Update Password Button */}
-                  <div className="mt-2">
+                  {/* Update Button */}
+                  <div className="pt-2">
                     <button
-                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                      onClick={handleUpdatePassword}
-                      disabled={
-                        typeof isLoading === "boolean" ? isLoading : false
-                      }
+                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleUpdatePassword();
+                      }}
+                      disabled={isLoading || isUpdatingPassword}
                     >
-                      {isLoading ? "Updating..." : "Update Password"}
+                      {isLoading || isUpdatingPassword
+                        ? "Updating..."
+                        : "Update Password"}
                     </button>
                   </div>
                 </div>

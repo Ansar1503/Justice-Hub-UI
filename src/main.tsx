@@ -9,7 +9,7 @@ import { store, persistor } from "./Redux/store.ts";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { PersistGate } from "redux-persist/integration/react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
@@ -30,7 +30,7 @@ createRoot(document.getElementById("root")!).render(
                 })
               }
             >
-              <ReactQueryDevtools initialIsOpen={false} />
+              {/* <ReactQueryDevtools initialIsOpen={false} /> */}
               <App />
             </QueryClientProvider>
           </GoogleOAuthProvider>

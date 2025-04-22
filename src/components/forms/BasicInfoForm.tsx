@@ -4,6 +4,7 @@ import { CircleUser } from "lucide-react";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 
 import { clientDataType } from "@/types/types/Client.data.type";
+import { useBasicInfoUpdateMutation } from "@/hooks/tanstack/mutations";
 
 function BasicInfoForm({
   data,
@@ -17,7 +18,7 @@ function BasicInfoForm({
   //   (state) => state.Client
   // );
   // console.log(";datatasd", data);
-  const [basicLoading, setBasicLoading] = useState(false);
+  const { isPending: basicLoading, mutateAsync } = useBasicInfoUpdateMutation();
   // const dispatch = useAppDispatch();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [BasicInfo, setBasicInfo] = useState({
@@ -39,10 +40,6 @@ function BasicInfoForm({
       });
     }
   }, [data]);
-
-  useEffect(() => {
-    setBasicLoading(isLoading);
-  }, [isLoading]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -94,10 +91,10 @@ function BasicInfoForm({
     }));
   };
 
-  function handleBasicInfoUpdate(e: React.FormEvent<HTMLFormElement>) {
+  async function handleBasicInfoUpdate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     e.stopPropagation();
-    console.log("basic info submit working... ");
+    // console.log("basic info submit working... ");
     const form = e.currentTarget;
     const formData = new FormData();
     const fileInput = form.elements.namedItem("image") as HTMLInputElement;
@@ -111,18 +108,15 @@ function BasicInfoForm({
       }));
       return;
     }
-
     formData.append("name", BasicInfo?.name || "");
     formData.append("mobile", BasicInfo?.mobile || "");
     formData.append("dob", BasicInfo?.dob || "");
     formData.append("gender", BasicInfo?.gender || "");
-    setBasicLoading(true);
+    await mutateAsync(formData);
     // dispatch(updateBasicInfo(formData));
-    setBasicLoading(isLoading);
     setIsEditingBasic(false);
   }
 
-  // Skeleton component for form fields
   const FieldSkeleton = () => (
     <div className="space-y-2">
       <Skeleton className="h-4 w-24 mb-1" />
@@ -138,7 +132,7 @@ function BasicInfoForm({
         className="bg-neutral-300 dark:bg-slate-800 shadow-lg dark:shadow-black rounded-lg p-6 w-full"
       >
         <div className="flex justify-between items-center mb-4">
-          {basicLoading ? (
+          {basicLoading || isLoading ? (
             <Skeleton className="h-7 w-48" />
           ) : (
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
@@ -146,7 +140,7 @@ function BasicInfoForm({
             </h2>
           )}
 
-          {basicLoading ? (
+          {basicLoading || isLoading ? (
             <Skeleton className="h-6 w-16" />
           ) : (
             <button
@@ -165,7 +159,7 @@ function BasicInfoForm({
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
           {/* Profile Picture */}
           <div className="relative">
-            {basicLoading ? (
+            {basicLoading || isLoading ? (
               <div className="flex flex-col items-center">
                 <Skeleton className="w-24 h-24 rounded-full" />
               </div>
@@ -178,7 +172,7 @@ function BasicInfoForm({
             ) : (
               <CircleUser className="w-20 h-20" />
             )}
-            {isEditingBasic && !basicLoading && (
+            {isEditingBasic && (!basicLoading || !isLoading) && (
               <>
                 <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-1 cursor-pointer">
                   <svg
@@ -220,7 +214,7 @@ function BasicInfoForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
             {/* Name Field */}
             <div>
-              {basicLoading ? (
+              {basicLoading || isLoading ? (
                 <FieldSkeleton />
               ) : (
                 <>
@@ -244,7 +238,7 @@ function BasicInfoForm({
 
             {/* Phone Number Field */}
             <div>
-              {basicLoading ? (
+              {basicLoading || isLoading ? (
                 <FieldSkeleton />
               ) : (
                 <>
@@ -268,7 +262,7 @@ function BasicInfoForm({
 
             {/* Date of Birth Field */}
             <div>
-              {basicLoading ? (
+              {basicLoading || isLoading ? (
                 <FieldSkeleton />
               ) : (
                 <>
@@ -292,7 +286,7 @@ function BasicInfoForm({
 
             {/* Gender Field */}
             <div>
-              {basicLoading ? (
+              {basicLoading || isLoading ? (
                 <FieldSkeleton />
               ) : (
                 <>
@@ -323,17 +317,15 @@ function BasicInfoForm({
         {/* Save Button */}
         {isEditingBasic && (
           <div className="mt-4 flex justify-end">
-            {basicLoading ? (
+            {basicLoading || isLoading ? (
               <Skeleton className="h-10 w-32 rounded" />
             ) : (
               <button
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                disabled={
-                  typeof basicLoading === "boolean" ? basicLoading : false
-                }
+                disabled={isLoading || basicLoading}
                 type="submit"
               >
-                {basicLoading ? "Saving..." : "Save Changes"}
+                {basicLoading || isLoading ? "Saving..." : "Save Changes"}
               </button>
             )}
           </div>

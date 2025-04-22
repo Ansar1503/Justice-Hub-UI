@@ -1,9 +1,10 @@
-import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
-import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
+// import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
+import { validateAddressFields } from "@/utils/validations/ProfileFormValidation";
 import React, { useEffect, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
-import { useFetchClientData } from "@/hooks/tanstack/queries";
+// import { useFetchClientData } from "@/hooks/tanstack/queries";
 import { clientDataType } from "@/types/types/Client.data.type";
+import { useUpdateAddressMutation } from "@/hooks/tanstack/mutations";
 
 function AddressInfoForm({
   data,
@@ -12,12 +13,9 @@ function AddressInfoForm({
   data: clientDataType;
   isLoading: boolean;
 }) {
-  // const { client: clientData, loading } = useAppSelector(
-  //   (state) => state.Client
-  // );
-
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { isPending, mutateAsync } = useUpdateAddressMutation();
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [address, setAddress] = useState({
     state: data?.address?.state || "",
@@ -34,6 +32,7 @@ function AddressInfoForm({
         locality: data.address?.locality || "",
         pincode: data.address?.pincode || "",
       });
+      // console.log("address fetche", address);  
     }
   }, [data]);
 
@@ -44,8 +43,8 @@ function AddressInfoForm({
     const { name, value } = e.target;
 
     setAddress((prev) => ({ ...prev, [name]: value }));
-
-    const validationError = ValidateProfileFields(name, value);
+    const validationError = validateAddressFields(name, value);
+    console.log(validationError);
     setErrors((prev) => ({
       ...prev,
       [name]: validationError,
@@ -53,15 +52,12 @@ function AddressInfoForm({
   };
 
   const handleUpdateAddress = async () => {
-    // if (!validateForm("address")) return;
     try {
-      console.log("Updating address:", address);
-      //   setSuccessMessage("Address updated successfully!");
-      setIsEditingAddress(false);
+      await mutateAsync(address);
     } catch (error) {
       console.error("Error updating address:", error);
     } finally {
-      //   setTimeout(() => setSuccessMessage(""), 3000);
+      setIsEditingAddress(false);
     }
   };
 
@@ -75,7 +71,7 @@ function AddressInfoForm({
   return (
     <div className="bg-neutral-300 dark:bg-slate-800 shadow-lg rounded-lg p-6 w-full dark:shadow-black">
       <div className="flex justify-between items-center mb-4">
-        {isLoading ? (
+        {isLoading || isPending ? (
           <>
             <Skeleton className="h-7 w-48" />
             <Skeleton className="h-6 w-16" />
@@ -142,7 +138,7 @@ function AddressInfoForm({
         </div>
 
         <div>
-          {isLoading ? (
+          {isLoading || isPending ? (
             <FieldSkeleton />
           ) : (
             <>
@@ -165,7 +161,7 @@ function AddressInfoForm({
         </div>
 
         <div>
-          {isLoading ? (
+          {isLoading || isPending ? (
             <FieldSkeleton />
           ) : (
             <>

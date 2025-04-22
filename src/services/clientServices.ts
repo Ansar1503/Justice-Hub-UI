@@ -1,4 +1,7 @@
+import { EmailUpdateResponse } from "@/hooks/tanstack/mutations";
 import { store } from "@/Redux/store";
+import { AddressType } from "@/types/types/Client.data.type";
+import { BasicUpdateResponse } from "@/types/types/LoginResponseTypes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 
 export async function fetchClientData() {
@@ -9,5 +12,74 @@ export async function fetchClientData() {
       Authorization: `Bearer ${token}`,
     },
   });
+  return response.data;
+}
+
+export async function updateBasicInfo(
+  basicInfo: FormData
+): Promise<BasicUpdateResponse> {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.put(
+    "/api/client/profile/basic/",
+    basicInfo,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+}
+
+export async function updateEmail(payload: {
+  email: string;
+}): Promise<EmailUpdateResponse> {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.put(
+    "/api/client/profile/personal",
+    payload,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function sendVerificationMail(payload: { email: string }) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    "/api/client/profile/verifyMail",
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+}
+
+export async function updatePassword(payload: {
+  password: string;
+  currentPassword: string;
+}) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.put(
+    "/api/client/profile/updatePassword",
+    payload,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function updateAddress(payload: AddressType) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    "api/client/profile/address",
+    payload,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
   return response.data;
 }

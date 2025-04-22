@@ -1,5 +1,4 @@
-import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import BasicInfoForm from "./forms/BasicInfoForm";
 import PersonalInfoForm from "./forms/PersonalInfoForm";
 import AddressInfoForm from "./forms/AddressInfoForm";
@@ -10,6 +9,7 @@ function ProfileCard() {
   // console.log("loading", loading);
   const [successMessage, setSuccessMessage] = useState("");
   const { data, isLoading } = useFetchClientData();
+  console.log("data fetched", data);
 
   return (
     <div className="flex flex-col gap-6 w-full">
