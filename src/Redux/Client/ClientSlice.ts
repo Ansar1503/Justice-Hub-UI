@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface ClentState {
   client: clientDataType | null;
-  loading: Boolean;
+  loading: boolean;
   error: string | null;
 }
 

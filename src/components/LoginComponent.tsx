@@ -1,12 +1,12 @@
-import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
+// import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
 import { validateSigninField } from "@/utils/validations/SigninFormValidation";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
 import { motion } from "framer-motion";
 import { useLoginMutation } from "@/hooks/tanstack/mutations";
-import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
+// import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
 
 function LoginComponent() {
   const navigate = useNavigate();
@@ -24,17 +24,9 @@ function LoginComponent() {
       [name]: validateSigninField(name, value),
     }));
   }
-  const {
-    data,
-    isPending,
-    isError,
-    error,
-    failureReason,
-    isSuccess,
-    mutateAsync,
-  } = useLoginMutation();
+  const { isPending, isError, error, mutateAsync } = useLoginMutation();
 
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     e.stopPropagation();
@@ -56,8 +48,8 @@ function LoginComponent() {
 
       try {
         await mutateAsync(postData);
-      } catch (error: any) {
-        
+      } catch (error) {
+        console.log("error while login", error);
       }
     }
   }

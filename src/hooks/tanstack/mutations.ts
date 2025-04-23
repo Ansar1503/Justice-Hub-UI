@@ -16,10 +16,11 @@ import {
   ResponseType,
 } from "@/types/types/LoginResponseTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export function useLoginMutation() {
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   return useMutation<LoginResponse, Error, LoginPayload>({
     mutationFn: loginUser,
@@ -28,7 +29,7 @@ export function useLoginMutation() {
       dispatch(setUser(data.user));
       dispatch(setToken(data.token));
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["client"] });
+      navigate(`/${data.user.role}`);
     },
     onError: (error: any) => {
       const message =

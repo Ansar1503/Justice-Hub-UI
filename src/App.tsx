@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import UserRoutes from "./Routes/user_routes/UserRoutes";
+import UserRoutes from "./Routes/user_routes/User.Routes";
 import { Bounce, ToastContainer } from "react-toastify";
 import { useContext } from "react";
 import { ThemeContext } from "./context/ThemeProvider";
