@@ -8,10 +8,11 @@ import { ButtonLink } from "../ui/custom/ButtonLink";
 import { clientDataType } from "@/types/types/Client.data.type";
 import { VerifiedBadge } from "../ui/custom/VerifiedBadge";
 import {
-  usesendVerificationMailMutation,
+  useSendVerificationMailMutation,
   useUpdateEmailMutation,
   useUpdatePasswordMutation,
 } from "@/hooks/tanstack/mutations";
+
 
 function PersonalInfoForm({
   data,
@@ -43,7 +44,7 @@ function PersonalInfoForm({
   const {
     isPending: isSendingVerification,
     mutateAsync: sendVerificationAsync,
-  } = usesendVerificationMailMutation();
+  } = useSendVerificationMailMutation();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();

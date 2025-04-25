@@ -1,4 +1,4 @@
-import EmailVerificationError from "../../components/EmailValidationError";
+import EmailVerificationError from "../../components/users/EmailValidationError";
 import Navbar from "@/layout/client/Navbar";
 import Footer from "@/layout/client/Footer";
 

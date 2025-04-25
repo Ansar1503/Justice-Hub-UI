@@ -42,6 +42,7 @@ export default function EmailVerificationError() {
       alert("Verification email resent successfully!");
     } catch (error) {
       alert("Failed to resend email. Please try again.");
+      console.log('error in resending email', error);
     }
     setLoading(false);
   };

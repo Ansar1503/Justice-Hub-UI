@@ -13,6 +13,8 @@ function PublicRoute() {
       return <Navigate to="/client/" />;
     case "lawyer":
       return <Navigate to="/lawyer/" />;
+    case "admin":
+      return <Navigate to="/admin/" />;
     default:
       return <Navigate to="/login" />;
   }

@@ -1,4 +1,4 @@
-import ProfileCard from "@/components/ProfileCard";
+import ProfileCard from "@/components/users/ProfileCard";
 import Footer from "@/layout/client/Footer";
 import Navbar from "@/layout/client/Navbar";
 import Sidebar from "@/layout/client/Sidebar";

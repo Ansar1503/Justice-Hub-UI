@@ -1,5 +1,6 @@
-import { Card, CardContent } from "./ui/card";
-import { Button } from "./ui/button";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Card, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import axiosinstance from "@/utils/api/axios/axios.instance";
@@ -90,8 +91,8 @@ function OtpVerification() {
       inputRefs.current[0]?.focus();
       setResendTimer(60);
       setLoading(false);
-    } catch (error:any) {
-      setLoading(false);;
+    } catch (error: any) {
+      setLoading(false);
       if (error.code === "ERR_NETWORK") {
         toast.error(error.message);
       } else if (error.response) {
@@ -115,7 +116,7 @@ function OtpVerification() {
         toast.success(response.data?.message);
         setLoading(false);
         navigate("/login");
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error);
         if (error.response) {
           if (error.response.data) {

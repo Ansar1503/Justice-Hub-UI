@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
 import { useAppDispatch } from "@/Redux/Hook";
-import { loginUser } from "@/services/AuthServices";
+import { loginUser } from "@/services/UserServices";
 import {
   sendVerificationMail,
   updateAddress,
@@ -29,7 +30,7 @@ export function useLoginMutation() {
       dispatch(setUser(data.user));
       dispatch(setToken(data.token));
       toast.success(data.message);
-      navigate(`/${data.user.role}`);
+      navigate(`/${data.user.role}/`);
     },
     onError: (error: any) => {
       const message =
@@ -57,7 +58,7 @@ export function useBasicInfoUpdateMutation() {
   });
 }
 
-export interface EmailUpdateResponse extends Omit<LoginResponse, "token"> {}
+export type EmailUpdateResponse = Omit<LoginResponse, "token">
 
 export function useUpdateEmailMutation() {
   const queryClient = useQueryClient();
@@ -76,7 +77,7 @@ export function useUpdateEmailMutation() {
   });
 }
 
-export function usesendVerificationMailMutation() {
+export function useSendVerificationMailMutation() {
   const queryClient = useQueryClient();
   return useMutation<ResponseType, Error, { email: string }>({
     mutationFn: sendVerificationMail,

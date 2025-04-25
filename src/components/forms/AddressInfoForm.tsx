@@ -44,7 +44,7 @@ function AddressInfoForm({
 
     setAddress((prev) => ({ ...prev, [name]: value }));
     const validationError = validateAddressFields(name, value);
-    console.log(validationError);
+    // console.log(validationError);
     setErrors((prev) => ({
       ...prev,
       [name]: validationError,

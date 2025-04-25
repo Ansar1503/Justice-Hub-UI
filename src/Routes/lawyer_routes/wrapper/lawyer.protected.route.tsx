@@ -11,6 +11,8 @@ export default function LawyerProtected() {
       return <Outlet />;
     case "client":
       return <Navigate to="/client/" />;
+    case "admin":
+      return <Navigate to="/admin/" />;
     default:
       return <Navigate to="/login" />;
   }

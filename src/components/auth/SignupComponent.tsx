@@ -2,11 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import classNames from "classnames";
 import { motion } from "framer-motion";
-import { UserEnum } from "../types/enums/user.enums";
-import { AuthContext } from "../context/AuthContextPovider";
+import { UserEnum } from "../../types/enums/user.enums";
+import { AuthContext } from "../../context/AuthContextPovider";
 import { useLocation, useNavigate } from "react-router-dom";
-import { validateSignupField } from "../utils/validations/SignupFormValidation";
-import axiosinstance from "../utils/api/axios/axios.instance";
+import { validateSignupField } from "../../utils/validations/SignupFormValidation";
+import axiosinstance from "../../utils/api/axios/axios.instance";
 import { toast } from "react-toastify";
 
 function SignupComponent() {
