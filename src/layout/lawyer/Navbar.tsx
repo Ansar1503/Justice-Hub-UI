@@ -106,7 +106,7 @@ function Navbar() {
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        // handleLogout();
+                        handleLogout();
                       }}
                       className="flex items-center w-full px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-white"
                     >
@@ -203,7 +203,6 @@ function Navbar() {
                       e.stopPropagation()
                       setIsDropdownOpen(false);
                       setIsOpen(false);
-                      console.log('/navigating to /lawyer/')
                       navigate("/lawyer/");
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-white"

@@ -1,26 +1,16 @@
-import { CalendarSync, ShieldAlert, User, UserPen, Wallet } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import {  User, UserPen } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "@/Redux/Hook";
+import { useLocation, Link } from "react-router-dom";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const user = useAppSelector((state) => state.Auth.user);
+  const location = useLocation(); // Get the current location
+
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
-    { path: `/${user?.role}/sessions`, label: "Sessions", icon: CalendarSync },
-    { path: `/${user?.role}/wallet`, label: "Wallet", icon: Wallet },
-    {
-      path: `/${user?.role}/disputes`,
-      label: "My Disputes",
-      icon: ShieldAlert,
-    },
-    {
-      path: `/${user?.role}/something`,
-      label: "Something",
-      icon: CalendarSync,
-    },
-    { path: `/${user?.role}/saved-cards`, label: "Saved Cards", icon: Wallet },
+    // { path: `/${user?.role}/verification`, label: "Verification", icon: ShieldCheck },
   ];
 
   return (
@@ -80,7 +70,7 @@ export default function Sidebar() {
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
           <User className="w-6 h-6 text-gray-600 dark:text-gray-300" />
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Ansar M A
+            {user?.name || "User Name"}
           </h2>
         </div>
 
@@ -89,37 +79,31 @@ export default function Sidebar() {
           <ul className="space-y-2">
             {menuItems.map((item) => (
               <li key={item.path}>
-                <NavLink
+                <Link
                   to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-2 rounded transition ${
-                      isActive
-                        ? "bg-gray-600 text-white"
-                        : "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-300"
-                    }`
-                  }
+                  className={`flex items-center gap-3 px-4 py-2 rounded transition ${
+                    location.pathname === item.path
+                      ? "bg-gray-600 text-white"
+                      : "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-300"
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
-                  {({ isActive }) => (
-                    <>
-                      <item.icon
-                        className={`w-5 h-5 ${
-                          isActive
-                            ? "text-white"
-                            : "text-gray-600 dark:text-gray-300"
-                        }`}
-                      />
-                      {item.label}
-                    </>
-                  )}
-                </NavLink>
+                  <item.icon
+                    className={`w-5 h-5 ${
+                      location.pathname === item.path
+                        ? "text-white"
+                        : "text-gray-600 dark:text-gray-300"
+                    }`}
+                  />
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>
         </nav>
       </aside>
 
-      {/* Overlay for mobile when sidebar is open */}
+
       {isOpen && (
         <div
           className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-10"

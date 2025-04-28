@@ -24,9 +24,29 @@ export type clientDataType = {
   role?: UserEnum;
   gender?: Gender;
   is_blocked?: boolean;
-  created_at?: Date;
-  updated_at?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
+
+interface LawyerDocuments {
+  user_id: string;
+  enrollment_certificate: string;
+  certificate_of_practice: string;
+  bar_council_certificate: string;
+}
+export interface LawerDataType extends clientDataType {
+  user_id: string;
+  description?: string;
+  bar_council_number: string;
+  enrollment_certificate_number: string;
+  certificate_of_practice_number: string;
+  verification_status: "verified" | "rejected" | "pending";
+  practice_areas: string[];
+  experience: number;
+  specialisation: string[];
+  consultation_fee: number;
+  documents: LawyerDocuments;
+}
 
 export type AddressType = {
   state?: string;

@@ -125,8 +125,8 @@ function BasicInfoForm({
   );
 
   return (
+    
     <>
-      {/* First Card - Basic Profile Info */}
       <form
         onSubmit={handleBasicInfoUpdate}
         className="bg-neutral-300 dark:bg-slate-800 shadow-lg dark:shadow-black rounded-lg p-6 w-full"

@@ -96,6 +96,8 @@ function PersonalInfoForm({
       const emailInput = form.elements.namedItem("email") as HTMLInputElement;
       const email = emailInput.value;
       await updateEmailAsync({ email });
+      
+      setEditEmail(false);
     } catch (error: any) {
       setErrors((prev) => ({ ...prev, email: error.message }));
     }

@@ -14,7 +14,6 @@ import ClientRoutes from "./Client.Routes";
 import LawyerRoutes from "../lawyer_routes/lawyer.routes";
 import PublicRoute from "./wrapper/Client.Public.Route";
 // import { VerificationModal } from "@/components/Modals/Verification.Modal";
-import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminRoutes from "../admin_routes/Admin.Routes";
 
 function UserRoutes() {
@@ -35,7 +34,6 @@ function UserRoutes() {
       </Route>
 
       <Route path="/" element={<Home />} />
-      <Route path="/sample/" element={<AdminDashboard />} />
 
       <Route path="/client/*" element={<ClientRoutes />} />
 

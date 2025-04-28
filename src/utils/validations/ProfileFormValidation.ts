@@ -6,29 +6,29 @@ export function ValidateProfileFields(field: string, value: string) {
       return "";
 
     case "email":
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      { const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!value.trim()) return "Email is required";
       if (!emailRegex.test(value)) return "Invalid email format";
-      return "";
+      return ""; }
 
     case "mobile":
-      const phoneRegex = /^[0-9]{10}$/;
+      { const phoneRegex = /^[0-9]{10}$/;
       if (!value.trim()) return "Phone number is required";
       if (!phoneRegex.test(value)) return "Enter a valid 10-digit phone number";
-      return "";
+      return ""; }
 
     case "password":
-      const passwordRegex =
+      { const passwordRegex =
         /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
       if (!value.trim()) return "Password is required";
       if (value.length < 8)
         return "Password must be at least 8 characters long";
       if (!passwordRegex.test(value))
         return "Password must include a number and a special character";
-      return "";
+      return ""; }
 
     case "dob":
-      if (!value.trim()) return "";
+      { if (!value.trim()) return "";
       const selectedDate = new Date(value);
       const today = new Date();
 
@@ -44,7 +44,7 @@ export function ValidateProfileFields(field: string, value: string) {
 
       if (age < 18) return "You must be at least 18 years old";
 
-      return "";
+      return ""; }
 
     default:
       return "";

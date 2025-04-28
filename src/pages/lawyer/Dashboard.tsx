@@ -4,7 +4,6 @@ import Navbar from "@/layout/lawyer/Navbar";
 import Sidebar from "@/layout/lawyer/Sidebar";
 
 function LawyerDashboard() {
-    console.log('lawyers dashboard')
   return (
     <div className="bg-[#FFF2F2] dark:bg-slate-700 min-h-screen flex flex-col">
       <Navbar />

@@ -9,12 +9,17 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 
-export function VerificationModal() {
+interface VerificationModalProps {
+  setVerificationModal: (open: boolean) => void;
+}
+
+export function VerificationModal({  setVerificationModal }: VerificationModalProps) {
   const [isopen, setIsOpen] = useState(false);
 
   useEffect(() => {
     setIsOpen(true);
   }, []);
+
 
   return (
     <Dialog open={isopen} onOpenChange={setIsOpen}>
@@ -24,7 +29,8 @@ export function VerificationModal() {
             Verify Your Account
           </DialogTitle>
           <DialogDescription className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Please verify your account to continue using our services. This step ensures the security of your account.
+            Please complete the verification process to continue using our
+            services.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex justify-end space-x-4 mt-4">
@@ -38,8 +44,14 @@ export function VerificationModal() {
           <Button
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-black dark:hover:bg-gray-900"
             type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOpen(false);
+              setVerificationModal(true)
+            }}
           >
-            Verify Now 
+            Verify Now
           </Button>
         </DialogFooter>
       </DialogContent>

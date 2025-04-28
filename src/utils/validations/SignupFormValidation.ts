@@ -6,23 +6,23 @@ export function validateSignupField(field: string, value: string, password?: str
         return "";
   
       case "email":
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        { const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!value.trim()) return "Email is required";
         if (!emailRegex.test(value)) return "Invalid email format";
-        return "";
+        return ""; }
   
       case "mobile":
-        const phoneRegex = /^[0-9]{10}$/; 
+        { const phoneRegex = /^[0-9]{10}$/; 
         if (!value.trim()) return "Phone number is required";
         if (!phoneRegex.test(value)) return "Enter a valid 10-digit phone number";
-        return "";
+        return ""; }
   
       case "password":
-        const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+        { const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
         if (!value.trim()) return "Password is required";
         if (value.length < 8) return "Password must be at least 8 characters long";
         if (!passwordRegex.test(value)) return "Password must include a number and a special character";
-        return "";
+        return ""; }
   
       case "cpassword":
         if (!value.trim()) return "Confirm password is required";

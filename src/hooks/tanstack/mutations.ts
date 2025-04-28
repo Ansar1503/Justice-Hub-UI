@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
 import { useAppDispatch } from "@/Redux/Hook";
+import { LawyerVerification } from "@/services/LawyerServices";
 import { loginUser } from "@/services/UserServices";
+import { blockUser } from "@/services/adminServices";
 import {
   sendVerificationMail,
   updateAddress,
@@ -58,7 +60,7 @@ export function useBasicInfoUpdateMutation() {
   });
 }
 
-export type EmailUpdateResponse = Omit<LoginResponse, "token">
+export type EmailUpdateResponse = Omit<LoginResponse, "token">;
 
 export function useUpdateEmailMutation() {
   const queryClient = useQueryClient();
@@ -121,11 +123,50 @@ export function useUpdateAddressMutation() {
     mutationFn: updateAddress,
     onSuccess: (data) => {
       toast.success(data.message);
-      queryClient.cancelQueries({ queryKey: ["client"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (error: any) => {
       const message =
         error.response?.data?.message || "update failed! Try again.";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useBlockUser() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ResponseType & { data: { role: "admin" | "client" | "lawyer" } },
+    Error,
+    string
+  >({
+    mutationFn: (user_id) => blockUser(user_id),
+    onSuccess: (data) => {
+      toast.success(data.message);
+      const role = data.data.role;
+      queryClient.invalidateQueries({ queryKey: ["user", role] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message || "user Block failed! Try again";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useLawyerVerification() {
+  const queryClient = useQueryClient();
+  return useMutation<ResponseType, Error, any>({
+    mutationFn: (formData) => LawyerVerification(formData),
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message || "lawyer verification failed!";
       error.message = message;
       toast.error(message);
     },
