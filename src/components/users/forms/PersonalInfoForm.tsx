@@ -2,11 +2,11 @@
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
-import { Skeleton } from "../ui/skeleton";
-import { AlertDestructive } from "../ui/custom/AlertDestructive";
-import { ButtonLink } from "../ui/custom/ButtonLink";
+import { Skeleton } from "../../ui/skeleton";
+import { AlertDestructive } from "../../ui/custom/AlertDestructive";
+import { ButtonLink } from "../../ui/custom/ButtonLink";
 import { clientDataType } from "@/types/types/Client.data.type";
-import { VerifiedBadge } from "../ui/custom/VerifiedBadge";
+import { VerifiedBadge } from "../../ui/custom/VerifiedBadge";
 import {
   useSendVerificationMailMutation,
   useUpdateEmailMutation,

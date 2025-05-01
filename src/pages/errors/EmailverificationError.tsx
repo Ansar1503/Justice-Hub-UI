@@ -1,6 +1,6 @@
 import EmailVerificationError from "../../components/users/EmailValidationError";
-import Navbar from "@/layout/client/Navbar";
-import Footer from "@/layout/client/Footer";
+import Navbar from "@/pages/client/layout/Navbar";
+import Footer from "@/pages/client/layout/Footer";
 
 function EmailverificationError() {
   return (

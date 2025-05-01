@@ -1,7 +1,7 @@
 import ProfileCard from "@/components/users/ProfileCard";
-import Footer from "@/layout/client/Footer";
-import Navbar from "@/layout/client/Navbar";
-import Sidebar from "@/layout/client/Sidebar";
+import Footer from "@/pages/client/layout/Footer";
+import Navbar from "@/pages/client/layout/Navbar";
+import Sidebar from "@/pages/client/layout/Sidebar";
 
 function ClientProfile() {
   return (

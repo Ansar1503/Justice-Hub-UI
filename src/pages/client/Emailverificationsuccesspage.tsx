@@ -1,6 +1,6 @@
 import EmailVerificationSuccess from "@/components/users/EmailVerficationSuccess";
-import Footer from "../../layout/client/Footer";
-import Navbar from "../../layout/client/Navbar";
+import Footer from "./layout/Footer";
+import Navbar from "./layout/Navbar";
 
 function Emailverificationsuccesspage() {
   return (

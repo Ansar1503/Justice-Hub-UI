@@ -37,10 +37,10 @@ interface LawyerDocuments {
 export interface LawerDataType extends clientDataType {
   user_id: string;
   description?: string;
-  bar_council_number: string;
+  barcouncil_number: string;
   enrollment_certificate_number: string;
   certificate_of_practice_number: string;
-  verification_status: "verified" | "rejected" | "pending";
+  verification_status: "verified" | "rejected" | "pending" | "requested";
   practice_areas: string[];
   experience: number;
   specialisation: string[];

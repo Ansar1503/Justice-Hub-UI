@@ -1,7 +1,7 @@
 import ProfileCard from "@/components/users/ProfileCard";
-import Footer from "@/layout/lawyer/Footer";
-import Navbar from "@/layout/lawyer/Navbar";
-import Sidebar from "@/layout/lawyer/Sidebar";
+import Footer from "@/pages/lawyer/layout/Footer";
+import Navbar from "@/pages/lawyer/layout/Navbar";
+import Sidebar from "@/pages/lawyer/layout/Sidebar";
 
 function LawyerDashboard() {
   return (

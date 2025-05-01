@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/layout/admin/app-sidebar";
+import { AppSidebar } from "@/pages/admin/layout/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,7 +18,7 @@ import { ThemeContext } from "@/context/ThemeProvider";
 import { ThemeEnum } from "@/types/enums/theme_enum";
 import { useLocation, Link } from "react-router-dom";
 import { Moon, Sun } from "lucide-react";
-import {LawyersList} from "@/components/admin/LawyersList";
+import { LawyersList } from "@/components/admin/LawyersList";
 
 function LawyerVerification() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -70,7 +70,6 @@ function LawyerVerification() {
                 <BreadcrumbList>{breadcrumbs}</BreadcrumbList>
               </Breadcrumb>
             </div>
-            {/* Dark/Light Mode Toggle Button */}
             <button
               onClick={toggleDarkMode}
               className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600"

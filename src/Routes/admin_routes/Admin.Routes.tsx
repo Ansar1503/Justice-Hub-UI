@@ -1,7 +1,9 @@
-import AdminDashboard from "@/pages/admin/Dashboard";
+import { lazy } from "react";
+
+const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 import { Route, Routes } from "react-router-dom";
 import { Protected } from "./wrapper/admin.protect.route";
-import LawyerVerfication from "@/pages/admin/VerificationInputs";
+const LawyerVerfication = lazy(() => import("@/pages/admin/VerificationInputs"));
 
 function AdminRoutes() {
   return (

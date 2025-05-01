@@ -25,11 +25,11 @@ export async function fetchAllLawyers() {
   return response.data;
 }
 
-export async function blockUser(user_id:string) {
+export async function blockUser(user_id: string) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.patch(
     "/api/admin/user/",
-    {user_id},
+    { user_id },
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -38,3 +38,14 @@ export async function blockUser(user_id:string) {
   );
   return response.data;
 }
+
+export async function changeLawyerVerificationStatus({user_id,status}:{user_id: string;status:"verified" | "rejected" | "pending" | "requested"}) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    "/api/admin/lawyer/",
+    { user_id,status },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+

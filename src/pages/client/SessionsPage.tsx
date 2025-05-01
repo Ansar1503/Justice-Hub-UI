@@ -1,6 +1,6 @@
-import Footer from "@/layout/client/Footer";
-import Navbar from "@/layout/client/Navbar";
-import Sidebar from "@/layout/client/Sidebar";
+import Footer from "@/pages/client/layout/Footer";
+import Navbar from "@/pages/client/layout/Navbar";
+import Sidebar from "@/pages/client/layout/Sidebar";
 
 function SessionsPage() {
   return (
@@ -8,6 +8,7 @@ function SessionsPage() {
       <div className="bg-[#FFF2F2] dark:bg-slate-700">
         <Navbar />
         <Sidebar />
+        
         <Footer />
       </div>
     </>

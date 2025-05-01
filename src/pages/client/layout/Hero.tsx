@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { UserEnum } from "../../types/enums/user.enums";
+import { UserEnum } from "../../../types/enums/user.enums";
 import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContextPovider";
+import { AuthContext } from "../../../context/AuthContextPovider";
 
 function Hero() {
   const navigate = useNavigate();

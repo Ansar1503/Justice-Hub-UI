@@ -1,6 +1,6 @@
-import Footer from "../../layout/client/Footer";
-import Hero from "../../layout/client/Hero";
-import Navbar from "../../layout/client/Navbar";
+import Footer from "./layout/Footer";
+import Hero from "./layout/Hero";
+import Navbar from "./layout/Navbar";
 
 function Home() {
   return (

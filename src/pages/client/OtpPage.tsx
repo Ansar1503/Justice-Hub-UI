@@ -1,6 +1,6 @@
 import OtpVerification from "@/components/users/OtpVerification";
-import Footer from "@/layout/client/Footer";
-import Navbar from "@/layout/client/Navbar";
+import Footer from "@/pages/client/layout/Footer";
+import Navbar from "@/pages/client/layout/Navbar";
 
 function OtpPage() {
   return (

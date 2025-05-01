@@ -1,5 +1,4 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
-import { ThemeType } from "../types/types/ThemeConext.type";
+import { createContext, ReactNode, useEffect, useState } from "react";import { ThemeType } from "../types/types/ThemeConext.type";
 import { ThemeEnum } from "../types/enums/theme_enum";
 
 export const ThemeContext = createContext<ThemeType>({

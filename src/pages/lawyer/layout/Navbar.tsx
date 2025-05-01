@@ -1,11 +1,10 @@
-"use client";
 
 import { useContext, useState } from "react";
-import { ThemeContext } from "../../context/ThemeProvider";
+import { ThemeContext } from "../../../context/ThemeProvider";
 import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
-import { AuthContext } from "../../context/AuthContextPovider";
+import { AuthContext } from "../../../context/AuthContextPovider";
 import { useNavigate } from "react-router-dom";
-import { UserEnum } from "../../types/enums/user.enums";
+import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
 import { LogOut } from "@/Redux/Client/ClientSlice";
 import { signOut } from "@/Redux/Auth/Auth.Slice";
@@ -17,6 +16,7 @@ function Navbar() {
   const { setUserRole } = useContext(AuthContext);
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.Auth.user);
+  
   const dispatch = useAppDispatch();
   const handleLogout = () => {
     dispatch(LogOut());
@@ -96,7 +96,7 @@ function Navbar() {
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        navigate("/client");
+                        navigate("/lawyer/");
                       }}
                       className="flex items-center w-full px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-white"
                     >
@@ -198,10 +198,12 @@ function Navbar() {
                     </p>
                   </div>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
                       setIsDropdownOpen(false);
                       setIsOpen(false);
-                      navigate("/client");
+                      navigate("/lawyer/");
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-white"
                   >

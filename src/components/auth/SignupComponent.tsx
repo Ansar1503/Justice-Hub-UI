@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import classNames from "classnames";
 import { motion } from "framer-motion";
 import { UserEnum } from "../../types/enums/user.enums";
@@ -8,6 +7,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { validateSignupField } from "../../utils/validations/SignupFormValidation";
 import axiosinstance from "../../utils/api/axios/axios.instance";
 import { toast } from "react-toastify";
+import { useGoogleLogin } from "@react-oauth/google";
+import { Button } from "../ui/button";
+import { useGoogleSignupMutation } from "@/hooks/tanstack/mutations";
 
 function SignupComponent() {
   const location = useLocation();
@@ -35,6 +37,7 @@ function SignupComponent() {
     }));
   }, [userRole]);
   const [validation, setValidation] = useState<Record<string, string>>({});
+  const { mutateAsync } = useGoogleSignupMutation();
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -46,6 +49,13 @@ function SignupComponent() {
       [name]: validateSignupField(name, value, signupData.password),
     }));
   }
+
+  const googleSign = useGoogleLogin({
+    flow: "auth-code",
+    onSuccess: async (res) => {
+      await mutateAsync({ code: res.code, role: userRole === UserEnum.lawyer ? "lawyer" : "client" });
+    },
+  });
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -251,12 +261,29 @@ function SignupComponent() {
           <div className="border-t border-gray-300 dark:border-gray-600 w-full"></div>
         </div>
 
-        <button className="w-full flex items-center justify-center gap-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition">
-          <FcGoogle size={20} />
-          <span className="text-gray-700 dark:text-gray-300 font-medium">
-            Sign up with Google
-          </span>
-        </button>
+        {/* <GoogleLogin
+          theme="filled_blue"
+          shape="pill"
+          onSuccess={(credentialResponse) => {
+            if (credentialResponse) {
+              console.log(credentialResponse);
+            }
+          }}
+          onError={() => {
+            console.log("error occured");
+          }}
+        /> */}
+        <Button
+          onClick={() => googleSign()}
+          className="w-full bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 flex items-center justify-center gap-2 shadow-sm"
+        >
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google logo"
+            className="w-5 h-5"
+          />
+          <span>Sign in with Google</span>
+        </Button>
 
         {/* Bottom Links */}
         <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">

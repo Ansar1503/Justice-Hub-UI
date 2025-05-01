@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "../../ui/skeleton";
 import { CircleUser } from "lucide-react";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 

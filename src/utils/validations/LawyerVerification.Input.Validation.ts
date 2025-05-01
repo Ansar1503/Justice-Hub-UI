@@ -7,7 +7,7 @@ export default function VerificationInputs(field: string, value: any) {
       return "";
     }
 
-    case "bar_council_number": {
+    case "barcouncil_number": {
       if (!value.trim()) return "Bar council number is required";
       if (value.length < 5) return "Bar council number must be at least 5 characters long";
       if (value.length > 20) return "Bar council number must not exceed 20 characters";
@@ -17,13 +17,11 @@ export default function VerificationInputs(field: string, value: any) {
     case "barcouncilid": {
       if (!value) return "Bar council ID document is required";
       
-      // Check file type for barcouncilid
       if (value instanceof File) {
         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
         if (!allowedTypes.includes(value.type)) {
           return "Only PDF or image files (JPEG, PNG) are allowed";
         }
-        // Check file size (max 5MB)
         if (value.size > 5 * 1024 * 1024) {
           return "File size should not exceed 5MB";
         }
@@ -41,13 +39,11 @@ export default function VerificationInputs(field: string, value: any) {
     case "enrollment_certificate": {
       if (!value) return "Enrollment certificate document is required";
       
-      // Check file type for enrollment certificate
       if (value instanceof File) {
         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
         if (!allowedTypes.includes(value.type)) {
           return "Only PDF or image files (JPEG, PNG) are allowed";
         }
-        // Check file size (max 5MB)
         if (value.size > 5 * 1024 * 1024) {
           return "File size should not exceed 5MB";
         }
@@ -65,13 +61,11 @@ export default function VerificationInputs(field: string, value: any) {
     case "certificate_of_practice": {
       if (!value) return "Certificate of practice document is required";
       
-      // Check file type for certificate of practice
       if (value instanceof File) {
         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
         if (!allowedTypes.includes(value.type)) {
           return "Only PDF or image files (JPEG, PNG) are allowed";
         }
-        // Check file size (max 5MB)
         if (value.size > 5 * 1024 * 1024) {
           return "File size should not exceed 5MB";
         }

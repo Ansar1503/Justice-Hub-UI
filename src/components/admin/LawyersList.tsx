@@ -9,6 +9,9 @@ import {
   AlertCircle,
   Eye,
   ArrowUpDown,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LawyerVerificationModal } from "../Modals/LawyerVerification.Modal";
+import { LawyerVerificationModal } from "./Modals/LawyerVerification.Modal";
 import { LawerDataType } from "@/types/types/Client.data.type";
 import { useFetchAllLawyers } from "@/hooks/tanstack/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,12 +55,14 @@ export function LawyersList() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   useEffect(() => {
     if (data?.data) {
       setLawyers(data.data);
     }
   }, [data]);
-
+  // console.log("data.data", data?.data);
   const filteredLawyers = lawyers.filter((lawyer) => {
     const matchesSearch =
       lawyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -84,7 +89,8 @@ export function LawyersList() {
         break;
       case "joined":
         comparison =
-          new Date(a.createdAt || "").getTime() - new Date(b.createdAt || "").getTime();
+          new Date(a.createdAt || "").getTime() -
+          new Date(b.createdAt || "").getTime();
         break;
       default:
         comparison = a.name.localeCompare(b.name);
@@ -93,6 +99,12 @@ export function LawyersList() {
     return sortOrder === "asc" ? comparison : -comparison;
   });
 
+  const totalItems = sortedLawyers.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedLawyers = sortedLawyers.slice(startIndex, endIndex);
+
   const handleSort = (field: string) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -100,6 +112,7 @@ export function LawyersList() {
       setSortBy(field);
       setSortOrder("asc");
     }
+    setCurrentPage(1);
   };
 
   const viewLawyerDetails = (lawyer: LawerDataType) => {
@@ -107,7 +120,9 @@ export function LawyersList() {
     setIsModalOpen(true);
   };
 
-  const renderStatusBadge = (status: "verified" | "pending" | "rejected") => {
+  const renderStatusBadge = (
+    status: "verified" | "pending" | "rejected" | "requested"
+  ) => {
     switch (status) {
       case "verified":
         return (
@@ -130,8 +145,32 @@ export function LawyersList() {
             Pending
           </Badge>
         );
+      case "requested":
+        return (
+          <Badge className="bg-blue-100 text-blue-800">
+            <Clock className="h-3 w-3 mr-1" />
+            Requested
+          </Badge>
+        );
       default:
         return null;
+    }
+  };
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
 
@@ -139,7 +178,9 @@ export function LawyersList() {
     <div className="space-y-6">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-2xl font-bold">Lawyers Verification</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Lawyers Verification
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {/* Filters and Search */}
@@ -150,11 +191,20 @@ export function LawyersList() {
                 placeholder="Search by name or email"
                 className="pl-8 bg-white dark:bg-gray-800"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
             <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                  setCurrentPage(1);
+                }}
+              >
                 <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4" />
@@ -164,6 +214,7 @@ export function LawyersList() {
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="verified">Verified</SelectItem>
+                  <SelectItem value="requested">Requested</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="rejected">Rejected</SelectItem>
                 </SelectContent>
@@ -171,18 +222,23 @@ export function LawyersList() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2 bg-white dark:bg-gray-800">
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 bg-white dark:bg-gray-800"
+                  >
                     <ArrowUpDown className="h-4 w-4" />
                     Sort by
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleSort("name")}>
-                    Name {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+                    Name{" "}
+                    {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleSort("experience")}>
                     Experience{" "}
-                    {sortBy === "experience" && (sortOrder === "asc" ? "↑" : "↓")}
+                    {sortBy === "experience" &&
+                      (sortOrder === "asc" ? "↑" : "↓")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleSort("fee")}>
                     Fee {sortBy === "fee" && (sortOrder === "asc" ? "↑" : "↓")}
@@ -194,13 +250,6 @@ export function LawyersList() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-          </div>
-
-          {/* Display count */}
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground">
-              Showing {sortedLawyers.length} of {lawyers.length} lawyers
-            </p>
           </div>
 
           {/* Table View */}
@@ -237,22 +286,29 @@ export function LawyersList() {
                       className="p-0 font-medium"
                       onClick={() => handleSort("fee")}
                     >
-                      Fee {sortBy === "fee" && (sortOrder === "asc" ? "↑" : "↓")}
+                      Fee{" "}
+                      {sortBy === "fee" && (sortOrder === "asc" ? "↑" : "↓")}
                     </Button>
                   </TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedLawyers.length === 0 ? (
+                {paginatedLawyers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell
+                      colSpan={6}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       No lawyers found matching your criteria
                     </TableCell>
                   </TableRow>
                 ) : (
-                  sortedLawyers.map((lawyer) => (
-                    <TableRow key={lawyer.user_id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  paginatedLawyers.map((lawyer) => (
+                    <TableRow
+                      key={lawyer.user_id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8 border">
@@ -295,6 +351,7 @@ export function LawyersList() {
                       </TableCell>
                       <TableCell>{lawyer.experience} yrs</TableCell>
                       <TableCell>₹{lawyer.consultation_fee}</TableCell>
+
                       <TableCell className="text-right">
                         <Button
                           variant="outline"
@@ -312,11 +369,57 @@ export function LawyersList() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-between mt-6">
+            <div className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className="bg-white dark:bg-gray-800"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
+              </Button>
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => goToPage(page)}
+                    className={
+                      currentPage === page
+                        ? "bg-gray-900 text-white"
+                        : "bg-white dark:bg-gray-800"
+                    }
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className="bg-white dark:bg-gray-800"
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
       {selectedLawyer && (
-        <LawyerVerificationModal 
+        <LawyerVerificationModal
           lawyer={selectedLawyer}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

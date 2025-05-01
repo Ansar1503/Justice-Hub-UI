@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/layout/admin/app-sidebar";
+import { AppSidebar } from "@/pages/admin/layout/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,7 +32,9 @@ export default function AdminDashboard() {
   const pathSegments = location.pathname
     .split("/")
     .filter(Boolean)
-    .map((segment, index) => (index === 0 && segment === "admin" ? "Home" : segment));
+    .map((segment, index) =>
+      index === 0 && segment === "admin" ? "Home" : segment
+    );
   // console.log("pathSegments", pathSegments);
 
   const breadcrumbs = pathSegments.map((segment, index) => {
@@ -61,13 +63,16 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-2 px-4 w-full justify-between">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mr-2 h-4 bg-stone-500"  />
-              <Breadcrumb >
+              <Separator
+                orientation="vertical"
+                className="mr-2 h-4 bg-stone-500"
+              />
+              <Breadcrumb>
                 <BreadcrumbList>{breadcrumbs}</BreadcrumbList>
               </Breadcrumb>
             </div>
             {/* Dark/Light Mode Toggle Button */}
-            <button 
+            <button
               onClick={toggleDarkMode}
               className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600"
               aria-label="Toggle Dark Mode"
@@ -77,7 +82,7 @@ export default function AdminDashboard() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0 ">
-        <UserManagement />
+          <UserManagement />
         </div>
       </SidebarInset>
     </SidebarProvider>

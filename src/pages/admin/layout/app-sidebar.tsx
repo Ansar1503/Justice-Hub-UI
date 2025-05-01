@@ -7,10 +7,10 @@ import {
   User,
 } from "lucide-react";
 
-import { NavMain } from "@/layout/admin/nav-main";
+import { NavMain } from "./nav-main";
 // import { NavProjects } from "@/layout/admin/nav-projects";
-import { NavUser } from "@/layout/admin/nav-user";
-import { TeamSwitcher } from "@/layout/admin/team-switcher";
+import { NavUser } from "./nav-user";
+import { TeamSwitcher } from "./team-switcher";
 import {
   Sidebar,
   SidebarContent,

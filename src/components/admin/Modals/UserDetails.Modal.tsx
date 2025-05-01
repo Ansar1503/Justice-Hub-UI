@@ -31,7 +31,6 @@ interface UserDetailsModalProps {
 export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDetailsModalProps) {
   const [isOpen, setIsOpen] = useState(open || false)
 
-  // Handle controlled/uncontrolled state
   const handleOpenChange = (newOpen: boolean) => {
     if (onOpenChange) {
       onOpenChange(newOpen)
@@ -40,7 +39,6 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
     }
   }
 
-  // Get initials for avatar fallback
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -50,7 +48,6 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
       .substring(0, 2)
   }
 
-  // Format date if it exists
   const formatDate = (date?: Date) => {
     if (!date) return "N/A"
     return format(date, "PPP")
@@ -65,7 +62,6 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
         </DialogHeader>
 
         <div className="flex flex-col space-y-4 py-4">
-          {/* User header with avatar and status */}
           <div className="flex items-center space-x-4">
             <Avatar className="h-16 w-16">
               {user.profile_image ? (
@@ -94,7 +90,6 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
 
           <Separator />
 
-          {/* Basic Info */}
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Basic Information</h4>
 
@@ -146,7 +141,6 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
             </div>
           </div>
 
-          {/* Address if available */}
           {user.address && Object.values(user.address).some((value) => value) && (
             <>
               <Separator />
@@ -176,7 +170,6 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
             </>
           )}
 
-          {/* Timestamps */}
           {(user.createdAt || user.updatedAt) && (
             <>
               <Separator />

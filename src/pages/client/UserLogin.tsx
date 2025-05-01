@@ -1,6 +1,6 @@
 import LoginComponent from "../../components/auth/LoginComponent";
-import Footer from "../../layout/client/Footer";
-import Navbar from "../../layout/client/Navbar";
+import Footer from "./layout/Footer";
+import Navbar from "./layout/Navbar";
 
 function UserLogin() {
   return (

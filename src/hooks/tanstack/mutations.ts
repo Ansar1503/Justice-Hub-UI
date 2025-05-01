@@ -1,16 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
 import { useAppDispatch } from "@/Redux/Hook";
-import { LawyerVerification } from "@/services/LawyerServices";
-import { loginUser } from "@/services/UserServices";
-import { blockUser } from "@/services/adminServices";
+import { LawyerVerification } from "@/utils/api/services/LawyerServices";
+import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
+import {
+  blockUser,
+  changeLawyerVerificationStatus,
+} from "@/utils/api/services/adminServices";
 import {
   sendVerificationMail,
   updateAddress,
   updateBasicInfo,
   updateEmail,
   updatePassword,
-} from "@/services/clientServices";
+} from "@/utils/api/services/clientServices";
 import { AddressType } from "@/types/types/Client.data.type";
 import {
   LoginPayload,
@@ -23,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export function useLoginMutation() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   return useMutation<LoginResponse, Error, LoginPayload>({
@@ -32,6 +36,7 @@ export function useLoginMutation() {
       dispatch(setUser(data.user));
       dispatch(setToken(data.token));
       toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate(`/${data.user.role}/`);
     },
     onError: (error: any) => {
@@ -49,7 +54,7 @@ export function useBasicInfoUpdateMutation() {
     mutationFn: updateBasicInfo,
     onSuccess: (data) => {
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["client"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (error: any) => {
       const message =
@@ -68,7 +73,7 @@ export function useUpdateEmailMutation() {
     mutationFn: updateEmail,
     onSuccess: (data) => {
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["client"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (error: any) => {
       const message =
@@ -85,7 +90,7 @@ export function useSendVerificationMailMutation() {
     mutationFn: sendVerificationMail,
     onSuccess: (data) => {
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["client"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (error: any) => {
       const message =
@@ -106,7 +111,7 @@ export function useUpdatePasswordMutation() {
     mutationFn: updatePassword,
     onSuccess: (data) => {
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["client"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (error: any) => {
       const message =
@@ -149,7 +154,7 @@ export function useBlockUser() {
     },
     onError: (error: any) => {
       const message =
-        error.response.data?.message || "user Block failed! Try again";
+        error.response.data?.message || "something went wrong! Try again";
       error.message = message;
       toast.error(message);
     },
@@ -167,6 +172,53 @@ export function useLawyerVerification() {
     onError: (error: any) => {
       const message =
         error.response.data?.message || "lawyer verification failed!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useChangeLawyerVerificationStatus() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ResponseType,
+    Error,
+    {
+      user_id: string;
+      status: "verified" | "rejected" | "pending" | "requested";
+    }
+  >({
+    mutationFn: (payload) => changeLawyerVerificationStatus(payload),
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["lawyers"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useGoogleSignupMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ResponseType,
+    Error,
+    { code: string; role: "lawyer" | "client" }
+  >({
+    mutationFn: (payload) => googlesignup(payload),
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
       error.message = message;
       toast.error(message);
     },

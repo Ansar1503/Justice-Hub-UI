@@ -37,7 +37,7 @@ import {
 import { MoreHorizontal, Check, X } from "lucide-react";
 import { clientDataType, LawerDataType } from "@/types/types/Client.data.type";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UserDetailsModal } from "@/components/Modals/UserDetails.Modal";
+import { UserDetailsModal } from "@/components/admin/Modals/UserDetails.Modal";
 import { toast } from "react-toastify";
 import { Paginations } from "../ui/custom/Pagination";
 import { useBlockUser } from "@/hooks/tanstack/mutations";
