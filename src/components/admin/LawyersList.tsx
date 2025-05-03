@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/table";
 import { LawyerVerificationModal } from "./Modals/LawyerVerification.Modal";
 import { LawerDataType } from "@/types/types/Client.data.type";
-import { useFetchAllLawyers } from "@/hooks/tanstack/queries";
+import { useFetchAllLawyers } from "@/store/tanstack/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function LawyersList() {

@@ -26,9 +26,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAppDispatch } from "@/Redux/Hook";
-import { signOut } from "@/Redux/Auth/Auth.Slice";
-import { LogOut as LogOutAction } from "@/Redux/Client/ClientSlice";
+import { useAppDispatch } from "@/store/redux/Hook";
+import { signOut } from "@/store/redux/auth/Auth.Slice";
+import { LogOut as LogOutAction } from "@/store/redux/client/ClientSlice";
 import { useNavigate } from "react-router-dom";
 
 export function NavUser({

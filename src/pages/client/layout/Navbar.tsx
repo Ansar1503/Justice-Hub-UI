@@ -6,9 +6,9 @@ import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
 import { AuthContext } from "../../../context/AuthContextPovider";
 import { useNavigate } from "react-router-dom";
 import { UserEnum } from "../../../types/enums/user.enums";
-import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
-import { LogOut } from "@/Redux/Client/ClientSlice";
-import { signOut } from "@/Redux/Auth/Auth.Slice";
+import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
+import { LogOut } from "@/store/redux/client/ClientSlice";
+import { signOut } from "@/store/redux/auth/Auth.Slice";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -33,7 +33,7 @@ function Navbar() {
       className={`p-4 transition-all duration-300 ${
         theme === "dark"
           ? "bg-[#1A1C2B] text-[#E0E0E0]"
-          : "bg-[#373F84] text-white"
+          : "bg-brandPrimary text-white"
       }`}
     >
       <div className="flex justify-between items-center">

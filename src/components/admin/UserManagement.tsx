@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useFetchUsersByRole } from "@/hooks/tanstack/queries";
+import { useFetchUsersByRole } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { UserDetailsModal } from "@/components/admin/Modals/UserDetails.Modal";
 import { toast } from "react-toastify";
 import { Paginations } from "../ui/custom/Pagination";
-import { useBlockUser } from "@/hooks/tanstack/mutations";
+import { useBlockUser } from "@/store/tanstack/mutations";
 
 export function UserManagement() {
   const [activeTab, setActiveTab] = useState<"client" | "lawyer">("client");

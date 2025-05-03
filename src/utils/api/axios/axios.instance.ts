@@ -28,17 +28,17 @@ axiosinstance.interceptors.response.use(
           // console.log("new token :", newToken);
           originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
           // console.log("og req:", originalRequest);
-          const { store } = await import("@/Redux/store");
-          const { setToken } = await import("@/Redux/Auth/Auth.Slice");
+          const { store } = await import("@/store/redux/store");
+          const { setToken } = await import("@/store/redux/auth/Auth.Slice");
           store.dispatch(setToken(newToken));
           // store.dispatch(setToken(result.data.token));
           return axiosinstance(originalRequest);
         }
       } catch (refresherror) {
         // console.log(refresherror);
-        const { store } = await import("@/Redux/store");
-        const { signOut } = await import("@/Redux/Auth/Auth.Slice");
-        const { LogOut } = await import("@/Redux/Client/ClientSlice");
+        const { store } = await import("@/store/redux/store");
+        const { signOut } = await import("@/store/redux/auth/Auth.Slice");
+        const { LogOut } = await import("@/store/redux/client/ClientSlice");
         store.dispatch(signOut());
         store.dispatch(LogOut());
         persistStore(store).purge();

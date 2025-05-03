@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 // import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
 import { motion } from "framer-motion";
-import { useLoginMutation } from "@/hooks/tanstack/mutations";
+import { useLoginMutation } from "@/store/tanstack/mutations";
 // import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
 
 function LoginComponent() {

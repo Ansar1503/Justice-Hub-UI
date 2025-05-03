@@ -1,6 +1,6 @@
-import { EmailUpdateResponse } from "@/hooks/tanstack/mutations";
-import { store } from "@/Redux/store";
-import { AddressType } from "@/types/types/Client.data.type";
+import { EmailUpdateResponse } from "@/store/tanstack/mutations";
+import { store } from "@/store/redux/store";
+import { AddressType, LawyerFilterParams } from "@/types/types/Client.data.type";
 import { BasicUpdateResponse } from "@/types/types/LoginResponseTypes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 
@@ -81,5 +81,14 @@ export async function updateAddress(payload: AddressType) {
     payload,
     { headers: { Authorization: `Bearer ${token}` } }
   );
+  return response.data;
+}
+
+export async function fetchLawyersByQuery(payload: LawyerFilterParams) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(`api/client/lawyers`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params:payload
+  });
   return response.data;
 }

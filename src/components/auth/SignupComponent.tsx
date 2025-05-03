@@ -9,7 +9,7 @@ import axiosinstance from "../../utils/api/axios/axios.instance";
 import { toast } from "react-toastify";
 import { useGoogleLogin } from "@react-oauth/google";
 import { Button } from "../ui/button";
-import { useGoogleSignupMutation } from "@/hooks/tanstack/mutations";
+import { useGoogleSignupMutation } from "@/store/tanstack/mutations";
 
 function SignupComponent() {
   const location = useLocation();

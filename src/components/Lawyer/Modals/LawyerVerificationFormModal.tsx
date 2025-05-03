@@ -7,7 +7,7 @@ import {
 import LawyerVerificationForm from "../Forms/Verification";
 import { useState } from "react";
 import { FourSquare } from "react-loading-indicators";
-import { useLawyerVerification } from "@/hooks/tanstack/mutations";
+import { useLawyerVerification } from "@/store/tanstack/mutations";
 
 interface LawyerVerificationFormProps {
   setVerificationModalOpen: (open: boolean) => void;

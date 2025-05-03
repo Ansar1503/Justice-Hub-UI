@@ -20,8 +20,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import VerificationInputs from "@/utils/validations/LawyerVerification.Input.Validation";
-import { useLawyerVerification } from "@/hooks/tanstack/mutations";
-import { useFetchLawyerData } from "@/hooks/tanstack/queries";
+import { useLawyerVerification } from "@/store/tanstack/mutations";
+import { useFetchLawyerData } from "@/store/tanstack/queries";
 
 type VerificationStatus = "verified" | "rejected" | "pending";
 
@@ -112,8 +112,6 @@ function LawyerVerificationForm({
       setErrors((prev) => ({ ...prev, [fieldName]: error }));
     }
   };
-
- 
 
   const handleMultiSelectChange = (value: string, fieldName: string) => {
     const currentValues = formData[
@@ -419,7 +417,7 @@ function LawyerVerificationForm({
                       <Badge
                         key={area}
                         variant={
-                          lawyerData && lawyerData.practice_areas
+                          lawyerData && lawyerData.practice_areas?.length
                             ? lawyerData.practice_areas.includes(area)
                               ? "default"
                               : "outline"
@@ -451,7 +449,7 @@ function LawyerVerificationForm({
                       <Badge
                         key={spec}
                         variant={
-                          lawyerData && lawyerData.specialisation
+                          lawyerData && lawyerData.specialisation.length
                             ? lawyerData.specialisation.includes(spec)
                               ? "default"
                               : "outline"

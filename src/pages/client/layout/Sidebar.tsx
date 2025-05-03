@@ -1,7 +1,7 @@
 import { CalendarSync, ShieldAlert, User, UserPen, Wallet } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import { useAppSelector } from "@/Redux/Hook";
+import { useAppSelector } from "@/store/redux/Hook";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);

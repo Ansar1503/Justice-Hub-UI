@@ -1,6 +1,6 @@
 import {  User, UserPen } from "lucide-react";
 import { useState } from "react";
-import { useAppSelector } from "@/Redux/Hook";
+import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
 
 export default function Sidebar() {

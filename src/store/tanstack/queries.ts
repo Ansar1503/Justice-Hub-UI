@@ -1,10 +1,14 @@
-import { fetchClientData } from "@/utils/api/services/clientServices";
+import {
+  fetchClientData,
+  fetchLawyersByQuery,
+} from "@/utils/api/services/clientServices";
 import {
   fetchAllLawyers,
   fetchUserByRole,
 } from "@/utils/api/services/adminServices";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLawyerData } from "@/utils/api/services/LawyerServices";
+import { LawyerFilterParams } from "@/types/types/Client.data.type";
 
 export function useFetchClientData() {
   return useQuery({
@@ -38,6 +42,14 @@ export function useFetchAllLawyers() {
   return useQuery({
     queryKey: ["lawyers"],
     queryFn: fetchAllLawyers,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchLawyersByQuery(query:LawyerFilterParams) {
+  return useQuery({
+    queryKey: ["lawyers", "queries"],
+    queryFn: ()=>fetchLawyersByQuery(query),
     staleTime: 1000 * 60 * 10,
   });
 }

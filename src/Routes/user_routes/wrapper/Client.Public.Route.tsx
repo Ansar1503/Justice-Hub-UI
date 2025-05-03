@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/Redux/Hook";
+import { useAppSelector } from "@/store/redux/Hook";
 import { Navigate, Outlet } from "react-router-dom";
 
 function PublicRoute() {

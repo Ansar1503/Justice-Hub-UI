@@ -54,3 +54,22 @@ export type AddressType = {
   locality?: string;
   pincode?: string;
 };
+
+export type VerificationStatus =
+  | "verified"
+  | "rejected"
+  | "pending"
+  | "requested";
+
+export interface LawyerFilterParams {
+  search: string;
+  practiceAreas?: string[];
+  specialisation?: string[];
+  experienceMin: number;
+  experienceMax: number;
+  feeMin: number;
+  feeMax: number;
+  sortBy: "rating" | "experience" | "fee-low" | "fee-high" | "recommended";
+  page?: number;
+  limit?: number;
+}

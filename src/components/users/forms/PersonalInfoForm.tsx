@@ -11,7 +11,7 @@ import {
   useSendVerificationMailMutation,
   useUpdateEmailMutation,
   useUpdatePasswordMutation,
-} from "@/hooks/tanstack/mutations";
+} from "@/store/tanstack/mutations";
 
 
 function PersonalInfoForm({

@@ -1,4 +1,4 @@
-import { store } from "@/Redux/store";
+import { store } from "@/store/redux/store";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 
 export async function fetchUserByRole(query: any) {
@@ -39,13 +39,18 @@ export async function blockUser(user_id: string) {
   return response.data;
 }
 
-export async function changeLawyerVerificationStatus({user_id,status}:{user_id: string;status:"verified" | "rejected" | "pending" | "requested"}) {
+export async function changeLawyerVerificationStatus({
+  user_id,
+  status,
+}: {
+  user_id: string;
+  status: "verified" | "rejected" | "pending" | "requested";
+}) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.patch(
     "/api/admin/lawyer/",
-    { user_id,status },
+    { user_id, status },
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
 }
-

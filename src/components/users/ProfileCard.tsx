@@ -2,7 +2,7 @@
 import BasicInfoForm from "./forms/BasicInfoForm";
 import PersonalInfoForm from "./forms/PersonalInfoForm";
 import AddressInfoForm from "./forms/AddressInfoForm";
-import { useFetchClientData } from "@/hooks/tanstack/queries";
+import { useFetchClientData } from "@/store/tanstack/queries";
 import { AlertVerificationModal } from "../Lawyer/Modals/AlertVerification";
 import { AlertDestructive } from "../ui/custom/AlertDestructive";
 import { ButtonLink } from "../ui/custom/ButtonLink";

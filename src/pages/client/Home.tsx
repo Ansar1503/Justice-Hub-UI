@@ -4,7 +4,7 @@ import Navbar from "./layout/Navbar";
 
 function Home() {
   return (
-    <div className="bg-[#FFF2F2] dark:bg-gray-800">
+    <div className="bg-brandCream dark:bg-gray-800">
       <Navbar />
       <Hero />
       <div className="m-10">

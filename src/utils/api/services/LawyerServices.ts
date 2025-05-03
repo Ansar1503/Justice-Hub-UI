@@ -1,4 +1,4 @@
-import { store } from "@/Redux/store";
+import { store } from "@/store/redux/store";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 
 export async function LawyerVerification(formData: any) {

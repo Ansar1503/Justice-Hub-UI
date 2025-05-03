@@ -24,7 +24,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { LawerDataType } from "@/types/types/Client.data.type";
-import { useChangeLawyerVerificationStatus } from "@/hooks/tanstack/mutations";
+import { useChangeLawyerVerificationStatus } from "@/store/tanstack/mutations";
 import { DocumentPreview } from "../DocumentPreview";
 import { RejectLawyerModal } from "./RejectModal";
 
@@ -79,7 +79,7 @@ export function LawyerVerificationModal({
       setIsRejectionDialogOpen(true);
       return;
     }
-
+    
     try {
       setStatusAction("approve");
       await mutateAsync({ user_id: lawyer.user_id, status });
@@ -408,7 +408,15 @@ export function LawyerVerificationModal({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <RejectLawyerModal  handleRejectionSubmit={handleRejectionSubmit} isRejectionDialogOpen={isRejectionDialogOpen} lawyer={lawyer} rejectionReason={rejectionReason} setIsRejectionDialogOpen={setIsRejectionDialogOpen} setRejectionReason={setRejectionReason} statusChangePending={statusChangePending} />
+      <RejectLawyerModal
+        handleRejectionSubmit={handleRejectionSubmit}
+        isRejectionDialogOpen={isRejectionDialogOpen}
+        lawyer={lawyer}
+        rejectionReason={rejectionReason}
+        setIsRejectionDialogOpen={setIsRejectionDialogOpen}
+        setRejectionReason={setRejectionReason}
+        statusChangePending={statusChangePending}
+      />
       <DocumentPreview
         handleDownloadDocument={handleDownloadDocument}
         previewDocument={previewDocument}

@@ -5,9 +5,9 @@ import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
 import { AuthContext } from "../../../context/AuthContextPovider";
 import { useNavigate } from "react-router-dom";
 import { UserEnum } from "../../../types/enums/user.enums";
-import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
-import { LogOut } from "@/Redux/Client/ClientSlice";
-import { signOut } from "@/Redux/Auth/Auth.Slice";
+import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
+import { LogOut } from "@/store/redux/client/ClientSlice";
+import { signOut } from "@/store/redux/auth/Auth.Slice";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);

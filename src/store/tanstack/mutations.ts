@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
-import { useAppDispatch } from "@/Redux/Hook";
+import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
+import { useAppDispatch } from "@/store/redux/Hook";
 import { LawyerVerification } from "@/utils/api/services/LawyerServices";
 import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
 import {

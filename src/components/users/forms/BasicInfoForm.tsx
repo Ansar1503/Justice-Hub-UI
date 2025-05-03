@@ -4,7 +4,7 @@ import { CircleUser } from "lucide-react";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 
 import { clientDataType } from "@/types/types/Client.data.type";
-import { useBasicInfoUpdateMutation } from "@/hooks/tanstack/mutations";
+import { useBasicInfoUpdateMutation } from "@/store/tanstack/mutations";
 
 function BasicInfoForm({
   data,

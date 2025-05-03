@@ -18,7 +18,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useFetchClientData } from "@/hooks/tanstack/queries";
+import { useFetchClientData } from "@/store/tanstack/queries";
 import { useLocation } from "react-router-dom";
 
 const navdata = {
