@@ -26,3 +26,35 @@ export async function fetchLawyerData() {
   });
   return response.data;
 }
+
+export async function addBlockedDates(payload: {
+  date: string;
+  reason: string;
+}) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    "/api/lawyer/schedule/block",
+    payload,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function fetchBlockedDates() {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get("/api/lawyer/schedule/block", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+}
+
+export async function removeBlockedDate(payload: { id: string }) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.delete(
+    `/api/lawyer/schedule/block/${payload.id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}

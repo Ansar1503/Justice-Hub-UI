@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
 import { useAppDispatch } from "@/store/redux/Hook";
-import { LawyerVerification } from "@/utils/api/services/LawyerServices";
+import {
+  addBlockedDates,
+  LawyerVerification,
+  removeBlockedDate,
+} from "@/utils/api/services/LawyerServices";
 import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
 import {
   blockUser,
   changeLawyerVerificationStatus,
 } from "@/utils/api/services/adminServices";
 import {
+  addReview,
   sendVerificationMail,
   updateAddress,
   updateBasicInfo,
@@ -214,6 +219,78 @@ export function useGoogleSignupMutation() {
     onSuccess: (data) => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useAddReview() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ResponseType,
+    Error,
+    { lawyerId: string; rating: number; review: string }
+  >({
+    mutationFn: (payload) => addReview(payload),
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: [""] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useAddBlockedDates() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ResponseType & {
+      data: {
+        id: string;
+        date: string;
+        reason: string;
+      }[];
+    },
+    Error,
+    {
+      date: string;
+      reason: string;
+    }
+  >({
+    mutationFn: addBlockedDates,
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["schedule", "blocked"] });
+    },
+    onError: (error: any) => {
+      // console.log("errormessage", error);
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useRemoveBlockedDate() {
+  const queryClient = useQueryClient();
+  return useMutation<ResponseType, Error, { id: string }>({
+    mutationFn: (payload: { id: string }) => removeBlockedDate(payload),
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["schedule", "blocked"] });
     },
     onError: (error: any) => {
       const message =

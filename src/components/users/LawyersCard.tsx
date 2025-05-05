@@ -101,7 +101,7 @@ export default function LawyersCard({
         </div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full" onClick={()=>{navigate('/client/lawyers')}}>View Profile</Button>
+        <Button className="w-full" onClick={()=>{navigate(`/client/lawyers/${lawyer.user_id}`)}}>View Profile</Button>
       </CardFooter>
     </Card>
   );

@@ -1,5 +1,6 @@
 import {
   fetchClientData,
+  fetchLawyerDetails,
   fetchLawyersByQuery,
 } from "@/utils/api/services/clientServices";
 import {
@@ -7,7 +8,10 @@ import {
   fetchUserByRole,
 } from "@/utils/api/services/adminServices";
 import { useQuery } from "@tanstack/react-query";
-import { fetchLawyerData } from "@/utils/api/services/LawyerServices";
+import {
+  fetchBlockedDates,
+  fetchLawyerData,
+} from "@/utils/api/services/LawyerServices";
 import { LawyerFilterParams } from "@/types/types/Client.data.type";
 
 export function useFetchClientData() {
@@ -46,10 +50,26 @@ export function useFetchAllLawyers() {
   });
 }
 
-export function useFetchLawyersByQuery(query:LawyerFilterParams) {
+export function useFetchLawyersByQuery(query: LawyerFilterParams) {
   return useQuery({
     queryKey: ["lawyers", "queries"],
-    queryFn: ()=>fetchLawyersByQuery(query),
+    queryFn: () => fetchLawyersByQuery(query),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchLawyerDetails(user_id: string) {
+  return useQuery({
+    queryKey: ["lawyer", "details"],
+    queryFn: () => fetchLawyerDetails(user_id),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchBlockedDates() {
+  return useQuery({
+    queryKey: ["schedule", "blocked"],
+    queryFn: fetchBlockedDates,
     staleTime: 1000 * 60 * 10,
   });
 }
