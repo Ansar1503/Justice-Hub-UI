@@ -3,8 +3,12 @@ import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
 import { useAppDispatch } from "@/store/redux/Hook";
 import {
   addBlockedDates,
+  addReccuringSlot,
   LawyerVerification,
   removeBlockedDate,
+  removeRecurringSlot,
+  updateRecurringSlot,
+  updateScheduleSettings,
 } from "@/utils/api/services/LawyerServices";
 import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
 import {
@@ -29,6 +33,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { reccuringType, slotSettings } from "@/types/types/SlotTypes";
 
 export function useLoginMutation() {
   const queryClient = useQueryClient();
@@ -291,6 +296,81 @@ export function useRemoveBlockedDate() {
     onSuccess: (data) => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["schedule", "blocked"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useAddRecurringSlot() {
+  const queryClient = useQueryClient();
+  return useMutation<ResponseType, Error, reccuringType>({
+    mutationFn: (payload) => addReccuringSlot(payload),
+    onSuccess: () => {
+      // toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["schedule", "recurring"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useRemoveRecurringSlot() {
+  const queryClient = useQueryClient();
+  return useMutation<ResponseType, Error, { id: string }>({
+    mutationFn: (payload: { id: string }) => removeRecurringSlot(payload.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schedule", "recurring"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useUpdateRecurringSlot() {
+  const queryClient = useQueryClient();
+  type Key = keyof Omit<reccuringType, "day">;
+
+  return useMutation<
+    ResponseType,
+    Error,
+    { id: string; key: Key; value: string | boolean }
+  >({
+    mutationFn: ({ id, key, value }) => updateRecurringSlot(id, key, value),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schedule", "recurring"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useUpdateScheduleSettings() {
+  const queryClient = useQueryClient();
+  return useMutation<ResponseType, Error, slotSettings>({
+    mutationFn: (payload: slotSettings) => updateScheduleSettings(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schedule", "settings"] });
     },
     onError: (error: any) => {
       const message =

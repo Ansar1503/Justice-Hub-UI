@@ -1,4 +1,4 @@
-import {  User, UserPen } from "lucide-react";
+import {  Calendar, User, UserPen } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
@@ -10,7 +10,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
-    // { path: `/${user?.role}/verification`, label: "Verification", icon: ShieldCheck },
+    { path: `/${user?.role}/schedule`, label: "Slots", icon: Calendar },
   ];
 
   return (

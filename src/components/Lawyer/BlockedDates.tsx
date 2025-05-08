@@ -88,12 +88,18 @@ export default function BlockedDates({ onUpdate }: BlockedDatesProps) {
             selected={selectedDate}
             onSelect={setSelectedDate}
             className="rounded-md border mx-auto dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            disabled={(date) =>
-              blockedDates &&
-              blockedDates.some((blocked: BlockedDate) =>
-                isSameDay(new Date(blocked.date), new Date(date))
-              )
-            }
+            disabled={(date) => {
+              const isBlocked =
+                blockedDates?.some((blocked: BlockedDate) =>
+                  isSameDay(new Date(blocked.date), date)
+                ) ?? false;
+
+              const isPast =
+                new Date(date).setHours(0, 0, 0, 0) <
+                new Date().setHours(0, 0, 0, 0);
+
+              return isBlocked || isPast;
+            }}
           />
         </div>
 

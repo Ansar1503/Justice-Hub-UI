@@ -17,136 +17,150 @@ import BlockedDates from "@/components/Lawyer/BlockedDates";
 import SettingsForm from "@/components/Lawyer/Forms/SettingsForm";
 import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
+import Sidebar from "./layout/Sidebar";
 
 export default function LawyerSchedulePage() {
+  const today = new Date(new Date().setHours(0, 0, 0, 0));
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date()
   );
   const [availabilityUpdated, setAvailabilityUpdated] = useState(false);
-  const today = new Date(new Date().setHours(0, 0, 0, 0));
-  const sixMonthsFromNow = new Date();
-  sixMonthsFromNow.setDate(today.getDate() + 30 * 6);
+  const [dateAvailable, setDateAvailable] = useState(30);
+  const maxDate = new Date(today);
+  maxDate.setDate(today.getDate() + dateAvailable);
 
   const handleAvailabilityUpdate = () => {
     setAvailabilityUpdated(!availabilityUpdated);
   };
 
   return (
-    <div className="bg-brandCream dark:bg-slate-950">
+    <div className="bg-brandCream dark:bg-slate-950 min-h-screen">
       <Navbar />
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-6 dark:text-white">
-          Manage Your Availability
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-8">
-          Set your available time slots for client consultations. Clients will
-          only be able to book appointments during these times.
-        </p>
+      <div className="flex-grow container md:ml-10 px-1 py-2 ">
+        <div className="flex flex-col md:flex-row md:gap-16 ">
+          <Sidebar />
+          <div className="flex-grow py-8">
+            <h1 className="text-3xl font-bold mb-6 dark:text-white">
+              Manage Your Availability
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">
+              Set your available time slots for client consultations. Clients
+              will only be able to book appointments during these times.
+            </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1">
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="dark:text-white">Select Date</CardTitle>
-                <CardDescription className="dark:text-gray-300">
-                  Choose a date to manage availability
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  disabled={(date) => date < today || date > sixMonthsFromNow}
-                  fromMonth={today}
-                  toMonth={sixMonthsFromNow}
-                  className="rounded-md border mx-auto dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-1">
+                <Card className="dark:bg-gray-800 dark:border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="dark:text-white">
+                      Select Date
+                    </CardTitle>
+                    <CardDescription className="dark:text-gray-300">
+                      Choose a date to manage availability
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      disabled={(date) => date < today || date > maxDate}
+                      fromMonth={today}
+                      toMonth={maxDate}
+                      className="rounded-md border mx-auto dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                    />
+                  </CardContent>
+                </Card>
 
-            <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="dark:text-white">
-                  Schedule Settings
-                </CardTitle>
-                <CardDescription className="dark:text-gray-300">
-                  Configure your appointment settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <SettingsForm onUpdate={handleAvailabilityUpdate} />
-              </CardContent>
-            </Card>
-          </div>
+                <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="dark:text-white">
+                      Schedule Settings
+                    </CardTitle>
+                    <CardDescription className="dark:text-gray-300">
+                      Configure your appointment settings
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <SettingsForm
+                      onUpdate={handleAvailabilityUpdate}
+                      setDateAvailable={setDateAvailable}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
 
-          <div className="lg:col-span-2">
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="dark:text-white">
-                  Manage Availability
-                </CardTitle>
-                <CardDescription className="dark:text-gray-300">
-                  Set your available time slots and blocked dates
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="daily" className="w-full">
-                  <TabsList className="mb-4 dark:bg-gray-700">
-                    <TabsTrigger
-                      value="daily"
-                      className="dark:data-[state=active]:bg-gray-600 dark:text-gray-200"
-                    >
-                      Daily Slots
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="recurring"
-                      className="dark:data-[state=active]:bg-gray-600 dark:text-gray-200"
-                    >
-                      Recurring Schedule
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="blocked"
-                      className="dark:data-[state=active]:bg-gray-600 dark:text-gray-200"
-                    >
-                      Blocked Dates
-                    </TabsTrigger>
-                  </TabsList>
+              <div className="lg:col-span-2">
+                <Card className="dark:bg-gray-800 dark:border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="dark:text-white">
+                      Manage Availability
+                    </CardTitle>
+                    <CardDescription className="dark:text-gray-300">
+                      Set your available time slots and blocked dates
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Tabs defaultValue="daily" className="w-full">
+                      <TabsList className="mb-4 dark:bg-gray-700">
+                        <TabsTrigger
+                          value="daily"
+                          className="dark:data-[state=active]:bg-gray-600 dark:text-gray-200"
+                        >
+                          Daily Slots
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="recurring"
+                          className="dark:data-[state=active]:bg-gray-600 dark:text-gray-200"
+                        >
+                          Recurring Schedule
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="blocked"
+                          className="dark:data-[state=active]:bg-gray-600 dark:text-gray-200"
+                        >
+                          Blocked Dates
+                        </TabsTrigger>
+                      </TabsList>
 
-                  <TabsContent value="daily">
-                    <AvailabilityForm
+                      <TabsContent value="daily">
+                        <AvailabilityForm
+                          selectedDate={selectedDate}
+                          onUpdate={handleAvailabilityUpdate}
+                        />
+                      </TabsContent>
+
+                      <TabsContent value="recurring">
+                        <RecurringAvailability
+                          onUpdate={handleAvailabilityUpdate}
+                        />
+                      </TabsContent>
+
+                      <TabsContent value="blocked">
+                        <BlockedDates onUpdate={handleAvailabilityUpdate} />
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
+
+                <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="dark:text-white">
+                      Your Schedule
+                    </CardTitle>
+                    <CardDescription className="dark:text-gray-300">
+                      Overview of your availability
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ScheduleVisualization
                       selectedDate={selectedDate}
-                      onUpdate={handleAvailabilityUpdate}
+                      refreshTrigger={availabilityUpdated}
                     />
-                  </TabsContent>
-
-                  <TabsContent value="recurring">
-                    <RecurringAvailability
-                      onUpdate={handleAvailabilityUpdate}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="blocked">
-                    <BlockedDates onUpdate={handleAvailabilityUpdate} />
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-
-            <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="dark:text-white">Your Schedule</CardTitle>
-                <CardDescription className="dark:text-gray-300">
-                  Overview of your availability
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScheduleVisualization
-                  selectedDate={selectedDate}
-                  refreshTrigger={availabilityUpdated}
-                />
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>

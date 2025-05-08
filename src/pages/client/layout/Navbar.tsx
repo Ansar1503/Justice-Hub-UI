@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
 import { AuthContext } from "../../../context/AuthContextPovider";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 import { LogOut } from "@/store/redux/client/ClientSlice";
@@ -52,7 +52,7 @@ function Navbar() {
               Home
             </li>
             <li className="hover:underline cursor-pointer">Services</li>
-            <li className="hover:underline cursor-pointer">Lawyers</li>
+            <NavLink to="/client/lawyers"><li className="hover:underline cursor-pointer" >Lawyers</li></NavLink>
             <li className="hover:underline cursor-pointer">Blogs</li>
             <li className="hover:underline cursor-pointer">About Us</li>
           </ul>

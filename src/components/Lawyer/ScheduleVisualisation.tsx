@@ -9,21 +9,20 @@ interface ScheduleVisualizationProps {
   refreshTrigger: boolean;
 }
 
-
 const mockAvailability = [
-  // { date: new Date(), slots: ["09:00-10:00", "10:30-11:30", "13:00-14:00"] },
-  // { date: addDays(new Date(), 1), slots: ["09:00-10:00", "10:30-11:30"] },
-  // { date: addDays(new Date(), 2), slots: ["14:00-15:00", "15:30-16:30"] },
-  // {
-  //   date: addDays(new Date(), 3),
-  //   slots: ["09:00-10:00", "13:00-14:00", "16:00-17:00"],
-  // },
-  // { date: addDays(new Date(), 4), slots: ["10:00-11:00", "11:30-12:30"] },
+  { date: new Date(), slots: ["09:00-10:00", "10:30-11:30", "13:00-14:00"] },
+  { date: addDays(new Date(), 1), slots: ["09:00-10:00", "10:30-11:30"] },
+  { date: addDays(new Date(), 2), slots: ["14:00-15:00", "15:30-16:30"] },
+  {
+    date: addDays(new Date(), 3),
+    slots: ["09:00-10:00", "13:00-14:00", "16:00-17:00"],
+  },
+  { date: addDays(new Date(), 4), slots: ["10:00-11:00", "11:30-12:30"] },
 ];
 
 const mockBlockedDates = [
-  // { date: addDays(new Date(), 5), reason: "Personal leave" },
-  // { date: addDays(new Date(), 6), reason: "Holiday" },
+  { date: addDays(new Date(), 5), reason: "Personal leave" },
+  { date: addDays(new Date(), 6), reason: "Holiday" },
 ];
 
 export default function ScheduleVisualization({
@@ -37,11 +36,8 @@ export default function ScheduleVisualization({
   const [blockedDates, setBlockedDates] = useState(mockBlockedDates);
 
   useEffect(() => {
-    // This would be an API call in a real application
     console.log("Fetching availability data...");
 
-    // For demo purposes, we're just using the mock data
-    // but in a real app you'd fetch this data based on the selected date
     setAvailability(mockAvailability);
     setBlockedDates(mockBlockedDates);
   }, [refreshTrigger, selectedDate]);

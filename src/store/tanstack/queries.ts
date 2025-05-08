@@ -9,8 +9,10 @@ import {
 } from "@/utils/api/services/adminServices";
 import { useQuery } from "@tanstack/react-query";
 import {
+  fetchAllRecurringSlot,
   fetchBlockedDates,
   fetchLawyerData,
+  fetchSlotSettings,
 } from "@/utils/api/services/LawyerServices";
 import { LawyerFilterParams } from "@/types/types/Client.data.type";
 
@@ -70,6 +72,22 @@ export function useFetchBlockedDates() {
   return useQuery({
     queryKey: ["schedule", "blocked"],
     queryFn: fetchBlockedDates,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchAllRecurringSlot() {
+  return useQuery({
+    queryKey: ["schedule", "recurring"],
+    queryFn: fetchAllRecurringSlot,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchSlotSettings() {
+  return useQuery({
+    queryKey: ["schedule", "settings"],
+    queryFn: fetchSlotSettings,
     staleTime: 1000 * 60 * 10,
   });
 }
