@@ -32,10 +32,10 @@ export default function BlockedDates({ onUpdate }: BlockedDatesProps) {
     useAddBlockedDates();
   const { mutateAsync: removeBlockMutate, isPending: removeBlockPending } =
     useRemoveBlockedDate();
-
+  // console.log("selectedDate", selectedDate);
   const { data, refetch } = useFetchBlockedDates();
   const blockedDates = data?.data;
-  console.log("blocked", blockedDates);
+  // console.log("blocked", blockedDates);
   const BlockedDate = async () => {
     if (!selectedDate) {
       setError("select a date to block");
@@ -48,8 +48,9 @@ export default function BlockedDates({ onUpdate }: BlockedDatesProps) {
       return;
     }
     try {
+      
       await addBlockMutate({
-        date: selectedDate.toISOString(),
+        date: selectedDate?.toISOString().split("T")[0],
         reason: reason.trim(),
       });
       refetch();
@@ -86,14 +87,13 @@ export default function BlockedDates({ onUpdate }: BlockedDatesProps) {
           <Calendar
             mode="single"
             selected={selectedDate}
-            onSelect={setSelectedDate}
-            className="rounded-md border mx-auto dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            onSelect={(date) => {
+              if (date) setSelectedDate(new Date(date));
+            }}
             disabled={(date) => {
-              const isBlocked =
-                blockedDates?.some((blocked: BlockedDate) =>
-                  isSameDay(new Date(blocked.date), date)
-                ) ?? false;
-
+              const isBlocked = blockedDates?.some((blocked: BlockedDate) =>
+                isSameDay(new Date(blocked.date), new Date(date))
+              );
               const isPast =
                 new Date(date).setHours(0, 0, 0, 0) <
                 new Date().setHours(0, 0, 0, 0);

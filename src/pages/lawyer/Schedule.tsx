@@ -18,6 +18,7 @@ import SettingsForm from "@/components/Lawyer/Forms/SettingsForm";
 import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
 import Sidebar from "./layout/Sidebar";
+import { useFetchSlotSettings } from "@/store/tanstack/queries";
 
 export default function LawyerSchedulePage() {
   const today = new Date(new Date().setHours(0, 0, 0, 0));
@@ -25,7 +26,8 @@ export default function LawyerSchedulePage() {
     new Date()
   );
   const [availabilityUpdated, setAvailabilityUpdated] = useState(false);
-  const [dateAvailable, setDateAvailable] = useState(30);
+  const { data } = useFetchSlotSettings();
+  const dateAvailable = data?.data?.maxDaysInAdvance;
   const maxDate = new Date(today);
   maxDate.setDate(today.getDate() + dateAvailable);
 
@@ -82,10 +84,7 @@ export default function LawyerSchedulePage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <SettingsForm
-                      onUpdate={handleAvailabilityUpdate}
-                      setDateAvailable={setDateAvailable}
-                    />
+                    <SettingsForm onUpdate={handleAvailabilityUpdate} />
                   </CardContent>
                 </Card>
               </div>
@@ -142,24 +141,25 @@ export default function LawyerSchedulePage() {
                     </Tabs>
                   </CardContent>
                 </Card>
-
-                <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="dark:text-white">
-                      Your Schedule
-                    </CardTitle>
-                    <CardDescription className="dark:text-gray-300">
-                      Overview of your availability
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ScheduleVisualization
-                      selectedDate={selectedDate}
-                      refreshTrigger={availabilityUpdated}
-                    />
-                  </CardContent>
-                </Card>
               </div>
+            </div>
+            <div>
+              <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle className="dark:text-white">
+                    Your Schedule
+                  </CardTitle>
+                  <CardDescription className="dark:text-gray-300">
+                    Overview of your availability
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ScheduleVisualization
+                    selectedDate={selectedDate}
+                    refreshTrigger={availabilityUpdated}
+                  />
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

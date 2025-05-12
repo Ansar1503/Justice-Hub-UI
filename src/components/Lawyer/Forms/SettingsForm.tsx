@@ -25,13 +25,9 @@ import { useFetchSlotSettings } from "@/store/tanstack/queries";
 
 interface SettingsFormProps {
   onUpdate: () => void;
-  setDateAvailable: (date: any) => void;
 }
 
-export default function SettingsForm({
-  onUpdate,
-  setDateAvailable,
-}: SettingsFormProps) {
+export default function SettingsForm({ onUpdate }: SettingsFormProps) {
   const { data, refetch } = useFetchSlotSettings();
   const settings = data?.data;
   const [slotDuration, setSlotDuration] = useState(
@@ -53,7 +49,6 @@ export default function SettingsForm({
       setSlotDuration(settings?.slotDuration.toString());
       setBufferTime(settings?.bufferTime.toString());
       setMaxDaysInAdvance(settings?.maxDaysInAdvance.toString());
-      setDateAvailable(settings?.maxDaysInAdvance);
       setAutoConfirm(settings?.autoConfirm);
     }
   }, [settings]);

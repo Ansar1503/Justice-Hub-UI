@@ -3,27 +3,12 @@ import { format, addDays, startOfWeek, isSameDay } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useFetchAvailableSlotsByWeek } from "@/store/tanstack/queries";
 
 interface ScheduleVisualizationProps {
   selectedDate: Date | undefined;
   refreshTrigger: boolean;
 }
-
-const mockAvailability = [
-  { date: new Date(), slots: ["09:00-10:00", "10:30-11:30", "13:00-14:00"] },
-  { date: addDays(new Date(), 1), slots: ["09:00-10:00", "10:30-11:30"] },
-  { date: addDays(new Date(), 2), slots: ["14:00-15:00", "15:30-16:30"] },
-  {
-    date: addDays(new Date(), 3),
-    slots: ["09:00-10:00", "13:00-14:00", "16:00-17:00"],
-  },
-  { date: addDays(new Date(), 4), slots: ["10:00-11:00", "11:30-12:30"] },
-];
-
-const mockBlockedDates = [
-  { date: addDays(new Date(), 5), reason: "Personal leave" },
-  { date: addDays(new Date(), 6), reason: "Holiday" },
-];
 
 export default function ScheduleVisualization({
   selectedDate,
@@ -32,15 +17,12 @@ export default function ScheduleVisualization({
   const [weekStart, setWeekStart] = useState(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
-  const [availability, setAvailability] = useState(mockAvailability);
-  const [blockedDates, setBlockedDates] = useState(mockBlockedDates);
-
+  const { data, refetch } = useFetchAvailableSlotsByWeek(weekStart);
+  const BlockedDates = data?.data?.blocks;
+  const AvailableSlots = data?.data?.slots;
   useEffect(() => {
-    console.log("Fetching availability data...");
-
-    setAvailability(mockAvailability);
-    setBlockedDates(mockBlockedDates);
-  }, [refreshTrigger, selectedDate]);
+    refetch();
+  }, [refreshTrigger,weekStart]);
 
   const nextWeek = () => {
     setWeekStart(addDays(weekStart, 7));
@@ -86,7 +68,8 @@ export default function ScheduleVisualization({
                 ? "border-emerald-500 dark:border-emerald-500"
                 : ""
             } ${
-              blockedDates.some((blocked) => isSameDay(blocked.date, day))
+              BlockedDates &&
+              BlockedDates.some((blocked: any) => isSameDay(blocked.date, day))
                 ? "bg-gray-100 dark:bg-gray-800"
                 : "dark:bg-gray-700"
             }`}
@@ -100,35 +83,52 @@ export default function ScheduleVisualization({
               </div>
             </div>
 
-            {blockedDates.some((blocked) => isSameDay(blocked.date, day)) ? (
-              <div className="flex justify-center mt-4">
+            {BlockedDates &&
+            BlockedDates.some((blocked: any) =>
+              isSameDay(new Date(blocked.date), day)
+            ) ? (
+              <div className="flex flex-col items-center mt-4">
                 <Badge
                   variant="destructive"
                   className="dark:bg-red-700 dark:text-white"
                 >
                   Blocked
                 </Badge>
+                {BlockedDates.find((b: any) => isSameDay(new Date(b.date), day))
+                  ?.reason && (
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 text-center">
+                    {
+                      BlockedDates.find((b: any) =>
+                        isSameDay(new Date(b.date), day)
+                      )?.reason
+                    }
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-1">
-                {availability
-                  .filter((avail) => isSameDay(avail.date, day))
-                  .flatMap((avail) => avail.slots)
-                  .map((slot, index) => (
-                    <div
-                      key={index}
-                      className="text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100 rounded px-1 py-0.5 text-center"
-                    >
-                      {slot}
-                    </div>
-                  ))}
+                {AvailableSlots &&
+                  AvailableSlots.filter((avail: any) =>
+                    isSameDay(new Date(avail.date), day)
+                  )
+                    .flatMap((avail: any) => avail.timeSlots)
+                    .map((slot: any, index: number) => (
+                      <div
+                        key={index}
+                        className="text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100 rounded px-1 py-0.5 text-center"
+                      >
+                        {slot.startTime} - {slot.endTime}
+                      </div>
+                    ))}
 
-                {availability.filter((avail) => isSameDay(avail.date, day))
-                  .length === 0 && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-                    No slots
-                  </div>
-                )}
+                {AvailableSlots &&
+                  AvailableSlots.filter((avail: any) =>
+                    isSameDay(avail.date, day)
+                  ).length === 0 && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
+                      No slots
+                    </div>
+                  )}
               </div>
             )}
           </div>

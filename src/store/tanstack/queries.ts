@@ -10,6 +10,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchAllRecurringSlot,
+  fetchAvailableSlots,
+  fetchAvailableSlotsByWeek,
   fetchBlockedDates,
   fetchLawyerData,
   fetchSlotSettings,
@@ -88,6 +90,22 @@ export function useFetchSlotSettings() {
   return useQuery({
     queryKey: ["schedule", "settings"],
     queryFn: fetchSlotSettings,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchAvailableSlots(date: Date | undefined) {
+  return useQuery({
+    queryKey: ["schedule", "availableslot"],
+    queryFn: () => fetchAvailableSlots(date),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchAvailableSlotsByWeek(weekstart:Date) {
+  return useQuery({
+    queryKey: ["schedule", "availableslot", "week"],
+    queryFn: ()=>fetchAvailableSlotsByWeek(weekstart),
     staleTime: 1000 * 60 * 10,
   });
 }

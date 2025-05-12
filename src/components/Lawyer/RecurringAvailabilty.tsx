@@ -16,12 +16,12 @@ import {
   useRemoveRecurringSlot,
   useUpdateRecurringSlot,
 } from "@/store/tanstack/mutations";
-import { dayType } from "@/types/types/SlotTypes";
+import { dayType, reccuringType } from "@/types/types/SlotTypes";
 import { useFetchAllRecurringSlot } from "@/store/tanstack/queries";
 
 interface RecurringSlot {
   _id: string;
-  day: string;
+  day: dayType;
   startTime: string;
   endTime: string;
   active: boolean;
@@ -41,23 +41,23 @@ export default function RecurringAvailability({
   const recurringSlots = data?.data;
   const { mutateAsync: removeRecurringMutate } = useRemoveRecurringSlot();
   // console.log("recurringg:", recurringSlots);
-
+  
   const addRecurringSlot = async (day: dayType) => {
     await addRecurringMutate({ day });
     onUpdate();
   };
 
-  const removeRecurringSlot = async (id: string) => {
-    await removeRecurringMutate({ id });
+  const removeRecurringSlot = async (day: dayType) => {
+    await removeRecurringMutate({ day });
     onUpdate();
   };
 
   const updateRecurringSlot = async (
-    id: string,
+    day: dayType,
     key: keyof Omit<RecurringSlot, "_id" | "day">,
     value: string | boolean
   ) => {
-    await updateRecurringMutate({ id, key, value });
+    await updateRecurringMutate({ day, key, value });
     onUpdate();
   };
 
@@ -74,8 +74,11 @@ export default function RecurringAvailability({
   const availableWeekdays = weekdays.filter(
     (day) =>
       !recurringSlots ||
-      recurringSlots.length === 0 ||
-      !recurringSlots.some((slot: RecurringSlot) => slot.day === day.value)
+      !recurringSlots.schedule ||
+      recurringSlots.schedule?.length === 0 ||
+      !recurringSlots.schedule?.some(
+        (slot: reccuringType) => slot.day === day.value
+      )
   );
 
   return (
@@ -91,8 +94,8 @@ export default function RecurringAvailability({
 
       <div className="space-y-4 mb-6">
         {recurringSlots &&
-          recurringSlots.length &&
-          recurringSlots
+          recurringSlots.schedule &&
+          recurringSlots.schedule
             .sort((a: RecurringSlot, b: RecurringSlot) => {
               const dayOrder = [
                 "monday",
@@ -135,7 +138,7 @@ export default function RecurringAvailability({
                         value={slot.startTime}
                         onChange={(e) =>
                           updateRecurringSlot(
-                            slot._id,
+                            slot.day,
                             "startTime",
                             e.target.value
                           )
@@ -158,7 +161,7 @@ export default function RecurringAvailability({
                         value={slot.endTime}
                         onChange={(e) =>
                           updateRecurringSlot(
-                            slot._id,
+                            slot.day,
                             "endTime",
                             e.target.value
                           )
@@ -174,7 +177,7 @@ export default function RecurringAvailability({
                           id={`active-${slot._id}`}
                           checked={slot.active}
                           onCheckedChange={(checked) =>
-                            updateRecurringSlot(slot._id, "active", checked)
+                            updateRecurringSlot(slot.day, "active", checked)
                           }
                         />
                         <Label
@@ -188,7 +191,7 @@ export default function RecurringAvailability({
                         type="button"
                         variant="destructive"
                         size="icon"
-                        onClick={() => removeRecurringSlot(slot._id)}
+                        onClick={() => removeRecurringSlot(slot.day)}
                         className="dark:bg-red-700 dark:hover:bg-red-800"
                       >
                         <Trash2 className="h-4 w-4" />

@@ -11,12 +11,12 @@ export interface reccuringType {
   day: dayType;
   startTime?: string;
   endTime?: string;
-  active?: boolean;  
+  active?: boolean;
 }
 
-export interface slotSettings{
-    slotDuration:string;
-    bufferTime?:string;
-    maxDaysInAdvance:string;
-    autoConfirm:boolean;
+export interface slotSettings {
+  slotDuration: string;
+  bufferTime?: string;
+  maxDaysInAdvance: string;
+  autoConfirm: boolean;
 }
