@@ -2,7 +2,8 @@
 import axios, { AxiosInstance, AxiosError } from "axios";
 import persistStore from "redux-persist/es/persistStore";
 
-const baseURL = import.meta.env.VITE_AXIOS_API_URL;
+const baseURL = import.meta.env.VITE_BACKEND_URL;
+
 
 
 const axiosinstance: AxiosInstance = axios.create({

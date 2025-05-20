@@ -35,6 +35,8 @@ import ReviewForm from "@/components/users/forms/ReviewForm";
 import { useParams } from "react-router-dom";
 import { useFetchLawyerDetails } from "@/store/tanstack/queries";
 import getVerificationBadge from "../ui/getVerificationBadge";
+import LawyerNotAccessible from "./LawyerNotAccessible";
+import { Skeleton } from "../ui/skeleton";
 
 export default function LawyerProfile() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -43,10 +45,9 @@ export default function LawyerProfile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string>("");
   const { id } = useParams();
-  const { data } = useFetchLawyerDetails(id || "");
+  const { data, isLoading, isError } = useFetchLawyerDetails(id || "");
   const lawyerDetails = data?.data;
-  // console.log("data", data);
-  // console.log("lawerdetails", lawyerDetails);
+
   const today = new Date(new Date().setHours(0, 0, 0, 0));
   const thirtyDaysFromNow = new Date();
   thirtyDaysFromNow.setDate(today.getDate() + 30);
@@ -102,8 +103,25 @@ export default function LawyerProfile() {
     setSelectedFile(null);
   };
 
+  const ProfileImageSkeleton = () => (
+    <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 animate-pulse">
+      <Skeleton className="w-full h-full" />
+    </div>
+  );
+
+  const BadgeSkeleton = () => <Skeleton className="h-6 w-20 rounded-full" />;
+
+  const TextSkeleton = ({ width }: { width: string }) => (
+    <Skeleton className={`h-5 ${width} rounded`} />
+  );
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 relative">
+      {(isError || !lawyerDetails) && !isLoading && (
+        <div className="absolute inset-0 z-50 bg-black bg-opacity-100 flex justify-center items-center">
+          <LawyerNotAccessible />
+        </div>
+      )}
       <div>
         {/* Profile Section */}
         <div className="lg:col-span-2">
@@ -111,67 +129,108 @@ export default function LawyerProfile() {
             <CardHeader className="pb-4">
               <div className="flex flex-col md:flex-row gap-6 items-start">
                 <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border-4 border-white dark:border-gray-600 shadow-lg">
-                  <img
-                    src={lawyerDetails?.profile_image}
-                    alt={lawyerDetails?.name}
-                    className="w-[128px] h-[128px] object-cover"
-                  />
+                  {isLoading ? (
+                    <ProfileImageSkeleton />
+                  ) : (
+                    <img
+                      src={lawyerDetails?.profile_image}
+                      alt={lawyerDetails?.name}
+                      className="w-[128px] h-[128px] object-cover"
+                    />
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <CardTitle className="text-2xl font-bold dark:text-white">
-                      {lawyerDetails?.name}
-                    </CardTitle>
-                    {getVerificationBadge(lawyerDetails?.verification_status)}
+                    {isLoading ? (
+                      <TextSkeleton width="w-44" />
+                    ) : (
+                      <>
+                        <CardTitle className="text-2xl font-bold dark:text-white">
+                          {lawyerDetails?.name}
+                        </CardTitle>
+                        {getVerificationBadge(
+                          lawyerDetails?.verification_status
+                        )}
+                      </>
+                    )}
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {lawyerDetails &&
-                      lawyerDetails?.practice_areas.length &&
-                      lawyerDetails.practice_areas.map((area: string) => (
-                        <Badge
-                          variant="outline"
-                          className="bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                        >
-                          {area}
-                        </Badge>
-                      ))}
+                    {isLoading
+                      ? Array(3)
+                          .fill(null)
+                          .map((_, idx) => <BadgeSkeleton key={idx} />)
+                      : lawyerDetails &&
+                        lawyerDetails?.practice_areas.length &&
+                        lawyerDetails.practice_areas.map((area: string) => (
+                          <Badge
+                            key={area}
+                            variant="outline"
+                            className="bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                          >
+                            {area}
+                          </Badge>
+                        ))}
                   </div>
                   <div className="mt-4">
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <Clock className="h-4 w-4 mr-2" />
-                      <span>
-                        {lawyerDetails?.experience || 0} years experience
-                      </span>
+                      {isLoading ? (
+                        <TextSkeleton width="w-32" />
+                      ) : (
+                        <span>
+                          {lawyerDetails?.experience || 0} years experience
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <MapPin className="h-4 w-4 mr-2" />
-                      <span>
-                        {lawyerDetails?.Address
-                          ? `${lawyerDetails.Address.city}, ${lawyerDetails.Address.state}, ${lawyerDetails.Address.pincode}`
-                          : "N/A"}
-                      </span>
+                      {isLoading ? (
+                        <TextSkeleton width="w-48" />
+                      ) : (
+                        <span>
+                          {lawyerDetails?.Address
+                            ? `${lawyerDetails.Address.city}, ${lawyerDetails.Address.state}, ${lawyerDetails.Address.pincode}`
+                            : "N/A"}
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <Mail className="h-4 w-4 mr-2" />
-                      <span>{lawyerDetails?.email}</span>
+                      {isLoading ? (
+                        <TextSkeleton width="w-52" />
+                      ) : (
+                        <span>{lawyerDetails?.email}</span>
+                      )}
                     </div>
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <Phone className="h-4 w-4 mr-2" />
-                      <span>+91 {lawyerDetails?.mobile}</span>
+                      {isLoading ? (
+                        <TextSkeleton width="w-36" />
+                      ) : (
+                        <span>+91 {lawyerDetails?.mobile}</span>
+                      )}
                     </div>
                   </div>
                 </div>
                 <div className="md:text-right">
                   <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                    ₹{lawyerDetails?.consultation_fee}
+                    {isLoading ? (
+                      <TextSkeleton width="w-24" />
+                    ) : (
+                      <>₹{lawyerDetails?.consultation_fee}</>
+                    )}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    Consultation Fee
+                    {isLoading ? (
+                      <TextSkeleton width="w-28" />
+                    ) : (
+                      "Consultation Fee"
+                    )}
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button className="mt-4 w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white">
-                        Book Now
+                        {isLoading ? <TextSkeleton width="w-16" /> : "Book Now"}
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[500px] dark:bg-gray-800 dark:border-gray-700">
@@ -303,7 +362,15 @@ export default function LawyerProfile() {
                 </TabsList>
                 <TabsContent value="about">
                   <CardDescription className="text-base dark:text-gray-300">
-                    {lawyerDetails?.description}
+                    {isLoading ? (
+                      <div className="space-y-2">
+                        <TextSkeleton width="w-full" />
+                        <TextSkeleton width="w-full" />
+                        <TextSkeleton width="w-3/4" />
+                      </div>
+                    ) : (
+                      lawyerDetails?.description
+                    )}
                   </CardDescription>
                 </TabsContent>
                 <TabsContent value="specializations">
@@ -311,13 +378,25 @@ export default function LawyerProfile() {
                     <h3 className="font-medium dark:text-white">
                       Areas of Expertise:
                     </h3>
-                    <ul className="list-disc pl-5 space-y-1 dark:text-gray-300">
-                      {lawyerDetails &&
-                        lawyerDetails?.specialisation.length &&
-                        lawyerDetails.specialisation.map((spec: string) => (
-                          <li>{spec}</li>
-                        ))}
-                    </ul>
+                    {isLoading ? (
+                      <div className="pl-5 space-y-2">
+                        {Array(4)
+                          .fill(null)
+                          .map((_, idx) => (
+                            <TextSkeleton key={idx} width="w-1/2" />
+                          ))}
+                      </div>
+                    ) : (
+                      <ul className="list-disc pl-5 space-y-1 dark:text-gray-300">
+                        {lawyerDetails &&
+                          lawyerDetails?.specialisation?.length > 0 &&
+                          lawyerDetails.specialisation.map(
+                            (spec: string, index: number) => (
+                              <li key={index}>{spec}</li>
+                            )
+                          )}
+                      </ul>
+                    )}
                   </div>
                 </TabsContent>
                 <TabsContent value="credentials">
@@ -326,25 +405,39 @@ export default function LawyerProfile() {
                       <h3 className="font-medium dark:text-white">
                         Bar Council Number
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        {lawyerDetails?.barcouncil_number || "N/A"}
-                      </p>
+                      {isLoading ? (
+                        <TextSkeleton width="w-40" />
+                      ) : (
+                        <p className="text-gray-600 dark:text-gray-300">
+                          {lawyerDetails?.barcouncil_number || "N/A"}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <h3 className="font-medium dark:text-white">
                         Certificate of Practice Number
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        {lawyerDetails?.certificate_of_practice_number || "N/A"}
-                      </p>
+                      {isLoading ? (
+                        <TextSkeleton width="w-40" />
+                      ) : (
+                        <p className="text-gray-600 dark:text-gray-300">
+                          {lawyerDetails?.certificate_of_practice_number ||
+                            "N/A"}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <h3 className="font-medium dark:text-white">
                         Enrollment Certificate Number
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        {lawyerDetails?.enrollment_certificate_number || "N/A"}
-                      </p>
+                      {isLoading ? (
+                        <TextSkeleton width="w-40" />
+                      ) : (
+                        <p className="text-gray-600 dark:text-gray-300">
+                          {lawyerDetails?.enrollment_certificate_number ||
+                            "N/A"}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </TabsContent>
@@ -358,18 +451,72 @@ export default function LawyerProfile() {
       <div className="mt-8">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="dark:text-white">Client Reviews</CardTitle>
+            <CardTitle className="dark:text-white">
+              {isLoading ? <TextSkeleton width="w-32" /> : "Client Reviews"}
+            </CardTitle>
             <CardDescription className="dark:text-gray-300">
-              See what others are saying about Naniso
+              {isLoading ? (
+                <TextSkeleton width="w-64" />
+              ) : (
+                "See what others are saying about this lawyer"
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <ReviewList />
+                {isLoading ? (
+                  <div className="space-y-6">
+                    {Array(3)
+                      .fill(null)
+                      .map((_, idx) => (
+                        <div
+                          key={idx}
+                          className="border p-4 rounded-lg dark:border-gray-700"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <Skeleton className="w-10 h-10 rounded-full" />
+                            <div className="space-y-1">
+                              <TextSkeleton width="w-24" />
+                              <div className="flex">
+                                {Array(5)
+                                  .fill(null)
+                                  .map((_, starIdx) => (
+                                    <Skeleton
+                                      key={starIdx}
+                                      className="w-4 h-4 mr-1"
+                                    />
+                                  ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <TextSkeleton width="w-full" />
+                            <TextSkeleton width="w-3/4" />
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <ReviewList />
+                )}
               </div>
               <div>
-                <ReviewForm id={lawyerDetails?.user_id} />
+                {isLoading ? (
+                  <div className="border p-4 rounded-lg dark:border-gray-700 space-y-4">
+                    <TextSkeleton width="w-32" />
+                    <div className="space-y-2">
+                      <TextSkeleton width="w-full" />
+                      <TextSkeleton width="w-full" />
+                      <TextSkeleton width="w-3/4" />
+                    </div>
+                    <div className="h-8 w-full">
+                      <Skeleton className="h-full w-full rounded" />
+                    </div>
+                  </div>
+                ) : (
+                  <ReviewForm id={lawyerDetails?.user_id} />
+                )}
               </div>
             </div>
           </CardContent>

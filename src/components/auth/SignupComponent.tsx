@@ -7,9 +7,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { validateSignupField } from "../../utils/validations/SignupFormValidation";
 import axiosinstance from "../../utils/api/axios/axios.instance";
 import { toast } from "react-toastify";
-import { useGoogleLogin } from "@react-oauth/google";
-import { Button } from "../ui/button";
-import { useGoogleSignupMutation } from "@/store/tanstack/mutations";
+// import { useGoogleLogin } from "@react-oauth/google";
+// import { Button } from "../ui/button";
+// import { useGoogleSignupMutation } from "@/store/tanstack/mutations";
 
 function SignupComponent() {
   const location = useLocation();
@@ -36,8 +36,9 @@ function SignupComponent() {
       role: Role ? Role : userRole,
     }));
   }, [userRole]);
+
   const [validation, setValidation] = useState<Record<string, string>>({});
-  const { mutateAsync } = useGoogleSignupMutation();
+  // const { mutateAsync } = useGoogleSignupMutation();
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -50,12 +51,15 @@ function SignupComponent() {
     }));
   }
 
-  const googleSign = useGoogleLogin({
-    flow: "auth-code",
-    onSuccess: async (res) => {
-      await mutateAsync({ code: res.code, role: userRole === UserEnum.lawyer ? "lawyer" : "client" });
-    },
-  });
+  // const googleSign = useGoogleLogin({
+  //   flow: "auth-code",
+  //   onSuccess: async (res) => {
+  //     await mutateAsync({
+  //       code: res.code,
+  //       role: userRole === UserEnum.lawyer ? "lawyer" : "client",
+  //     });
+  //   },
+  // });
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -273,8 +277,8 @@ function SignupComponent() {
             console.log("error occured");
           }}
         /> */}
-        <Button
-          onClick={() => googleSign()}
+        {/* <Button
+          // onClick={() => googleSign()}
           className="w-full bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 flex items-center justify-center gap-2 shadow-sm"
         >
           <img
@@ -283,7 +287,7 @@ function SignupComponent() {
             className="w-5 h-5"
           />
           <span>Sign in with Google</span>
-        </Button>
+        </Button> */}
 
         {/* Bottom Links */}
         <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
