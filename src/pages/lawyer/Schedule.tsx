@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
+// import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
@@ -10,9 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AvailabilityForm from "@/components/Lawyer/Forms/AvailabiltyForm";
+// import AvailabilityForm from "@/components/Lawyer/Forms/AvailabiltyForm";
 import RecurringAvailability from "@/components/Lawyer/RecurringAvailabilty";
-import ScheduleVisualization from "@/components/Lawyer/ScheduleVisualisation";
+// import ScheduleVisualization from "@/components/Lawyer/ScheduleVisualisation";
 import BlockedDates from "@/components/Lawyer/BlockedDates";
 import SettingsForm from "@/components/Lawyer/Forms/SettingsForm";
 import Navbar from "./layout/Navbar";
@@ -22,9 +22,9 @@ import { useFetchSlotSettings } from "@/store/tanstack/queries";
 
 export default function LawyerSchedulePage() {
   const today = new Date(new Date().setHours(0, 0, 0, 0));
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
-  );
+  // const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+  //   new Date()
+  // );
   const [availabilityUpdated, setAvailabilityUpdated] = useState(false);
   const { data } = useFetchSlotSettings();
   const dateAvailable = data?.data?.maxDaysInAdvance;
@@ -38,8 +38,8 @@ export default function LawyerSchedulePage() {
   return (
     <div className="bg-brandCream dark:bg-slate-950 min-h-screen">
       <Navbar />
-      <div className="flex-grow container md:ml-10 px-1 py-2 ">
-        <div className="flex flex-col md:flex-row md:gap-16 ">
+      <div className="flex-grow container">
+        <div className="flex flex-col md:flex-row md:justify-evenly md:gap-16 ">
           <Sidebar />
           <div className="flex-grow py-8">
             <h1 className="text-3xl font-bold mb-6 dark:text-white">
@@ -52,7 +52,7 @@ export default function LawyerSchedulePage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-1">
-                <Card className="dark:bg-gray-800 dark:border-gray-700">
+                {/* <Card className="dark:bg-gray-800 dark:border-gray-700">
                   <CardHeader>
                     <CardTitle className="dark:text-white">
                       Select Date
@@ -72,9 +72,9 @@ export default function LawyerSchedulePage() {
                       className="rounded-md border mx-auto dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </CardContent>
-                </Card>
+                </Card> */}
 
-                <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
+                <Card className=" dark:bg-gray-800 dark:border-gray-700">
                   <CardHeader>
                     <CardTitle className="dark:text-white">
                       Schedule Settings
@@ -100,16 +100,16 @@ export default function LawyerSchedulePage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Tabs defaultValue="daily" className="w-full">
+                    <Tabs defaultValue="availability" className="w-full">
                       <TabsList className="mb-4 dark:bg-gray-700">
-                        <TabsTrigger
+                        {/* <TabsTrigger
                           value="daily"
                           className="dark:data-[state=active]:bg-gray-600 dark:text-gray-200"
                         >
                           Daily Slots
-                        </TabsTrigger>
+                        </TabsTrigger> */}
                         <TabsTrigger
-                          value="recurring"
+                          value="availability"
                           className="dark:data-[state=active]:bg-gray-600 dark:text-gray-200"
                         >
                           Recurring Schedule
@@ -122,14 +122,14 @@ export default function LawyerSchedulePage() {
                         </TabsTrigger>
                       </TabsList>
 
-                      <TabsContent value="daily">
+                      {/* <TabsContent value="daily">
                         <AvailabilityForm
                           selectedDate={selectedDate}
                           onUpdate={handleAvailabilityUpdate}
                         />
-                      </TabsContent>
+                      </TabsContent> */}
 
-                      <TabsContent value="recurring">
+                      <TabsContent value="availability">
                         <RecurringAvailability
                           onUpdate={handleAvailabilityUpdate}
                         />
@@ -144,7 +144,7 @@ export default function LawyerSchedulePage() {
               </div>
             </div>
             <div>
-              <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
+              {/* <Card className="mt-6 dark:bg-gray-800 dark:border-gray-700">
                 <CardHeader>
                   <CardTitle className="dark:text-white">
                     Your Schedule
@@ -159,7 +159,7 @@ export default function LawyerSchedulePage() {
                     refreshTrigger={availabilityUpdated}
                   />
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </div>
         </div>

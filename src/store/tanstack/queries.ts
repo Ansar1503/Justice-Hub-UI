@@ -102,10 +102,10 @@ export function useFetchAvailableSlots(date: Date | undefined) {
   });
 }
 
-export function useFetchAvailableSlotsByWeek(weekstart:Date) {
+export function useFetchAvailableSlotsByWeek(weekstart: Date) {
   return useQuery({
     queryKey: ["schedule", "availableslot", "week"],
-    queryFn: ()=>fetchAvailableSlotsByWeek(weekstart),
+    queryFn: () => fetchAvailableSlotsByWeek(weekstart),
     staleTime: 1000 * 60 * 10,
   });
 }

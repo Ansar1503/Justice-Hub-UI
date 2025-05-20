@@ -1,7 +1,7 @@
 function Footer() {
   return (
     <footer
-      className="p-10 transition-all duration-300 
+      className="p-16 transition-all duration-300 
       bg-[#A9B5DF] text-black dark:bg-[#1A1C2B] dark:text-[#E0E0E0]"
     >
       <div className="flex flex-col md:flex-row justify-stretch items-start md:items-center gap-20">

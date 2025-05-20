@@ -1,12 +1,16 @@
-import {  Calendar, User, UserPen } from "lucide-react";
+import { Calendar, User, UserPen } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
+import { useFetchClientData } from "@/store/tanstack/queries";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const user = useAppSelector((state) => state.Auth.user);
-  const location = useLocation(); // Get the current location
+  const { data } = useFetchClientData();
+  const userData = data?.data;
+  const location = useLocation();
 
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
@@ -52,23 +56,35 @@ export default function Sidebar() {
           </svg>
         )}
       </button>
-
       {/* Sidebar content */}
       <aside
         className={`
-         p bg-neutral-300 dark:bg-slate-800 rounded-lg shadow-lg shadow-slate-300 dark:shadow-black
-          md:w-64 w-full md:min-w-64 flex-shrink-0
+          bg-brandForm dark:bg-black border dark:border-gray-800 border-gray-200 border-l-0 border-t-0 border-b-0
+          md:w-1/12 w-1/2 md:min-w-64 flex-shrink-0
           ${
             isOpen
               ? "fixed left-0 h-screen w-72 z-20 p-4 pt-16 overflow-y-auto top-0"
               : "fixed -left-full p-4"
           } 
-          md:static md:left-0 md:p-4 md:my-4 transition-all duration-300 ease-in-out
+          md:static transition-all duration-300 ease-in-out
         `}
+        style={{
+          borderTopRightRadius: "10px",
+          borderBottomRightRadius: "10px",
+        }}
       >
         {/* User Info Section */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <User className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+          <Avatar className="h-8 w-8 rounded-lg">
+            <AvatarImage
+              className="rounded-full"
+              src={userData?.profile_image}
+              alt={userData?.name}
+            />
+            <AvatarFallback className="rounded-lg">
+              <User />
+            </AvatarFallback>
+          </Avatar>
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
             {user?.name || "User Name"}
           </h2>
@@ -102,7 +118,6 @@ export default function Sidebar() {
           </ul>
         </nav>
       </aside>
-
 
       {isOpen && (
         <div

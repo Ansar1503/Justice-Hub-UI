@@ -1,6 +1,6 @@
-
 import { useContext, useState } from "react";
 import { ThemeContext } from "../../../context/ThemeProvider";
+import { VscLaw } from "react-icons/vsc";
 import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
 import { AuthContext } from "../../../context/AuthContextPovider";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ function Navbar() {
   const { setUserRole } = useContext(AuthContext);
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.Auth.user);
-  
+
   const dispatch = useAppDispatch();
   const handleLogout = () => {
     dispatch(LogOut());
@@ -30,15 +30,20 @@ function Navbar() {
 
   return (
     <nav
-      className={`p-4 transition-all duration-300 ${
+      className={`transition-all duration-300 ${
         theme === "dark"
-          ? "bg-[#1A1C2B] text-[#E0E0E0]"
-          : "bg-[#373F84] text-white"
-      }`}
+          ? "bg-brandBlack text-[#E0E0E0]"
+          : "bg-brandPrimary text-white"
+      }` }
     >
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center p-2 ml-5 ">
         {/* Logo */}
-        <div id="logo" onClick={() => navigate("/")} className="cursor-pointer">
+        <div
+          id="logo"
+          onClick={() => navigate("/")}
+          className="cursor-pointer flex justify-between items-center gap-1"
+        >
+          <VscLaw className="h-full w-8 " />
           <h2 className="text-xl font-semibold">Justice Hub</h2>
         </div>
 
@@ -199,8 +204,8 @@ function Navbar() {
                   </div>
                   <button
                     onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
+                      e.preventDefault();
+                      e.stopPropagation();
                       setIsDropdownOpen(false);
                       setIsOpen(false);
                       navigate("/lawyer/");

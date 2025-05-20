@@ -30,26 +30,24 @@ interface SettingsFormProps {
 export default function SettingsForm({ onUpdate }: SettingsFormProps) {
   const { data, refetch } = useFetchSlotSettings();
   const settings = data?.data;
-  const [slotDuration, setSlotDuration] = useState(
-    settings?.slotDuration || "30"
-  );
-  const [bufferTime, setBufferTime] = useState(settings?.bufferTime || "0");
+  const [slotDuration, setSlotDuration] = useState("30");
+  // const [bufferTime, setBufferTime] = useState(settings?.bufferTime || "0");
   const [maxDaysInAdvance, setMaxDaysInAdvance] = useState(
     settings?.maxDaysInAdvance || "30"
   );
   const [autoConfirm, setAutoConfirm] = useState(settings?.autoConfirm || true);
   const [errors, setErrors] = useState({
     slotDurationError: "",
-    bufferTimeError: "",
+    // bufferTimeError: "",
     maxDaysInAdvanceError: "",
     autoConfirmError: "",
   });
   useEffect(() => {
     if (settings) {
-      setSlotDuration(settings?.slotDuration.toString());
-      setBufferTime(settings?.bufferTime.toString());
-      setMaxDaysInAdvance(settings?.maxDaysInAdvance.toString());
-      setAutoConfirm(settings?.autoConfirm);
+      setSlotDuration(settings?.slotDuration?.toString() || "30");
+      // setBufferTime(settings?.bufferTime?.toString());
+      setMaxDaysInAdvance(settings?.maxDaysInAdvance?.toString() || "30");
+      setAutoConfirm(settings?.autoConfirm || false);
     }
   }, [settings]);
   const {
@@ -65,10 +63,10 @@ export default function SettingsForm({ onUpdate }: SettingsFormProps) {
       }));
       return;
     }
-    if (Number(slotDuration) < 15) {
+    if (Number(slotDuration) < 30) {
       setErrors((prev) => ({
         ...prev,
-        slotDurationError: "slot duration cannot be less than 15",
+        slotDurationError: "slot duration cannot be less than 30 minutes",
       }));
       return;
     }
@@ -79,10 +77,11 @@ export default function SettingsForm({ onUpdate }: SettingsFormProps) {
       }));
       return;
     }
-    if (Number(maxDaysInAdvance) < 7) {
+    if (Number(maxDaysInAdvance) < 15) {
       setErrors((prev) => ({
         ...prev,
-        maxDaysInAdvanceError: "max days in advance cannot be less than 7 days",
+        maxDaysInAdvanceError:
+          "max days in advance cannot be less than 15 days",
       }));
       return;
     }
@@ -91,7 +90,7 @@ export default function SettingsForm({ onUpdate }: SettingsFormProps) {
         autoConfirm,
         maxDaysInAdvance,
         slotDuration,
-        bufferTime,
+        // bufferTime,
       });
 
       onUpdate();
@@ -101,7 +100,7 @@ export default function SettingsForm({ onUpdate }: SettingsFormProps) {
     } finally {
       setErrors({
         autoConfirmError: "",
-        bufferTimeError: "",
+        // bufferTimeError: "",
         maxDaysInAdvanceError: "",
         slotDurationError: "",
       });
@@ -131,7 +130,7 @@ export default function SettingsForm({ onUpdate }: SettingsFormProps) {
             <SelectValue placeholder="Select duration" />
           </SelectTrigger>
           <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
-            {["15", "30", "45", "60", "90", "120"].map((val) => (
+            {["30", "45", "60", "90", "120"].map((val) => (
               <SelectItem
                 value={val}
                 key={val}
@@ -145,7 +144,7 @@ export default function SettingsForm({ onUpdate }: SettingsFormProps) {
         <span className="text-red-600">{errors.slotDurationError}</span>
       </div>
 
-      <div>
+      {/* <div>
         <div className="flex items-center justify-between">
           <Label htmlFor="buffer-time" className="dark:text-gray-200">
             Buffer Time Between Appointments
@@ -178,7 +177,7 @@ export default function SettingsForm({ onUpdate }: SettingsFormProps) {
           </SelectContent>
         </Select>
         <span className="text-red-600">{errors.bufferTimeError}</span>
-      </div>
+      </div> */}
 
       <div>
         <div className="flex items-center justify-between">
@@ -201,7 +200,7 @@ export default function SettingsForm({ onUpdate }: SettingsFormProps) {
             <SelectValue placeholder="Select maximum days" />
           </SelectTrigger>
           <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
-            {["7", "14", "30", "60", "90"].map((num) => (
+            {["15", "30", "60", "90"].map((num) => (
               <SelectItem
                 value={num}
                 key={num}

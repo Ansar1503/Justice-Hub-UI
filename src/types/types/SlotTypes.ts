@@ -16,7 +16,6 @@ export interface reccuringType {
 
 export interface slotSettings {
   slotDuration: string;
-  bufferTime?: string;
   maxDaysInAdvance: string;
   autoConfirm: boolean;
 }

@@ -13,7 +13,9 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			colors: {
+				brandBlack: "#1A1C2B",
 				brandPrimary: '#373F84',
+				brandForm: "#ebebff",
 				brandCream: "#FFF2F2",
 				brandSecondary: '#4A519E',
 				brandAccent: '#15355E',
