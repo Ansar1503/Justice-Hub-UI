@@ -7,15 +7,22 @@ export type dayType =
   | "saturday"
   | "sunday";
 
-export interface reccuringType {
-  day: dayType;
-  startTime?: string;
-  endTime?: string;
-  active?: boolean;
-}
-
 export interface slotSettings {
   slotDuration: string;
   maxDaysInAdvance: string;
   autoConfirm: boolean;
 }
+
+export interface TimeSlot {
+  start: string;
+  end: string;
+}
+
+export interface DayAvailability {
+  enabled: boolean;
+  timeSlots: TimeSlot[];
+}
+
+export type Availability = {
+  [key in string]: DayAvailability;
+};

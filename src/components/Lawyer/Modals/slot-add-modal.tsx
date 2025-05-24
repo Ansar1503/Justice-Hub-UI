@@ -13,22 +13,6 @@ export default function SlotAddModal() {
   useEffect(() => {
     setStep(Number(id));
   }, [id]);
-  const [slotSettings, setSlotSettings] = useState({
-    title: "",
-    duration: 30,
-    buffer: 10,
-    location: "online",
-  });
-
-  const handleSlotSettingsSubmit = (data: any) => {
-    setSlotSettings(data);
-    setStep(2);
-  };
-
-  const handleAvailabilitySubmit = (data: any) => {
-    console.log("Slot settings:", slotSettings);
-    console.log("Availability data:", data);
-  };
 
   return (
     <div className="flex justify-center w-full h-full mt-10">
@@ -54,10 +38,7 @@ export default function SlotAddModal() {
                 Step 1 of 2
               </div>
             </CardHeader>
-            <SlotSettingsForm
-              onSubmit={handleSlotSettingsSubmit}
-              initialData={slotSettings}
-            />
+            <SlotSettingsForm />
           </>
         ) : (
           <>
@@ -80,7 +61,7 @@ export default function SlotAddModal() {
                 Step 2 of 2
               </div>
             </CardHeader>
-            <AvailabilityForm onSubmit={handleAvailabilitySubmit} />
+            <AvailabilityForm  />
           </>
         )}
       </Card>
