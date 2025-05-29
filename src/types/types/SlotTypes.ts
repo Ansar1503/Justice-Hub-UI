@@ -26,3 +26,16 @@ export interface DayAvailability {
 export type Availability = {
   [key in string]: DayAvailability;
 };
+
+export interface OverrideDate {
+  _id: string;
+  date: Date;
+  isUnavailable: boolean;
+  timeRanges?: { start: string; end: string }[];
+}
+
+export interface OverrideDateResponse {
+  lawyer_id: string;
+  _id: string;
+  overrideDates: OverrideDate[];
+}

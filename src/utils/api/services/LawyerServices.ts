@@ -1,5 +1,9 @@
 import { store } from "@/store/redux/store";
-import { Availability, slotSettings } from "@/types/types/SlotTypes";
+import {
+  Availability,
+  OverrideDate,
+  slotSettings,
+} from "@/types/types/SlotTypes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 
 export async function LawyerVerification(formData: any) {
@@ -55,10 +59,41 @@ export async function updateAvailableSlots(payload: Availability) {
   return response.data;
 }
 
-export async function fetchAvailableSlots(){
+export async function fetchAvailableSlots() {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
     `/api/lawyer/schedule/availability`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function addOverrideSlots(payload: OverrideDate[]) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    `/api/lawyer/schedule/override`,
+    payload,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function fetchOverrideslots() {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(`/api/lawyer/schedule/override`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+}
+
+export async function removeOverrideSlot(overrideId: string) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.delete(
+    `/api/lawyer/schedule/override/${overrideId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

@@ -2,6 +2,7 @@ import {
   fetchClientData,
   fetchLawyerDetails,
   fetchLawyersByQuery,
+  fetchSlotsforClients,
 } from "@/utils/api/services/clientServices";
 import {
   fetchAllLawyers,
@@ -11,10 +12,15 @@ import { useQuery } from "@tanstack/react-query";
 import {
   fetchAvailableSlots,
   fetchLawyerData,
+  fetchOverrideslots,
   fetchSlotSettings,
 } from "@/utils/api/services/LawyerServices";
 import { LawyerFilterParams } from "@/types/types/Client.data.type";
-import { Availability, slotSettings } from "@/types/types/SlotTypes";
+import {
+  Availability,
+  OverrideDateResponse,
+  slotSettings,
+} from "@/types/types/SlotTypes";
 
 export function useFetchClientData() {
   return useQuery({
@@ -62,7 +68,7 @@ export function useFetchLawyersByQuery(query: LawyerFilterParams) {
 
 export function useFetchLawyerDetails(user_id: string) {
   return useQuery({
-    queryKey: ["lawyer", "details"],
+    queryKey: ["lawyer", "details",user_id],
     queryFn: () => fetchLawyerDetails(user_id),
     staleTime: 1000 * 60 * 10,
   });
@@ -83,3 +89,21 @@ export function useFetchAvailableSlots() {
     staleTime: 1000 * 60 * 10,
   });
 }
+
+export function useFetchOverrideSlots() {
+  return useQuery<ResponseType & { data: OverrideDateResponse }, Error>({
+    queryKey: ["schedule", "overrides"],
+    queryFn: () => fetchOverrideslots(),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchSlotsforClients(id: string, date: Date) {
+  return useQuery<ResponseType & { data: any }, Error>({
+    queryKey: ["schedule", "slots", id, date],
+    queryFn: () => fetchSlotsforClients(id, date),
+    staleTime: 1000 * 60 * 10,
+    enabled: id !== "" && !date,
+  });
+}
+

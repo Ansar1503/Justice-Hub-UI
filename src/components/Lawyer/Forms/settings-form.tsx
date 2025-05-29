@@ -14,6 +14,8 @@ import { useParams } from "react-router-dom";
 import { UpdateScheduleSettingsMutation } from "@/store/tanstack/mutations/slotMutations";
 import { slotSettings } from "@/types/types/SlotTypes";
 import { useQueryClient } from "@tanstack/react-query";
+import { useFetchSlotSettings } from "@/store/tanstack/queries";
+import { ResponseType } from "@/types/types/LoginResponseTypes";
 
 export function SlotSettingsForm() {
   const { id } = useParams();
@@ -25,23 +27,42 @@ export function SlotSettingsForm() {
   });
 
   const { mutateAsync, isPending } = UpdateScheduleSettingsMutation();
+  const { data, refetch } = useFetchSlotSettings();
+  const slotSettingsData = data?.data;
   const queryClient = useQueryClient();
-  const slotSettings: slotSettings | undefined = queryClient.getQueryData([
-    "schedule",
-    "settings",
-  ]);
+  const cacheData: (ResponseType & { data: slotSettings }) | undefined =
+    queryClient.getQueryData(["schedule", "settings"]);
+  const cachedSlotSettings = cacheData?.data;
 
   useEffect(() => {
-    if (slotSettings) {
-      if (Object.keys(slotSettings).length > 0) {
-        setFormData({
-          slotDuration: slotSettings?.slotDuration.toString(),
-          maxDaysInAdvance: slotSettings?.maxDaysInAdvance.toString(),
-          autoConfirm: slotSettings?.autoConfirm,
-        });
-      }
+    if (cachedSlotSettings && Object.keys(cachedSlotSettings).length > 0) {
+      setFormData({
+        slotDuration: cachedSlotSettings?.slotDuration.toString(),
+        maxDaysInAdvance: cachedSlotSettings?.maxDaysInAdvance.toString(),
+        autoConfirm: cachedSlotSettings.autoConfirm,
+      });
+    } else if (slotSettingsData && Object.keys(slotSettingsData).length > 0) {
+      setFormData({
+        slotDuration: slotSettingsData?.slotDuration.toString(),
+        maxDaysInAdvance: slotSettingsData?.maxDaysInAdvance.toString(),
+        autoConfirm: slotSettingsData.autoConfirm,
+      });
+    } else {
+      refetch();
     }
-  }, [slotSettings]);
+  }, [cachedSlotSettings, slotSettingsData, refetch]);
+
+  // useEffect(() => {
+  //   if (slotSettings) {
+  //     if (Object.keys(slotSettings).length > 0) {
+  //       setFormData({
+  //         slotDuration: slotSettings?.slotDuration?.toString(),
+  //         maxDaysInAdvance: slotSettings?.maxDaysInAdvance?.toString(),
+  //         autoConfirm: slotSettings?.autoConfirm,
+  //       });
+  //     }
+  //   }
+  // }, [slotSettings]);
 
   const handleChange = (field: string, value: string | boolean) => {
     if (field === "slotDuration" || field === "maxDaysInAdvance") {
@@ -135,7 +156,7 @@ export function SlotSettingsForm() {
           type="submit"
           className="w-full bg-gray-200 text-black hover:bg-white"
         >
-          {isPending? "Saving..." : id ? "Next Step" : "Save Settings"}
+          {isPending ? "Saving..." : id ? "Next Step" : "Save Settings"}
         </Button>
       </CardFooter>
     </form>

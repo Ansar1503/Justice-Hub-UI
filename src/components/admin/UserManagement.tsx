@@ -93,7 +93,6 @@ export function UserManagement() {
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
     e.stopPropagation();
-
     setSearch(e.target.value);
     // useFetchUsersByRole({ role: activeTab, search });
   }
@@ -225,7 +224,7 @@ export function UserManagement() {
                   <TableRow className="bg-gray-100 dark:bg-slate-800">
                     <TableHead>User</TableHead>
                     <TableHead>Role</TableHead>
-                    <TableHead>Verified</TableHead>
+                    <TableHead>Email Verified</TableHead>
                     {activeTab === "lawyer" && <TableHead>Status</TableHead>}
                     <TableHead>Blocked</TableHead>
                     <TableHead>Join Date</TableHead>
@@ -367,7 +366,7 @@ export function UserManagement() {
                                     e.stopPropagation();
                                     if (!user.user_id) return;
                                     await mutateAsync(user.user_id);
-                                    document.body.click(); // Hide the dropdown menu
+                                    document.body.click(); 
                                   }}
                                 >
                                   <Check className="mr-2 h-4 w-4" />
@@ -381,7 +380,7 @@ export function UserManagement() {
                                     e.stopPropagation();
                                     if (!user.user_id) return;
                                     await mutateAsync(user.user_id);
-                                    document.body.click(); // Hide the dropdown menu
+                                    document.body.click(); 
                                   }}
                                 >
                                   <X className="mr-2 h-4 w-4" />

@@ -2,7 +2,6 @@ import { Copy, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { RRule } from "rrule";
 
 import {
   Select,
@@ -18,6 +17,7 @@ import { Availability, slotSettings } from "@/types/types/SlotTypes";
 import { useUpdateAvailableSlots } from "@/store/tanstack/mutations/slotMutations";
 import { useFetchAvailableSlots } from "@/store/tanstack/queries";
 import { useParams } from "react-router-dom";
+import { ResponseType } from "@/types/types/LoginResponseTypes";
 
 interface ModalPosition {
   top: number;
@@ -67,42 +67,48 @@ export function AvailabilityForm() {
     }
   }, [availabilityData]);
   useEffect(() => {
-    const data: slotSettings | undefined = queryClient.getQueryData([
-      "schedule",
-      "settings",
-    ]);
-    if (data) {
-      setSlotSettings(data);
+    const data: (ResponseType & { data: slotSettings }) | undefined =
+      queryClient.getQueryData(["schedule", "settings"]);
+    const settings = data?.data;
+    if (settings && Object.keys(settings).length > 0) {
+      setSlotSettings(settings);
     }
   }, [queryClient]);
 
-  const timeOptions = useMemo(() => {
-    const duration = Number(slotSettings?.slotDuration);
+ const timeOptions = useMemo(() => {
+  const duration = Number(slotSettings?.slotDuration);
 
-    if (!duration || duration <= 0) return [];
+  const times = [];
 
-    const count = Math.floor((24 * 60) / duration);
-
-    try {
-      const times = new RRule({
-        freq: RRule.MINUTELY,
-        interval: duration,
-        count,
-        dtstart: new Date(Date.UTC(2000, 0, 1, 0, 0, 0)),
-        until: new Date(Date.UTC(2000, 0, 1, 23, 59, 59)),
-      }).all();
-
-      const options = times.map((date) => {
-        const hours = date.getUTCHours().toString().padStart(2, "0");
-        const minutes = date.getUTCMinutes().toString().padStart(2, "0");
-        return `${hours}:${minutes}`;
-      });
-      return options;
-    } catch (error) {
-      console.error("Error generating time options:", error);
-      return [];
+  if (!duration || duration <= 0) {
+    // Default: every 30 minutes
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const timeString = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        times.push(timeString);
+      }
     }
-  }, [slotSettings?.slotDuration]);
+    return times;
+  }
+
+  // Custom duration
+  const totalMinutesInDay = 24 * 60;
+
+  for (let minutes = 0; minutes < totalMinutesInDay; minutes += duration) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    const timeString = `${hours.toString().padStart(2, "0")}:${mins
+      .toString()
+      .padStart(2, "0")}`;
+    times.push(timeString);
+  }
+
+  return times;
+}, [slotSettings?.slotDuration]);
+
 
   const formatTime = useCallback((time24: string) => {
     const [hours, minutes] = time24.split(":");
@@ -252,7 +258,6 @@ export function AvailabilityForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("availabilty", availability);
     await mutateAsync(availability);
   };
 

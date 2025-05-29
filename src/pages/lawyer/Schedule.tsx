@@ -25,10 +25,7 @@ export default function LawyerSchedulePage() {
   // const maxDate = new Date(today);
   // maxDate.setDate(today.getDate() + dateAvailable);
 
-  const handleAvailabilityUpdate = () => {
-
-    console.log("Availability updated")
-  }
+ 
 
   return (
     <div className="bg-brandCream dark:bg-slate-950 min-h-screen">
@@ -85,7 +82,7 @@ export default function LawyerSchedulePage() {
                     </TabsContent>
 
                     <TabsContent value="overrides">
-                      <OverrideDates onUpdate={handleAvailabilityUpdate} />
+                      <OverrideDates  />
                     </TabsContent>
                   </Tabs>
                 </CardContent>

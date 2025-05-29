@@ -117,3 +117,31 @@ export async function addReview(payload: {
   );
   return response.data;
 }
+
+export async function fetchSlotsforClients(
+  lawyer_id: string,
+  date: Date
+): Promise<
+  ResponseType & { data: { isAvailable: boolean; slots: string[] | [] } }
+> {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/client/lawyers/slots/${lawyer_id}?date=${date}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function bookAppointment(formData:FormData){
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    `/api/client/lawyers/book`,
+    formData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}

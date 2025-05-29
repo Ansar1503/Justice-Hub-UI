@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./wrapper/ClientProtected.Route";
 import LawyerDirectory from "@/pages/client/LawyersListing";
 import LawyersPage from "@/pages/client/LawyerProfile";
+import PaymentSuccessPage from "@/pages/client/payment_successpaeg";
 
 function ClientRoutes() {
   return (
@@ -13,7 +14,11 @@ function ClientRoutes() {
         <Route index element={<ClientProfile />} />
         <Route path="/sessions" element={<SessionsPage />} />
         <Route path="/lawyers" element={<LawyerDirectory />} />
-        <Route path="/lawyers/:id" element={<LawyersPage/>} />
+        <Route path="/lawyers/:id" element={<LawyersPage />} />
+        <Route
+          path="/lawyers/payment_success"
+          element={<PaymentSuccessPage />}
+        />
       </Route>
     </Routes>
   );

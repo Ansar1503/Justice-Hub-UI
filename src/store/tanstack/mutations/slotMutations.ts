@@ -1,9 +1,13 @@
 import { ResponseType } from "@/types/types/LoginResponseTypes";
 import {
   Availability,
+  OverrideDate,
+  OverrideDateResponse,
   slotSettings,
 } from "@/types/types/SlotTypes";
 import {
+  addOverrideSlots,
+  removeOverrideSlot,
   updateAvailableSlots,
   updateScheduleSettings,
 } from "@/utils/api/services/LawyerServices";
@@ -44,6 +48,50 @@ export function useUpdateAvailableSlots() {
     onSuccess: (data) => {
       toast.success(data.message);
       queryClient.setQueryData(["schedule", "availability"], data.data);
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useAddOverrideSlots() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ResponseType & { data: OverrideDateResponse },
+    Error,
+    OverrideDate[]
+  >({
+    mutationFn: (payload: OverrideDate[]) => addOverrideSlots(payload),
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.setQueryData(["schedule", "overrides"], data.data);
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useDeleteOverrideSlot() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ResponseType & { data: OverrideDateResponse },
+    Error,
+    string
+  >({
+    mutationFn: (payload: string) => removeOverrideSlot(payload),
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.setQueryData(["schedule", "overrides"], data.data);
     },
     onError: (error: any) => {
       const message =
