@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import {
   Search,
@@ -10,8 +8,6 @@ import {
   Eye,
   ArrowUpDown,
   Clock,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,17 +34,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { LawyerVerificationModal } from "./Modals/LawyerVerification.Modal";
 import { LawerDataType } from "@/types/types/Client.data.type";
 import { useFetchAllLawyers } from "@/store/tanstack/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function LawyersList() {
-  const { data } = useFetchAllLawyers();
-  const [lawyers, setLawyers] = useState<LawerDataType[]>([]);
+  const [lawyers, setLawyers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("name");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "verified" | "rejected" | "pending" | "requested"
+  >("all");
+  const [sortBy, setSortBy] = useState<
+    "name" | "experience" | "consultation_fee" | "createdAt"
+  >("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [selectedLawyer, setSelectedLawyer] = useState<LawerDataType | null>(
     null
@@ -56,56 +64,39 @@ export function LawyersList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(2);
+  const { data, refetch: lawyerrefetch } = useFetchAllLawyers({
+    sort: sortBy,
+    order: sortOrder,
+    search: searchTerm,
+    status: statusFilter,
+    page: currentPage,
+    limit: itemsPerPage,
+  });
+
   useEffect(() => {
     if (data?.data) {
-      setLawyers(data.data);
+      setLawyers(data.data?.lawyers);
     }
-  }, [data]);
-  // console.log("data.data", data?.data);
-  const filteredLawyers = lawyers.filter((lawyer) => {
-    const matchesSearch =
-      lawyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lawyer.email.toLowerCase().includes(searchTerm.toLowerCase());
+  }, [data?.data, data, data?.data?.lawyers]);
 
-    const matchesStatus =
-      statusFilter === "all" || lawyer.verification_status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
-  const sortedLawyers = [...filteredLawyers].sort((a, b) => {
-    let comparison = 0;
-
-    switch (sortBy) {
-      case "name":
-        comparison = a.name.localeCompare(b.name);
-        break;
-      case "experience":
-        comparison = a.experience - b.experience;
-        break;
-      case "fee":
-        comparison = a.consultation_fee - b.consultation_fee;
-        break;
-      case "joined":
-        comparison =
-          new Date(a.createdAt || "").getTime() -
-          new Date(b.createdAt || "").getTime();
-        break;
-      default:
-        comparison = a.name.localeCompare(b.name);
+  useEffect(() => {
+    async function fetchLawyers() {
+      await lawyerrefetch();
     }
+    fetchLawyers();
+  }, [currentPage, sortBy, sortOrder, searchTerm, statusFilter]);
 
-    return sortOrder === "asc" ? comparison : -comparison;
-  });
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy, sortOrder, searchTerm, statusFilter]);
 
-  const totalItems = sortedLawyers.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedLawyers = sortedLawyers.slice(startIndex, endIndex);
+  const totalPages = data?.data?.totalPages;
+  const totalItems = data?.data?.totalCount;
 
-  const handleSort = (field: string) => {
+  const handleSort = (
+    field: "name" | "experience" | "consultation_fee" | "createdAt"
+  ) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -156,19 +147,43 @@ export function LawyersList() {
         return null;
     }
   };
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+
+  const generatePageNumbers = () => {
+    const pages = [];
+    const showEllipsis = totalPages > 7;
+
+    if (!showEllipsis) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+
+      if (currentPage > 4) {
+        pages.push("ellipsis-start");
+      }
+
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        if (!pages.includes(i)) {
+          pages.push(i);
+        }
+      }
+
+      if (currentPage < totalPages - 3) {
+        pages.push("ellipsis-end");
+      }
+      if (!pages.includes(totalPages)) {
+        pages.push(totalPages);
+      }
     }
+
+    return pages;
   };
 
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const goToPage = (page: number) => {
+  const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
@@ -200,9 +215,15 @@ export function LawyersList() {
             <div className="flex gap-2">
               <Select
                 value={statusFilter}
-                onValueChange={(value) => {
+                onValueChange={(
+                  value:
+                    | "all"
+                    | "verified"
+                    | "rejected"
+                    | "pending"
+                    | "requested"
+                ) => {
                   setStatusFilter(value);
-                  setCurrentPage(1);
                 }}
               >
                 <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800">
@@ -240,12 +261,17 @@ export function LawyersList() {
                     {sortBy === "experience" &&
                       (sortOrder === "asc" ? "↑" : "↓")}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSort("fee")}>
-                    Fee {sortBy === "fee" && (sortOrder === "asc" ? "↑" : "↓")}
+                  <DropdownMenuItem
+                    onClick={() => handleSort("consultation_fee")}
+                  >
+                    Fee{" "}
+                    {sortBy === "consultation_fee" &&
+                      (sortOrder === "asc" ? "↑" : "↓")}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSort("joined")}>
+                  <DropdownMenuItem onClick={() => handleSort("createdAt")}>
                     Joined Date{" "}
-                    {sortBy === "joined" && (sortOrder === "asc" ? "↑" : "↓")}
+                    {sortBy === "createdAt" &&
+                      (sortOrder === "asc" ? "↑" : "↓")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -284,17 +310,18 @@ export function LawyersList() {
                     <Button
                       variant="ghost"
                       className="p-0 font-medium"
-                      onClick={() => handleSort("fee")}
+                      onClick={() => handleSort("consultation_fee")}
                     >
                       Fee{" "}
-                      {sortBy === "fee" && (sortOrder === "asc" ? "↑" : "↓")}
+                      {sortBy === "consultation_fee" &&
+                        (sortOrder === "asc" ? "↑" : "↓")}
                     </Button>
                   </TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedLawyers.length === 0 ? (
+                {lawyers && lawyers.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={6}
@@ -304,53 +331,64 @@ export function LawyersList() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedLawyers.map((lawyer) => (
+                  lawyers &&
+                  lawyers.map((lawyer) => (
                     <TableRow
-                      key={lawyer.user_id}
+                      key={lawyer?.user_id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8 border">
                             <AvatarImage
-                              src={lawyer.profile_image || "/placeholder.svg"}
-                              alt={lawyer.name}
+                              src={lawyer?.clientData?.profile_image}
+                              alt={lawyer?.name}
                             />
                             <AvatarFallback>
-                              {lawyer.name.substring(0, 2).toUpperCase()}
+                              {lawyer?.name?.substring(0, 2).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{lawyer.name}</p>
+                            <p className="font-medium">{lawyer?.name}</p>
                             <p className="text-xs text-muted-foreground">
-                              {lawyer.email}
+                              {lawyer?.email}
                             </p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {renderStatusBadge(lawyer.verification_status)}
+                        {renderStatusBadge(lawyer?.verification_status)}
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {lawyer.practice_areas.slice(0, 2).map((area) => (
-                            <Badge
-                              key={area}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {area}
-                            </Badge>
-                          ))}
-                          {lawyer.practice_areas.length > 2 && (
+                          {lawyer.lawyerData &&
+                            lawyer.lawyerData.practice_areas &&
+                            lawyer.lawyerData?.practice_areas?.length > 0 &&
+                            lawyer.lawyerData.practice_areas
+                              .slice(
+                                0,
+                                lawyer.lawyerData.practice_areas.length - 1
+                              )
+                              .map((area: any) => (
+                                <Badge
+                                  key={area}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {area}
+                                </Badge>
+                              ))}
+                          {lawyer.lawyerData.practice_areas.length > 2 && (
                             <Badge variant="outline" className="text-xs">
-                              +{lawyer.practice_areas.length - 2}
+                              +{lawyer.lawyerData.practice_areas.length - 2}
                             </Badge>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>{lawyer.experience} yrs</TableCell>
-                      <TableCell>₹{lawyer.consultation_fee}</TableCell>
+                      <TableCell>{lawyer.lawyerData.experience} yrs</TableCell>
+                      <TableCell>
+                        ₹{lawyer.lawyerData.consultation_fee}
+                      </TableCell>
 
                       <TableCell className="text-right">
                         <Button
@@ -370,51 +408,71 @@ export function LawyersList() {
             </Table>
           </div>
 
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
+          {/* Pagination with shadcn/ui */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6">
+              <div className="text-sm text-muted-foreground">
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
+                {totalItems} results
+              </div>
+
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage > 1) {
+                          handlePageChange(currentPage - 1);
+                        }
+                      }}
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    />
+                  </PaginationItem>
+
+                  {generatePageNumbers().map((pageNum, index) => (
+                    <PaginationItem key={index}>
+                      {pageNum === "ellipsis-start" ||
+                      pageNum === "ellipsis-end" ? (
+                        <PaginationEllipsis />
+                      ) : (
+                        <PaginationLink
+                          isActive={pageNum === currentPage}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(Number(pageNum));
+                          }}
+                        >
+                          {pageNum}
+                        </PaginationLink>
+                      )}
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage < totalPages) {
+                          handlePageChange(currentPage + 1);
+                        }
+                      }}
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={goToPreviousPage}
-                disabled={currentPage === 1}
-                className="bg-white dark:bg-gray-800"
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
-              </Button>
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-                (page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => goToPage(page)}
-                    className={
-                      currentPage === page
-                        ? "bg-gray-900 text-white"
-                        : "bg-white dark:bg-gray-800"
-                    }
-                  >
-                    {page}
-                  </Button>
-                )
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={goToNextPage}
-                disabled={currentPage === totalPages}
-                className="bg-white dark:bg-gray-800"
-              >
-                Next
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 

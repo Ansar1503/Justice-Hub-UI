@@ -29,7 +29,7 @@ import { DocumentPreview } from "../DocumentPreview";
 import { RejectLawyerModal } from "./RejectModal";
 
 interface LawyerVerificationModalProps {
-  lawyer: LawerDataType;
+  lawyer: any;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -53,22 +53,21 @@ export function LawyerVerificationModal({
   const [statusAction, setStatusAction] = useState<"approve" | "reject" | null>(
     null
   );
-  // console.log(lawyer)
   const documents = [
     {
       name: "Bar Council Certificate",
-      url: lawyer.documents?.bar_council_certificate || "",
-      number: lawyer?.barcouncil_number || "N/A",
+      url: lawyer?.lawyerDocuments?.bar_council_certificate || "",
+      number: lawyer?.lawyerData?.barcouncil_number || "N/A",
     },
     {
       name: "Enrollment Certificate",
-      url: lawyer.documents?.enrollment_certificate || "",
-      number: lawyer.enrollment_certificate_number || "N/A",
+      url: lawyer.lawyerDocuments?.enrollment_certificate || "",
+      number: lawyer?.lawyerData?.enrollment_certificate_number || "N/A",
     },
     {
       name: "Certificate of Practice",
-      url: lawyer.documents?.certificate_of_practice || "",
-      number: lawyer.certificate_of_practice_number || "N/A",
+      url: lawyer?.lawyerDocuments?.certificate_of_practice || "",
+      number: lawyer?.lawyerData?.certificate_of_practice_number || "N/A",
     },
   ];
 
@@ -79,7 +78,7 @@ export function LawyerVerificationModal({
       setIsRejectionDialogOpen(true);
       return;
     }
-    
+
     try {
       setStatusAction("approve");
       await mutateAsync({ user_id: lawyer.user_id, status });
@@ -121,6 +120,7 @@ export function LawyerVerificationModal({
 
   const handleDownloadDocument = (url: string, name: string) => {
     if (url) {
+      
       const link = document.createElement("a");
       link.href = url;
       link.download = `${name}.${url.split(".").pop() || "pdf"}`;
@@ -172,7 +172,7 @@ export function LawyerVerificationModal({
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>Lawyer Details</span>
-              {renderStatusBadge(lawyer.verification_status)}
+              {renderStatusBadge(lawyer?.lawyerData?.verification_status)}
             </DialogTitle>
             <DialogDescription>
               Review {lawyer.name}'s profile and verification details
@@ -197,12 +197,12 @@ export function LawyerVerificationModal({
                   <CardTitle>Basic Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {lawyer.description && (
+                  {lawyer?.lawyerData?.description && (
                     <div>
                       <Label className="text-muted-foreground">
                         Description
                       </Label>
-                      <p className="mt-1">{lawyer.description}</p>
+                      <p className="mt-1">{lawyer?.lawyerData?.description}</p>
                     </div>
                   )}
                 </CardContent>
@@ -272,11 +272,15 @@ export function LawyerVerificationModal({
                         Practice Areas
                       </Label>
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {lawyer.practice_areas.map((area) => (
-                          <Badge key={area} variant="secondary">
-                            {area}
-                          </Badge>
-                        ))}
+                        {(lawyer?.lawyerData?.practice_areas &&
+                          lawyer?.lawyerData?.practice_areas?.length > 0 &&
+                          lawyer?.lawyerData?.practice_areas?.map(
+                            (area: any) => (
+                              <Badge key={area} variant="secondary">
+                                {area}
+                              </Badge>
+                            )
+                          )) || <span>N/A</span>}
                       </div>
                     </div>
                     <div>
@@ -284,11 +288,15 @@ export function LawyerVerificationModal({
                         Specialisation
                       </Label>
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {lawyer.specialisation?.map((spec) => (
-                          <Badge key={spec} variant="secondary">
-                            {spec}
-                          </Badge>
-                        )) || <span>N/A</span>}
+                        {(lawyer?.lawyerData?.specialisation &&
+                          lawyer?.lawyerData?.specialisation?.length > 0 &&
+                          lawyer?.lawyerData?.specialisation?.map(
+                            (spec: any) => (
+                              <Badge key={spec} variant="secondary">
+                                {spec}
+                              </Badge>
+                            )
+                          )) || <span>N/A</span>}
                       </div>
                     </div>
                     <div>
@@ -296,7 +304,7 @@ export function LawyerVerificationModal({
                         Experience
                       </Label>
                       <p className="mt-1 font-medium">
-                        {lawyer.experience} years
+                        {lawyer?.lawyerData?.experience || "N/A"} years
                       </p>
                     </div>
                     <div>
@@ -304,7 +312,7 @@ export function LawyerVerificationModal({
                         Consultation Fee
                       </Label>
                       <p className="mt-1 font-medium">
-                        ₹{lawyer.consultation_fee}
+                        ₹{lawyer?.lawyerData?.consultation_fee || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -329,7 +337,7 @@ export function LawyerVerificationModal({
                       </Label>
                       <p className="mt-1 font-medium">
                         {lawyer.email}{" "}
-                        {lawyer.is_verified && <Badge>verified</Badge>}
+                        {lawyer.is_verified}
                       </p>
                     </div>
                     <div>
@@ -337,7 +345,7 @@ export function LawyerVerificationModal({
                         Phone Number
                       </Label>
                       <p className="mt-1 font-medium">
-                        {lawyer.mobile || "N/A"}
+                        {lawyer?.clientData?.mobile || "N/A"}
                       </p>
                     </div>
                     <div>
@@ -345,8 +353,8 @@ export function LawyerVerificationModal({
                         Joined Date
                       </Label>
                       <p className="mt-1 font-medium">
-                        {lawyer.createdAt
-                          ? new Date(lawyer.createdAt).toLocaleDateString(
+                        {lawyer?.createdAt
+                          ? new Date(lawyer?.createdAt)?.toLocaleDateString(
                               "en-IN",
                               {
                                 day: "numeric",
@@ -364,7 +372,7 @@ export function LawyerVerificationModal({
           </Tabs>
 
           <DialogFooter className="flex justify-between items-center">
-            {lawyer.verification_status === "requested" && (
+            {lawyer?.lawyerData?.verification_status === "requested" && (
               <div className="flex gap-2">
                 <Button
                   variant="destructive"

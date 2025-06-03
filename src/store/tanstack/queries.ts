@@ -41,6 +41,11 @@ export function useFetchLawyerData() {
 export function useFetchUsersByRole(query: {
   role: "lawyer" | "client";
   search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: string;
+  status: "all" | "verified" | "blocked";
 }) {
   return useQuery({
     queryKey: ["user", query.role],
@@ -50,10 +55,17 @@ export function useFetchUsersByRole(query: {
   });
 }
 
-export function useFetchAllLawyers() {
+export function useFetchAllLawyers(query: {
+  sort?: "name" | "experience" | "consultation_fee" | "createdAt";
+  order?: "asc" | "desc";
+  page: number;
+  limit: number;
+  status?: "all" |   "verified" | "rejected" | "pending" | "requested";
+  search:string
+}) {
   return useQuery({
     queryKey: ["lawyers"],
-    queryFn: fetchAllLawyers,
+    queryFn: () => fetchAllLawyers(query),
     staleTime: 1000 * 60 * 10,
   });
 }
@@ -68,7 +80,7 @@ export function useFetchLawyersByQuery(query: LawyerFilterParams) {
 
 export function useFetchLawyerDetails(user_id: string) {
   return useQuery({
-    queryKey: ["lawyer", "details",user_id],
+    queryKey: ["lawyer", "details", user_id],
     queryFn: () => fetchLawyerDetails(user_id),
     staleTime: 1000 * 60 * 10,
   });
@@ -106,4 +118,3 @@ export function useFetchSlotsforClients(id: string, date: Date) {
     enabled: id !== "" && !date,
   });
 }
-

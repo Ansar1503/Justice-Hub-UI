@@ -1,5 +1,4 @@
-"use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useFetchUsersByRole } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -51,12 +50,41 @@ export function UserManagement() {
   const [sortBy, setSortBy] = useState<"name" | "createdAt">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(2);
+
   const { mutateAsync } = useBlockUser();
-  const { data, isLoading, isError, error } = useFetchUsersByRole({
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch: refetchUser,
+  } = useFetchUsersByRole({
     role: activeTab,
+    search,
+    sortBy,
+    sortOrder,
+    page: currentPage,
+    limit: itemsPerPage,
+    status: statusFilter,
   });
-  const users = data?.data || [];
+  useEffect(()=>{
+    async function refetch() {
+      await refetchUser();
+    }
+    refetch();
+  },[currentPage,refetchUser])
+  const users = useMemo(() => data?.data?.data || [], [data]);
+  const totalCount = useMemo(() => data?.data?.totalCount || 0, [data]);
+  const totalPages = useMemo(
+    () => Math.ceil(totalCount / itemsPerPage),
+    [totalCount, itemsPerPage]
+  );
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, search, statusFilter, sortBy, sortOrder]);
+
   useEffect(() => {
     if (isError) {
       if ((error as any).response && (error as any).response.data) {
@@ -72,29 +100,12 @@ export function UserManagement() {
     }
   }, [isError, error]);
 
-  const filteredUsers = users.filter((user: clientDataType | LawerDataType) => {
-    const matchesSearch = user.name
-      ?.toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" ||
-      (statusFilter === "verified" && user.is_verified) ||
-      (statusFilter === "blocked" && user.is_blocked);
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalItems = filteredUsers.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-    e.preventDefault();
-    e.stopPropagation();
     setSearch(e.target.value);
-    // useFetchUsersByRole({ role: activeTab, search });
+  }
+
+  function handleTabChange(tab: "client" | "lawyer") {
+    setActiveTab(tab);
   }
 
   if (isLoading) {
@@ -203,17 +214,17 @@ export function UserManagement() {
             </Select>
           </div>
 
-          <Tabs defaultValue={activeTab}>
+          <Tabs defaultValue={activeTab} value={activeTab}>
             <TabsList>
               <TabsTrigger
                 value="client"
-                onClick={() => setActiveTab("client")}
+                onClick={() => handleTabChange("client")}
               >
                 Clients
               </TabsTrigger>
               <TabsTrigger
                 value="lawyer"
-                onClick={() => setActiveTab("lawyer")}
+                onClick={() => handleTabChange("lawyer")}
               >
                 Lawyers
               </TabsTrigger>
@@ -232,8 +243,8 @@ export function UserManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedUsers?.length > 0 ? (
-                    paginatedUsers.map((user: clientDataType) => (
+                  {users && users?.length > 0 ? (
+                    users.map((user: clientDataType) => (
                       <TableRow
                         key={user.user_id || user.email}
                         className="hover:bg-gray-50 dark:hover:bg-slate-700"
@@ -366,7 +377,7 @@ export function UserManagement() {
                                     e.stopPropagation();
                                     if (!user.user_id) return;
                                     await mutateAsync(user.user_id);
-                                    document.body.click(); 
+                                    document.body.click();
                                   }}
                                 >
                                   <Check className="mr-2 h-4 w-4" />
@@ -380,7 +391,7 @@ export function UserManagement() {
                                     e.stopPropagation();
                                     if (!user.user_id) return;
                                     await mutateAsync(user.user_id);
-                                    document.body.click(); 
+                                    document.body.click();
                                   }}
                                 >
                                   <X className="mr-2 h-4 w-4" />
@@ -406,11 +417,13 @@ export function UserManagement() {
               </Table>
             </TabsContent>
           </Tabs>
-          <Paginations
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(page: number) => setCurrentPage(page)}
-          />
+          {totalPages > 1 && (
+            <Paginations
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page: number) => setCurrentPage(page)}
+            />
+          )}
         </div>
       </CardContent>
     </Card>

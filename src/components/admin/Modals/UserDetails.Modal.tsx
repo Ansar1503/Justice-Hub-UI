@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { format } from "date-fns"
+import { useState } from "react";
+import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -12,32 +12,45 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { CalendarIcon, MapPinIcon, PhoneIcon, MailIcon, UserIcon, ShieldIcon, ClockIcon } from "lucide-react"
-import { clientDataType } from "@/types/types/Client.data.type"
-
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  CalendarIcon,
+  MapPinIcon,
+  PhoneIcon,
+  MailIcon,
+  UserIcon,
+  ShieldIcon,
+  ClockIcon,
+} from "lucide-react";
+import { clientDataType } from "@/types/types/Client.data.type";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface UserDetailsModalProps {
-  user: clientDataType
-  trigger?: React.ReactNode
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
+  user: clientDataType;
+  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDetailsModalProps) {
-  const [isOpen, setIsOpen] = useState(open || false)
+export function UserDetailsModal({
+  user,
+  trigger,
+  open,
+  onOpenChange,
+}: UserDetailsModalProps) {
+  const [isOpen, setIsOpen] = useState(open || false);
 
   const handleOpenChange = (newOpen: boolean) => {
     if (onOpenChange) {
-      onOpenChange(newOpen)
+      onOpenChange(newOpen);
     } else {
-      setIsOpen(newOpen)
+      setIsOpen(newOpen);
     }
-  }
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -45,27 +58,36 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
       .map((part) => part[0])
       .join("")
       .toUpperCase()
-      .substring(0, 2)
-  }
+      .substring(0, 2);
+  };
 
   const formatDate = (date?: Date) => {
-    if (!date) return "N/A"
-    return format(date, "PPP")
-  }
+    if (!date) return "N/A";
+    return format(date, "PPP");
+  };
 
   return (
-    <Dialog open={open !== undefined ? open : isOpen} onOpenChange={handleOpenChange}>
+    <Dialog
+      open={open !== undefined ? open : isOpen}
+      onOpenChange={handleOpenChange}
+    >
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>User Details</DialogTitle>
+          <DialogDescription>
+            View detailed information about this user account.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col space-y-4 py-4">
           <div className="flex items-center space-x-4">
             <Avatar className="h-16 w-16">
               {user.profile_image ? (
-                <AvatarImage src={user.profile_image || "/placeholder.svg"} alt={user.name} />
+                <AvatarImage
+                  src={user.profile_image || "/placeholder.svg"}
+                  alt={user.name}
+                />
               ) : (
                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
               )}
@@ -75,12 +97,18 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <span>{user.email}</span>
                 {user.is_verified && (
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-50 text-green-700 border-green-200"
+                  >
                     Verified
                   </Badge>
                 )}
                 {user.is_blocked && (
-                  <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                  <Badge
+                    variant="outline"
+                    className="bg-red-50 text-red-700 border-red-200"
+                  >
                     Blocked
                   </Badge>
                 )}
@@ -141,34 +169,37 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
             </div>
           </div>
 
-          {user.address && Object.values(user.address).some((value) => value) && (
-            <>
-              <Separator />
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Address</h4>
-                <div className="grid grid-cols-1 gap-1 text-sm">
-                  <div className="flex items-start space-x-2">
-                    <MapPinIcon className="h-4 w-4 text-muted-foreground mt-0.5" />
-                    <div>
-                      {user.address.locality && <div>{user.address.locality}</div>}
-                      {(user.address.city || user.address.state) && (
-                        <div>
-                          {user.address.city && `${user.address.city}, `}
-                          {user.address.state}
-                        </div>
-                      )}
-                      {(user.address.state || user.address.pincode) && (
-                        <div>
-                          {user.address.state && `${user.address.state} `}
-                          {user.address.pincode && `${user.address.pincode}`}
-                        </div>
-                      )}
+          {user.address &&
+            Object.values(user.address).some((value) => value) && (
+              <>
+                <Separator />
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Address</h4>
+                  <div className="grid grid-cols-1 gap-1 text-sm">
+                    <div className="flex items-start space-x-2">
+                      <MapPinIcon className="h-4 w-4 text-muted-foreground mt-0.5" />
+                      <div>
+                        {user.address.locality && (
+                          <div>{user.address.locality}</div>
+                        )}
+                        {(user.address.city || user.address.state) && (
+                          <div>
+                            {user.address.city && `${user.address.city}, `}
+                            {user.address.state}
+                          </div>
+                        )}
+                        {(user.address.state || user.address.pincode) && (
+                          <div>
+                            {user.address.state && `${user.address.state} `}
+                            {user.address.pincode && `${user.address.pincode}`}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
           {(user.createdAt || user.updatedAt) && (
             <>
@@ -203,5 +234,5 @@ export function UserDetailsModal({ user, trigger, open, onOpenChange }: UserDeta
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -5,7 +5,6 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -41,15 +40,14 @@ function LawyerVerification() {
     const isLast = index === pathSegments.length - 1;
 
     return (
-      <BreadcrumbItem key={path}>
+      <BreadcrumbItem key={index}>
         {isLast ? (
           <BreadcrumbPage>{segment}</BreadcrumbPage>
         ) : (
-          <BreadcrumbLink>
+          <BreadcrumbLink asChild>
             <Link to={path}>{segment}</Link>
           </BreadcrumbLink>
         )}
-        {!isLast && <BreadcrumbSeparator />}
       </BreadcrumbItem>
     );
   });

@@ -12,7 +12,7 @@ function ClientRoutes() {
     <Routes>
       <Route element={<ProtectedRoute />}>
         <Route index element={<ClientProfile />} />
-        <Route path="/sessions" element={<SessionsPage />} />
+        <Route path="/consultations" element={<SessionsPage />} />
         <Route path="/lawyers" element={<LawyerDirectory />} />
         <Route path="/lawyers/:id" element={<LawyersPage />} />
         <Route

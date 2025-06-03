@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { LawerDataType } from "@/types/types/Client.data.type";
 import { Badge } from "../ui/badge";
 import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function LawyersCard({
   lawyer,
@@ -18,17 +19,18 @@ export default function LawyersCard({
   lawyer: Partial<LawerDataType>;
   getVerificationBadge: any;
 }) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <Card key={lawyer.user_id}>
       <CardHeader className="pb-2">
         <div className="flex justify-between">
           <div className="flex items-center space-x-4">
-            <img
-              src={lawyer.profile_image || "/placeholder.svg"}
-              alt={lawyer.name}
-              className="w-12 h-12 rounded-full object-cover"
-            />
+            <Avatar className="h-8 w-8 border">
+              <AvatarImage src={lawyer?.profile_image} alt={lawyer?.name} />
+              <AvatarFallback>
+                {lawyer?.name?.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <div>
               <CardTitle className="text-lg">{lawyer.name}</CardTitle>
               <CardDescription>{lawyer.address?.city}</CardDescription>
@@ -81,9 +83,9 @@ export default function LawyersCard({
           </div>
         </div>
         <div>
-          <div className="flex items-center">
-            {/* <div className="flex"> */}
-            {/* {Array.from({ length: 5 }).map((_, i) => (
+          {/* <div className="flex items-center"> */}
+          {/* <div className="flex"> */}
+          {/* {Array.from({ length: 5 }).map((_, i) => (
               <svg
                 key={i}
                 className={`w-4 h-4 ${
@@ -95,13 +97,20 @@ export default function LawyersCard({
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             ))} */}
-            {/* </div> */}
-            {/* <span className="ml-1 text-sm text-gray-500">({lawyer.reviews} reviews)</span> */}
-          </div>
+          {/* </div> */}
+          {/* <span className="ml-1 text-sm text-gray-500">({lawyer.reviews} reviews)</span> */}
+          {/* </div> */}
         </div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full" onClick={()=>{navigate(`/client/lawyers/${lawyer.user_id}`)}}>View Profile</Button>
+        <Button
+          className="w-full"
+          onClick={() => {
+            navigate(`/client/lawyers/${lawyer.user_id}`);
+          }}
+        >
+          View Profile
+        </Button>
       </CardFooter>
     </Card>
   );
