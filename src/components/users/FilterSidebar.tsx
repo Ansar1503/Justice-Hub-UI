@@ -19,7 +19,7 @@ interface FiltersSidebarProps {
     specialisation: string[];
     experienceRange: number[];
     feeRange: number[];
-    sortBy: "recommended" | "rating" | "experience" | "fee-low" | "fee-high";
+    sortBy:   "rating" | "experience" | "fee-low" | "fee-high";
   };
   setFilters: React.Dispatch<
     React.SetStateAction<FiltersSidebarProps["filters"]>

@@ -34,19 +34,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+
 import { LawyerVerificationModal } from "./Modals/LawyerVerification.Modal";
 import { LawerDataType } from "@/types/types/Client.data.type";
 import { useFetchAllLawyers } from "@/store/tanstack/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PaginationComponent from "../pagination";
 
 export function LawyersList() {
   const [lawyers, setLawyers] = useState<any[]>([]);
@@ -62,7 +55,6 @@ export function LawyersList() {
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(2);
   const { data, refetch: lawyerrefetch } = useFetchAllLawyers({
@@ -85,7 +77,7 @@ export function LawyersList() {
       await lawyerrefetch();
     }
     fetchLawyers();
-  }, [currentPage, sortBy, sortOrder, searchTerm, statusFilter]);
+  }, [currentPage, sortBy, sortOrder, searchTerm, statusFilter, lawyerrefetch]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -146,41 +138,6 @@ export function LawyersList() {
       default:
         return null;
     }
-  };
-
-  const generatePageNumbers = () => {
-    const pages = [];
-    const showEllipsis = totalPages > 7;
-
-    if (!showEllipsis) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-
-      if (currentPage > 4) {
-        pages.push("ellipsis-start");
-      }
-
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = start; i <= end; i++) {
-        if (!pages.includes(i)) {
-          pages.push(i);
-        }
-      }
-
-      if (currentPage < totalPages - 3) {
-        pages.push("ellipsis-end");
-      }
-      if (!pages.includes(totalPages)) {
-        pages.push(totalPages);
-      }
-    }
-
-    return pages;
   };
 
   const handlePageChange = (page: number) => {
@@ -407,72 +364,13 @@ export function LawyersList() {
               </TableBody>
             </Table>
           </div>
-
-          {/* Pagination with shadcn/ui */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6">
-              <div className="text-sm text-muted-foreground">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
-                {totalItems} results
-              </div>
-
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) {
-                          handlePageChange(currentPage - 1);
-                        }
-                      }}
-                      className={
-                        currentPage === 1
-                          ? "pointer-events-none opacity-50"
-                          : ""
-                      }
-                    />
-                  </PaginationItem>
-
-                  {generatePageNumbers().map((pageNum, index) => (
-                    <PaginationItem key={index}>
-                      {pageNum === "ellipsis-start" ||
-                      pageNum === "ellipsis-end" ? (
-                        <PaginationEllipsis />
-                      ) : (
-                        <PaginationLink
-                          isActive={pageNum === currentPage}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(Number(pageNum));
-                          }}
-                        >
-                          {pageNum}
-                        </PaginationLink>
-                      )}
-                    </PaginationItem>
-                  ))}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage < totalPages) {
-                          handlePageChange(currentPage + 1);
-                        }
-                      }}
-                      className={
-                        currentPage === totalPages
-                          ? "pointer-events-none opacity-50"
-                          : ""
-                      }
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
+          <PaginationComponent
+            currentPage={currentPage}
+            handlePageChange={handlePageChange}
+            itemsPerPage={itemsPerPage}
+            totalItems={totalItems}
+            totalPages={totalPages}
+          />
         </CardContent>
       </Card>
 

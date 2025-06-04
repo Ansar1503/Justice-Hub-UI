@@ -19,13 +19,9 @@ import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
 import SearchComponent from "@/components/SearchComponent";
 import { useFetchLawyersByQuery } from "@/store/tanstack/queries";
+import PaginationComponent from "@/components/pagination";
 
-export type sortType =
-  | "fee-high"
-  | "recommended"
-  | "rating"
-  | "experience"
-  | "fee-low";
+export type sortType = "fee-high" | "rating" | "experience" | "fee-low";
 
 export type filterType = {
   practiceAreas: string[];
@@ -38,12 +34,14 @@ export type filterType = {
 export default function LawyerDirectory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [lawyers, setLawyers] = useState([]);
+  const [itemsPerPage] = useState(2);
+  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<filterType>({
     practiceAreas: [] as string[],
     specialisation: [] as string[],
     experienceRange: [0, 25],
     feeRange: [0, 10000],
-    sortBy: "recommended",
+    sortBy: "experience",
   });
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const { data, refetch } = useFetchLawyersByQuery({
@@ -55,26 +53,30 @@ export default function LawyerDirectory() {
     practiceAreas: filters.practiceAreas,
     specialisation: filters.specialisation,
     sortBy: filters.sortBy,
+    limit: itemsPerPage,
+    page: currentPage,
   });
-
-  //   console.log("data:", data);
   useEffect(() => {
     refetch();
-  }, [searchTerm]);
+  }, [searchTerm, filters,currentPage,itemsPerPage, refetch]);
 
   useEffect(() => {
-    if (data) {
-      setLawyers(data?.data || []);
+    if (data && data?.data) {
+      setLawyers(data?.data?.data || []);
     }
   }, [data]);
-  //   console.log("lawyers", lawyers);
+  // console.log("lawyers", lawyers);
+
+  const totalPages = data?.data?.totalPages;
+  const totalItems = data?.data?.totalCount;
+
   const resetFilters = () => {
     setFilters({
       practiceAreas: [],
       specialisation: [],
       experienceRange: [0, 25],
       feeRange: [0, 10000],
-      sortBy: "recommended",
+      sortBy: "experience",
     });
     setSearchTerm("");
   };
@@ -82,6 +84,11 @@ export default function LawyerDirectory() {
   function handleApplyFilters() {
     refetch();
   }
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="dark:bg-slate-800 bg-brandCream">
@@ -139,7 +146,6 @@ export default function LawyerDirectory() {
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="recommended">Recommended</SelectItem>
                     <SelectItem value="rating">Highest Rating</SelectItem>
                     <SelectItem value="experience">Most Experience</SelectItem>
                     <SelectItem value="fee-low">Fee: Low to High</SelectItem>
@@ -165,16 +171,28 @@ export default function LawyerDirectory() {
                   </Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {lawyers &&
-                    lawyers.map((lawyer, index) => (
-                      <LawyersCard
-                        key={index}
-                        getVerificationBadge={getVerificationBadge}
-                        lawyer={lawyer}
-                      />
-                    ))}
-                </div>
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {lawyers &&
+                      lawyers.map((lawyer, index) => (
+                        <LawyersCard
+                          key={index}
+                          getVerificationBadge={getVerificationBadge}
+                          lawyer={lawyer}
+                        />
+                      ))}
+                  </div>
+
+                  <div className="mt-8 flex justify-center">
+                    <PaginationComponent
+                      currentPage={currentPage}
+                      handlePageChange={handlePageChange}
+                      itemsPerPage={itemsPerPage}
+                      totalItems={totalItems}
+                      totalPages={totalPages}
+                    />
+                  </div>
+                </>
               )}
             </div>
           </div>

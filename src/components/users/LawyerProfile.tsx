@@ -44,6 +44,7 @@ import axiosinstance from "@/utils/api/axios/axios.instance";
 import { store } from "@/store/redux/store";
 import { toast } from "react-toastify";
 import { Riple } from "react-loading-indicators";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 // import { LawerDataType } from "@/types/types/Client.data.type";
 
 export default function LawyerProfile() {
@@ -194,19 +195,16 @@ export default function LawyerProfile() {
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
-      {/* Loading Overlay */}
       {isSubmitting && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          {/* Backdrop with blur */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          {/* Loading indicator */}
+
           <div className="relative z-10">
             <Riple color="#050505" size="medium" text="" textColor="" />
           </div>
         </div>
       )}
 
-      {/* Blur the main content when submitting */}
       <div className={isSubmitting ? "blur-sm pointer-events-none" : ""}>
         {(isError || !lawyerDetails) && !isLoading && (
           <div className="absolute inset-0 z-50 bg-black bg-opacity-100 flex justify-center items-center">
@@ -214,20 +212,24 @@ export default function LawyerProfile() {
           </div>
         )}
         <div>
-          {/* Profile Section */}
           <div className="lg:col-span-2">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader className="pb-4">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
-                  <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border-4 border-white dark:border-gray-600 shadow-lg">
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border-4 border-white dark:border-gray-600 shadow-lg">
                     {isLoading ? (
                       <ProfileImageSkeleton />
                     ) : (
-                      <img
-                        src={lawyerDetails?.profile_image || "/placeholder.svg"}
-                        alt={lawyerDetails?.name}
-                        className="w-[128px] h-[128px] object-cover"
-                      />
+                      <Avatar className="w-full h-full flex items-center justify-center">
+                        <AvatarImage
+                          src={lawyerDetails?.profile_image}
+                          alt={lawyerDetails?.name}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                        <AvatarFallback className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold text-lg rounded-full">
+                          {lawyerDetails?.name?.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
                     )}
                   </div>
                   <div className="flex-1">
