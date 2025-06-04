@@ -23,7 +23,6 @@ function PaginationComponent({
   itemsPerPage,
   totalItems,
 }: paginationProps) {
-    
   const generatePageNumbers = () => {
     const pages = [];
     const showEllipsis = totalPages > 7;
@@ -59,7 +58,6 @@ function PaginationComponent({
     return pages;
   };
 
-
   return (
     <>
       {totalPages > 1 && (
@@ -81,7 +79,9 @@ function PaginationComponent({
                     }
                   }}
                   className={
-                    currentPage === 1 ? "pointer-events-none opacity-50" : ""
+                    currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
                   }
                 />
               </PaginationItem>
@@ -94,6 +94,11 @@ function PaginationComponent({
                   ) : (
                     <PaginationLink
                       isActive={pageNum === currentPage}
+                      className={
+                        pageNum === currentPage
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                       onClick={(e) => {
                         e.preventDefault();
                         handlePageChange(Number(pageNum));
@@ -116,7 +121,7 @@ function PaginationComponent({
                   className={
                     currentPage === totalPages
                       ? "pointer-events-none opacity-50"
-                      : ""
+                      : "cursor-pointer"
                   }
                 />
               </PaginationItem>
@@ -128,4 +133,4 @@ function PaginationComponent({
   );
 }
 
-export default PaginationComponent  ;
+export default PaginationComponent;

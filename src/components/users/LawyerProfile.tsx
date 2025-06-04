@@ -91,6 +91,7 @@ export default function LawyerProfile() {
   );
   const slotDetailsData: { isAvailable: boolean; slots: string[] | [] } =
     slotDetails?.data;
+  // 
   useEffect(() => {
     if (slotDetailsData && Object.keys(slotDetailsData).length > 0) {
       if (slotDetailsData?.isAvailable && slotDetailsData?.slots.length > 0) {

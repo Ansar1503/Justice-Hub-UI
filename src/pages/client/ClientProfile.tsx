@@ -7,7 +7,7 @@ function ClientProfile() {
   return (
     <div className="bg-[#FFF2F2] dark:bg-black min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-grow flex flex-col md:flex-row md:gap-6 container mx-auto ">
+      <div className="flex-grow flex flex-col md:flex-row md:gap-6">
         <Sidebar />
         <main className="flex-grow  m-6">
           <ProfileCard />

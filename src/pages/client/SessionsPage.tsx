@@ -8,7 +8,6 @@ function SessionsPage() {
       <div className="bg-[#FFF2F2] dark:bg-slate-700">
         <Navbar />
         <Sidebar />
-        consultations page
         <Footer />
       </div>
     </>
