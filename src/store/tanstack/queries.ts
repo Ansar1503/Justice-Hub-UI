@@ -2,6 +2,7 @@ import {
   fetchClientData,
   fetchLawyerDetails,
   fetchLawyersByQuery,
+  fetchLawyerSlotSettings,
   fetchSlotsforClients,
 } from "@/utils/api/services/clientServices";
 import {
@@ -60,8 +61,8 @@ export function useFetchAllLawyers(query: {
   order?: "asc" | "desc";
   page: number;
   limit: number;
-  status?: "all" |   "verified" | "rejected" | "pending" | "requested";
-  search:string
+  status?: "all" | "verified" | "rejected" | "pending" | "requested";
+  search: string;
 }) {
   return useQuery({
     queryKey: ["lawyers"],
@@ -90,6 +91,14 @@ export function useFetchSlotSettings() {
   return useQuery<ResponseType & { data: slotSettings }, Error>({
     queryKey: ["schedule", "settings"],
     queryFn: fetchSlotSettings,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchLawyerSlotSettings(lawyer_id: string) {
+  return useQuery<ResponseType & { data: slotSettings }, Error>({
+    queryKey: ["schedule", "settings", lawyer_id],
+    queryFn: () => fetchLawyerSlotSettings(lawyer_id),
     staleTime: 1000 * 60 * 10,
   });
 }

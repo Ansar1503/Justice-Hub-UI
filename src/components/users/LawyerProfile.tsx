@@ -26,12 +26,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin, Mail, Phone, Upload, Clock } from "lucide-react";
+import { MapPin, Mail, Phone, Clock } from "lucide-react";
 import ReviewList from "@/components/users/ReviewList";
 import ReviewForm from "@/components/users/forms/ReviewForm";
 import { useParams } from "react-router-dom";
 import {
   useFetchLawyerDetails,
+  useFetchLawyerSlotSettings,
   useFetchSlotsforClients,
 } from "@/store/tanstack/queries";
 import getVerificationBadge from "../ui/getVerificationBadge";
@@ -45,6 +46,7 @@ import { store } from "@/store/redux/store";
 import { toast } from "react-toastify";
 import { Riple } from "react-loading-indicators";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { DialogDescription } from "@radix-ui/react-dialog";
 // import { LawerDataType } from "@/types/types/Client.data.type";
 
 export default function LawyerProfile() {
@@ -54,13 +56,16 @@ export default function LawyerProfile() {
   const [timeSlots, setTimeSlots] = useState<string[]>([]);
   const [lawyerAvailablity, setLawyerAvailability] = useState<boolean>(false);
   const [reason, setReason] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [fileError, setFileError] = useState<string>("");
+  // const [fileError, setFileError] = useState<string>("");
   const { id } = useParams();
   const queryClient = useQueryClient();
   const lawyerDetailsCache = queryClient.getQueryData(["lawyerDetails", id]);
   // const {mutateAsync:bookingMutate} = useBookingMutation()
+  const { data: slotSettingsData, refetch: refetchslotSettings } =
+    useFetchLawyerSlotSettings(id || "");
+  const slotSettings = slotSettingsData?.data;
   const {
     data,
     refetch: refetchLawyerDetails,
@@ -84,14 +89,21 @@ export default function LawyerProfile() {
       }
     };
     fetchLawyerDetails();
-  }, [id, lawyerDetailsData, refetchLawyerDetails, lawyerDetailsCache]);
+  }, [
+    id,
+    lawyerDetailsData,
+    refetchLawyerDetails,
+    lawyerDetailsCache,
+    refetchslotSettings,
+  ]);
   const { data: slotDetails, refetch: fetchSlots } = useFetchSlotsforClients(
     id || "",
     date || new Date()
   );
+
   const slotDetailsData: { isAvailable: boolean; slots: string[] | [] } =
     slotDetails?.data;
-  // 
+
   useEffect(() => {
     if (slotDetailsData && Object.keys(slotDetailsData).length > 0) {
       if (slotDetailsData?.isAvailable && slotDetailsData?.slots.length > 0) {
@@ -106,38 +118,44 @@ export default function LawyerProfile() {
     const fetchSlotDetails = async () => {
       if (id && date) {
         await fetchSlots();
+        await refetchslotSettings();
       }
     };
     fetchSlotDetails();
-  }, [id, date, fetchSlots]);
+  }, [id, date, fetchSlots, refetchslotSettings]);
 
   const today = new Date(new Date().setHours(0, 0, 0, 0));
   const thirtyDaysFromNow = new Date();
-  thirtyDaysFromNow.setDate(today.getDate() + 30);
+  thirtyDaysFromNow.setDate(
+    today.getDate() +
+      (slotSettings?.maxDaysInAdvance
+        ? Number(slotSettings.maxDaysInAdvance)
+        : 30)
+  );
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      setFileError("File size must be less than 10MB");
-      setSelectedFile(null);
-      return;
-    }
-    const validTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "image/png",
-    ];
-    if (!validTypes.includes(file.type)) {
-      setFileError("Only PDF, DOC, DOCX, and PNG files are allowed");
-      setSelectedFile(null);
-      return;
-    }
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+  //   if (file.size > 10 * 1024 * 1024) {
+  //     setFileError("File size must be less than 10MB");
+  //     setSelectedFile(null);
+  //     return;
+  //   }
+  //   const validTypes = [
+  //     "application/pdf",
+  //     "application/msword",
+  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  //     "image/png",
+  //   ];
+  //   if (!validTypes.includes(file.type)) {
+  //     setFileError("Only PDF, DOC, DOCX, and PNG files are allowed");
+  //     setSelectedFile(null);
+  //     return;
+  //   }
 
-    setFileError("");
-    setSelectedFile(file);
-  };
+  //   setFileError("");
+  //   setSelectedFile(file);
+  // };
 
   const handleSubmit = async () => {
     if (!lawyerAvailablity || !date || !timeSlot || !reason.trim() || !id) {
@@ -145,33 +163,29 @@ export default function LawyerProfile() {
     }
     const stripe_pk = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
     if (!stripe_pk) {
-      console.log("Stripe publishable key is not set");
+      console.error("Stripe publishable key not found");
       return;
     }
     setIsSubmitting(true);
     const stripe = await loadStripe(stripe_pk);
-    const formData = new FormData();
-    formData.append("lawyer_id", id);
-    formData.append("date", date?.toISOString() || "");
-    formData.append("timeSlot", timeSlot);
-    formData.append("reason", reason);
-    if (selectedFile) {
-      formData.append("caseDocument", selectedFile);
-    }
-
     const { token } = store.getState().Auth;
     let response;
     try {
       response = await axiosinstance.post(
         "/api/client/lawyer/slots/checkout-session/",
-        formData,
+        {
+          lawyer_id: id,
+          date: date?.toISOString(),
+          timeSlot,
+          reason,
+          duration: slotSettings?.slotDuration,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const sessionId = response?.data?.id;
-      const result = stripe?.redirectToCheckout({
+      stripe?.redirectToCheckout({
         sessionId,
       });
-      console.log("result", result);
     } catch (error: any) {
       const message =
         error.response?.data?.message || "Booking failed! Try again.";
@@ -336,6 +350,9 @@ export default function LawyerProfile() {
                           <DialogTitle className="dark:text-white">
                             Book a Consultation
                           </DialogTitle>
+                          <DialogDescription>
+                            Please select a date and time for your consultation.
+                          </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                           <div className="grid gap-2">
@@ -372,7 +389,7 @@ export default function LawyerProfile() {
                                 <SelectValue placeholder="Select a time slot" />
                               </SelectTrigger>
                               <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
-                                {!lawyerAvailablity ? (
+                                {!lawyerAvailablity || !date ? (
                                   <SelectItem
                                     value="unavailable"
                                     className="dark:text-gray-400 dark:focus:bg-gray-600"
@@ -395,6 +412,15 @@ export default function LawyerProfile() {
                           </div>
                           <div className="grid gap-2">
                             <Label
+                              htmlFor="time"
+                              className="dark:text-gray-200"
+                            >
+                              Slot Duration - {slotSettings?.slotDuration}{" "}
+                              minutes
+                            </Label>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label
                               htmlFor="reason"
                               className="dark:text-gray-200"
                             >
@@ -409,7 +435,7 @@ export default function LawyerProfile() {
                               className="resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400"
                             />
                           </div>
-                          <div className="grid gap-2">
+                          {/* <div className="grid gap-2">
                             <Label
                               htmlFor="document"
                               className="dark:text-gray-200"
@@ -442,7 +468,7 @@ export default function LawyerProfile() {
                                 </p>
                               )}
                             </div>
-                          </div>
+                          </div> */}
                           <Button
                             onClick={handleSubmit}
                             className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white"

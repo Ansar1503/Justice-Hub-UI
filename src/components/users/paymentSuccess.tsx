@@ -123,7 +123,7 @@ export default function Component() {
                 </span>
               </div>
               <Badge variant="secondary" className="text-lg font-bold">
-                {paymentDetails.amount|| "N/A"}
+                ₹ {paymentDetails.amount|| "N/A"}
               </Badge>
             </div>
 

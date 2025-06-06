@@ -242,7 +242,7 @@ export function useAddReview() {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: [""] });
     },
-    onError: (error: any) => {
+    onError: (error:any) => {
       const message =
         error.response.data?.message ||
         "Something went wrong please try again later!";

@@ -31,6 +31,8 @@ export async function fetchLawyerData() {
   return response.data;
 }
 
+
+
 export async function updateScheduleSettings(payload: slotSettings) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.patch(

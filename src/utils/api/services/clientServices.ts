@@ -134,11 +134,22 @@ export async function fetchSlotsforClients(
   return response.data;
 }
 
-export async function bookAppointment(formData:FormData){
+export async function bookAppointment(formData: FormData) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.post(
     `/api/client/lawyers/book`,
     formData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function fetchLawyerSlotSettings(lawyer_id: string) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/client/lawyers/settings/${lawyer_id}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
