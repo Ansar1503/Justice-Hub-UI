@@ -12,16 +12,16 @@ export default function LawyerProtected() {
   }
   if (userData.is_blocked) return <Navigate to="/login" />;
   // if (settings &&Object.keys(settings).length > 0) {
-    switch (userData.role) {
-      case "lawyer":
-        return <Outlet />;
-      case "client":
-        return <Navigate to="/client/" />;
-      case "admin":
-        return <Navigate to="/admin/" />;
-      default:
-        return <Navigate to="/login" />;
-    }
+  switch (userData.role) {
+    case "lawyer":
+      return <Outlet />;
+    case "client":
+      return <Navigate to="/client/" />;
+    case "admin":
+      return <Navigate to="/admin/" />;
+    default:
+      return <Navigate to="/login" />;
+  }
   // } else {
   //   return <Navigate to="/lawyer/slot-setup/1" />;
   // }

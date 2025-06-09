@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import {
   Search,
@@ -11,6 +9,7 @@ import {
 } from "lucide-react";
 import PaginationComponent from "../pagination";
 import { useFetchAppointmentsForClients } from "@/store/tanstack/queries";
+import AppointmentDetailModal from "@/components/users/modals/AppointmentDetails.modal";
 
 export type AppointmentStatus =
   | "all"
@@ -37,6 +36,9 @@ export default function LawyerAppointmentListing() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -136,7 +138,7 @@ export default function LawyerAppointmentListing() {
   };
   const formatTimeTo12Hour = (time: string) => {
     const [hourStr, minute] = time.split(":");
-    let hour = parseInt(hourStr, 10);
+    let hour = Number.parseInt(hourStr, 10);
     const ampm = hour >= 12 ? "PM" : "AM";
     hour = hour % 12 || 12;
     return `${hour}:${minute} ${ampm}`;
@@ -160,6 +162,20 @@ export default function LawyerAppointmentListing() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleViewAppointment = (appointment: any) => {
+    setSelectedAppointment(appointment);
+    setIsModalOpen(true);
+  };
+
+  const handleCancelAppointment = async (appointmentId: string) => {
+    try {
+      console.log("a[", appointmentId);
+      // await refetchAppointment();
+    } catch (error) {
+      console.error("Error cancelling appointment:", error);
+    }
   };
 
   return (
@@ -331,7 +347,10 @@ export default function LawyerAppointmentListing() {
                       </span>
                     </td>
                     <td className="py-4 px-4 text-right">
-                      <button className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300">
+                      <button
+                        className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+                        onClick={() => handleViewAppointment(appointment)}
+                      >
                         <Eye className="h-4 w-4" />
                         View
                       </button>
@@ -351,6 +370,14 @@ export default function LawyerAppointmentListing() {
           totalPages={totalPages}
         />
       </div>
+
+      {/* Appointment Detail Modal */}
+      <AppointmentDetailModal
+        appointment={selectedAppointment}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCancel={handleCancelAppointment}
+      />
     </div>
   );
 }
