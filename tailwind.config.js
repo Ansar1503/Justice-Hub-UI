@@ -16,6 +16,7 @@ export default {
 				brandBlack: "#1A1C2B",
 				brandPrimary: '#373F84',
 				brandForm: "#ebebff",
+				brandForm2: "rgb(182 182 217)",	
 				brandCream: "#FFF2F2",
 				brandSecondary: '#4A519E',
 				brandAccent: '#15355E',

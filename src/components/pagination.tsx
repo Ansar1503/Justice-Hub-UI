@@ -23,6 +23,7 @@ function PaginationComponent({
   itemsPerPage,
   totalItems,
 }: paginationProps) {
+
   const generatePageNumbers = () => {
     const pages = [];
     const showEllipsis = totalPages > 7;

@@ -14,7 +14,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
-    { path: `/${user?.role}/consultations`, label: "Consultations", icon: Calendar },
+    { path: `/${user?.role}/appointments`, label: "appointments", icon: Calendar },
   ];
 
   return (
@@ -59,7 +59,7 @@ export default function Sidebar() {
       {/* Sidebar content */}
       <aside
         className={`
-          bg-brandForm dark:bg-black border dark:border-gray-800 border-gray-200 border-l-0 border-t-0 border-b-0
+          bg-brandForm2 dark:bg-black
           md:w-1/12 w-1/2 md:min-w-64 flex-shrink-0
           ${
             isOpen

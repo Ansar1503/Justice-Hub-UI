@@ -30,6 +30,7 @@ import { MapPin, Mail, Phone, Clock } from "lucide-react";
 import ReviewList from "@/components/users/ReviewList";
 import ReviewForm from "@/components/users/forms/ReviewForm";
 import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   useFetchLawyerDetails,
   useFetchLawyerSlotSettings,
@@ -73,6 +74,9 @@ export default function LawyerProfile() {
     isError,
   } = useFetchLawyerDetails(id || "");
   const lawyerDetailsData = data?.data;
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get("session_id");
+
   useEffect(() => {
     const fetchLawyerDetails = async () => {
       if (lawyerDetailsCache && Object.keys(lawyerDetailsCache).length > 0) {
@@ -100,7 +104,20 @@ export default function LawyerProfile() {
     id || "",
     date || new Date()
   );
-
+  useEffect(() => {
+    const { token } = store.getState().Auth;
+    async function deleteSession() {
+      if (!sessionId) return;
+      console.log("sessionId", sessionId);
+      await axiosinstance.delete(
+        `/api/client/lawyer/slots/session/${sessionId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      refetchslotSettings();
+      fetchSlots();
+    }
+    deleteSession();
+  }, [sessionId, fetchSlots, refetchslotSettings]);
   const slotDetailsData: { isAvailable: boolean; slots: string[] | [] } =
     slotDetails?.data;
 

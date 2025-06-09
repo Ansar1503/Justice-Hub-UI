@@ -6,6 +6,12 @@ import {
 } from "@/types/types/Client.data.type";
 import { BasicUpdateResponse } from "@/types/types/LoginResponseTypes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
+import {
+  AppointmentStatus,
+  AppointmentType,
+  SortField,
+  SortOrder,
+} from "@/components/users/AppointmentsComponent";
 
 export async function fetchClientData() {
   const { token } = store.getState().Auth;
@@ -153,6 +159,24 @@ export async function fetchLawyerSlotSettings(lawyer_id: string) {
     {
       headers: { Authorization: `Bearer ${token}` },
     }
+  );
+  return response.data;
+}
+
+export async function fetchAppointmentsForClient(payload: {
+  search?: string;
+  appointmentStatus: AppointmentStatus;
+  appointmentType: AppointmentType;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  page: number;
+  limit: number;
+}) {
+  // console.log("payload", payload);
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/client/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&appointmentType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
+    { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
 }

@@ -1,4 +1,5 @@
 import {
+  fetchAppointmentsForClient,
   fetchClientData,
   fetchLawyerDetails,
   fetchLawyersByQuery,
@@ -22,6 +23,13 @@ import {
   OverrideDateResponse,
   slotSettings,
 } from "@/types/types/SlotTypes";
+import {
+  AppointmentStatus,
+  AppointmentType,
+  SortField,
+  SortOrder,
+} from "@/components/users/AppointmentsComponent";
+import { ResponseType } from "@/types/types/LoginResponseTypes";
 
 export function useFetchClientData() {
   return useQuery({
@@ -120,10 +128,26 @@ export function useFetchOverrideSlots() {
 }
 
 export function useFetchSlotsforClients(id: string, date: Date) {
-  return useQuery<ResponseType & { data: any }, Error>({
+  return useQuery({
     queryKey: ["schedule", "slots", id, date],
     queryFn: () => fetchSlotsforClients(id, date),
     staleTime: 1000 * 60 * 10,
     enabled: id !== "" && !date,
+  });
+}
+
+export function useFetchAppointmentsForClients(payload: {
+  search?: string;
+  appointmentStatus: AppointmentStatus;
+  appointmentType: AppointmentType;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  page: number;
+  limit: number;
+}) {
+  return useQuery({
+    queryKey: ["client", "appointments"],
+    queryFn: () => fetchAppointmentsForClient(payload),
+    staleTime: 1000 * 60 * 10,
   });
 }
