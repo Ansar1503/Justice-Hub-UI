@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import {
   Search,
@@ -8,9 +10,12 @@ import {
   Clock,
 } from "lucide-react";
 import PaginationComponent from "../pagination";
-import { useFetchAppointmentsForClients } from "@/store/tanstack/queries";
-import AppointmentDetailModal from "@/components/users/modals/AppointmentDetails.modal";
-import { useCancellAppointment } from "@/store/tanstack/mutations";
+import { useFetchAppointmentsForLawyers } from "@/store/tanstack/queries";
+import ClientAppointmentDetailModal from "@/components/Lawyer/Modals/appointmentDetails";
+import {
+  useConfirmAppointment,
+  useRejectAppointment,
+} from "@/store/tanstack/mutations";
 
 export type AppointmentStatus =
   | "all"
@@ -21,14 +26,15 @@ export type AppointmentStatus =
   | "rejected";
 export type AppointmentType = "all" | "consultation" | "follow-up";
 export type SortField =
-  | "lawyer_name"
+  | "client_name"
   | "appointment_date"
   | "fee"
   | "created_at";
 export type SortOrder = "asc" | "desc";
 
-export default function LawyerAppointmentListing() {
+export default function LawyerClientAppointmentListing() {
   const [searchTerm, setSearchTerm] = useState("");
+  //   const [appointments, setAppointments] = useState<any>([]);
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus>("all");
   const [typeFilter, setTypeFilter] = useState<AppointmentType>("all");
   const [sortBy, setSortBy] = useState<SortField>("appointment_date");
@@ -57,17 +63,20 @@ export default function LawyerAppointmentListing() {
   };
 
   const { data: appointmentData, refetch: refetchAppointment } =
-    useFetchAppointmentsForClients({
+    useFetchAppointmentsForLawyers({
       appointmentStatus: statusFilter,
       appointmentType: typeFilter,
-      sortField: sortBy,
+      sortField: "created_at",
       sortOrder: sortOrder,
       limit: itemsPerPage,
       page: currentPage,
       search: searchTerm,
     });
-  const { mutateAsync: cancelAppointmentMutate } = useCancellAppointment();
-  const appointments = appointmentData?.data ?? [];
+
+  const appointments = appointmentData?.data;
+
+  const { mutateAsync: rejectMutation } = useRejectAppointment();
+  const { mutateAsync: confirmAppointmentMutation } = useConfirmAppointment();
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       refetchAppointment();
@@ -80,7 +89,8 @@ export default function LawyerAppointmentListing() {
     if (appointmentData?.totalCount) {
       setTotalPages(Math.ceil(appointmentData.totalCount / itemsPerPage));
     }
-  }, [itemsPerPage, appointmentData?.totalCount]);
+  }, [appointmentData, itemsPerPage]);
+
   useEffect(() => {
     refetchAppointment();
   }, [
@@ -131,6 +141,7 @@ export default function LawyerAppointmentListing() {
       </span>
     );
   };
+
   const formatTimeTo12Hour = (time: string) => {
     const [hourStr, minute] = time.split(":");
     let hour = Number.parseInt(hourStr, 10);
@@ -164,11 +175,22 @@ export default function LawyerAppointmentListing() {
     setIsModalOpen(true);
   };
 
-  const handleCancelAppointment = async (appointmentId: string) => {
+  const handleConfirmAppointment = async (appointmentId: string) => {
     try {
-      await cancelAppointmentMutate({ id: appointmentId, status: "cancelled" });
+      await confirmAppointmentMutation({
+        id: appointmentId,
+        status: "confirmed",
+      });
     } catch (error) {
-      console.error("Error cancelling appointment:", error);
+      console.error("Error confirming appointment:", error);
+    }
+  };
+
+  const handleRejectAppointment = async (appointmentId: string) => {
+    try {
+      await rejectMutation({ id: appointmentId, status: "rejected" });
+    } catch (error) {
+      console.error("Error rejecting appointment:", error);
     }
   };
 
@@ -177,7 +199,7 @@ export default function LawyerAppointmentListing() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Lawyer Appointment Management
+            Client Appointment Management
           </h1>
         </div>
 
@@ -187,7 +209,7 @@ export default function LawyerAppointmentListing() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by lawyer name or specialization"
+              placeholder="Search by client name or appointment details"
               className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               value={searchTerm}
               onChange={(e) => {
@@ -211,6 +233,7 @@ export default function LawyerAppointmentListing() {
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
+                <option value="rejected">Rejected</option>
               </select>
               <Filter className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>
@@ -242,11 +265,11 @@ export default function LawyerAppointmentListing() {
               <tr>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("lawyer_name")}
+                    onClick={() => handleSort("client_name")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
-                    Lawyer Details
-                    {sortBy === "lawyer_name" &&
+                    Client Details
+                    {sortBy === "client_name" &&
                       (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
@@ -281,7 +304,7 @@ export default function LawyerAppointmentListing() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {appointments.length === 0 ? (
+              {appointments?.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
@@ -291,15 +314,16 @@ export default function LawyerAppointmentListing() {
                   </td>
                 </tr>
               ) : (
-                appointments.map((appointment: any) => (
+                appointments &&
+                appointments?.map((appointment: any) => (
                   <tr
                     key={appointment?._id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
+                        <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                          <span className="text-sm font-medium text-green-600 dark:text-green-300">
                             {getInitials(appointment?.userData?.name)}
                           </span>
                         </div>
@@ -307,11 +331,11 @@ export default function LawyerAppointmentListing() {
                           <p className="font-medium text-base text-gray-900 dark:text-white">
                             {appointment?.userData?.name}
                           </p>
-                          <p className="text-sm text-blue-600 dark:text-blue-400">
-                            {appointment?.lawyerData?.specialisation}
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {appointment?.userData?.email}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {appointment?.lawyerData?.experience} experience
+                            Phone: {appointment?.userData?.phone || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -337,7 +361,7 @@ export default function LawyerAppointmentListing() {
                     </td>
                     <td className="py-4 px-4">
                       <span className="font-medium text-gray-900 dark:text-white">
-                        ₹{appointment?.lawyerData?.consultation_fee}
+                        ₹{appointment?.amount}
                       </span>
                     </td>
                     <td className="py-4 px-4 text-right">
@@ -366,11 +390,12 @@ export default function LawyerAppointmentListing() {
       </div>
 
       {/* Appointment Detail Modal */}
-      <AppointmentDetailModal
+      <ClientAppointmentDetailModal
         appointment={selectedAppointment}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onCancel={handleCancelAppointment}
+        onConfirm={handleConfirmAppointment}
+        onReject={handleRejectAppointment}
       />
     </div>
   );

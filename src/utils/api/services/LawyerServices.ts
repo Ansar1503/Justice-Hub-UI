@@ -1,3 +1,9 @@
+import {
+  AppointmentStatus,
+  AppointmentType,
+  SortField,
+  SortOrder,
+} from "@/components/users/AppointmentsComponent";
 import { store } from "@/store/redux/store";
 import {
   Availability,
@@ -30,8 +36,6 @@ export async function fetchLawyerData() {
   });
   return response.data;
 }
-
-
 
 export async function updateScheduleSettings(payload: slotSettings) {
   const { token } = store.getState().Auth;
@@ -99,6 +103,50 @@ export async function removeOverrideSlot(overrideId: string) {
     {
       headers: { Authorization: `Bearer ${token}` },
     }
+  );
+  return response.data;
+}
+
+export async function fetchAppointmentsForLawyers(payload: {
+  search?: string;
+  appointmentStatus: AppointmentStatus;
+  appointmentType: AppointmentType;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  page: number;
+  limit: number;
+}) {
+  // console.log("payload", payload);
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/lawyer/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&appointmentType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function rejectClientAppointment(payload: {
+  id: string;
+  status: string;
+}) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    "/api/lawyer/profile/appointments/reject",
+    payload,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function confirmAppointment(payload: {
+  id: string;
+  status: string;
+}) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    "/api/lawyer/profile/appointments/approve",
+    payload,
+    { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
 }

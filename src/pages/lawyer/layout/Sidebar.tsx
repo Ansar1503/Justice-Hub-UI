@@ -20,6 +20,7 @@ export default function Sidebar() {
       label: "Appointments",
       icon: Timer,
     },
+    // { path: `/${user?.role}/sessions`, label: "Sessions", icon: Calendar1Icon },
   ];
 
   return (

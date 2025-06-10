@@ -14,7 +14,12 @@ export default function Sidebar() {
 
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
-    { path: `/${user?.role}/appointments`, label: "appointments", icon: Calendar },
+    {
+      path: `/${user?.role}/appointments`,
+      label: "appointments",
+      icon: Calendar,
+    },
+    // { path: `/${user?.role}/sessions`, label: "Session", icon: Calendar1 },
   ];
 
   return (

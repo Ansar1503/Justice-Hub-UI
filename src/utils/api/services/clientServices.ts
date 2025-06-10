@@ -180,3 +180,13 @@ export async function fetchAppointmentsForClient(payload: {
   );
   return response.data;
 }
+
+export async function cancellAppointment(payload: { id: string; status: string }) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    "/api/client/profile/appointments",
+    payload,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}

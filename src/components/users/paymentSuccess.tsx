@@ -168,7 +168,7 @@ export default function Component() {
             </Button>
 
             <Button onClick={()=>{
-                navigate("/client/");
+                navigate("/client/appointments");
             }} className="w-full">Continue to Dashboard</Button>
           </div>
 

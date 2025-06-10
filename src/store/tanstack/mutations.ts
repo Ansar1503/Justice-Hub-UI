@@ -3,7 +3,9 @@
 import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
 import { useAppDispatch } from "@/store/redux/Hook";
 import {
+  confirmAppointment,
   LawyerVerification,
+  rejectClientAppointment,
 } from "@/utils/api/services/LawyerServices";
 import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
 import {
@@ -12,6 +14,7 @@ import {
 } from "@/utils/api/services/adminServices";
 import {
   addReview,
+  cancellAppointment,
   sendVerificationMail,
   updateAddress,
   updateBasicInfo,
@@ -242,7 +245,7 @@ export function useAddReview() {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: [""] });
     },
-    onError: (error:any) => {
+    onError: (error: any) => {
       const message =
         error.response.data?.message ||
         "Something went wrong please try again later!";
@@ -252,3 +255,86 @@ export function useAddReview() {
   });
 }
 
+export function useCancellAppointment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string; status: string }) =>
+      cancellAppointment(payload),
+    onSuccess: (updated) => {
+      toast.success("Appointment cancelled!");
+      queryClient.setQueryData(["client", "appointments"], (old: any) => {
+        return {
+          ...old,
+          data: old.data.map((appt: any) =>
+            appt._id === updated.data._id
+              ? { ...appt, status: updated.data.status }
+              : appt
+          ),
+        };
+      });
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong!";
+      toast.error(message);
+    },
+  });
+}
+
+export function useRejectAppointment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string; status: string }) =>
+      rejectClientAppointment(payload),
+    onSuccess: (updated) => {
+      toast.success(updated.message);
+      queryClient.setQueryData(["lawyer", "appointments"], (old: any) => {
+        return {
+          ...old,
+          data: old?.data?.map((appt: any) =>
+            appt._id === updated?.data?._id
+              ? { ...appt, status: updated?.data?.status }
+              : appt
+          ),
+        };
+      });
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong!";
+      toast.error(message);
+    },
+  });
+}
+
+export function useConfirmAppointment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string; status: string }) =>
+      confirmAppointment(payload),
+    onSuccess: (updated) => {
+      toast.success(updated.message);
+      queryClient.setQueryData(["lawyer", "appointments"], (old: any) => {
+        return {
+          ...old,
+          data: old?.data?.map((appt: any) =>
+            appt._id === updated?.data?._id
+              ? { ...appt, status: updated?.data?.status }
+              : appt
+          ),
+        };
+      });
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong!";
+      toast.error(message);
+    },
+  });
+}

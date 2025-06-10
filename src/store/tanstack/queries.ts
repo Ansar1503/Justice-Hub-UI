@@ -12,6 +12,7 @@ import {
 } from "@/utils/api/services/adminServices";
 import { useQuery } from "@tanstack/react-query";
 import {
+  fetchAppointmentsForLawyers,
   fetchAvailableSlots,
   fetchLawyerData,
   fetchOverrideslots,
@@ -148,6 +149,22 @@ export function useFetchAppointmentsForClients(payload: {
   return useQuery({
     queryKey: ["client", "appointments"],
     queryFn: () => fetchAppointmentsForClient(payload),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchAppointmentsForLawyers(payload: {
+  search?: string;
+  appointmentStatus: AppointmentStatus;
+  appointmentType: AppointmentType;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  page: number;
+  limit: number;
+}) {
+  return useQuery({
+    queryKey: ["lawyer", "appointments"],
+    queryFn: () => fetchAppointmentsForLawyers(payload),
     staleTime: 1000 * 60 * 10,
   });
 }

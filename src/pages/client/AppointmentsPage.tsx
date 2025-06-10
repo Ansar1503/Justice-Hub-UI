@@ -1,7 +1,7 @@
 import AppointmentListing from "@/components/users/AppointmentsComponent";
-import Footer from "@/pages/lawyer/layout/Footer";
-import Navbar from "@/pages/lawyer/layout/Navbar";
-import Sidebar from "@/pages/lawyer/layout/Sidebar";
+import Footer from "@/pages/client/layout/Footer";
+import Navbar from "@/pages/client/layout/Navbar";
+import Sidebar from "@/pages/client/layout/Sidebar";
 
 function AppointmentsPage() {
   return (

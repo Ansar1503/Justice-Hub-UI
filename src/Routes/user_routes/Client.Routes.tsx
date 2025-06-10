@@ -6,7 +6,6 @@ import ProtectedRoute from "./wrapper/ClientProtected.Route";
 import LawyerDirectory from "@/pages/client/LawyersListing";
 import LawyersPage from "@/pages/client/LawyerProfile";
 import PaymentSuccessPage from "@/pages/client/payment_successpaeg";
-
 function ClientRoutes() {
   return (
     <Routes>
