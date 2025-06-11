@@ -22,8 +22,8 @@ export type AppointmentStatus =
 export type AppointmentType = "all" | "consultation" | "follow-up";
 export type SortField =
   | "lawyer_name"
-  | "appointment_date"
-  | "fee"
+  | "date"
+  | "consultation_fee"
   | "created_at";
 export type SortOrder = "asc" | "desc";
 
@@ -31,7 +31,7 @@ export default function LawyerAppointmentListing() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus>("all");
   const [typeFilter, setTypeFilter] = useState<AppointmentType>("all");
-  const [sortBy, setSortBy] = useState<SortField>("appointment_date");
+  const [sortBy, setSortBy] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(3);
@@ -68,6 +68,7 @@ export default function LawyerAppointmentListing() {
     });
   const { mutateAsync: cancelAppointmentMutate } = useCancellAppointment();
   const appointments = appointmentData?.data ?? [];
+
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       refetchAppointment();
@@ -81,6 +82,7 @@ export default function LawyerAppointmentListing() {
       setTotalPages(Math.ceil(appointmentData.totalCount / itemsPerPage));
     }
   }, [itemsPerPage, appointmentData?.totalCount]);
+
   useEffect(() => {
     refetchAppointment();
   }, [
@@ -131,6 +133,7 @@ export default function LawyerAppointmentListing() {
       </span>
     );
   };
+
   const formatTimeTo12Hour = (time: string) => {
     const [hourStr, minute] = time.split(":");
     let hour = Number.parseInt(hourStr, 10);
@@ -171,6 +174,16 @@ export default function LawyerAppointmentListing() {
       console.error("Error cancelling appointment:", error);
     }
   };
+
+  // const getSortDisplayText = () => {
+  //   const fieldNames = {
+  //     lawyer_name: "Lawyer Name",
+  //     appointment_date: "Date",
+  //     fee: "Fee",
+  //     created_at: "Created Date",
+  //   };
+  //   return `${fieldNames[sortBy]} (${sortOrder === "asc" ? "A-Z" : "Z-A"})`;
+  // };
 
   return (
     <div className="h-full p-6 bg-white dark:bg-gray-900">
@@ -228,10 +241,27 @@ export default function LawyerAppointmentListing() {
               <option value="follow-up">Follow-up</option>
             </select>
 
-            <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-white">
-              <ArrowUpDown className="h-4 w-4" />
-              Sort by
-            </button>
+            {/* Fixed Sort Dropdown */}
+            <div className="relative">
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [field, order] = e.target.value.split("-");
+                  setSortBy(field as SortField);
+                  setSortOrder(order as SortOrder);
+                  setCurrentPage(1);
+                }}
+                className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md pl-8 pr-8 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white min-w-[140px]"
+              >
+                <option value="appointment_date-desc">Date (Newest)</option>
+                <option value="appointment_date-asc">Date (Oldest)</option>
+                <option value="lawyer_name-asc">Lawyer (A-Z)</option>
+                <option value="lawyer_name-desc">Lawyer (Z-A)</option>
+                <option value="consultation_fee-asc">Fee (Low-High)</option>
+                <option value="consultation_fee-desc">Fee (High-Low)</option>
+              </select>
+              <ArrowUpDown className="absolute left-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+            </div>
           </div>
         </div>
 
@@ -252,11 +282,11 @@ export default function LawyerAppointmentListing() {
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("appointment_date")}
+                    onClick={() => handleSort("date")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Date & Time
-                    {sortBy === "appointment_date" &&
+                    {sortBy === "date" &&
                       (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
@@ -268,11 +298,12 @@ export default function LawyerAppointmentListing() {
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("fee")}
+                    onClick={() => handleSort("consultation_fee")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Fee
-                    {sortBy === "fee" && (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "consultation_fee" &&
+                      (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white">

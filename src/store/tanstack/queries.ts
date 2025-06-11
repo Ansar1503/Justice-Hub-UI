@@ -4,6 +4,7 @@ import {
   fetchLawyerDetails,
   fetchLawyersByQuery,
   fetchLawyerSlotSettings,
+  fetchSessionsforClients,
   fetchSlotsforClients,
 } from "@/utils/api/services/clientServices";
 import {
@@ -16,6 +17,7 @@ import {
   fetchAvailableSlots,
   fetchLawyerData,
   fetchOverrideslots,
+  fetchSessionsforLawyers,
   fetchSlotSettings,
 } from "@/utils/api/services/LawyerServices";
 import { LawyerFilterParams } from "@/types/types/Client.data.type";
@@ -157,7 +159,7 @@ export function useFetchAppointmentsForLawyers(payload: {
   search?: string;
   appointmentStatus: AppointmentStatus;
   appointmentType: AppointmentType;
-  sortField: SortField;
+  sortField: string;
   sortOrder: SortOrder;
   page: number;
   limit: number;
@@ -165,6 +167,38 @@ export function useFetchAppointmentsForLawyers(payload: {
   return useQuery({
     queryKey: ["lawyer", "appointments"],
     queryFn: () => fetchAppointmentsForLawyers(payload),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchSessionsForLawyers(payload: {
+  search: string;
+  status: string;
+  sort: string;
+  order: "asc" | "desc";
+  consultation_type: string;
+  page: number;
+  limit: number;
+}) {
+  return useQuery({
+    queryKey: ["lawyer", "sessions"],
+    queryFn: () => fetchSessionsforLawyers(payload),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchsessionsForclients(payload: {
+  search: string;
+  status: string;
+  sort: string;
+  order: "asc" | "desc";
+  consultation_type: string;
+  page: number;
+  limit: number;
+}) {
+  return useQuery({
+    queryKey: ["lawyer", "sessions"],
+    queryFn: () => fetchSessionsforClients(payload),
     staleTime: 1000 * 60 * 10,
   });
 }

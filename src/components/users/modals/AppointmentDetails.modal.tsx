@@ -177,7 +177,8 @@ export default function AppointmentDetailModal({
             </Button>
             {appointment?.status !== "cancelled" &&
               appointment?.status !== "completed" &&
-              appointment?.status !== "rejected" && (
+              appointment?.status !== "rejected" &&
+              appointment?.status !== "confirmed" && (
                 <Button
                   variant="destructive"
                   onClick={() => setShowCancelConfirm(true)}

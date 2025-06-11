@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/Lawyer/Modals/sessionDetails";
-import { useFetchSessionsForLawyers } from "@/store/tanstack/queries";
+import { useFetchsessionsForclients } from "@/store/tanstack/queries";
 
 export type SessionStatus =
   | "all"
@@ -44,7 +44,7 @@ export default function SessionsListing() {
     }
   };
   const { data: sessionsData, refetch: sessionRefetch } =
-    useFetchSessionsForLawyers({
+    useFetchsessionsForclients({
       consultation_type: typeFilter,
       limit: itemsPerPage,
       order: sortOrder,
@@ -53,7 +53,7 @@ export default function SessionsListing() {
       sort: sortBy,
       status: statusFilter,
     });
-  console.log("datad", sessionsData);
+//   console.log("datad", sessionsData);
   const sessions = sessionsData?.data;
   const getInitials = (name: string) => {
     const names = name.split(" ");
@@ -161,17 +161,14 @@ export default function SessionsListing() {
   };
 
   const handleStartSession = async (sessionId: string) => {
-    // Implement start session logic
     console.log("Starting session:", sessionId);
   };
 
   const handleEndSession = async (sessionId: string) => {
-    // Implement end session logic
     console.log("Ending session:", sessionId);
   };
 
   const handleCancelSession = async (sessionId: string) => {
-    // Implement cancel session logic
     console.log("Cancelling session:", sessionId);
   };
 

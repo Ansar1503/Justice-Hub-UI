@@ -1,4 +1,4 @@
-import { Calendar, User, UserPen } from "lucide-react";
+import { Calendar, Calendar1, User, UserPen } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
@@ -19,7 +19,7 @@ export default function Sidebar() {
       label: "appointments",
       icon: Calendar,
     },
-    // { path: `/${user?.role}/sessions`, label: "Session", icon: Calendar1 },
+    { path: `/${user?.role}/sessions`, label: "Session", icon: Calendar1 },
   ];
 
   return (

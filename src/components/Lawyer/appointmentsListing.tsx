@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
   Search,
   Filter,
-  ArrowUpDown,
   Eye,
   Calendar,
   Clock,
@@ -25,11 +24,7 @@ export type AppointmentStatus =
   | "cancelled"
   | "rejected";
 export type AppointmentType = "all" | "consultation" | "follow-up";
-export type SortField =
-  | "client_name"
-  | "appointment_date"
-  | "fee"
-  | "created_at";
+export type SortField = "name" | "date" | "consultation_fee" | "created_at";
 export type SortOrder = "asc" | "desc";
 
 export default function LawyerClientAppointmentListing() {
@@ -37,7 +32,7 @@ export default function LawyerClientAppointmentListing() {
   //   const [appointments, setAppointments] = useState<any>([]);
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus>("all");
   const [typeFilter, setTypeFilter] = useState<AppointmentType>("all");
-  const [sortBy, setSortBy] = useState<SortField>("appointment_date");
+  const [sortBy, setSortBy] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(3);
@@ -66,13 +61,12 @@ export default function LawyerClientAppointmentListing() {
     useFetchAppointmentsForLawyers({
       appointmentStatus: statusFilter,
       appointmentType: typeFilter,
-      sortField: "created_at",
+      sortField: sortBy,
       sortOrder: sortOrder,
       limit: itemsPerPage,
       page: currentPage,
       search: searchTerm,
     });
-
   const appointments = appointmentData?.data;
 
   const { mutateAsync: rejectMutation } = useRejectAppointment();
@@ -251,10 +245,20 @@ export default function LawyerClientAppointmentListing() {
               <option value="follow-up">Follow-up</option>
             </select>
 
-            <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-white">
-              <ArrowUpDown className="h-4 w-4" />
-              Sort by
-            </button>
+            <select
+              className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-white"
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value as SortField);
+                setSortOrder((s) => (s === "asc" ? "desc" : "asc"));
+                setCurrentPage(1);
+              }}
+            >
+              <option value="consultation_fee">Fee</option>
+              <option value="date">Appointment Date</option>
+              <option value="created_at">Created Date</option>
+              <option value="name">Name</option>
+            </select>
           </div>
         </div>
 
@@ -265,22 +269,20 @@ export default function LawyerClientAppointmentListing() {
               <tr>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("client_name")}
+                    onClick={() => handleSort("name")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Client Details
-                    {sortBy === "client_name" &&
-                      (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "name" && (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("appointment_date")}
+                    onClick={() => handleSort("date")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Date & Time
-                    {sortBy === "appointment_date" &&
-                      (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "date" && (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
@@ -291,11 +293,12 @@ export default function LawyerClientAppointmentListing() {
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("fee")}
+                    onClick={() => handleSort("consultation_fee")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Fee
-                    {sortBy === "fee" && (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "consultation_fee" &&
+                      (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white">

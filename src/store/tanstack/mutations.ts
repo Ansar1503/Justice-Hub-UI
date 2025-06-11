@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
 import { useAppDispatch } from "@/store/redux/Hook";
@@ -338,3 +338,22 @@ export function useConfirmAppointment() {
     },
   });
 }
+
+// export function useFetchSessionsForLawyers() {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: (payload: {
+//       search: string;
+//       status: string;
+//       sort: string;
+//       order: "asc" | "desc";
+//       consultation_type: string;
+//       page: number;
+//       limit: number;
+//     }) => fetchSessionsforLawyers(payload),
+//     onSuccess:(updated)=>{
+//       toast.success(updated.message || "success")
+
+//     }
+//   });
+// }
