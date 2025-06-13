@@ -80,9 +80,21 @@ export default function ClientAppointmentDetailModal({
   };
 
   if (!appointment) return null;
-
-  const canConfirmOrReject = appointment?.status === "pending";
-
+  function checkifTimeOut() {
+    const currentDate = new Date();
+    const appointmentDate = new Date(appointment?.date);
+    const time = appointment?.time;
+    const [h, m] = time.split(":").map(Number);
+    appointmentDate.setHours(h, m, 0, 0);
+    if (currentDate > appointmentDate) {
+      return true;
+    }
+    return false;
+  }
+  let canConfirmOrReject = false;
+  if (appointment?.status === "pending" && !checkifTimeOut()) {
+    canConfirmOrReject = true;
+  }
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>

@@ -1,13 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Search,
-  Filter,
-  Eye,
-  Calendar,
-  Clock,
-} from "lucide-react";
+import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
 import { useFetchAppointmentsForLawyers } from "@/store/tanstack/queries";
 import ClientAppointmentDetailModal from "@/components/Lawyer/Modals/appointmentDetails";
@@ -15,6 +9,7 @@ import {
   useConfirmAppointment,
   useRejectAppointment,
 } from "@/store/tanstack/mutations";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 export type AppointmentStatus =
   | "all"
@@ -49,13 +44,6 @@ export default function LawyerClientAppointmentListing() {
     }
   };
 
-  const getInitials = (name: string) => {
-    const names = name.split(" ");
-    return names
-      .map((n) => n[0].toUpperCase())
-      .join("")
-      .slice(0, 2);
-  };
 
   const { data: appointmentData, refetch: refetchAppointment } =
     useFetchAppointmentsForLawyers({
@@ -325,11 +313,17 @@ export default function LawyerClientAppointmentListing() {
                   >
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                          <span className="text-sm font-medium text-green-600 dark:text-green-300">
-                            {getInitials(appointment?.userData?.name)}
-                          </span>
-                        </div>
+                        <Avatar className="h-8 w-8 border">
+                          <AvatarImage
+                            src={appointment?.clientData?.profile_image}
+                            alt={appointment?.userData?.name}
+                          />
+                          <AvatarFallback>
+                            {appointment?.userData?.name
+                              ?.substring(0, 2)
+                              ?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
                           <p className="font-medium text-base text-gray-900 dark:text-white">
                             {appointment?.userData?.name}

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
-import SessionDetailModal from "@/components/Lawyer/Modals/sessionDetails";
+import SessionDetailModal from "@/components/users/modals/sessionDetails";
 import { useFetchsessionsForclients } from "@/store/tanstack/queries";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 export type SessionStatus =
   | "all"
@@ -53,15 +54,9 @@ export default function SessionsListing() {
       sort: sortBy,
       status: statusFilter,
     });
-//   console.log("datad", sessionsData);
+  //   console.log("datad", sessionsData);
   const sessions = sessionsData?.data;
-  const getInitials = (name: string) => {
-    const names = name.split(" ");
-    return names
-      .map((n) => n[0].toUpperCase())
-      .join("")
-      .slice(0, 2);
-  };
+
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       sessionRefetch();
@@ -245,7 +240,7 @@ export default function SessionsListing() {
                     onClick={() => handleSort("client_name")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
-                    Client Details
+                    Lawyer Details
                     {sortBy === "client_name" &&
                       (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
@@ -303,11 +298,18 @@ export default function SessionsListing() {
                     >
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                            <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
-                              {getInitials(session?.userData?.name)}
-                            </span>
-                          </div>
+                          <Avatar className="h-8 w-8 rounded-full overflow-hidden">
+                            <AvatarImage
+                              src={session?.clientData?.profile_image}
+                              alt={session?.userData?.name}
+                              className="rounded-full"
+                            />
+                            <AvatarFallback className="rounded-full w-8 h-8 bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium">
+                              {session?.userData?.name
+                                ?.substring(0, 2)
+                                ?.toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
                           <div>
                             <p className="font-medium text-base text-gray-900 dark:text-white">
                               {session?.userData?.name || "N/A"}

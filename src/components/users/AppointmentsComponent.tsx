@@ -11,6 +11,7 @@ import PaginationComponent from "../pagination";
 import { useFetchAppointmentsForClients } from "@/store/tanstack/queries";
 import AppointmentDetailModal from "@/components/users/modals/AppointmentDetails.modal";
 import { useCancellAppointment } from "@/store/tanstack/mutations";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 export type AppointmentStatus =
   | "all"
@@ -46,14 +47,6 @@ export default function LawyerAppointmentListing() {
       setSortBy(field);
       setSortOrder("asc");
     }
-  };
-
-  const getInitials = (name: string) => {
-    const names = name.split(" ");
-    return names
-      .map((n) => n[0].toUpperCase())
-      .join("")
-      .slice(0, 2);
   };
 
   const { data: appointmentData, refetch: refetchAppointment } =
@@ -286,8 +279,7 @@ export default function LawyerAppointmentListing() {
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Date & Time
-                    {sortBy === "date" &&
-                      (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "date" && (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
@@ -327,13 +319,20 @@ export default function LawyerAppointmentListing() {
                     key={appointment?._id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
-                            {getInitials(appointment?.userData?.name)}
-                          </span>
-                        </div>
+                    <td className="py-4 px-4 rounded-full">
+                      <div className="flex items-center gap-3 ">
+                        <Avatar className="h-8 w-8 rounded-full overflow-hidden">
+                          <AvatarImage
+                            src={appointment?.clientData?.profile_image}
+                            alt={appointment?.userData?.name}
+                            className="rounded-full"
+                          />
+                          <AvatarFallback className="rounded-full w-8 h-8 bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium">
+                            {appointment?.userData?.name
+                              ?.substring(0, 2)
+                              ?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
                           <p className="font-medium text-base text-gray-900 dark:text-white">
                             {appointment?.userData?.name}

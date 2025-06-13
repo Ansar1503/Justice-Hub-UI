@@ -1,7 +1,7 @@
 // import { useAppDispatch } from "@/Redux/Hook";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 import { Eye, EyeOff } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Skeleton } from "../../ui/skeleton";
 import { AlertDestructive } from "../../ui/custom/AlertDestructive";
 import { ButtonLink } from "../../ui/custom/ButtonLink";
@@ -12,7 +12,6 @@ import {
   useUpdateEmailMutation,
   useUpdatePasswordMutation,
 } from "@/store/tanstack/mutations";
-
 
 function PersonalInfoForm({
   data,
@@ -45,6 +44,12 @@ function PersonalInfoForm({
     isPending: isSendingVerification,
     mutateAsync: sendVerificationAsync,
   } = useSendVerificationMailMutation();
+
+  useEffect(() => {
+    if (data?.email) {
+      setnewMail(data.email);
+    }
+  }, [data]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
@@ -96,7 +101,7 @@ function PersonalInfoForm({
       const emailInput = form.elements.namedItem("email") as HTMLInputElement;
       const email = emailInput.value;
       await updateEmailAsync({ email });
-      
+
       setEditEmail(false);
     } catch (error: any) {
       setErrors((prev) => ({ ...prev, email: error.message }));
@@ -212,7 +217,7 @@ function PersonalInfoForm({
                       disabled={!editEmail}
                       type="email"
                       name="email"
-                      value={data?.email || newMail}
+                      value={data.email}
                       onChange={handleChange}
                       className="flex-grow p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
                     />
@@ -230,7 +235,6 @@ function PersonalInfoForm({
                 <button
                   onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     setEditEmail(!editEmail);
                     if (editEmail) {
                       setnewMail(data?.email || "");

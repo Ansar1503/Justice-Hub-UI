@@ -40,8 +40,6 @@ import type {
   OverrideDateResponse,
   slotSettings,
 } from "@/types/types/SlotTypes";
-import { useQueryClient } from "@tanstack/react-query";
-import type { ResponseType } from "@/types/types/LoginResponseTypes";
 import {
   useFetchOverrideSlots,
   useFetchSlotSettings,
@@ -69,8 +67,6 @@ export default function OverrideDates() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const queryClient = useQueryClient();
-
   const { data: overrideData, refetch: fetchOverrideData } =
     useFetchOverrideSlots();
   const overrideSlots = overrideData?.data;
@@ -78,18 +74,6 @@ export default function OverrideDates() {
   const { data, refetch } = useFetchSlotSettings();
   const { mutateAsync: AddOverrideSlots } = useAddOverrideSlots();
   const slotSettingsData = data?.data;
-
-  const cacheData: (ResponseType & { data: slotSettings }) | undefined =
-    useMemo(
-      () => queryClient.getQueryData(["schedule", "settings"]),
-      [queryClient]
-    );
-  const cachedSlotSettings = cacheData?.data;
-
-  const cachedOverrideSlots: OverrideDateResponse | undefined = useMemo(
-    () => queryClient.getQueryData(["schedule", "overrides"]),
-    [queryClient]
-  );
 
   const { today, maxDate } = useMemo(() => {
     const todayDate = new Date();
@@ -109,18 +93,12 @@ export default function OverrideDates() {
           _id: overrideSlots._id || "",
           overrideDates: overrideSlots.overrideDates,
         });
-      } else if (cachedOverrideSlots) {
-        setOverrideDates({
-          lawyer_id: cachedOverrideSlots.lawyer_id,
-          _id: cachedOverrideSlots._id || "",
-          overrideDates: cachedOverrideSlots.overrideDates,
-        });
       } else {
         await fetchOverrideData();
       }
     };
     fetchData();
-  }, [overrideSlots, cachedOverrideSlots, fetchOverrideData]);
+  }, [overrideSlots, fetchOverrideData]);
 
   const allOverrideDates = useMemo(() => {
     return overrideDates?.overrideDates || [];
@@ -128,13 +106,7 @@ export default function OverrideDates() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (cachedSlotSettings && Object.keys(cachedSlotSettings).length > 0) {
-        setSlotSettings({
-          slotDuration: cachedSlotSettings.slotDuration.toString(),
-          maxDaysInAdvance: cachedSlotSettings.maxDaysInAdvance.toString(),
-          autoConfirm: cachedSlotSettings.autoConfirm,
-        });
-      } else if (slotSettingsData && Object.keys(slotSettingsData).length > 0) {
+      if (slotSettingsData && Object.keys(slotSettingsData).length > 0) {
         setSlotSettings({
           slotDuration: slotSettingsData.slotDuration.toString(),
           maxDaysInAdvance: slotSettingsData.maxDaysInAdvance.toString(),
@@ -145,7 +117,7 @@ export default function OverrideDates() {
       }
     };
     fetchData();
-  }, [cachedSlotSettings, slotSettingsData, refetch]);
+  }, [slotSettingsData, refetch]);
 
   const timeOptions = useMemo(() => {
     const duration = Number(slotSettings?.slotDuration);
@@ -349,7 +321,7 @@ export default function OverrideDates() {
     const days = eachDayOfInterval({ start, end });
     return { monthStart: start, monthEnd: end, monthDays: days };
   }, [currentMonth]);
-  console.log('selectedDates', selectedDates);
+  console.log("selectedDates", selectedDates);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   return (

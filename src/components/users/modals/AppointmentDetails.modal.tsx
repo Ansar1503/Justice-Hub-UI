@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 interface AppointmentDetailModalProps {
   appointment: any;
@@ -67,7 +68,21 @@ export default function AppointmentDetailModal({
   };
 
   if (!appointment) return null;
-
+  function checkifTimeOut() {
+    const currentDate = new Date();
+    const appointmentDate = new Date(appointment?.date);
+    const time = appointment?.time;
+    const [h, m] = time.split(":").map(Number);
+    appointmentDate.setHours(h, m, 0, 0);
+    if (currentDate > appointmentDate) {
+      return true;
+    }
+    return false;
+  }
+  let canCancelAppointment = false;
+  if (appointment?.status === "pending" && !checkifTimeOut()) {
+    canCancelAppointment = true;
+  }
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -84,15 +99,18 @@ export default function AppointmentDetailModal({
                 Lawyer Information
               </h3>
               <div className="flex items-center gap-3 mb-2">
-                <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
+                <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+                  <AvatarImage
+                    src={appointment?.clientData?.profile_image}
+                    alt={appointment?.userData?.name}
+                    className="h-full w-full object-cover"
+                  />
+                  <AvatarFallback className="h-full w-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 rounded-full">
                     {appointment?.userData?.name
-                      ?.split(" ")
-                      .map((n: string) => n[0].toUpperCase())
-                      .join("")
-                      .slice(0, 2)}
-                  </span>
-                </div>
+                      ?.substring(0, 2)
+                      ?.toUpperCase() || "NA"}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">
                     {appointment?.userData?.name}
@@ -175,17 +193,14 @@ export default function AppointmentDetailModal({
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-            {appointment?.status !== "cancelled" &&
-              appointment?.status !== "completed" &&
-              appointment?.status !== "rejected" &&
-              appointment?.status !== "confirmed" && (
-                <Button
-                  variant="destructive"
-                  onClick={() => setShowCancelConfirm(true)}
-                >
-                  Cancel Appointment
-                </Button>
-              )}
+            {canCancelAppointment && (
+              <Button
+                variant="destructive"
+                onClick={() => setShowCancelConfirm(true)}
+              >
+                Cancel Appointment
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

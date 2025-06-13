@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   X,
   Calendar,
@@ -28,7 +29,7 @@ export default function SessionDetailModal({
   onClose,
   onStartSession,
   onEndSession,
-  // onCancelSession,
+  onCancelSession,
 }: SessionDetailModalProps) {
   // const [notes, setNotes] = useState(session?.notes || "");
   // const [summary, setSummary] = useState(session?.summary || "");
@@ -44,6 +45,28 @@ export default function SessionDetailModal({
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+  const sessionStartable = () => {
+    const currentDate = new Date();
+    const sessionDate = new Date(session?.scheduled_at);
+    const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
+    sessionDate.setHours(h, m, 0, 0);
+    const sessionEnd = new Date(
+      sessionDate.getTime() + session.duration * 60000
+    );
+    return (
+      session?.status === "upcoming" &&
+      currentDate >= sessionDate &&
+      currentDate < sessionEnd
+    );
+  };
+
+  const sessionCancelable = () => {
+    const currentDate = new Date();
+    const sessionDate = new Date(session?.scheduled_at);
+    const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
+    sessionDate.setHours(h, m, 0, 0);
+    return session?.status === "upcoming" && currentDate < sessionDate;
   };
 
   const formatDuration = (minutes: number) => {
@@ -113,7 +136,7 @@ export default function SessionDetailModal({
 
         <div className="p-6 space-y-6">
           {/* Status and Payment Info */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
                 Session Status
@@ -152,14 +175,30 @@ export default function SessionDetailModal({
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
               <User className="h-5 w-5" />
-              Client Information
+              Lawyer Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Name</p>
-                <p className="font-medium text-gray-900 dark:text-white">
-                  {session?.userData?.name || "N/A"}
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  Name
                 </p>
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+                    <AvatarImage
+                      src={session?.clientData?.profile_image}
+                      alt={session?.userData?.name}
+                      className="h-full w-full object-cover"
+                    />
+                    <AvatarFallback className="h-full w-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 rounded-full">
+                      {session?.userData?.name
+                        ?.substring(0, 2)
+                        ?.toUpperCase() || "NA"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {session?.userData?.name || "N/A"}
+                  </p>
+                </div>
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -307,19 +346,23 @@ export default function SessionDetailModal({
         <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
           {session?.status === "upcoming" && (
             <>
-              <button
-                onClick={() => onStartSession?.(session._id)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
-              >
-                <Video className="h-4 w-4" />
-                Start Session
-              </button>
-              {/* <button
-                onClick={() => onCancelSession?.(session._id)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                Cancel Session
-              </button> */}
+              {sessionStartable() && (
+                <button
+                  onClick={() => onStartSession?.(session._id)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                >
+                  <Video className="h-4 w-4" />
+                  Start Session
+                </button>
+              )}
+              {sessionCancelable() && (
+                <button
+                  onClick={() => onCancelSession?.(session._id)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Cancel Session
+                </button>
+              )}
             </>
           )}
 
