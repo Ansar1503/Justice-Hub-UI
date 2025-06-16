@@ -1,11 +1,10 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/Lawyer/Modals/sessionDetails";
 import { useFetchSessionsForLawyers } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { useCancelSessionByLawyer } from "@/store/tanstack/mutations/sessionMutation";
 
 export type SessionStatus =
   | "all"
@@ -44,6 +43,8 @@ export default function SessionsListing() {
       setSortOrder("asc");
     }
   };
+  const { mutateAsync: CancelSession } = useCancelSessionByLawyer();
+
   const { data: sessionsData, refetch: sessionRefetch } =
     useFetchSessionsForLawyers({
       consultation_type: typeFilter,
@@ -54,8 +55,9 @@ export default function SessionsListing() {
       sort: sortBy,
       status: statusFilter,
     });
-  // console.log("datad", sessionsData);
+
   const sessions = sessionsData?.data;
+
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       sessionRefetch();
@@ -63,6 +65,7 @@ export default function SessionsListing() {
 
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, sessionRefetch]);
+
   useEffect(() => {
     sessionRefetch();
   }, [
@@ -164,28 +167,29 @@ export default function SessionsListing() {
 
   const handleCancelSession = async (sessionId: string) => {
     console.log("Cancelling session:", sessionId);
+    await CancelSession({ id: sessionId });
   };
 
   return (
-    <div className="h-full p-6 bg-white dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+    <div className="h-full p-4 sm:p-6 bg-white dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Sessions Management
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
             Manage and track all your client sessions
           </p>
         </div>
 
         {/* Filters and Search */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by client name or session details"
-              className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Search by client name..."
+              className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -194,7 +198,7 @@ export default function SessionsListing() {
             />
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div className="relative">
               <select
                 value={statusFilter}
@@ -202,9 +206,9 @@ export default function SessionsListing() {
                   setStatusFilter(e.target.value as SessionStatus);
                   setCurrentPage(1);
                 }}
-                className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+                className="w-full appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
               >
-                <option value="all">All Statuses</option>
+                <option value="all">All Status</option>
                 <option value="upcoming">Upcoming</option>
                 <option value="ongoing">Ongoing</option>
                 <option value="completed">Completed</option>
@@ -220,162 +224,272 @@ export default function SessionsListing() {
                 setTypeFilter(e.target.value as SessionType);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+              className="w-full appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
             >
               <option value="all">All Types</option>
               <option value="consultation">Consultation</option>
               <option value="follow-up">Follow-up</option>
             </select>
+
+            <select
+              className="w-full col-span-2 sm:col-span-1 appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value as SortField);
+                setSortOrder((s) => (s === "asc" ? "desc" : "asc"));
+                setCurrentPage(1);
+              }}
+            >
+              <option value="scheduled_at">Sort by Time</option>
+              <option value="amount">Sort by Amount</option>
+              <option value="client_name">Sort by Name</option>
+              <option value="created_at">Sort by Created</option>
+            </select>
+
+            <button
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="sm:hidden bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-white"
+            >
+              {sortOrder === "asc" ? "↑ Asc" : "↓ Desc"}
+            </button>
           </div>
         </div>
 
-        {/* Sessions Table */}
-        <div className="border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden shadow-sm">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
-                  <button
-                    onClick={() => handleSort("client_name")}
-                    className="flex items-center gap-1 hover:text-blue-600"
-                  >
-                    Client Details
-                    {sortBy === "client_name" &&
-                      (sortOrder === "asc" ? " ↑" : " ↓")}
-                  </button>
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
-                  <button
-                    onClick={() => handleSort("scheduled_at")}
-                    className="flex items-center gap-1 hover:text-blue-600"
-                  >
-                    Scheduled Time
-                    {sortBy === "scheduled_at" &&
-                      (sortOrder === "asc" ? " ↑" : " ↓")}
-                  </button>
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
-                  Status
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
-                  Type
-                </th>
-                {/* <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
-                  Payment
-                </th> */}
-                <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
-                  <button
-                    onClick={() => handleSort("amount")}
-                    className="flex items-center gap-1 hover:text-blue-600"
-                  >
-                    Amount
-                    {sortBy === "amount" && (sortOrder === "asc" ? " ↑" : " ↓")}
-                  </button>
-                </th>
-                <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {sessions?.length === 0 ? (
+        {/* Desktop Table View */}
+        <div className="hidden lg:block border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-full">
+              <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="text-center py-8 text-gray-500 dark:text-gray-400"
-                  >
-                    No sessions found matching your criteria
-                  </td>
-                </tr>
-              ) : (
-                sessions?.map((session: any) => {
-                  const { date, time } = formatDateTime(session?.scheduled_at);
-                  return (
-                    <tr
-                      key={session._id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[200px]">
+                    <button
+                      onClick={() => handleSort("client_name")}
+                      className="flex items-center gap-1 hover:text-blue-600"
                     >
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                            <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+                      Client Details
+                      {sortBy === "client_name" &&
+                        (sortOrder === "asc" ? " ↑" : " ↓")}
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[150px]">
+                    <button
+                      onClick={() => handleSort("scheduled_at")}
+                      className="flex items-center gap-1 hover:text-blue-600"
+                    >
+                      Scheduled Time
+                      {sortBy === "scheduled_at" &&
+                        (sortOrder === "asc" ? " ↑" : " ↓")}
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                    Status
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                    Type
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                    <button
+                      onClick={() => handleSort("amount")}
+                      className="flex items-center gap-1 hover:text-blue-600"
+                    >
+                      Amount
+                      {sortBy === "amount" &&
+                        (sortOrder === "asc" ? " ↑" : " ↓")}
+                    </button>
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[100px]">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {sessions?.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="text-center py-8 text-gray-500 dark:text-gray-400"
+                    >
+                      No sessions found matching your criteria
+                    </td>
+                  </tr>
+                ) : (
+                  sessions?.map((session: any) => {
+                    const { date, time } = formatDateTime(
+                      session?.scheduled_at
+                    );
+                    return (
+                      <tr
+                        key={session._id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                      >
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10 border flex-shrink-0 rounded-full overflow-hidden">
                               <AvatarImage
                                 src={session?.clientData?.profile_image}
                                 alt={session?.userData?.name}
                                 className="h-full w-full object-cover"
                               />
-                              <AvatarFallback className="h-full w-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 rounded-full">
+                              <AvatarFallback className="h-full w-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-sm font-medium text-blue-600 dark:text-blue-300 rounded-full">
                                 {session?.userData?.name
                                   ?.substring(0, 2)
                                   ?.toUpperCase() || "NA"}
                               </AvatarFallback>
                             </Avatar>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-base text-gray-900 dark:text-white truncate">
+                                {session?.userData?.name || "N/A"}
+                              </p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                                {session?.userData?.email || "N/A"}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {session?.clientData?.phone || "N/A"}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium text-base text-gray-900 dark:text-white">
-                              {session?.userData?.name || "N/A"}
-                            </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {session?.userData?.email || "N/A"}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {session?.clientData?.phone || "N/A"}
-                            </p>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1 text-sm text-gray-900 dark:text-white">
+                              <Calendar className="h-3 w-3 flex-shrink-0" />
+                              <span className="whitespace-nowrap">{date}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                              <Clock className="h-3 w-3 flex-shrink-0" />
+                              <span className="whitespace-nowrap">
+                                {time} ({session?.duration} min)
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-1 text-sm text-gray-900 dark:text-white">
-                            <Calendar className="h-3 w-3" />
-                            {date}
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                            <Clock className="h-3 w-3" />
-                            {time} ({session?.duration} min)
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        {renderStatusBadge(session?.status)}
-                      </td>
-                      <td className="py-4 px-4">
-                        {renderTypeBadge(session?.type)}
-                      </td>
-                      {/* <td className="py-4 px-4">
-                        {renderPaymentBadge(session?.payment_status)}
-                      </td> */}
-                      <td className="py-4 px-4">
-                        <span className="font-medium text-gray-900 dark:text-white">
-                          ₹{session.amount}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          {/* {session?.status === "upcoming" && (
-                            <button
-                              onClick={() => handleStartSession(session._id)}
-                              className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 dark:bg-green-900 dark:text-green-200"
-                            >
-                              <Video className="h-3 w-3" />
-                              Start
-                            </button>
-                          )} */}
+                        </td>
+                        <td className="py-4 px-4">
+                          {renderStatusBadge(session?.status)}
+                        </td>
+                        <td className="py-4 px-4">
+                          {renderTypeBadge(session?.type)}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                            ₹{session.amount}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-right">
                           <button
-                            className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 whitespace-nowrap"
                             onClick={() => handleViewSession(session)}
                           >
                             <Eye className="h-4 w-4" />
                             View
                           </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-4">
+          {sessions?.length === 0 ? (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              No sessions found matching your criteria
+            </div>
+          ) : (
+            sessions?.map((session: any) => {
+              const { date, time } = formatDateTime(session?.scheduled_at);
+              return (
+                <div
+                  key={session._id}
+                  className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
+                >
+                  {/* Client Info Header */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <Avatar className="h-12 w-12 border flex-shrink-0 rounded-full overflow-hidden">
+                        <AvatarImage
+                          src={session?.clientData?.profile_image}
+                          alt={session?.userData?.name}
+                          className="h-full w-full object-cover"
+                        />
+                        <AvatarFallback className="h-full w-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-sm font-medium text-blue-600 dark:text-blue-300 rounded-full">
+                          {session?.userData?.name
+                            ?.substring(0, 2)
+                            ?.toUpperCase() || "NA"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white truncate">
+                          {session?.userData?.name || "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                          {session?.userData?.email || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 flex-shrink-0 ml-2"
+                      onClick={() => handleViewSession(session)}
+                    >
+                      <Eye className="h-4 w-4" />
+                      View
+                    </button>
+                  </div>
+
+                  {/* Session Details Grid */}
+                  <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                    <div>
+                      <span className="text-gray-500 dark:text-gray-400 text-xs block mb-1">
+                        Scheduled Time
+                      </span>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1 text-gray-900 dark:text-white">
+                          <Calendar className="h-3 w-3" />
+                          <span className="text-xs">{date}</span>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                          <Clock className="h-3 w-3" />
+                          <span className="text-xs">{time}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 dark:text-gray-400 text-xs block mb-1">
+                        Amount
+                      </span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        ₹{session.amount}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Status and Type Row */}
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-600">
+                    <div className="flex items-center gap-2">
+                      {renderStatusBadge(session?.status)}
+                      {renderTypeBadge(session?.type)}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {session?.duration} min
+                    </div>
+                  </div>
+
+                  {/* Phone Number */}
+                  {session?.clientData?.phone && (
+                    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Phone: {session?.clientData?.phone}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
 
         <PaginationComponent

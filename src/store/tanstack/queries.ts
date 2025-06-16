@@ -197,7 +197,7 @@ export function useFetchsessionsForclients(payload: {
   limit: number;
 }) {
   return useQuery({
-    queryKey: ["lawyer", "sessions"],
+    queryKey: ["client", "sessions"],
     queryFn: () => fetchSessionsforClients(payload),
     staleTime: 1000 * 60 * 10,
   });

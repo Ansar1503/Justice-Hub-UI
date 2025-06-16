@@ -212,3 +212,13 @@ export async function fetchSessionsforClients(payload: {
   );
   return response.data;
 }
+
+export async function cancelSessionByClient(payload: { id: string }) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    "/api/client/profile/sessions/cancel",
+    payload,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}

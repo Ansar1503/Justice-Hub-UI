@@ -6,6 +6,7 @@ import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/users/modals/sessionDetails";
 import { useFetchsessionsForclients } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { useCancelSessionByClient } from "@/store/tanstack/mutations/sessionMutation";
 
 export type SessionStatus =
   | "all"
@@ -44,6 +45,7 @@ export default function SessionsListing() {
       setSortOrder("asc");
     }
   };
+  const { mutateAsync: sessionCancel } = useCancelSessionByClient();
   const { data: sessionsData, refetch: sessionRefetch } =
     useFetchsessionsForclients({
       consultation_type: typeFilter,
@@ -55,6 +57,7 @@ export default function SessionsListing() {
       status: statusFilter,
     });
   //   console.log("datad", sessionsData);
+
   const sessions = sessionsData?.data;
 
   useEffect(() => {
@@ -164,7 +167,9 @@ export default function SessionsListing() {
   };
 
   const handleCancelSession = async (sessionId: string) => {
-    console.log("Cancelling session:", sessionId);
+    console.log("Cancelling session in client:", sessionId);
+    await sessionCancel({ id: sessionId });
+    setIsModalOpen(false);
   };
 
   return (

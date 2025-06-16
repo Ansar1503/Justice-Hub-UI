@@ -168,3 +168,13 @@ export async function fetchSessionsforLawyers(payload: {
   );
   return response.data;
 }
+
+export async function cancelSessionByLawyer(payload: { id: string }) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    `/api/lawyer/profile/sessions/cancel`,
+    payload,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
