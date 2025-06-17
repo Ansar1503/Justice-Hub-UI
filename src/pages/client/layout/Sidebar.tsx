@@ -4,6 +4,7 @@ import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
 import { useFetchClientData } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { IoChatbubblesOutline } from "react-icons/io5";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +21,7 @@ export default function Sidebar() {
       icon: Calendar,
     },
     { path: `/${user?.role}/sessions`, label: "Session", icon: Calendar1 },
+    { path: `/${user?.role}/chats`, label: "chats", icon: IoChatbubblesOutline },
   ];
 
   return (
