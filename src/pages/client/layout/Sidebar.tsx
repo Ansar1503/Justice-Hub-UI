@@ -12,6 +12,8 @@ export default function Sidebar() {
   const { data } = useFetchClientData();
   const userData = data?.data;
   const location = useLocation();
+  const path = location.pathname;
+  const pathname = path.split("/")[path.split("/").length - 1];
 
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
@@ -21,59 +23,65 @@ export default function Sidebar() {
       icon: Calendar,
     },
     { path: `/${user?.role}/sessions`, label: "Session", icon: Calendar1 },
-    { path: `/${user?.role}/chats`, label: "chats", icon: IoChatbubblesOutline },
+    {
+      path: `/${user?.role}/chats`,
+      label: "chats",
+      icon: IoChatbubblesOutline,
+    },
   ];
 
   return (
     <>
-      {/* Mobile sidebar toggle button */}
-      <button
-        className="md:hidden fixed z-30 bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        )}
-      </button>
+      {/* Toggle button*/}
+      {(pathname === "chats" || window.innerWidth < 768) && (
+        <button
+          className="fixed z-30 bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          )}
+        </button>
+      )}
       {/* Sidebar content */}
       <aside
         className={`
           bg-brandForm2 dark:bg-black
-          md:w-1/12 w-1/2 md:min-w-64 flex-shrink-0
+          md:w-1/12 w-1/2 md:min-w-64 flex-shrink-0 min-h-screen
           ${
-            isOpen
-              ? "fixed left-0 h-screen w-72 z-20 p-4 pt-16 overflow-y-auto top-0"
+            isOpen || (pathname !== "chats" && window.innerWidth >= 768)
+              ? "fixed left-0 h-screen w-72 z-20 p-4 pt-16 overflow-y-auto top-0 md:static md:h-auto md:pt-4"
               : "fixed -left-full p-4"
           } 
-          md:static transition-all duration-300 ease-in-out
+          transition-all duration-300 ease-in-out
         `}
         style={{
           borderTopRightRadius: "10px",
@@ -128,7 +136,7 @@ export default function Sidebar() {
 
       {isOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-10"
+          className="fixed inset-0 bg-black bg-opacity-50 z-10"
           onClick={() => setIsOpen(false)}
         />
       )}

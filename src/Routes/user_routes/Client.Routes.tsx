@@ -1,10 +1,10 @@
 import { lazy } from "react";
-const ClientProfile = lazy(() => import("@/pages/client/ClientProfile"));
-const SessionsPage = lazy(() => import("@/pages/client/AppointmentsPage"));
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./wrapper/ClientProtected.Route";
-import LawyerDirectory from "@/pages/client/LawyersListing";
-import LawyersPage from "@/pages/client/LawyerProfile";
+const ClientProfile = lazy(() => import("@/pages/client/ClientProfile"));
+const SessionsPage = lazy(() => import("@/pages/client/AppointmentsPage"));
+const LawyerDirectory = lazy(() => import("@/pages/client/LawyersListing"));
+const LawyersPage = lazy(() => import("@/pages/client/LawyerProfile"));
 import PaymentSuccessPage from "@/pages/client/payment_successpaeg";
 import SessionPage from "@/pages/client/sessions";
 const Chats_page = lazy(() => import("@/pages/client/chats_page"));

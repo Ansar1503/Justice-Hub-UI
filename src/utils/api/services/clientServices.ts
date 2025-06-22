@@ -222,3 +222,14 @@ export async function cancelSessionByClient(payload: { id: string }) {
   );
   return response.data;
 }
+
+export async function fetchChatsForClientApi(cursor = 1, search: string) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/client/profile/chats?cursor=${cursor}&search=${search}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}

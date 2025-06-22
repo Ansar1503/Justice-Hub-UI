@@ -1,168 +1,213 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import ChatList from "@/components/users/chat/ChatList";
 import Footer from "./layout/Footer";
 import Navbar from "./layout/Navbar";
 import Sidebar from "./layout/Sidebar";
-import Chat from "@/components/users/chat/chat";
+
 import { store } from "@/store/redux/store";
+import type { ChatMessage, ChatSession } from "@/types/types/ChatType";
+import Chat from "@/components/users/chat/chat";
+import { useInfiniteFetchChatforClient } from "@/store/tanstack/infiniteQuery";
 
-export interface ChatMessage {
-  id: string;
-  content: string;
-  role: "user" | "assistant";
-  timestamp: Date;
+enum SocketEvents {
+  CONNECTED_EVENT = "connected",
+  CONNECTED_ERROR = "connect_error",
+  ERROR = "error",
+  DISCONNECT_EVENT = "disconnect",
+  JOIN_CHAT_EVENT = "joinChat",
+  TYPING_EVENT = "typing",
+  STOP_TYPING_EVENT = "stopTyping",
+  MESSAGE_RECEIVED_EVENT = "messageReceived",
+  MESSAGE_DELETE_EVENT = "messageDeleted",
+  GET_MESSAGES_EVENT = "getMessages",
+  MESSAGES_RECEIVED_EVENT = "messagesReceived",
 }
-
-export interface ChatConversation {
-  id: string;
-  title: string;
-  lastMessage: string;
-  timestamp: Date;
-  messages: ChatMessage[];
-}
-
-const sampleChats: ChatConversation[] = [
-  {
-    id: "1",
-    title: "Project Planning Discussion",
-    lastMessage: "Let me help you create a project timeline...",
-    timestamp: new Date("2024-01-15T10:30:00"),
-    messages: [
-      {
-        id: "1-1",
-        content: "I need help planning my new project",
-        role: "user",
-        timestamp: new Date("2024-01-15T10:25:00"),
-      },
-      {
-        id: "1-2",
-        content:
-          "I'd be happy to help you plan your project! What type of project are you working on?",
-        role: "assistant",
-        timestamp: new Date("2024-01-15T10:26:00"),
-      },
-      {
-        id: "1-3",
-        content: "It's a web application for task management",
-        role: "user",
-        timestamp: new Date("2024-01-15T10:28:00"),
-      },
-      {
-        id: "1-4",
-        content:
-          "Let me help you create a project timeline. For a task management web app, I recommend breaking it down into these phases:\n\n1. Planning & Design (1-2 weeks)\n2. Backend Development (2-3 weeks)\n3. Frontend Development (2-3 weeks)\n4. Testing & Deployment (1 week)",
-        role: "assistant",
-        timestamp: new Date("2024-01-15T10:30:00"),
-      },
-    ],
-  },
-  {
-    id: "2",
-    title: "React Best Practices",
-    lastMessage: "Always use useCallback for event handlers...",
-    timestamp: new Date("2024-01-14T15:45:00"),
-    messages: [
-      {
-        id: "2-1",
-        content: "What are some React best practices I should follow?",
-        role: "user",
-        timestamp: new Date("2024-01-14T15:40:00"),
-      },
-      {
-        id: "2-2",
-        content:
-          "Here are some key React best practices:\n\n1. Use functional components with hooks\n2. Keep components small and focused\n3. Use proper key props in lists\n4. Avoid inline functions in JSX\n5. Use useCallback for event handlers to prevent unnecessary re-renders",
-        role: "assistant",
-        timestamp: new Date("2024-01-14T15:45:00"),
-      },
-    ],
-  },
-  {
-    id: "3",
-    title: "Database Design Help",
-    lastMessage: "For your e-commerce app, consider these tables...",
-    timestamp: new Date("2024-01-13T09:20:00"),
-    messages: [
-      {
-        id: "3-1",
-        content:
-          "I need help designing a database for an e-commerce application",
-        role: "user",
-        timestamp: new Date("2024-01-13T09:15:00"),
-      },
-      {
-        id: "3-2",
-        content:
-          "For your e-commerce app, consider these main tables:\n\n- Users (customers, admins)\n- Products (with categories, inventory)\n- Orders (with order items)\n- Payments\n- Reviews\n- Shopping Cart\n\nWould you like me to detail the schema for any specific table?",
-        role: "assistant",
-        timestamp: new Date("2024-01-13T09:20:00"),
-      },
-    ],
-  },
-];
 
 function ChatsPage() {
-  const { token } = store.getState().Auth;
+  const [isConnected, setIsConnected] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selectedSession, setSelectedSession] = useState<ChatSession | null>(
+    null
+  );
+  const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+
+  const { token, user } = store.getState().Auth;
+  const currentUserId = user?.user_id || "";
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const socket = io(backendUrl || "http://localhost:8000", {
     auth: { token: `bearer ${token}` },
-    extraHeaders: {
-      authorization: `bearer ${token}`,
-    },
     withCredentials: true,
-    retries: 5,
   });
 
-  socket.on("connect", () => {
-    console.log("Connected!");
-    socket.emit("message", "Hello from the client!");
-  });
+  const { data, fetchNextPage, hasNextPage, isLoading } =
+    useInfiniteFetchChatforClient(search);
 
-  socket.on("connect_error", (err) => {
-    console.error("Socket connection failed:", err.message);
-  });
-  const [selectedChat, setSelectedChat] = useState<ChatConversation | null>(
-    sampleChats[0]
-  );
+  const chatSessions = data?.pages.flatMap((page) => page.data) ?? [];
+
+  const sessions: any = [];
+  console.log("sessions", chatSessions);
+  // const { data: chatData } = useFetchChatsForClients();
+
+  const onConnect = () => {
+    setIsConnected(true);
+  };
+
+  const onDisconnect = () => {
+    setIsConnected(false);
+  };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on(SocketEvents.CONNECTED_EVENT, onConnect);
+    socket.on(SocketEvents.DISCONNECT_EVENT, onDisconnect);
+    socket.on(SocketEvents.CONNECTED_ERROR, (err: any) => {
+      console.log("Socket connection error:", err, err.statusCode);
+    });
+    socket.on(SocketEvents.ERROR, (err) => {
+      console.log("Socket error:", err);
+    });
+
+    socket.on(
+      SocketEvents.MESSAGE_RECEIVED_EVENT,
+      (newMessage: ChatMessage) => {
+        if (selectedSession && newMessage.session_id === selectedSession._id) {
+          setSessionMessages((prev) => [...prev, newMessage]);
+        }
+
+        if (newMessage.senderId !== currentUserId) {
+          setUnreadCounts((prev) => ({
+            ...prev,
+            [newMessage.session_id]: (prev[newMessage.session_id] || 0) + 1,
+          }));
+        }
+      }
+    );
+
+    // listening for message received
+    socket.on(
+      SocketEvents.MESSAGES_RECEIVED_EVENT,
+      (data: { session_id: string; messages: ChatMessage[] }) => {
+        if (selectedSession && data.session_id === selectedSession._id) {
+          setSessionMessages(data.messages);
+        }
+      }
+    );
+
+    // listending for typing event
+    socket.on(
+      SocketEvents.TYPING_EVENT,
+      (data: { session_id: string; userId: string }) => {
+        if (
+          selectedSession &&
+          data.session_id === selectedSession._id &&
+          data.userId !== currentUserId
+        ) {
+          setIsTyping(true);
+          setTimeout(() => setIsTyping(false), 3000);
+        }
+      }
+    );
+
+    return () => {
+      socket.off(SocketEvents.CONNECTED_EVENT, onConnect);
+      socket.off(SocketEvents.DISCONNECT_EVENT, onDisconnect);
+      socket.off(SocketEvents.CONNECTED_ERROR);
+      socket.off(SocketEvents.ERROR);
+      socket.off(SocketEvents.MESSAGE_RECEIVED_EVENT);
+      socket.off(SocketEvents.MESSAGES_RECEIVED_EVENT);
+      socket.off(SocketEvents.TYPING_EVENT);
+    };
+  }, [socket, selectedSession, currentUserId]);
+
+  const handleSelectSession = (session: ChatSession) => {
+    setSelectedSession(session);
+    setSessionMessages([]); // Clear previous messages
+
+    // Join the session room
+    socket.emit(SocketEvents.JOIN_CHAT_EVENT, { sessionId: session._id });
+
+    // Request messages for this session
+    socket.emit(SocketEvents.GET_MESSAGES_EVENT, { session_id: session._id });
+
+    // Clear unread count for this session
+    if (session._id) {
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [session._id!]: 0,
+      }));
+    }
+  };
+
+  const handleSendMessage = (content: string, attachments?: File[]) => {
+    if (!selectedSession || !content.trim()) return;
+
+    const partnerId =
+      selectedSession.participants.lawyer_id === currentUserId
+        ? selectedSession.participants.client_id
+        : selectedSession.participants.lawyer_id;
+
+    const newMessage: Omit<ChatMessage, "_id" | "createdAt" | "updatedAt"> = {
+      session_id: selectedSession._id!,
+      senderId: currentUserId,
+      receiverId: partnerId,
+      content,
+      read: false,
+      attachments: attachments
+        ? attachments.map((file) => ({
+            url: URL.createObjectURL(file),
+            type: file.type,
+          }))
+        : undefined,
+    };
+
+    socket.emit("sendMessage", newMessage);
+
+    const messageWithId: ChatMessage = {
+      ...newMessage,
+      _id: Date.now().toString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    setSessionMessages((prev) => [...prev, messageWithId]);
+  };
+
+  const handleInputMessage = () => {
+    if (!socket || !selectedSession) return;
+    socket.emit(SocketEvents.TYPING_EVENT, {
+      session_id: selectedSession._id,
+      userId: currentUserId,
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FFF2F2] dark:bg-black">
       <Navbar />
-      <div className="flex flex-1">
+      <div className="flex flex-1 ">
         <Sidebar />
-        <div className="flex flex-1">
+        <div className="flex flex-1 min-h-screen">
           <div className="w-80 border-r border-gray-200 dark:border-gray-700">
             <ChatList
-              chats={sampleChats}
-              selectedChat={selectedChat}
-              onSelectChat={setSelectedChat}
+              sessions={chatSessions}
+              selectedSession={selectedSession}
+              onSelectSession={handleSelectSession}
+              unreadCounts={unreadCounts}
             />
           </div>
           <div className="flex-1 p-4">
             <Chat
-              conversation={selectedChat}
-              onSendMessage={(message) => {
-                if (selectedChat) {
-                  const newMessage: ChatMessage = {
-                    id: `${selectedChat.id}-${Date.now()}`,
-                    content: message,
-                    role: "user",
-                    timestamp: new Date(),
-                  };
-
-                  const updatedChat = {
-                    ...selectedChat,
-                    messages: [...selectedChat.messages, newMessage],
-                    lastMessage: message,
-                    timestamp: new Date(),
-                  };
-
-                  setSelectedChat(updatedChat);
-                }
-              }}
+              selectedSession={selectedSession}
+              messages={sessionMessages}
+              onSendMessage={handleSendMessage}
+              onInputMessage={handleInputMessage}
+              currentUserId={currentUserId}
+              isTyping={isTyping}
             />
           </div>
         </div>
