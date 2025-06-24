@@ -9,3 +9,12 @@ export function useInfiniteFetchChatforClient(search: string) {
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
   });
 }
+
+export function useInfiniteFetchChatforLawyer() {
+  return useInfiniteQuery({
+    queryKey: ["user", "chatMessages"],
+    queryFn: ({ pageParam = 1 }) => fetchChatMessages(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
+  });
+}

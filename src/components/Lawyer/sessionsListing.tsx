@@ -18,7 +18,7 @@ export type SessionType = "all" | "consultation" | "follow-up";
 export type PaymentStatus = "all" | "pending" | "success" | "failed";
 export type SortField =
   | "client_name"
-  | "scheduled_at"
+  | "scheduled_date"
   | "amount"
   | "created_at";
 export type SortOrder = "asc" | "desc";
@@ -27,7 +27,7 @@ export default function SessionsListing() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<SessionStatus>("all");
   const [typeFilter, setTypeFilter] = useState<SessionType>("all");
-  const [sortBy, setSortBy] = useState<SortField>("scheduled_at");
+  const [sortBy, setSortBy] = useState<SortField>("scheduled_date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -240,7 +240,7 @@ export default function SessionsListing() {
                 setCurrentPage(1);
               }}
             >
-              <option value="scheduled_at">Sort by Time</option>
+              <option value="scheduled_date">Sort by Time</option>
               <option value="amount">Sort by Amount</option>
               <option value="client_name">Sort by Name</option>
               <option value="created_at">Sort by Created</option>
@@ -273,11 +273,11 @@ export default function SessionsListing() {
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[150px]">
                     <button
-                      onClick={() => handleSort("scheduled_at")}
+                      onClick={() => handleSort("scheduled_date")}
                       className="flex items-center gap-1 hover:text-blue-600"
                     >
                       Scheduled Time
-                      {sortBy === "scheduled_at" &&
+                      {sortBy === "scheduled_date" &&
                         (sortOrder === "asc" ? " ↑" : " ↓")}
                     </button>
                   </th>
@@ -314,9 +314,7 @@ export default function SessionsListing() {
                   </tr>
                 ) : (
                   sessions?.map((session: any) => {
-                    const { date, time } = formatDateTime(
-                      session?.scheduled_at
-                    );
+                    const { date } = formatDateTime(session?.scheduled_date);
                     return (
                       <tr
                         key={session._id}
@@ -358,7 +356,8 @@ export default function SessionsListing() {
                             <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                               <Clock className="h-3 w-3 flex-shrink-0" />
                               <span className="whitespace-nowrap">
-                                {time} ({session?.duration} min)
+                                {session?.scheduled_time} ({session?.duration}{" "}
+                                min)
                               </span>
                             </div>
                           </div>
@@ -400,7 +399,7 @@ export default function SessionsListing() {
             </div>
           ) : (
             sessions?.map((session: any) => {
-              const { date, time } = formatDateTime(session?.scheduled_at);
+              const { date, time } = formatDateTime(session?.scheduled_date);
               return (
                 <div
                   key={session._id}

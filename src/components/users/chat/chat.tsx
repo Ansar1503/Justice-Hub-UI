@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ChatMessage } from "@/types/types/ChatType";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 interface ChatProps {
   selectedSession: any | null;
@@ -38,6 +39,17 @@ function Chat({
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
   }, [messages]);
+
+  function checkifTimeOut(date: Date, time: string) {
+    const currentDate = new Date();
+    const appointmentDate = new Date(date);
+    const [h, m] = time.split(":").map(Number);
+    appointmentDate.setHours(h, m, 0, 0);
+    if (currentDate > appointmentDate) {
+      return true;
+    }
+    return false;
+  }
 
   // handle send messages...
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -78,8 +90,8 @@ function Chat({
     const isCurrentUserLawyer =
       selectedSession.participants.lawyer_id === currentUserId;
     return isCurrentUserLawyer
-      ? `Client ${selectedSession.participants.client_id.slice(-4)}`
-      : `Lawyer ${selectedSession.participants.lawyer_id.slice(-4)}`;
+      ? `Client ${selectedSession?.clientData?.name}`
+      : `Lawyer ${selectedSession?.lawyerData?.name}`;
   }
 
   // render attachments...
@@ -87,7 +99,9 @@ function Chat({
     attachment: { url: string; type: string },
     index: number
   ) => {
-    if (attachment.type.startsWith("image/")) {
+    if (!attachment) return;
+    if (!attachment.url) return;
+    if (attachment.type.startsWith("image")) {
       return (
         <img
           key={index}
@@ -104,7 +118,7 @@ function Chat({
       >
         <Paperclip className="h-4 w-4" />
         <span className="text-sm truncate">
-          {attachment.url.split("/").pop()}
+          {attachment?.url?.split("/")?.pop()}
         </span>
       </div>
     );
@@ -114,7 +128,6 @@ function Chat({
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">No chat session selected</h3>
           <p className="text-muted-foreground">
             Choose a session from the sidebar to start chatting
@@ -123,12 +136,19 @@ function Chat({
       </div>
     );
   }
-
+  // console.log("currentsession", selectedSession?.clientData?.profile_image);
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="border-b">
         <CardTitle className="flex items-center gap-2">
           <Avatar className="h-8 w-8">
+            <AvatarImage
+              src={
+                selectedSession?.participants?.client_id !== currentUserId
+                  ? selectedSession?.clientData?.profile_image
+                  : selectedSession?.lawyerData?.profile_image
+              }
+            />
             <AvatarFallback>
               <User className="h-4 w-4" />
             </AvatarFallback>
@@ -139,7 +159,7 @@ function Chat({
               <span className="text-sm font-normal text-muted-foreground">
                 {messages.length} messages
               </span>
-              <Badge
+              {/* <Badge
                 variant="outline"
                 className={`text-xs ${
                   selectedSession.status === "active"
@@ -150,7 +170,7 @@ function Chat({
                 }`}
               >
                 {selectedSession.status}
-              </Badge>
+              </Badge> */}
             </div>
           </div>
         </CardTitle>
@@ -159,85 +179,105 @@ function Chat({
       <CardContent className="flex-1 flex flex-col p-0">
         <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
           <div className="space-y-4">
-            {messages.map((message) => {
-              const isOwn = isFromCurrentUser(message);
-              return (
-                <div
-                  key={message._id}
-                  className={`flex gap-3 ${
-                    isOwn ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {!isOwn && (
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-
-                  <div className={`max-w-[70%] ${isOwn ? "order-1" : ""}`}>
-                    <div
-                      className={`rounded-lg p-3 ${
-                        isOwn
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-100 dark:bg-gray-800"
-                      }`}
-                    >
-                      <p className="text-sm whitespace-pre-wrap">
-                        {message.content}
-                      </p>
-
-                      {message.attachments &&
-                        message.attachments.length > 0 && (
-                          <div className="mt-2 space-y-2">
-                            {message.attachments.map(
-                              (
-                                attachment: {
-                                  url: string;
-                                  type: string;
-                                },
-                                index: number
-                              ) => renderAttachment(attachment, index)
-                            )}
-                          </div>
-                        )}
-                    </div>
-
-                    <div
-                      className={`flex items-center gap-2 mt-1 px-1 ${
-                        isOwn ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <p className="text-xs text-muted-foreground">
-                        {formatMessageTime(message.createdAt || new Date())}
-                      </p>
-                      {isOwn && (
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            message.read ? "bg-blue-500" : "bg-gray-400"
-                          }`}
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  {isOwn && (
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
+            {messages.length === 0 ? (
+              <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
+                <div>
+                  <h3 className="text-md font-semibold mb-1">
+                    No messages yet
+                  </h3>
+                  <p className="text-sm">
+                    Start the conversation by sending a message.
+                  </p>
                 </div>
-              );
-            })}
+              </div>
+            ) : (
+              messages.map((message) => {
+                const isOwn = isFromCurrentUser(message);
+                return (
+                  <div
+                    key={message._id}
+                    className={`flex gap-3 ${
+                      isOwn ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    {!isOwn && (
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>
+                          <User className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+
+                    <div className={`max-w-[70%] ${isOwn ? "order-1" : ""}`}>
+                      <div
+                        className={`rounded-lg p-3 ${
+                          isOwn
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-100 dark:bg-gray-800"
+                        }`}
+                      >
+                        <p className="text-sm whitespace-pre-wrap">
+                          {message.content}
+                        </p>
+
+                        {message.attachments &&
+                          message.attachments.length > 0 && (
+                            <div className="mt-2 space-y-2">
+                              {message.attachments.map(
+                                (
+                                  attachment: {
+                                    url: string;
+                                    type: string;
+                                  },
+                                  index: number
+                                ) => renderAttachment(attachment, index)
+                              )}
+                            </div>
+                          )}
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-2 mt-1 px-1 ${
+                          isOwn ? "justify-end" : "justify-start"
+                        }`}
+                      >
+                        <p className="text-xs text-muted-foreground">
+                          {formatMessageTime(message.createdAt || new Date())}
+                        </p>
+                        {isOwn && (
+                          <div
+                            className={`w-2 h-2 rounded-full ${
+                              message.read ? "bg-blue-500" : "bg-gray-400"
+                            }`}
+                          />
+                        )}
+                      </div>
+                    </div>
+
+                    {isOwn && (
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>
+                          <User className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                  </div>
+                );
+              })
+            )}
 
             {isTyping && (
               <div className="flex gap-3 justify-start">
                 <Avatar className="h-8 w-8">
+                  <AvatarImage
+                    src={
+                      selectedSession?.participants?.client_id === currentUserId
+                        ? selectedSession?.clientData?.profile_image
+                        : selectedSession?.lawyerData?.profile_image
+                    }
+                  />
                   <AvatarFallback>
-                    <Bot className="h-4 w-4" />
+                    <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="bg-muted rounded-lg p-3">
@@ -309,19 +349,31 @@ function Chat({
                 onInputMessage();
               }}
               placeholder={
-                selectedSession.status === "active"
+                ["upcoming", "ongoing"].includes(
+                  selectedSession?.sessionDetails?.status
+                )
                   ? "Type your message..."
                   : "This session is not active"
               }
               className="flex-1"
-              disabled={selectedSession.status !== "active"}
+              disabled={
+                !["upcoming", "ongoing"].includes(
+                  selectedSession?.sessionDetails?.status
+                )
+              }
             />
 
             <Button
               type="submit"
               disabled={
                 (!newMessage.trim() && selectedFiles.length === 0) ||
-                selectedSession.status !== "active"
+                (!["upcoming", "ongoing"].includes(
+                  selectedSession?.sessionDetails?.status
+                ) &&
+                  checkifTimeOut(
+                    selectedSession?.sessionDetails?.scheduled_date,
+                    selectedSession?.sessionDetails?.scheduled_time
+                  ))
               }
             >
               <Send className="h-4 w-4" />

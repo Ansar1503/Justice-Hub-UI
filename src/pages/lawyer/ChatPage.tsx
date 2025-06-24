@@ -44,23 +44,16 @@ function ChatsPage() {
 
   const socket = useRef<Socket | null>(null);
 
-  const {
-    data: chatSessionData,
-    fetchNextPage,
-    hasNextPage,
-    isLoading,
-  } = useInfiniteFetchChatforClient(search);
+  const { data, fetchNextPage, hasNextPage, isLoading } =
+    useInfiniteFetchChatforClient(search);
 
-  const chatSessions =
-    chatSessionData?.pages.flatMap((page) => page.data) ?? [];
-
-  
+  const chatSessions = data?.pages.flatMap((page) => page.data) ?? [];
 
   const onConnect = () => setIsConnected(true);
   const onDisconnect = () => setIsConnected(false);
 
   useEffect(() => {
-    // console.log("userid:", currentUserId);
+    // console.log("currentuserid", currentUserId);
     if (!token) return;
     if (!socket.current) {
       socket.current = getSocket(token);
@@ -75,7 +68,7 @@ function ChatsPage() {
     });
     s.on(SocketEvents.SOCKET_ERROR_EVENT, (err: any) => {
       console.log("Socket error:", err);
-      // toast.error(err?.message || "Socket error");
+      toast.error(err?.message || "Socket error");
     });
     s.on(SocketEvents.ERROR, (err) => {
       console.log("Socket error:", err);
@@ -106,7 +99,7 @@ function ChatsPage() {
     s.on(
       SocketEvents.TYPING_EVENT,
       (data: { session_id: string; userId: string }) => {
-        // console.log("someone is typing in chat", data);
+        // console.log("Received typing event:", data);
         if (
           selectedSession &&
           data.session_id === selectedSession._id &&
@@ -127,8 +120,9 @@ function ChatsPage() {
       s.off(SocketEvents.MESSAGE_RECEIVED_EVENT);
       s.off(SocketEvents.MESSAGES_RECEIVED_EVENT);
       s.off(SocketEvents.TYPING_EVENT);
+      // disconnectSocket();
     };
-  }, [token, selectedSession, currentUserId]);
+  }, [token, currentUserId, selectedSession]);
 
   const handleSelectSession = (session: ChatSession) => {
     setSelectedSession(session);
@@ -137,7 +131,7 @@ function ChatsPage() {
     const s = socket.current;
     // console.log("s:", s);
     if (!s) return;
-    // console.log("s is here : ", s);
+
     s.emit(SocketEvents.JOIN_CHAT_EVENT, { sessionId: session._id });
     // s.emit(SocketEvents.GET_MESSAGES_EVENT, { session_id: session._id });
 
@@ -167,13 +161,14 @@ function ChatsPage() {
         type: file.type,
       })),
     };
-
     s.emit(SocketEvents.SEND_MESSAGE_EVENT, newMessage);
+    s.on(SocketEvents.MESSAGES_RECEIVED_EVENT, (message: ChatMessage) => {
+      console.log("message:", message);
+    });
   };
 
   const handleInputMessage = () => {
     if (!socket.current || !selectedSession) return;
-
     socket.current.emit(SocketEvents.TYPING_EVENT, {
       session_id: selectedSession._id,
       userId: currentUserId,

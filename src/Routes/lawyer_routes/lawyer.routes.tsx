@@ -6,6 +6,7 @@ import SlotAddModal from "@/components/Lawyer/Modals/slot-add-modal";
 import LawyerSlotProtectRoute from "./wrapper/lawyer.slot.protect.route";
 import AppointmentsPage from "@/pages/lawyer/Appointments";
 import SessionPage from "@/pages/lawyer/Sessions";
+import ChatsPage from "@/pages/lawyer/ChatPage";
 
 export default function LawyerRoutes() {
   return (
@@ -15,6 +16,7 @@ export default function LawyerRoutes() {
         <Route path="/schedule" element={<LawyerSchedulePage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/sessions" element={<SessionPage />} />
+        <Route path="/chats" element={<ChatsPage />} />
       </Route>
       <Route element={<LawyerSlotProtectRoute />}>
         <Route path="/slot-setup/:id" element={<SlotAddModal />} />

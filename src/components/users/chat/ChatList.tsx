@@ -12,6 +12,7 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 interface ChatListProps {
   sessions: any[];
   selectedSession: ChatSession | null;
+  currentUserId: string;
   onSelectSession: (session: ChatSession) => void;
   unreadCounts?: Record<string, number>;
 }
@@ -19,6 +20,7 @@ interface ChatListProps {
 export default function ChatList({
   sessions,
   selectedSession,
+  currentUserId,
   onSelectSession,
   unreadCounts = {},
 }: ChatListProps) {
@@ -38,11 +40,11 @@ export default function ChatList({
     return date.toLocaleDateString();
   };
 
-  // const getSessionPartnerId = (session: ChatSession) => {
-  //   return session.participants?.lawyer_id === currentUserId
-  //     ? session.participants?.client_id
-  //     : session.participants?.lawyer_id;
-  // };
+  const getSessionPartnerId = (session: ChatSession) => {
+    return session.participants?.lawyer_id === currentUserId
+      ? session.participants?.client_id
+      : session.participants?.lawyer_id;
+  };
 
   // const getStatusColor = (status: ChatSession["status"]) => {
   //   switch (status) {
@@ -91,7 +93,7 @@ export default function ChatList({
           ) : (
             sessions.map((session) => {
               const unreadCount = unreadCounts[session._id || ""] || 0;
-              // const partnerId = getSessionPartnerId(session);
+              const partnerId = getSessionPartnerId(session);
               return (
                 <div
                   key={session._id}
@@ -105,7 +107,13 @@ export default function ChatList({
                   <div className="flex items-start gap-3">
                     <div className="relative">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={session?.lawyerData?.profile_image} />
+                        <AvatarImage
+                          src={
+                            session?.participants?.lawyer_id === partnerId
+                              ? session?.lawyerData?.profile_image
+                              : session?.clientData?.profile_image
+                          }
+                        />
                         <AvatarFallback>
                           <User className="h-5 w-5" />
                         </AvatarFallback>
@@ -120,7 +128,9 @@ export default function ChatList({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-medium text-sm truncate text-gray-900 dark:text-white">
-                          {session?.lawyerData?.name || "Unknown"}
+                          {session?.participants?.lawyer_id === partnerId
+                            ? session?.lawyerData?.name
+                            : session?.clientData?.name || "Unknown"}
                         </span>
                         <div className="flex items-center gap-2">
                           {unreadCount > 0 && (
