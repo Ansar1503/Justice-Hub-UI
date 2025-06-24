@@ -8,7 +8,11 @@ import Sidebar from "./layout/Sidebar";
 import { store } from "@/store/redux/store";
 import type { ChatMessage, ChatSession } from "@/types/types/ChatType";
 import Chat from "@/components/users/chat/chat";
-import { useInfiniteFetchChatforClient } from "@/store/tanstack/infiniteQuery";
+import {
+  useInfiniteFetchChatforClient,
+  useInfiniteFetchMessages,
+} from "@/store/tanstack/infiniteQuery";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 import { getSocket, disconnectSocket } from "@/utils/socket/socket";
@@ -41,23 +45,30 @@ function ChatsPage() {
 
   const { token, user } = store.getState().Auth;
   const currentUserId = user?.user_id || "";
+  const queryClient = useQueryClient();
 
   const socket = useRef<Socket | null>(null);
 
-  const {
-    data: chatSessionData,
-    fetchNextPage,
-    hasNextPage,
-    isLoading,
-  } = useInfiniteFetchChatforClient(search);
-
-  const chatSessions =
-    chatSessionData?.pages.flatMap((page) => page.data) ?? [];
-
-  
-
   const onConnect = () => setIsConnected(true);
   const onDisconnect = () => setIsConnected(false);
+
+  const {
+    data: chatSessionData,
+    fetchNextPage: fetchNextChats,
+    hasNextPage: hasNextChats,
+    isLoading: isLoadingChats,
+  } = useInfiniteFetchChatforClient(search);
+
+  const {
+    data: chatMessageData,
+    fetchNextPage: fetchNextMessages,
+    hasNextPage: hasNextMessages,
+    isLoading: isLoadingMessages,
+  } = useInfiniteFetchMessages(selectedSession?._id || "");
+  const chatMessages =
+    chatMessageData?.pages.flatMap((page) => page.data) || [];
+  const chatSessions =
+    chatSessionData?.pages.flatMap((page) => page.data) ?? [];
 
   useEffect(() => {
     // console.log("userid:", currentUserId);
@@ -83,7 +94,25 @@ function ChatsPage() {
 
     s.on(SocketEvents.MESSAGE_RECEIVED_EVENT, (newMessage: ChatMessage) => {
       if (selectedSession && newMessage.session_id === selectedSession._id) {
-        setSessionMessages((prev) => [...prev, newMessage]);
+        queryClient.setQueryData(
+          ["user", "chatMessages", selectedSession._id],
+          (oldData: any) => {
+            if (!oldData) return oldData;
+
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any, index: number) => {
+                if (index === oldData.pages.length - 1) {
+                  return {
+                    ...page,
+                    data: [...page.data, newMessage],
+                  };
+                }
+                return page;
+              }),
+            };
+          }
+        );
       }
 
       if (newMessage.senderId !== currentUserId) {
@@ -94,14 +123,6 @@ function ChatsPage() {
       }
     });
 
-    s.on(
-      SocketEvents.MESSAGES_RECEIVED_EVENT,
-      (data: { session_id: string; messages: ChatMessage[] }) => {
-        if (selectedSession && data.session_id === selectedSession._id) {
-          setSessionMessages(data.messages);
-        }
-      }
-    );
 
     s.on(
       SocketEvents.TYPING_EVENT,
@@ -168,7 +189,69 @@ function ChatsPage() {
       })),
     };
 
-    s.emit(SocketEvents.SEND_MESSAGE_EVENT, newMessage);
+    s.emit(
+      SocketEvents.SEND_MESSAGE_EVENT,
+      newMessage,
+      (response: {
+        success: boolean;
+        savedMessage?: ChatMessage;
+        error?: string;
+      }) => {
+        if (response.success && response.savedMessage) {
+          queryClient.setQueryData(
+            ["user", "chatMessages", selectedSession._id],
+            (oldData: any) => {
+              if (!oldData) return oldData;
+              return {
+                ...oldData,
+                pages: oldData.pages.map((page: any, index: number) => {
+                  if (index === oldData.pages.length - 1) {
+                    const withoutTemp = page.data.filter(
+                      (msg: ChatMessage) =>
+                        !(
+                          msg.content === newMessage.content &&
+                          msg.senderId === newMessage.senderId
+                        )
+                    );
+                    return {
+                      ...page,
+                      data: [...withoutTemp, response.savedMessage],
+                    };
+                  }
+                  return page;
+                }),
+              };
+            }
+          );
+        } else {
+          toast.error("Message failed to send.");
+          queryClient.setQueryData(
+            ["user", "chatMessages", selectedSession._id],
+            (oldData: any) => {
+              if (!oldData) return oldData;
+              return {
+                ...oldData,
+                pages: oldData.pages.map((page: any, index: number) => {
+                  if (index === oldData.pages.length - 1) {
+                    return {
+                      ...page,
+                      data: page.data.filter(
+                        (msg: ChatMessage) =>
+                          !(
+                            msg.content === newMessage.content &&
+                            msg.senderId === newMessage.senderId
+                          )
+                      ),
+                    };
+                  }
+                  return page;
+                }),
+              };
+            }
+          );
+        }
+      }
+    );
   };
 
   const handleInputMessage = () => {
@@ -198,7 +281,7 @@ function ChatsPage() {
           <div className="flex-1 p-4">
             <Chat
               selectedSession={selectedSession}
-              messages={sessionMessages}
+              messages={chatMessages}
               onSendMessage={handleSendMessage}
               onInputMessage={handleInputMessage}
               currentUserId={currentUserId}

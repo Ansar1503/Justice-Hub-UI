@@ -234,10 +234,10 @@ export async function fetchChatsForClientApi(cursor = 1, search: string) {
   return response.data;
 }
 
-export async function fetchChatMessages(cursor = 1) {
+export async function fetchChatMessages(cursor = 1, sessionId: string) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/client/profile/chats?cursor=${cursor}`,
+    `/api/client/profile/chats/messages?cursor=${cursor}&sId=${sessionId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

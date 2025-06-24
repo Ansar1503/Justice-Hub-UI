@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Paperclip, X } from "lucide-react";
+import { Send, User, Paperclip, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -51,7 +51,7 @@ function Chat({
     return false;
   }
 
-  // handle send messages...
+  // handle send messages
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!newMessage.trim() && selectedFiles.length === 0) || !selectedSession)
@@ -63,20 +63,26 @@ function Chat({
     onSendMessage(message, selectedFiles);
   };
 
-  // handle file select .....
+  // handle file select
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setSelectedFiles((prev) => [...prev, ...files]);
   };
 
-  // handler file remove....
+  // handler file remove
   const removeFile = (index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // formet message time ...
+  // formet message time
   const formatMessageTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    if (date && date instanceof Date) {
+      return date?.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    return;
   };
 
   // is from current suser
@@ -84,11 +90,11 @@ function Chat({
     return message.senderId === currentUserId;
   };
 
-  // render partner name ...
+  // render partner name
   function getPartnerName() {
     if (!selectedSession) return "Chat";
     const isCurrentUserLawyer =
-      selectedSession.participants.lawyer_id === currentUserId;
+      selectedSession.participants?.lawyer_id === currentUserId;
     return isCurrentUserLawyer
       ? `Client ${selectedSession?.clientData?.name}`
       : `Lawyer ${selectedSession?.lawyerData?.name}`;

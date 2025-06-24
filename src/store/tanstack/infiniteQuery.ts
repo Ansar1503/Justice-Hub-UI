@@ -1,4 +1,8 @@
-import { fetchChatsForClientApi } from "@/utils/api/services/clientServices";
+import { ChatMessage } from "@/types/types/ChatType";
+import {
+  fetchChatMessages,
+  fetchChatsForClientApi,
+} from "@/utils/api/services/clientServices";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export function useInfiniteFetchChatforClient(search: string) {
@@ -10,11 +14,12 @@ export function useInfiniteFetchChatforClient(search: string) {
   });
 }
 
-export function useInfiniteFetchChatforLawyer() {
+export function useInfiniteFetchMessages(sessionId: string) {
   return useInfiniteQuery({
-    queryKey: ["user", "chatMessages"],
-    queryFn: ({ pageParam = 1 }) => fetchChatMessages(pageParam),
+    queryKey: ["user", "chatMessages", sessionId],
+    queryFn: ({ pageParam = 1 }) => fetchChatMessages(pageParam, sessionId),
     initialPageParam: 1,
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
+    enabled: sessionId ? true : false,
   });
 }
