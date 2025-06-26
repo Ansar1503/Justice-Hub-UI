@@ -4,6 +4,7 @@ import {
   fetchLawyerDetails,
   fetchLawyersByQuery,
   fetchLawyerSlotSettings,
+  fetchSessionDocuments,
   fetchSessionsforClients,
   fetchSlotsforClients,
 } from "@/utils/api/services/clientServices";
@@ -33,6 +34,7 @@ import {
   SortOrder,
 } from "@/components/users/AppointmentsComponent";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
+import { SessionDocument } from "@/types/types/sessionType";
 
 export function useFetchClientData() {
   return useQuery({
@@ -200,5 +202,14 @@ export function useFetchsessionsForclients(payload: {
     queryKey: ["client", "sessions"],
     queryFn: () => fetchSessionsforClients(payload),
     staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchSessionDocuments(sessionId: string) {
+  return useQuery<string, Error, ResponseType & { data: SessionDocument }>({
+    queryKey: ["session", "documents", sessionId],
+    queryFn: () => fetchSessionDocuments(sessionId),
+    staleTime: 1000 * 60 * 10,
+    enabled: !!sessionId,
   });
 }

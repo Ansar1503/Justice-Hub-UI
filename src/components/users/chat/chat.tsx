@@ -1,15 +1,13 @@
-"use client";
-
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Send, User, Paperclip, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ChatMessage } from "@/types/types/ChatType";
+import moment from "moment-timezone";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 interface ChatProps {
@@ -19,9 +17,11 @@ interface ChatProps {
   onInputMessage: () => void;
   currentUserId: string;
   isTyping?: boolean;
+  isConnected: boolean;
 }
 
 function Chat({
+  // isConnected,
   selectedSession,
   messages,
   onSendMessage,
@@ -38,59 +38,43 @@ function Chat({
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   function checkifTimeOut(date: Date, time: string) {
     const currentDate = new Date();
     const appointmentDate = new Date(date);
     const [h, m] = time.split(":").map(Number);
     appointmentDate.setHours(h, m, 0, 0);
-    if (currentDate > appointmentDate) {
-      return true;
-    }
-    return false;
+    return currentDate > appointmentDate;
   }
 
-  // handle send messages
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if ((!newMessage.trim() && selectedFiles.length === 0) || !selectedSession)
       return;
-
     const message = newMessage.trim();
     setNewMessage("");
     setSelectedFiles([]);
     onSendMessage(message, selectedFiles);
   };
 
-  // handle file select
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setSelectedFiles((prev) => [...prev, ...files]);
   };
 
-  // handler file remove
   const removeFile = (index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // formet message time
   const formatMessageTime = (date: Date) => {
-    if (date && date instanceof Date) {
-      return date?.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-    return;
+    return moment(date).tz("Asia/Kolkata").format("h:mm A");
   };
 
-  // is from current suser
-  const isFromCurrentUser = (message: ChatMessage) => {
-    return message.senderId === currentUserId;
-  };
+  // const isFromCurrentUser = (message: ChatMessage) => {
+  //   return message.senderId === currentUserId;
+  // };
 
-  // render partner name
   function getPartnerName() {
     if (!selectedSession) return "Chat";
     const isCurrentUserLawyer =
@@ -100,18 +84,16 @@ function Chat({
       : `Lawyer ${selectedSession?.lawyerData?.name}`;
   }
 
-  // render attachments...
   const renderAttachment = (
     attachment: { url: string; type: string },
     index: number
   ) => {
-    if (!attachment) return;
-    if (!attachment.url) return;
+    if (!attachment?.url) return null;
     if (attachment.type.startsWith("image")) {
       return (
         <img
           key={index}
-          src={attachment.url || "/placeholder.svg"}
+          src={attachment.url}
           alt="Attachment"
           className="max-w-xs rounded-lg border"
         />
@@ -124,7 +106,7 @@ function Chat({
       >
         <Paperclip className="h-4 w-4" />
         <span className="text-sm truncate">
-          {attachment?.url?.split("/")?.pop()}
+          {attachment.url.split("/").pop()}
         </span>
       </div>
     );
@@ -142,7 +124,7 @@ function Chat({
       </div>
     );
   }
-  // console.log("currentsession", selectedSession?.clientData?.profile_image);
+
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="border-b">
@@ -161,151 +143,147 @@ function Chat({
           </Avatar>
           <div className="flex flex-col">
             <span>{getPartnerName()}</span>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-normal text-muted-foreground">
-                {messages.length} messages
-              </span>
-              {/* <Badge
-                variant="outline"
-                className={`text-xs ${
-                  selectedSession.status === "active"
-                    ? "border-green-500 text-green-700"
-                    : selectedSession.status === "closed"
-                    ? "border-gray-500 text-gray-700"
-                    : "border-red-500 text-red-700"
-                }`}
-              >
-                {selectedSession.status}
-              </Badge> */}
-            </div>
+            <span className="text-sm font-normal text-muted-foreground">
+              {messages.length} messages
+            </span>
           </div>
         </CardTitle>
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col p-0">
-        <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-          <div className="space-y-4">
-            {messages.length === 0 ? (
-              <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
-                <div>
-                  <h3 className="text-md font-semibold mb-1">
-                    No messages yet
-                  </h3>
-                  <p className="text-sm">
-                    Start the conversation by sending a message.
-                  </p>
-                </div>
+        {/* Messages + Typing */}
+        <div
+          className="flex-1 overflow-y-auto p-4 flex flex-col space-y-4"
+          ref={scrollAreaRef}
+        >
+          {messages.length === 0 ? (
+            <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
+              <div>
+                <h3 className="text-md font-semibold mb-1">No messages yet</h3>
+                <p className="text-sm">
+                  Start the conversation by sending a message.
+                </p>
               </div>
-            ) : (
-              messages.map((message) => {
-                const isOwn = isFromCurrentUser(message);
-                return (
-                  <div
-                    key={message._id}
-                    className={`flex gap-3 ${
-                      isOwn ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    {!isOwn && (
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          <User className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
+            </div>
+          ) : (
+            messages.map((message) => {
+              const isOwn = message.senderId === currentUserId;
+              return (
+                <div
+                  key={message._id}
+                  className={`flex gap-3 ${
+                    isOwn ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  {!isOwn && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={
+                          selectedSession?.participants?.client_id !==
+                          currentUserId
+                            ? selectedSession?.clientData?.profile_image
+                            : selectedSession?.lawyerData?.profile_image
+                        }
+                      />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
 
-                    <div className={`max-w-[70%] ${isOwn ? "order-1" : ""}`}>
-                      <div
-                        className={`rounded-lg p-3 ${
-                          isOwn
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-100 dark:bg-gray-800"
-                        }`}
-                      >
-                        <p className="text-sm whitespace-pre-wrap">
-                          {message.content}
-                        </p>
+                  <div className={`max-w-[70%] ${isOwn ? "order-1" : ""}`}>
+                    <div
+                      className={`rounded-lg p-3 ${
+                        isOwn
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-100 dark:bg-gray-800"
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">
+                        {message.content}
+                      </p>
 
-                        {message.attachments &&
-                          message.attachments.length > 0 && (
-                            <div className="mt-2 space-y-2">
-                              {message.attachments.map(
-                                (
-                                  attachment: {
-                                    url: string;
-                                    type: string;
-                                  },
-                                  index: number
-                                ) => renderAttachment(attachment, index)
-                              )}
-                            </div>
-                          )}
-                      </div>
-
-                      <div
-                        className={`flex items-center gap-2 mt-1 px-1 ${
-                          isOwn ? "justify-end" : "justify-start"
-                        }`}
-                      >
-                        <p className="text-xs text-muted-foreground">
-                          {formatMessageTime(message.createdAt || new Date())}
-                        </p>
-                        {isOwn && (
-                          <div
-                            className={`w-2 h-2 rounded-full ${
-                              message.read ? "bg-blue-500" : "bg-gray-400"
-                            }`}
-                          />
+                      {message.attachments &&
+                        message.attachments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {message.attachments.map((attachment, index) =>
+                              renderAttachment(attachment, index)
+                            )}
+                          </div>
                         )}
-                      </div>
                     </div>
 
-                    {isOwn && (
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          <User className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
+                    <div
+                      className={`flex items-center gap-2 mt-1 px-1 ${
+                        isOwn ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      <p className="text-xs text-muted-foreground">
+                        {formatMessageTime(message?.createdAt || new Date())}
+                      </p>
+                      {isOwn && (
+                        <div
+                          className={`w-2 h-2 rounded-full ${
+                            message.read ? "bg-blue-500" : "bg-gray-400"
+                          }`}
+                        />
+                      )}
+                    </div>
                   </div>
-                );
-              })
-            )}
 
-            {isTyping && (
-              <div className="flex gap-3 justify-start">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src={
-                      selectedSession?.participants?.client_id === currentUserId
-                        ? selectedSession?.clientData?.profile_image
-                        : selectedSession?.lawyerData?.profile_image
-                    }
-                  />
-                  <AvatarFallback>
-                    <User className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="bg-muted rounded-lg p-3">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                    <div
-                      className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                      style={{ animationDelay: "0.1s" }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                      style={{ animationDelay: "0.2s" }}
-                    ></div>
-                  </div>
+                  {isOwn && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={
+                          selectedSession?.participants?.client_id ===
+                          currentUserId
+                            ? selectedSession?.clientData?.profile_image
+                            : selectedSession?.lawyerData?.profile_image
+                        }
+                      />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              );
+            })
+          )}
+
+          {isTyping && (
+            <div className="flex gap-3 justify-start">
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src={
+                    selectedSession?.participants?.client_id === currentUserId
+                      ? selectedSession?.clientData?.profile_image
+                      : selectedSession?.lawyerData?.profile_image
+                  }
+                />
+                <AvatarFallback>
+                  <User className="h-4 w-4" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="bg-muted rounded-lg p-3">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                  <div
+                    className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  ></div>
                 </div>
               </div>
-            )}
-          </div>
-        </ScrollArea>
+            </div>
+          )}
+        </div>
 
+        {/* Input and file preview */}
         <div className="border-t p-4">
-          {/* File Preview */}
           {selectedFiles.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-2">
               {selectedFiles.map((file, index) => (
@@ -343,7 +321,11 @@ function Chat({
               variant="outline"
               size="sm"
               onClick={() => fileInputRef.current?.click()}
-              disabled={selectedSession.status !== "active"}
+              disabled={
+                !["upcoming", "ongoing"].includes(
+                  selectedSession?.sessionDetails?.status
+                )
+              }
             >
               <Paperclip className="h-4 w-4" />
             </Button>

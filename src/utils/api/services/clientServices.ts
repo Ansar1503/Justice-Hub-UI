@@ -244,3 +244,39 @@ export async function fetchChatMessages(cursor = 1, sessionId: string) {
   );
   return response.data;
 }
+
+export async function uploadDocuments(
+  payload: FormData,
+  setProgress?: (value: number) => void
+) {
+  const { token } = store.getState().Auth;
+
+  const response = await axiosinstance.post(
+    `/api/client/profile/sessions/document`,
+    payload,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      onUploadProgress: (progressEvent) => {
+        // console.log("progressevent", progressEvent);
+        if (setProgress) {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 1)
+          );
+          setProgress(percent);
+        }
+      },
+    }
+  );
+
+  return response.data;
+}
+
+export async function fetchSessionDocuments(sessionId: string) {
+  const response = await axiosinstance.get(
+    `/api/client/profile/sessions/document/${sessionId}`,
+    {
+      headers: { Authorization: `Bearer ${store.getState().Auth.token}` },
+    }
+  );
+  return response.data;
+}

@@ -58,16 +58,23 @@ export default function SessionDetailModal({
 
   if (!isOpen || !session) return null;
 
-  const formatDateTime = (dateString: string) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
   };
+  const formatTime = (timeString: string | undefined) => {
+    if (!timeString) return "";
+    const [hourStr, minute] = timeString.split(":");
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
+
   const sessionStartable = () => {
     const currentDate = new Date();
     const sessionDate = new Date(session?.scheduled_date);
@@ -127,7 +134,7 @@ export default function SessionDetailModal({
   };
 
   const handleStartSession = () => {
-    onStartSession?.(session._id);
+    onStartSession?.(session);
     setShowStartConfirm(false);
     onClose();
   };
@@ -154,7 +161,6 @@ export default function SessionDetailModal({
   //       return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
   //   }
   // };
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -254,12 +260,8 @@ export default function SessionDetailModal({
                       Scheduled At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {session?.scheduled_date?.substring(0, 10)}
-                      {` - ${session?.scheduled_time} ${
-                        Number(session?.scheduled_time.split(":")[0]) >= 12
-                          ? "PM"
-                          : "AM"
-                      } `}
+                      {formatDate(session?.scheduled_date)},
+                      {formatTime(session?.scheduled_time)}
                     </p>
                   </div>
                 </div>
@@ -296,7 +298,7 @@ export default function SessionDetailModal({
                       Started At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session?.start_time)}
+                      {formatDate(session?.start_time)}
                     </p>
                   </div>
                 )}
@@ -307,7 +309,7 @@ export default function SessionDetailModal({
                       Ended At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session?.end_time)}
+                      {formatDate(session?.end_time)}
                     </p>
                   </div>
                 )}
@@ -318,7 +320,7 @@ export default function SessionDetailModal({
                       Client Joined At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session?.client_joined_at)}
+                      {formatDate(session?.client_joined_at)}
                     </p>
                   </div>
                 )}
@@ -356,7 +358,7 @@ export default function SessionDetailModal({
             <div className="flex gap-3">
               {session?.status === "upcoming" && (
                 <>
-                  {sessionStartable() && (
+                  {
                     <Button
                       onClick={() => setShowStartConfirm(true)}
                       className="bg-green-600 hover:bg-green-700"
@@ -364,7 +366,7 @@ export default function SessionDetailModal({
                       <Video className="h-4 w-4 mr-2" />
                       Start Session
                     </Button>
-                  )}
+                  }
                   {sessionCancelable() && (
                     <Button
                       variant="destructive"

@@ -71,6 +71,16 @@ function ChatsPage() {
     chatSessionData?.pages.flatMap((page) => page.data) ?? [];
 
   useEffect(() => {
+    if (!token) return;
+    if (!socket.current) {
+      socket.current = getSocket(token);
+    }
+    return () => {
+      disconnectSocket();
+    };
+  }, []);
+
+  useEffect(() => {
     // console.log("userid:", currentUserId);
     if (!token) return;
     if (!socket.current) {
@@ -123,7 +133,6 @@ function ChatsPage() {
       }
     });
 
-
     s.on(
       SocketEvents.TYPING_EVENT,
       (data: { session_id: string; userId: string }) => {
@@ -149,7 +158,7 @@ function ChatsPage() {
       s.off(SocketEvents.MESSAGES_RECEIVED_EVENT);
       s.off(SocketEvents.TYPING_EVENT);
     };
-  }, [token, selectedSession, currentUserId]);
+  }, [token, selectedSession, currentUserId, queryClient]);
 
   const handleSelectSession = (session: ChatSession) => {
     setSelectedSession(session);
@@ -206,16 +215,16 @@ function ChatsPage() {
                 ...oldData,
                 pages: oldData.pages.map((page: any, index: number) => {
                   if (index === oldData.pages.length - 1) {
-                    const withoutTemp = page.data.filter(
-                      (msg: ChatMessage) =>
-                        !(
-                          msg.content === newMessage.content &&
-                          msg.senderId === newMessage.senderId
-                        )
-                    );
+                    // const withoutTemp = page.data.filter(
+                    //   (msg: ChatMessage) =>
+                    //     !(
+                    //       msg.content === newMessage.content &&
+                    //       msg.senderId === newMessage.senderId
+                    //     )
+                    // );
                     return {
                       ...page,
-                      data: [...withoutTemp, response.savedMessage],
+                      data: [...page.data, response.savedMessage],
                     };
                   }
                   return page;
@@ -271,6 +280,8 @@ function ChatsPage() {
         <div className="flex flex-1 ">
           <div className="w-80 border-r border-gray-200 dark:border-gray-700">
             <ChatList
+              searchTerm={search}
+              setSearch={setSearch}
               sessions={chatSessions}
               selectedSession={selectedSession}
               onSelectSession={handleSelectSession}

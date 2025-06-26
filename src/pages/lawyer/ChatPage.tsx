@@ -39,7 +39,6 @@ function ChatsPage() {
   const [selectedSession, setSelectedSession] = useState<ChatSession | null>(
     null
   );
-  const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
@@ -71,6 +70,16 @@ function ChatsPage() {
     chatSessionData?.pages.flatMap((page) => page.data) ?? [];
 
   useEffect(() => {
+    if (!token) return;
+    if (!socket.current) {
+      socket.current = getSocket(token);
+    }
+    return () => {
+      disconnectSocket();
+    };
+  }, []);
+
+  useEffect(() => {
     // console.log("userid:", currentUserId);
     if (!token) return;
     if (!socket.current) {
@@ -86,10 +95,17 @@ function ChatsPage() {
     });
     s.on(SocketEvents.SOCKET_ERROR_EVENT, (err: any) => {
       console.log("Socket error:", err);
+      if (err === "Token expired") {
+        if (!socket.current) {
+          socket.current = getSocket(token);
+        }
+      }
+      disconnectSocket();
       // toast.error(err?.message || "Socket error");
     });
     s.on(SocketEvents.ERROR, (err) => {
-      console.log("Socket error:", err);
+      console.log("socket events error:", err);
+      disconnectSocket();
     });
 
     s.on(SocketEvents.MESSAGE_RECEIVED_EVENT, (newMessage: ChatMessage) => {
@@ -123,7 +139,6 @@ function ChatsPage() {
       }
     });
 
-
     s.on(
       SocketEvents.TYPING_EVENT,
       (data: { session_id: string; userId: string }) => {
@@ -149,11 +164,10 @@ function ChatsPage() {
       s.off(SocketEvents.MESSAGES_RECEIVED_EVENT);
       s.off(SocketEvents.TYPING_EVENT);
     };
-  }, [token, selectedSession, currentUserId]);
+  }, [token, selectedSession, currentUserId, queryClient]);
 
   const handleSelectSession = (session: ChatSession) => {
     setSelectedSession(session);
-    setSessionMessages([]);
 
     const s = socket.current;
     // console.log("s:", s);
@@ -206,16 +220,16 @@ function ChatsPage() {
                 ...oldData,
                 pages: oldData.pages.map((page: any, index: number) => {
                   if (index === oldData.pages.length - 1) {
-                    const withoutTemp = page.data.filter(
-                      (msg: ChatMessage) =>
-                        !(
-                          msg.content === newMessage.content &&
-                          msg.senderId === newMessage.senderId
-                        )
-                    );
+                    // const withoutTemp = page.data.filter(
+                    //   (msg: ChatMessage) =>
+                    //     !(
+                    //       msg.content === newMessage.content &&
+                    //       msg.senderId === newMessage.senderId
+                    //     )
+                    // );
                     return {
                       ...page,
-                      data: [...withoutTemp, response.savedMessage],
+                      data: [...page.data, response.savedMessage],
                     };
                   }
                   return page;
@@ -271,6 +285,9 @@ function ChatsPage() {
         <div className="flex flex-1 ">
           <div className="w-80 border-r border-gray-200 dark:border-gray-700">
             <ChatList
+              isConnected={isConnected}
+              searchTerm={search}
+              setSearch={setSearch}
               sessions={chatSessions}
               selectedSession={selectedSession}
               onSelectSession={handleSelectSession}
@@ -280,6 +297,7 @@ function ChatsPage() {
           </div>
           <div className="flex-1 p-4">
             <Chat
+              isConnected={isConnected}
               selectedSession={selectedSession}
               messages={chatMessages}
               onSendMessage={handleSendMessage}

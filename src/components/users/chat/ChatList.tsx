@@ -6,26 +6,30 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import type { ChatSession } from "@/types/types/ChatType";
+import type { ChatMessage, ChatSession } from "@/types/types/ChatType";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 interface ChatListProps {
   sessions: any[];
   selectedSession: ChatSession | null;
   currentUserId: string;
+  searchTerm: string;
+  setSearch: (search: string) => void;
   onSelectSession: (session: ChatSession) => void;
   unreadCounts?: Record<string, number>;
+  isConnected:boolean
 }
 
 export default function ChatList({
+  // isConnected,
   sessions,
+  searchTerm,
+  setSearch,
   selectedSession,
   currentUserId,
   onSelectSession,
   unreadCounts = {},
 }: ChatListProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-
   const formatTime = (date?: Date) => {
     if (!date) return "N/A";
     const now = new Date();
@@ -73,8 +77,8 @@ export default function ChatList({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search sessions..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -87,7 +91,7 @@ export default function ChatList({
             <div className="text-center py-8">
               <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 dark:text-gray-400">
-                {searchQuery ? "No sessions found" : "No chat sessions yet"}
+                {searchTerm ? "No sessions found" : "No chat sessions yet"}
               </p>
             </div>
           ) : (
@@ -149,7 +153,7 @@ export default function ChatList({
 
                       <div className="flex items-center justify-between">
                         <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 flex-1">
-                          {session.last_message || "No messages yet"}
+                          {session?.lastMessage?.content || "No messages yet"}
                         </p>
                         {/* <Badge
                           variant="outline"

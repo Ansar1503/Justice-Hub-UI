@@ -28,7 +28,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { toast } from "react-toastify";
+import { useDocumentUpdateMutation } from "@/store/tanstack/mutations/DocumentMutation";
+import { Progress } from "@radix-ui/react-progress";
+import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 
 interface SessionDetailModalProps {
   session: any;
@@ -49,23 +54,108 @@ export default function SessionDetailModal({
 }: SessionDetailModalProps) {
   // const [notes, setNotes] = useState(session?.notes || "");
   // const [summary, setSummary] = useState(session?.summary || "");
-
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: sessionDocumentsData } = useFetchSessionDocuments(session?._id);
+  const sessionDocuments = sessionDocumentsData?.data;
+  const { mutateAsync: uploadDocuments, isPending: documentUploading } =
+    useDocumentUpdateMutation();
 
   if (!isOpen || !session) return null;
 
-  const formatDateTime = (dateString: string) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
   };
+
+  // input files
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadedFiles([]);
+    const newFiles = Array.from(e.target.files || []);
+    const totalFiles = uploadedFiles.length + newFiles.length;
+    if (totalFiles > 3) {
+      toast.info("Only 3 files can be uploaded");
+      return;
+    }
+    const allowedTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+    ];
+
+    for (const file of newFiles) {
+      const fileType = file.type;
+      const fileName = file.name.toLowerCase();
+      const isAllowedType =
+        allowedTypes.includes(fileType) ||
+        fileName.endsWith(".doc") ||
+        fileName.endsWith(".docx");
+
+      if (file.size > 10 * 1024 * 1024) {
+        toast.info("File size should be less than 5MB");
+        return;
+      }
+      if (!isAllowedType) {
+        toast.info("Only PDF, DOC, DOCX, JPG, PNG, JPEG files are allowed");
+        return;
+      }
+    }
+
+    setUploadedFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  // remove file from state
+  const handleRemoveFile = (index: number) => {
+    const newFiles = uploadedFiles.filter((_, i) => i !== index);
+    setUploadedFiles(newFiles);
+
+    const dataTransfer = new DataTransfer();
+    newFiles.forEach((file) => dataTransfer.items.add(file));
+
+    if (fileInputRef.current) {
+      fileInputRef.current.files = dataTransfer.files;
+    }
+  };
+
+  const formatTime = (timeString: string | undefined) => {
+    if (!timeString) return "";
+    const [hourStr, minute] = timeString.split(":");
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
+
+  // handle file uploads
+  const handleUploadDocuments = async () => {
+    const formData = new FormData();
+    uploadedFiles.forEach((file) => formData.append("documents", file));
+    formData.append("session_id", session?._id);
+    setUploadProgress(0);
+    await uploadDocuments({
+      payload: formData,
+      setProgress: setUploadProgress,
+    });
+    setUploadedFiles([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // checks if session is startable
   const sessionStartable = () => {
     const currentDate = new Date();
     const sessionDate = new Date(session?.scheduled_at);
@@ -81,11 +171,13 @@ export default function SessionDetailModal({
     );
   };
 
+  // check if session is cancelable
   const sessionCancelable = () => {
     const currentDate = new Date();
-    const sessionDate = new Date(session?.scheduled_at);
+    const sessionDate = new Date(session?.scheduled_date);
     const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
+
     return session?.status === "upcoming" && currentDate < sessionDate;
   };
 
@@ -144,7 +236,12 @@ export default function SessionDetailModal({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={() => {
+          if (!documentUploading) onClose();
+        }}
+      >
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center gap-3">
@@ -194,10 +291,7 @@ export default function SessionDetailModal({
                   <div className="flex items-center gap-3 mb-2">
                     <Avatar className="h-10 w-10 rounded-full overflow-hidden">
                       <AvatarImage
-                        src={
-                          session?.clientData?.profile_image ||
-                          "/placeholder.svg"
-                        }
+                        src={session?.clientData?.profile_image || ""}
                         alt={session?.userData?.name}
                         className="h-full w-full object-cover"
                       />
@@ -241,7 +335,8 @@ export default function SessionDetailModal({
                       Scheduled At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session?.scheduled_at)}
+                      {formatDate(session?.scheduled_date)},
+                      {formatTime(session?.scheduled_time)}
                     </p>
                   </div>
                 </div>
@@ -278,7 +373,7 @@ export default function SessionDetailModal({
                       Started At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session?.start_time)}
+                      {formatDate(session?.start_time)}
                     </p>
                   </div>
                 )}
@@ -289,7 +384,7 @@ export default function SessionDetailModal({
                       Ended At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session?.end_time)}
+                      {formatDate(session?.end_time)}
                     </p>
                   </div>
                 )}
@@ -300,7 +395,8 @@ export default function SessionDetailModal({
                       Client Joined At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session?.client_joined_at)}
+                      {formatDate(session?.scheduled_date)} at{" "}
+                      {formatTime(session?.scheduled_time)}
                     </p>
                   </div>
                 )}
@@ -318,6 +414,119 @@ export default function SessionDetailModal({
               </p>
             </div>
 
+            {/* Upload Documents */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Upload Documents
+              </h3>
+
+              <Input
+                type="file"
+                multiple
+                maxLength={3}
+                accept=".pdf, .doc, .docx, .jpg, .png, .jpeg"
+                placeholder="Upload Documents"
+                ref={fileInputRef}
+                disabled={uploadedFiles.length > 3}
+                onChange={handleFileInputChange}
+                className="mb-3 cursor-pointer"
+              />
+
+              <div className="flex gap-3">
+                {uploadedFiles.map((file, index) => {
+                  const fileURL = URL.createObjectURL(file);
+                  const fileType = file.type;
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg max-w-xs"
+                    >
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="truncate max-w-[150px]">
+                          {file.name}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="ml-2 p-0 h-4 w-4"
+                          onClick={() => handleRemoveFile(index)}
+                        >
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+
+                      {/* preview */}
+                      {fileType.startsWith("image/") ? (
+                        <div
+                          onClick={() => window.open(fileURL, "_blank")}
+                          className="cursor-pointer"
+                        >
+                          <img
+                            src={fileURL}
+                            alt="Preview"
+                            className="rounded w-full max-h-40 object-cover"
+                          />
+                        </div>
+                      ) : fileType === "application/pdf" ? (
+                        <div
+                          onClick={() => window.open(fileURL, "_blank")}
+                          className="cursor-pointer"
+                        >
+                          <iframe
+                            src={fileURL}
+                            className="w-full h-40 rounded border pointer-events-none"
+                            title="PDF Preview"
+                          />
+                        </div>
+                      ) : file.name.endsWith(".doc") ||
+                        file.name.endsWith(".docx") ? (
+                        <a
+                          href={fileURL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 underline text-xs mt-1"
+                        >
+                          Open {file.name}
+                        </a>
+                      ) : (
+                        <a
+                          href={fileURL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 underline text-xs mt-1"
+                        >
+                          Open document
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <Button
+                className="mt-5 "
+                onClick={handleUploadDocuments}
+                disabled={
+                  uploadedFiles.length === 0 ||
+                  !sessionCancelable() ||
+                  documentUploading
+                }
+              >
+                Upload Files
+              </Button>
+              {documentUploading && (
+                <div className="mt-3">
+                  <Progress value={uploadProgress} />
+                  <p className="text-sm text-gray-500 mt-1">
+                    {uploadProgress <= 100
+                      ? ` Uploading... ${uploadProgress}%`
+                      : `processing...`}
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* Follow-up Information */}
             {session.follow_up_suggested && (
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
@@ -332,7 +541,11 @@ export default function SessionDetailModal({
           </div>
 
           <DialogFooter className="sm:justify-between">
-            <Button variant="outline" onClick={onClose}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={documentUploading}
+            >
               Close
             </Button>
             <div className="flex gap-3">
@@ -342,6 +555,7 @@ export default function SessionDetailModal({
                     <Button
                       onClick={() => setShowStartConfirm(true)}
                       className="bg-green-600 hover:bg-green-700"
+                      disabled={documentUploading}
                     >
                       <Video className="h-4 w-4 mr-2" />
                       Start Session
@@ -351,6 +565,7 @@ export default function SessionDetailModal({
                     <Button
                       variant="destructive"
                       onClick={() => setShowCancelConfirm(true)}
+                      disabled={documentUploading}
                     >
                       Cancel Session
                     </Button>
@@ -361,6 +576,7 @@ export default function SessionDetailModal({
               {session?.status === "ongoing" && (
                 <Button
                   variant="destructive"
+                  disabled={documentUploading}
                   onClick={() => setShowEndConfirm(true)}
                 >
                   End Session
