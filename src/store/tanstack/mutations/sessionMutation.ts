@@ -96,12 +96,26 @@ export function useStartSession() {
   });
 }
 
-export function useRemoveFile() {
-  // const queryClient = useQueryClient();
+export function useRemoveFile(sessionDocid: string) {
+  const queryClient = useQueryClient();
   return useMutation<ResponseType & { data?: SessionDocument }, Error, string>({
     mutationFn: (id) => removeDocumentFile(id),
     onSuccess: (data) => {
       toast.success(data?.message || "Session started successfully!");
+      queryClient.setQueryData(
+        ["session", "documents", sessionDocid],
+        (old: ResponseType & { data?: SessionDocument }) => {
+          if (!old) return old;
+          old.data =
+            !old.data || !data.data
+              ? undefined
+              : {
+                  ...old.data,
+                  document: data.data.document,
+                };
+          return old;
+        }
+      );
     },
     onError: (error: any) => {
       const message =

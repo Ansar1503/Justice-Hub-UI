@@ -3,10 +3,10 @@
 import { Search, MessageSquare, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react";
+// import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import type { ChatMessage, ChatSession } from "@/types/types/ChatType";
+import type {  ChatSession } from "@/types/types/ChatType";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 interface ChatListProps {

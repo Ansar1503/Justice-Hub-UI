@@ -28,23 +28,85 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@radix-ui/react-progress";
+import { useRef, useState, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import { useDocumentUpdateMutation } from "@/store/tanstack/mutations/DocumentMutation";
-import { Progress } from "@radix-ui/react-progress";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
+import { useRemoveFile } from "@/store/tanstack/mutations/sessionMutation";
+
+interface Session {
+  _id: string;
+  status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
+  type: "consultation" | "follow-up";
+  scheduled_date: string;
+  scheduled_time: string;
+  scheduled_at: string;
+  duration: number;
+  amount: number;
+  reason: string;
+  room_id?: string;
+  start_time?: string;
+  end_time?: string;
+  client_joined_at?: string;
+  follow_up_suggested?: boolean;
+  userData: any;
+  clientData: any;
+}
 
 interface SessionDetailModalProps {
-  session: any;
+  session: Session | null;
   isOpen: boolean;
   onClose: () => void;
-  onStartSession?: (sessionId: string) => void;
+  onStartSession?: (session: Session) => void;
   onEndSession?: (sessionId: string) => void;
   onCancelSession?: (sessionId: string) => void;
-  onremoveFile: (id: string) => void;
 }
+
+// Constants
+const ALLOWED_FILE_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+];
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILES = 3;
+
+const STATUS_CONFIG = {
+  completed: {
+    icon: CheckCircle,
+    color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    iconColor: "text-green-500",
+  },
+  ongoing: {
+    icon: AlertCircle,
+    color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    iconColor: "text-blue-500",
+  },
+  cancelled: {
+    icon: XCircle,
+    color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    iconColor: "text-red-500",
+  },
+  missed: {
+    icon: XCircle,
+    color:
+      "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+    iconColor: "text-red-500",
+  },
+  upcoming: {
+    icon: Clock,
+    color:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+    iconColor: "text-yellow-500",
+  },
+};
 
 export default function SessionDetailModal({
   session,
@@ -53,10 +115,7 @@ export default function SessionDetailModal({
   onStartSession,
   onEndSession,
   onCancelSession,
-  onremoveFile,
 }: SessionDetailModalProps) {
-  // const [notes, setNotes] = useState(session?.notes || "");
-  // const [summary, setSummary] = useState(session?.summary || "");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
@@ -65,209 +124,225 @@ export default function SessionDetailModal({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: sessionDocumentsData } = useFetchSessionDocuments(session?._id);
+  const { data: sessionDocumentsData } = useFetchSessionDocuments(
+    session?._id || ""
+  );
   const sessionDocuments = sessionDocumentsData?.data;
-  // console.log("sessiond", sessionDocuments);
   const { mutateAsync: uploadDocuments, isPending: documentUploading } =
     useDocumentUpdateMutation();
 
-  if (!isOpen || !session) return null;
+  const { mutateAsync: removeFile, isPending: fileRemoving } = useRemoveFile(
+    sessionDocuments?.session_id || ""
+  );
 
-  const formatDate = (dateString: string) => {
+  // Utility functions
+  const formatDate = useCallback((dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
+  }, []);
 
-  // input files
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUploadedFiles([]);
-    const newFiles = Array.from(e.target.files || []);
-    const totalFiles = uploadedFiles.length + newFiles.length;
-    if (totalFiles > 3) {
-      toast.info("Only 3 files can be uploaded");
-      return;
-    }
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-    ];
-
-    for (const file of newFiles) {
-      const fileType = file.type;
-      const fileName = file.name.toLowerCase();
-      const isAllowedType =
-        allowedTypes.includes(fileType) ||
-        fileName.endsWith(".doc") ||
-        fileName.endsWith(".docx");
-
-      if (file.size > 10 * 1024 * 1024) {
-        toast.info("File size should be less than 5MB");
-        return;
-      }
-      if (!isAllowedType) {
-        toast.info("Only PDF, DOC, DOCX, JPG, PNG, JPEG files are allowed");
-        return;
-      }
-    }
-
-    setUploadedFiles((prev) => [...prev, ...newFiles]);
-  };
-
-  // remove file from state
-  const handleRemoveFile = (index: number) => {
-    const newFiles = uploadedFiles.filter((_, i) => i !== index);
-    setUploadedFiles(newFiles);
-
-    const dataTransfer = new DataTransfer();
-    newFiles.forEach((file) => dataTransfer.items.add(file));
-
-    if (fileInputRef.current) {
-      fileInputRef.current.files = dataTransfer.files;
-    }
-  };
-
-  const formatTime = (timeString: string | undefined) => {
+  const formatTime = useCallback((timeString: string | undefined) => {
     if (!timeString) return "";
     const [hourStr, minute] = timeString.split(":");
     let hour = parseInt(hourStr, 10);
     const ampm = hour >= 12 ? "PM" : "AM";
     hour = hour % 12 || 12;
     return `${hour}:${minute} ${ampm}`;
-  };
+  }, []);
 
-  // handle file uploads
-  const handleUploadDocuments = async () => {
-    const formData = new FormData();
-    uploadedFiles.forEach((file) => formData.append("documents", file));
-    formData.append("session_id", session?._id);
-    setUploadProgress(0);
-    await uploadDocuments({
-      payload: formData,
-      setProgress: setUploadProgress,
-    });
-    setUploadedFiles([]);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const formatDuration = useCallback((minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  }, []);
+
+  // Validation functions
+  const validateFile = useCallback((file: File): boolean => {
+    const fileType = file.type;
+    const fileName = file.name.toLowerCase();
+    const isAllowedType =
+      ALLOWED_FILE_TYPES.includes(fileType) ||
+      fileName.endsWith(".doc") ||
+      fileName.endsWith(".docx");
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File size should be less than 10MB");
+      return false;
     }
-  };
 
-  // checks if session is startable
-  const sessionStartable = () => {
+    if (!isAllowedType) {
+      toast.error("Only PDF, DOC, DOCX, JPG, PNG, JPEG files are allowed");
+      return false;
+    }
+
+    return true;
+  }, []);
+
+  // Session status checks
+  const sessionStartable = useMemo(() => {
+    if (!session || session.status !== "upcoming" || !session.room_id)
+      return false;
+
     const currentDate = new Date();
-    const sessionDate = new Date(session?.scheduled_at);
-    const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
+    const sessionDate = new Date(session.scheduled_at);
+    const [h, m] = session.scheduled_time
+      ? session.scheduled_time.split(":").map(Number)
+      : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     const sessionEnd = new Date(
       sessionDate.getTime() + session.duration * 60000
     );
-    return (
-      session?.status === "upcoming" &&
-      session?.room_id &&
-      currentDate >= sessionDate &&
-      currentDate < sessionEnd
-    );
-  };
 
-  // check if session is cancelable
-  const sessionCancelable = () => {
+    return currentDate >= sessionDate && currentDate < sessionEnd;
+  }, [session]);
+
+  const sessionCancelable = useMemo(() => {
+    if (!session || session.status !== "upcoming") return false;
+
     const currentDate = new Date();
-    const sessionDate = new Date(session?.scheduled_date);
-    const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
+    const sessionDate = new Date(session.scheduled_date);
+    const [h, m] = session.scheduled_time
+      ? session.scheduled_time.split(":").map(Number)
+      : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
 
-    return session?.status === "upcoming" && currentDate < sessionDate;
+    return currentDate < sessionDate;
+  }, [session]);
+
+  // Status components
+  const getStatusIcon = useCallback((status: Session["status"]) => {
+    const config = STATUS_CONFIG[status];
+    const IconComponent = config.icon;
+    return <IconComponent className={`h-5 w-5 ${config.iconColor}`} />;
+  }, []);
+
+  const getStatusColor = useCallback((status: Session["status"]) => {
+    return STATUS_CONFIG[status].color;
+  }, []);
+
+  // File handling
+  const handleFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newFiles = Array.from(e.target.files || []);
+      const totalFiles = uploadedFiles.length + newFiles.length;
+
+      if (totalFiles > MAX_FILES) {
+        toast.info(`Only ${MAX_FILES} files can be uploaded`);
+        return;
+      }
+
+      const validFiles = newFiles.filter(validateFile);
+      if (validFiles.length !== newFiles.length) return;
+
+      setUploadedFiles((prev) => [...prev, ...validFiles]);
+    },
+    [uploadedFiles.length, validateFile]
+  );
+
+  const handleRemoveFile = useCallback(
+    (index: number) => {
+      const newFiles = uploadedFiles.filter((_, i) => i !== index);
+      setUploadedFiles(newFiles);
+
+      const dataTransfer = new DataTransfer();
+      newFiles.forEach((file) => dataTransfer.items.add(file));
+
+      if (fileInputRef.current) {
+        fileInputRef.current.files = dataTransfer.files;
+      }
+    },
+    [uploadedFiles]
+  );
+
+  const handleRemoveFileAsync = async (id: string) => {
+    await removeFile(id);
   };
 
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  };
+  const handleUploadDocuments = useCallback(async () => {
+    if (!session || uploadedFiles.length === 0) return;
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "cancelled":
-      case "missed":
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      case "ongoing":
-        return <AlertCircle className="h-5 w-5 text-blue-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-yellow-500" />;
+    const formData = new FormData();
+    uploadedFiles.forEach((file) => formData.append("documents", file));
+    formData.append("session_id", session._id);
+
+    setUploadProgress(0);
+
+    try {
+      await uploadDocuments({
+        payload: formData,
+        setProgress: setUploadProgress,
+      });
+
+      setUploadedFiles([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error: any) {
+      toast.error("Failed to upload documents", error);
     }
-  };
+  }, [session, uploadedFiles, uploadDocuments]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      case "ongoing":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
-      case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      case "missed":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-      default:
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+  // Action handlers
+  const handleStartSession = useCallback(() => {
+    if (session) {
+      onStartSession?.(session);
+      setShowStartConfirm(false);
+      onClose();
     }
-  };
+  }, [session, onStartSession, onClose]);
 
-  const handleStartSession = () => {
-    onStartSession?.(session);
-    setShowStartConfirm(false);
-    onClose();
-  };
+  const handleEndSession = useCallback(() => {
+    if (session) {
+      onEndSession?.(session._id);
+      setShowEndConfirm(false);
+      onClose();
+    }
+  }, [session, onEndSession, onClose]);
 
-  const handleEndSession = () => {
-    onEndSession?.(session._id);
-    setShowEndConfirm(false);
-    onClose();
-  };
+  const handleCancelSession = useCallback(() => {
+    if (session) {
+      onCancelSession?.(session._id);
+      setShowCancelConfirm(false);
+      onClose();
+    }
+  }, [session, onCancelSession, onClose]);
 
-  const handleCancelSession = () => {
-    onCancelSession?.(session._id);
-    setShowCancelConfirm(false);
-    onClose();
-  };
+  const handleClose = useCallback(() => {
+    if (!documentUploading) {
+      onClose();
+    }
+  }, [documentUploading, onClose]);
+
+  if (!isOpen || !session) return null;
 
   return (
     <>
-      <Dialog
-        open={isOpen}
-        onOpenChange={() => {
-          if (!documentUploading) onClose();
-        }}
-      >
+      <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center gap-3">
-              {getStatusIcon(session?.status)}
+              {getStatusIcon(session.status)}
               <DialogTitle className="text-xl">Session Details</DialogTitle>
             </div>
           </DialogHeader>
 
           <div className="space-y-6 py-4">
-            {/* Status and Payment Info */}
-            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+            {/* Status and Session Type */}
+            <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
                   Session Status
                 </h3>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                    session?.status
+                    session.status
                   )}`}
                 >
-                  {session?.status}
+                  {session.status}
                 </span>
               </div>
               <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
@@ -282,7 +357,7 @@ export default function SessionDetailModal({
               </div>
             </div>
 
-            {/* Client Information */}
+            {/* Lawyer Information */}
             <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                 <User className="h-5 w-5" />
@@ -296,18 +371,18 @@ export default function SessionDetailModal({
                   <div className="flex items-center gap-3 mb-2">
                     <Avatar className="h-10 w-10 rounded-full overflow-hidden">
                       <AvatarImage
-                        src={session?.clientData?.profile_image || ""}
-                        alt={session?.userData?.name}
+                        src={session.userData.profile_image || ""}
+                        alt={session.userData.name}
                         className="h-full w-full object-cover"
                       />
                       <AvatarFallback className="h-full w-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 rounded-full">
-                        {session?.userData?.name
+                        {session.userData.name
                           ?.substring(0, 2)
                           ?.toUpperCase() || "NA"}
                       </AvatarFallback>
                     </Avatar>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {session?.userData?.name || "N/A"}
+                      {session.userData.name || "N/A"}
                     </p>
                   </div>
                 </div>
@@ -316,7 +391,7 @@ export default function SessionDetailModal({
                     Email
                   </p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {session?.userData?.email || "N/A"}
+                    {session.userData.email || "N/A"}
                   </p>
                 </div>
                 <div>
@@ -324,7 +399,7 @@ export default function SessionDetailModal({
                     Phone
                   </p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {session?.clientData?.phone || "N/A"}
+                    {session.clientData.phone || "N/A"}
                   </p>
                 </div>
               </div>
@@ -340,8 +415,8 @@ export default function SessionDetailModal({
                       Scheduled At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.scheduled_date)},
-                      {formatTime(session?.scheduled_time)}
+                      {formatDate(session.scheduled_date)},{" "}
+                      {formatTime(session.scheduled_time)}
                     </p>
                   </div>
                 </div>
@@ -353,7 +428,7 @@ export default function SessionDetailModal({
                       Duration
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDuration(session?.duration)}
+                      {formatDuration(session.duration)}
                     </p>
                   </div>
                 </div>
@@ -378,7 +453,7 @@ export default function SessionDetailModal({
                       Started At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.start_time)}
+                      {formatDate(session.start_time)}
                     </p>
                   </div>
                 )}
@@ -389,7 +464,7 @@ export default function SessionDetailModal({
                       Ended At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.end_time)}
+                      {formatDate(session.end_time)}
                     </p>
                   </div>
                 )}
@@ -400,8 +475,8 @@ export default function SessionDetailModal({
                       Client Joined At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.scheduled_date)} at{" "}
-                      {formatTime(session?.scheduled_time)}
+                      {formatDate(session.scheduled_date)} at{" "}
+                      {formatTime(session.scheduled_time)}
                     </p>
                   </div>
                 )}
@@ -415,7 +490,7 @@ export default function SessionDetailModal({
                 Reason for Consultation
               </h3>
               <p className="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
-                {session?.reason}
+                {session.reason}
               </p>
             </div>
 
@@ -431,61 +506,63 @@ export default function SessionDetailModal({
                   <Input
                     type="file"
                     multiple
-                    maxLength={3}
                     accept=".pdf, .doc, .docx, .jpg, .png, .jpeg"
                     placeholder="Upload Documents"
                     ref={fileInputRef}
-                    disabled={uploadedFiles.length > 3}
+                    disabled={uploadedFiles.length >= MAX_FILES}
                     onChange={handleFileInputChange}
                     className="mb-3 cursor-pointer"
                   />
                 </>
               )}
 
-              <div className="flex gap-3">
-                {sessionDocuments && sessionDocuments.document.length > 0
-                  ? sessionDocuments.document.map((file, index) => (
+              <div className="flex gap-3 flex-wrap">
+                {sessionDocuments &&
+                !fileRemoving &&
+                sessionDocuments?.document.length > 0
+                  ? sessionDocuments.document.map((file) => (
                       <SessionDocumentsPreview
-                        key={index}
-                        id={file?._id || ""}
+                        key={file._id}
+                        id={file._id || ""}
                         name={file.name}
                         type={file.type}
                         url={file.url}
-                        onRemoveFile={onremoveFile}
+                        onRemoveFile={handleRemoveFileAsync}
                       />
                     ))
-                  : uploadedFiles.map((file, index) => {
+                  : uploadedFiles.length > 0 &&
+                    uploadedFiles.map((file, index) => {
                       const fileURL = URL.createObjectURL(file);
-                      const fileType = file.type;
-
                       return (
                         <SessionDocumentsPreview
                           key={index}
-                          id={index}
+                          id={index.toString()}
                           name={file.name}
                           onRemoveFile={handleRemoveFile}
-                          type={fileType}
+                          type={file.type}
                           url={fileURL}
                         />
                       );
                     })}
               </div>
-              {!sessionDocuments && (
+
+              {!sessionDocuments && uploadedFiles.length > 0 && (
                 <Button
-                  className="mt-5 "
+                  className="mt-5"
                   onClick={handleUploadDocuments}
-                  disabled={uploadedFiles.length === 0 || documentUploading}
+                  disabled={documentUploading}
                 >
                   Upload Files
                 </Button>
               )}
+
               {documentUploading && (
                 <div className="mt-3">
                   <Progress value={uploadProgress} />
                   <p className="text-sm text-gray-500 mt-1">
                     {uploadProgress <= 100
-                      ? ` Uploading... ${uploadProgress}%`
-                      : `processing...`}
+                      ? `Uploading... ${uploadProgress}%`
+                      : "Processing..."}
                   </p>
                 </div>
               )}
@@ -507,15 +584,15 @@ export default function SessionDetailModal({
           <DialogFooter className="sm:justify-between">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={documentUploading}
             >
               Close
             </Button>
             <div className="flex gap-3">
-              {session?.status === "upcoming" && (
+              {session.status === "upcoming" && (
                 <>
-                  {sessionStartable() && (
+                  {sessionStartable && (
                     <Button
                       onClick={() => setShowStartConfirm(true)}
                       className="bg-green-600 hover:bg-green-700"
@@ -525,7 +602,7 @@ export default function SessionDetailModal({
                       Join Session
                     </Button>
                   )}
-                  {sessionCancelable() && (
+                  {sessionCancelable && (
                     <Button
                       variant="destructive"
                       onClick={() => setShowCancelConfirm(true)}
@@ -537,7 +614,7 @@ export default function SessionDetailModal({
                 </>
               )}
 
-              {session?.status === "ongoing" && (
+              {session.status === "ongoing" && (
                 <Button
                   variant="destructive"
                   disabled={documentUploading}
@@ -551,7 +628,7 @@ export default function SessionDetailModal({
         </DialogContent>
       </Dialog>
 
-      {/* Start Session Confirmation Dialog */}
+      {/* Confirmation Dialogs */}
       <AlertDialog open={showStartConfirm} onOpenChange={setShowStartConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -572,7 +649,6 @@ export default function SessionDetailModal({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* End Session Confirmation Dialog */}
       <AlertDialog open={showEndConfirm} onOpenChange={setShowEndConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -594,7 +670,6 @@ export default function SessionDetailModal({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Cancel Session Confirmation Dialog */}
       <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>

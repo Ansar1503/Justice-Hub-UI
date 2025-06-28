@@ -6,7 +6,7 @@ interface sessionDocumentsPreviewProps {
   type: string;
   name: string;
   id: number | string;
-  onRemoveFile(payload: string | number): void;
+  onRemoveFile?(payload: string | number): void;
 }
 
 export function SessionDocumentsPreview({
@@ -27,7 +27,11 @@ export function SessionDocumentsPreview({
           variant="ghost"
           size="sm"
           className="ml-2 p-0 h-4 w-4"
-          onClick={() => onRemoveFile(id)}
+          onClick={() => {
+            if (onRemoveFile) {
+              onRemoveFile(id);
+            }
+          }}
         >
           <XCircle className="h-4 w-4 text-red-500" />
         </Button>
