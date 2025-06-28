@@ -280,3 +280,13 @@ export async function fetchSessionDocuments(sessionId: string) {
   );
   return response.data;
 }
+
+export async function removeDocumentFile(id: string) {
+  const response = await axiosinstance.delete(
+    `/api/client/profile/sessions/document/${id}`,
+    {
+      headers: { Authorization: `Bearer ${store.getState().Auth.token}` },
+    }
+  );
+  return response.data;
+}

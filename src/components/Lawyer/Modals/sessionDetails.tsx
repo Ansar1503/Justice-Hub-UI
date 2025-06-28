@@ -83,6 +83,10 @@ export default function SessionDetailModal({
     const sessionEnd = new Date(
       sessionDate.getTime() + session.duration * 60000
     );
+    // console.log("currentdata", currentDate);
+    // console.log("sessionDate", sessionDate);
+    // console.log("sessionEnd", sessionEnd);
+    // console.log("status", session?.status);
     return (
       session?.status === "upcoming" &&
       currentDate >= sessionDate &&
@@ -358,7 +362,7 @@ export default function SessionDetailModal({
             <div className="flex gap-3">
               {session?.status === "upcoming" && (
                 <>
-                  {
+                  {sessionStartable() && (
                     <Button
                       onClick={() => setShowStartConfirm(true)}
                       className="bg-green-600 hover:bg-green-700"
@@ -366,7 +370,7 @@ export default function SessionDetailModal({
                       <Video className="h-4 w-4 mr-2" />
                       Start Session
                     </Button>
-                  }
+                  )}
                   {sessionCancelable() && (
                     <Button
                       variant="destructive"

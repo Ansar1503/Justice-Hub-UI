@@ -17,7 +17,7 @@ interface ChatListProps {
   setSearch: (search: string) => void;
   onSelectSession: (session: ChatSession) => void;
   unreadCounts?: Record<string, number>;
-  isConnected:boolean
+  // isConnected:boolean
 }
 
 export default function ChatList({

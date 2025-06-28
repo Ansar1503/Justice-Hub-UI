@@ -4,9 +4,12 @@ import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/Lawyer/Modals/sessionDetails";
 import { useFetchSessionsForLawyers } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { useCancelSessionByLawyer } from "@/store/tanstack/mutations/sessionMutation";
+import {
+  useCancelSessionByLawyer,
+  useStartSession,
+} from "@/store/tanstack/mutations/sessionMutation";
 import ZegoVideoCall from "../ZegoCloud";
-import axiosinstance from "@/utils/api/axios/axios.instance";
+
 
 export type SessionStatus =
   | "all"
@@ -38,6 +41,8 @@ export default function SessionsListing() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [zegoRoomID, setZegoRoomID] = useState("");
+
+  const { mutateAsync: startSessionMutation } = useStartSession();
 
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
@@ -88,6 +93,17 @@ export default function SessionsListing() {
     }
   }, [sessionsData, itemsPerPage]);
 
+  if (showVideo && selectedSession) {
+    return (
+      <div className="w-full h-full">
+        <ZegoVideoCall
+          roomID={zegoRoomID}
+          userID={selectedSession?.userData?._id}
+          userName={selectedSession?.userData?.name}
+        />
+      </div>
+    );
+  }
   const renderStatusBadge = (status: string) => {
     const statusConfig = {
       upcoming: {
@@ -164,14 +180,10 @@ export default function SessionsListing() {
   const handleStartSession = async (session: any) => {
     try {
       console.log("Starting session:", session);
-      const response = await axiosinstance.patch(`/api/lawyer/profile/sessions`, {
-        sessionId: session.id,
-      });
+      const { data } = await startSessionMutation({ sessionId: session?._id });
 
-      const data = response.data;
-
-      if (data.roomId) {
-        setZegoRoomID(data.roomId);
+      if (data?.room_id) {
+        setZegoRoomID(data?.room_id);
         setSelectedSession(session);
         setShowVideo(true);
       }
@@ -188,17 +200,6 @@ export default function SessionsListing() {
     console.log("Cancelling session:", sessionId);
     await CancelSession({ id: sessionId });
   };
-  if (showVideo && selectedSession) {
-    return (
-      <div className="mt-6">
-        <ZegoVideoCall
-          roomID={zegoRoomID}
-          userID={selectedSession?.userData?._id}
-          userName={selectedSession?.userData?.name}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="h-full p-4 sm:p-6 bg-white dark:bg-gray-900">

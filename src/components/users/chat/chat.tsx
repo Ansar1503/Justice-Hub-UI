@@ -17,7 +17,7 @@ interface ChatProps {
   onInputMessage: () => void;
   currentUserId: string;
   isTyping?: boolean;
-  isConnected: boolean;
+  // isConnected: boolean;
 }
 
 function Chat({

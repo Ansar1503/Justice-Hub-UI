@@ -34,6 +34,7 @@ import { toast } from "react-toastify";
 import { useDocumentUpdateMutation } from "@/store/tanstack/mutations/DocumentMutation";
 import { Progress } from "@radix-ui/react-progress";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
+import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 
 interface SessionDetailModalProps {
   session: any;
@@ -42,6 +43,7 @@ interface SessionDetailModalProps {
   onStartSession?: (sessionId: string) => void;
   onEndSession?: (sessionId: string) => void;
   onCancelSession?: (sessionId: string) => void;
+  onremoveFile: (id: string) => void;
 }
 
 export default function SessionDetailModal({
@@ -51,6 +53,7 @@ export default function SessionDetailModal({
   onStartSession,
   onEndSession,
   onCancelSession,
+  onremoveFile,
 }: SessionDetailModalProps) {
   // const [notes, setNotes] = useState(session?.notes || "");
   // const [summary, setSummary] = useState(session?.summary || "");
@@ -64,6 +67,7 @@ export default function SessionDetailModal({
 
   const { data: sessionDocumentsData } = useFetchSessionDocuments(session?._id);
   const sessionDocuments = sessionDocumentsData?.data;
+  // console.log("sessiond", sessionDocuments);
   const { mutateAsync: uploadDocuments, isPending: documentUploading } =
     useDocumentUpdateMutation();
 
@@ -166,6 +170,7 @@ export default function SessionDetailModal({
     );
     return (
       session?.status === "upcoming" &&
+      session?.room_id &&
       currentDate >= sessionDate &&
       currentDate < sessionEnd
     );
@@ -217,7 +222,7 @@ export default function SessionDetailModal({
   };
 
   const handleStartSession = () => {
-    onStartSession?.(session._id);
+    onStartSession?.(session);
     setShowStartConfirm(false);
     onClose();
   };
@@ -416,105 +421,64 @@ export default function SessionDetailModal({
 
             {/* Upload Documents */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Upload Documents
-              </h3>
+              {!sessionDocuments && (
+                <>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Upload Documents
+                  </h3>
 
-              <Input
-                type="file"
-                multiple
-                maxLength={3}
-                accept=".pdf, .doc, .docx, .jpg, .png, .jpeg"
-                placeholder="Upload Documents"
-                ref={fileInputRef}
-                disabled={uploadedFiles.length > 3}
-                onChange={handleFileInputChange}
-                className="mb-3 cursor-pointer"
-              />
+                  <Input
+                    type="file"
+                    multiple
+                    maxLength={3}
+                    accept=".pdf, .doc, .docx, .jpg, .png, .jpeg"
+                    placeholder="Upload Documents"
+                    ref={fileInputRef}
+                    disabled={uploadedFiles.length > 3}
+                    onChange={handleFileInputChange}
+                    className="mb-3 cursor-pointer"
+                  />
+                </>
+              )}
 
               <div className="flex gap-3">
-                {uploadedFiles.map((file, index) => {
-                  const fileURL = URL.createObjectURL(file);
-                  const fileType = file.type;
+                {sessionDocuments && sessionDocuments.document.length > 0
+                  ? sessionDocuments.document.map((file, index) => (
+                      <SessionDocumentsPreview
+                        key={index}
+                        id={file?._id || ""}
+                        name={file.name}
+                        type={file.type}
+                        url={file.url}
+                        onRemoveFile={onremoveFile}
+                      />
+                    ))
+                  : uploadedFiles.map((file, index) => {
+                      const fileURL = URL.createObjectURL(file);
+                      const fileType = file.type;
 
-                  return (
-                    <div
-                      key={index}
-                      className="flex flex-col bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg max-w-xs"
-                    >
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="truncate max-w-[150px]">
-                          {file.name}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="ml-2 p-0 h-4 w-4"
-                          onClick={() => handleRemoveFile(index)}
-                        >
-                          <XCircle className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </div>
-
-                      {/* preview */}
-                      {fileType.startsWith("image/") ? (
-                        <div
-                          onClick={() => window.open(fileURL, "_blank")}
-                          className="cursor-pointer"
-                        >
-                          <img
-                            src={fileURL}
-                            alt="Preview"
-                            className="rounded w-full max-h-40 object-cover"
-                          />
-                        </div>
-                      ) : fileType === "application/pdf" ? (
-                        <div
-                          onClick={() => window.open(fileURL, "_blank")}
-                          className="cursor-pointer"
-                        >
-                          <iframe
-                            src={fileURL}
-                            className="w-full h-40 rounded border pointer-events-none"
-                            title="PDF Preview"
-                          />
-                        </div>
-                      ) : file.name.endsWith(".doc") ||
-                        file.name.endsWith(".docx") ? (
-                        <a
-                          href={fileURL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 underline text-xs mt-1"
-                        >
-                          Open {file.name}
-                        </a>
-                      ) : (
-                        <a
-                          href={fileURL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 underline text-xs mt-1"
-                        >
-                          Open document
-                        </a>
-                      )}
-                    </div>
-                  );
-                })}
+                      return (
+                        <SessionDocumentsPreview
+                          key={index}
+                          id={index}
+                          name={file.name}
+                          onRemoveFile={handleRemoveFile}
+                          type={fileType}
+                          url={fileURL}
+                        />
+                      );
+                    })}
               </div>
-              <Button
-                className="mt-5 "
-                onClick={handleUploadDocuments}
-                disabled={
-                  uploadedFiles.length === 0 ||
-                  !sessionCancelable() ||
-                  documentUploading
-                }
-              >
-                Upload Files
-              </Button>
+              {!sessionDocuments && (
+                <Button
+                  className="mt-5 "
+                  onClick={handleUploadDocuments}
+                  disabled={uploadedFiles.length === 0 || documentUploading}
+                >
+                  Upload Files
+                </Button>
+              )}
               {documentUploading && (
                 <div className="mt-3">
                   <Progress value={uploadProgress} />
@@ -558,7 +522,7 @@ export default function SessionDetailModal({
                       disabled={documentUploading}
                     >
                       <Video className="h-4 w-4 mr-2" />
-                      Start Session
+                      Join Session
                     </Button>
                   )}
                   {sessionCancelable() && (
@@ -591,10 +555,9 @@ export default function SessionDetailModal({
       <AlertDialog open={showStartConfirm} onOpenChange={setShowStartConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Start Session</AlertDialogTitle>
+            <AlertDialogTitle>Join Session</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you ready to start this session? The client will be notified
-              and the session will begin.
+              Are you ready to join this session?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

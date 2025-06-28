@@ -6,7 +6,11 @@ import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/users/modals/sessionDetails";
 import { useFetchsessionsForclients } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { useCancelSessionByClient } from "@/store/tanstack/mutations/sessionMutation";
+import {
+  useCancelSessionByClient,
+  useRemoveFile,
+} from "@/store/tanstack/mutations/sessionMutation";
+import ZegoVideoCall from "../ZegoCloud";
 
 export type SessionStatus =
   | "all"
@@ -36,6 +40,8 @@ export default function SessionsListing() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+  const [zegoRoomID, setZegoRoomID] = useState("");
 
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
@@ -46,6 +52,8 @@ export default function SessionsListing() {
     }
   };
   const { mutateAsync: sessionCancel } = useCancelSessionByClient();
+  const { mutateAsync: removeSessionDocument } = useRemoveFile();
+
   const { data: sessionsData, refetch: sessionRefetch } =
     useFetchsessionsForclients({
       consultation_type: typeFilter,
@@ -126,6 +134,18 @@ export default function SessionsListing() {
     );
   };
 
+  if (showVideo && selectedSession) {
+    return (
+      <div className="w-full h-full">
+        <ZegoVideoCall
+          roomID={zegoRoomID}
+          userID={selectedSession?.userData?._id}
+          userName={selectedSession?.userData?.name}
+        />
+      </div>
+    );
+  }
+
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
     return {
@@ -153,13 +173,22 @@ export default function SessionsListing() {
     setCurrentPage(page);
   };
 
+  const handleRemoveFile = async (id: string) => {
+    if (!id) return;
+    await removeSessionDocument(id);
+  };
+
   const handleViewSession = (session: any) => {
     setSelectedSession(session);
     setIsModalOpen(true);
   };
 
-  const handleStartSession = async (sessionId: string) => {
-    console.log("Starting session:", sessionId);
+  const handleStartSession = async (session: any) => {
+    if (session?.room_id) {
+      setZegoRoomID(session?.room_id);
+      setSelectedSession(session);
+      setShowVideo(true);
+    }
   };
 
   const handleEndSession = async (sessionId: string) => {
@@ -295,7 +324,7 @@ export default function SessionsListing() {
                 </tr>
               ) : (
                 sessions?.map((session: any) => {
-                  const { date, time } = formatDateTime(session?.scheduled_at);
+                  const { date, time } = formatDateTime(session?.scheduled_date);
                   return (
                     <tr
                       key={session._id}
@@ -393,6 +422,7 @@ export default function SessionsListing() {
 
       {/* Session Detail Modal */}
       <SessionDetailModal
+        onremoveFile={handleRemoveFile}
         session={selectedSession}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

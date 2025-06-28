@@ -32,5 +32,18 @@ export default function ZegoVideoCall({
     });
   }, [roomID, userID, userName]);
 
-  return <div ref={containerRef} style={{ width: "100%", height: "600px" }} />;
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        zIndex: 9999,
+        backgroundColor: "black",
+      }}
+    />
+  );
 }

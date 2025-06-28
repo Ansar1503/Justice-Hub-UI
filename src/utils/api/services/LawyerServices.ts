@@ -178,3 +178,17 @@ export async function cancelSessionByLawyer(payload: { id: string }) {
   );
   return response.data;
 }
+
+export async function StartSession(sessionId: string) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    `/api/lawyer/profile/sessions/startSession`,
+    {
+      sessionId: sessionId,
+    },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+
