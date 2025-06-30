@@ -36,6 +36,7 @@ import { useDocumentUpdateMutation } from "@/store/tanstack/mutations/DocumentMu
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { useRemoveFile } from "@/store/tanstack/mutations/sessionMutation";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface Session {
   _id: string;
@@ -327,6 +328,7 @@ export default function SessionDetailModal({
             <div className="flex items-center gap-3">
               {getStatusIcon(session.status)}
               <DialogTitle className="text-xl">Session Details</DialogTitle>
+              <DialogDescription></DialogDescription>
             </div>
           </DialogHeader>
 
@@ -496,25 +498,25 @@ export default function SessionDetailModal({
 
             {/* Upload Documents */}
             <div>
-              {!sessionDocuments && (
-                <>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Upload Documents
-                  </h3>
-
-                  <Input
-                    type="file"
-                    multiple
-                    accept=".pdf, .doc, .docx, .jpg, .png, .jpeg"
-                    placeholder="Upload Documents"
-                    ref={fileInputRef}
-                    disabled={uploadedFiles.length >= MAX_FILES}
-                    onChange={handleFileInputChange}
-                    className="mb-3 cursor-pointer"
-                  />
-                </>
-              )}
+              {(!sessionDocuments || sessionDocuments.document.length === 0) &&
+                sessionCancelable && (
+                  <>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Upload Documents
+                    </h3>
+                    <Input
+                      type="file"
+                      multiple
+                      accept=".pdf, .doc, .docx, .jpg, .png, .jpeg"
+                      placeholder="Upload Documents"
+                      ref={fileInputRef}
+                      disabled={uploadedFiles.length >= MAX_FILES}
+                      onChange={handleFileInputChange}
+                      className="mb-3 cursor-pointer"
+                    />
+                  </>
+                )}
 
               <div className="flex gap-3 flex-wrap">
                 {sessionDocuments &&
@@ -545,17 +547,16 @@ export default function SessionDetailModal({
                       );
                     })}
               </div>
-
-              {!sessionDocuments && uploadedFiles.length > 0 && (
-                <Button
-                  className="mt-5"
-                  onClick={handleUploadDocuments}
-                  disabled={documentUploading}
-                >
-                  Upload Files
-                </Button>
-              )}
-
+              {(!sessionDocuments || sessionDocuments.document.length === 0) &&
+                sessionCancelable && (
+                  <Button
+                    className="mt-5"
+                    onClick={handleUploadDocuments}
+                    disabled={documentUploading}
+                  >
+                    Upload Files
+                  </Button>
+                )}
               {documentUploading && (
                 <div className="mt-3">
                   <Progress value={uploadProgress} />

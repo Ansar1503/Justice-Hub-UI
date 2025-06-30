@@ -96,18 +96,17 @@ export function useStartSession() {
   });
 }
 
-export function useRemoveFile(sessionDocid: string) {
+export function useRemoveFile(sessionId: string) {
   const queryClient = useQueryClient();
   return useMutation<ResponseType & { data?: SessionDocument }, Error, string>({
     mutationFn: (id) => removeDocumentFile(id),
     onSuccess: (data) => {
       toast.success(data?.message || "Session started successfully!");
       queryClient.setQueryData(
-        ["session", "documents", sessionDocid],
+        ["session", "documents", sessionId],
         (old: ResponseType & { data?: SessionDocument }) => {
-          if (!old) return old;
           old.data =
-            !old.data || !data.data
+            !old?.data || !data?.data
               ? undefined
               : {
                   ...old.data,
