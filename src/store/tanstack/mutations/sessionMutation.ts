@@ -99,9 +99,10 @@ export function useStartSession() {
 export function useRemoveFile(sessionId: string) {
   const queryClient = useQueryClient();
   return useMutation<ResponseType & { data?: SessionDocument }, Error, string>({
-    mutationFn: (id) => removeDocumentFile(id),
+    mutationFn: (id) => removeDocumentFile(id, sessionId),
     onSuccess: (data) => {
       toast.success(data?.message || "Session started successfully!");
+      console.log("data after remove", data);
       queryClient.setQueryData(
         ["session", "documents", sessionId],
         (old: ResponseType & { data?: SessionDocument }) => {

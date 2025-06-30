@@ -283,9 +283,9 @@ export async function fetchSessionDocuments(sessionId: string) {
   return response.data;
 }
 
-export async function removeDocumentFile(id: string) {
+export async function removeDocumentFile(id: string, sessionId: string) {
   const response = await axiosinstance.delete(
-    `/api/client/profile/sessions/document/${id}`,
+    `/api/client/profile/sessions/document/${id}?session=${sessionId}`,
     {
       headers: { Authorization: `Bearer ${store.getState().Auth.token}` },
     }
