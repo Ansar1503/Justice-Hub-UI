@@ -6,10 +6,7 @@ import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/users/modals/sessionDetails";
 import { useFetchsessionsForclients } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import {
-  useCancelSessionByClient,
-  useRemoveFile,
-} from "@/store/tanstack/mutations/sessionMutation";
+import { useCancelSessionByClient } from "@/store/tanstack/mutations/sessionMutation";
 import ZegoVideoCall from "../ZegoCloud";
 
 export type SessionStatus =
@@ -22,18 +19,14 @@ export type SessionStatus =
 
 export type SessionType = "all" | "consultation" | "follow-up";
 export type PaymentStatus = "all" | "pending" | "success" | "failed";
-export type SortField =
-  | "client_name"
-  | "scheduled_at"
-  | "amount"
-  | "created_at";
+export type SortField = "name" | "date" | "amount" | "created_at";
 export type SortOrder = "asc" | "desc";
 
 export default function SessionsListing() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<SessionStatus>("all");
   const [typeFilter, setTypeFilter] = useState<SessionType>("all");
-  const [sortBy, setSortBy] = useState<SortField>("scheduled_at");
+  const [sortBy, setSortBy] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -52,7 +45,6 @@ export default function SessionsListing() {
     }
   };
   const { mutateAsync: sessionCancel } = useCancelSessionByClient();
-  const { mutateAsync: removeSessionDocument } = useRemoveFile();
 
   const { data: sessionsData, refetch: sessionRefetch } =
     useFetchsessionsForclients({
@@ -65,7 +57,6 @@ export default function SessionsListing() {
       status: statusFilter,
     });
   //   console.log("datad", sessionsData);
-
   const sessions = sessionsData?.data;
 
   useEffect(() => {
@@ -173,11 +164,6 @@ export default function SessionsListing() {
     setCurrentPage(page);
   };
 
-  const handleRemoveFile = async (id: string) => {
-    if (!id) return;
-    await removeSessionDocument(id);
-  };
-
   const handleViewSession = (session: any) => {
     setSelectedSession(session);
     setIsModalOpen(true);
@@ -271,21 +257,21 @@ export default function SessionsListing() {
               <tr>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("client_name")}
+                    onClick={() => handleSort("name")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Lawyer Details
-                    {sortBy === "client_name" &&
+                    {sortBy === "name" &&
                       (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("scheduled_at")}
+                    onClick={() => handleSort("date")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Scheduled Time
-                    {sortBy === "scheduled_at" &&
+                    {sortBy === "date" &&
                       (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
@@ -324,7 +310,9 @@ export default function SessionsListing() {
                 </tr>
               ) : (
                 sessions?.map((session: any) => {
-                  const { date, time } = formatDateTime(session?.scheduled_date);
+                  const { date, time } = formatDateTime(
+                    session?.scheduled_date
+                  );
                   return (
                     <tr
                       key={session._id}
@@ -422,7 +410,6 @@ export default function SessionsListing() {
 
       {/* Session Detail Modal */}
       <SessionDetailModal
-        onremoveFile={handleRemoveFile}
         session={selectedSession}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

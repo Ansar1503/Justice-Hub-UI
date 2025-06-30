@@ -10,7 +10,6 @@ import {
 } from "@/store/tanstack/mutations/sessionMutation";
 import ZegoVideoCall from "../ZegoCloud";
 
-
 export type SessionStatus =
   | "all"
   | "upcoming"
@@ -21,18 +20,14 @@ export type SessionStatus =
 
 export type SessionType = "all" | "consultation" | "follow-up";
 export type PaymentStatus = "all" | "pending" | "success" | "failed";
-export type SortField =
-  | "client_name"
-  | "scheduled_date"
-  | "amount"
-  | "created_at";
+export type SortField = "name" | "date" | "amount" | "created_at";
 export type SortOrder = "asc" | "desc";
 
 export default function SessionsListing() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<SessionStatus>("all");
   const [typeFilter, setTypeFilter] = useState<SessionType>("all");
-  const [sortBy, setSortBy] = useState<SortField>("scheduled_date");
+  const [sortBy, setSortBy] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -294,22 +289,20 @@ export default function SessionsListing() {
                 <tr>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[200px]">
                     <button
-                      onClick={() => handleSort("client_name")}
+                      onClick={() => handleSort("name")}
                       className="flex items-center gap-1 hover:text-blue-600"
                     >
                       Client Details
-                      {sortBy === "client_name" &&
-                        (sortOrder === "asc" ? " ↑" : " ↓")}
+                      {sortBy === "name" && (sortOrder === "asc" ? " ↑" : " ↓")}
                     </button>
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[150px]">
                     <button
-                      onClick={() => handleSort("scheduled_date")}
+                      onClick={() => handleSort("date")}
                       className="flex items-center gap-1 hover:text-blue-600"
                     >
                       Scheduled Time
-                      {sortBy === "scheduled_date" &&
-                        (sortOrder === "asc" ? " ↑" : " ↓")}
+                      {sortBy === "date" && (sortOrder === "asc" ? " ↑" : " ↓")}
                     </button>
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">

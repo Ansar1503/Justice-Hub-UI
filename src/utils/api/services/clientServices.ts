@@ -272,10 +272,12 @@ export async function uploadDocuments(
 }
 
 export async function fetchSessionDocuments(sessionId: string) {
+  const { token, user } = store.getState().Auth;
+  if (!user?.role) return;
   const response = await axiosinstance.get(
-    `/api/client/profile/sessions/document/${sessionId}`,
+    `/api/${user?.role}/profile/sessions/document/${sessionId}`,
     {
-      headers: { Authorization: `Bearer ${store.getState().Auth.token}` },
+      headers: { Authorization: `Bearer ${token}` },
     }
   );
   return response.data;

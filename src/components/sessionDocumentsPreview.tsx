@@ -23,18 +23,20 @@ export function SessionDocumentsPreview({
     >
       <div className="flex justify-between items-center mb-1">
         <span className="truncate max-w-[150px]">{name}</span>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="ml-2 p-0 h-4 w-4"
-          onClick={() => {
-            if (onRemoveFile) {
-              onRemoveFile(id);
-            }
-          }}
-        >
-          <XCircle className="h-4 w-4 text-red-500" />
-        </Button>
+        {onRemoveFile && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-2 p-0 h-4 w-4"
+            onClick={() => {
+              if (onRemoveFile) {
+                onRemoveFile(id);
+              }
+            }}
+          >
+            <XCircle className="h-4 w-4 text-red-500" />
+          </Button>
+        )}
       </div>
 
       {/* preview */}

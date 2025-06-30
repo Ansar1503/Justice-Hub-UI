@@ -246,7 +246,7 @@ export default function SessionDetailModal({
 
   const handleRemoveFile = useCallback(
     (index: number) => {
-      const newFiles = uploadedFiles.filter((_, i) => i !== index);
+      const newFiles = uploadedFiles.filter((_, i) => i != index);
       setUploadedFiles(newFiles);
 
       const dataTransfer = new DataTransfer();
@@ -315,6 +315,7 @@ export default function SessionDetailModal({
   const handleClose = useCallback(() => {
     if (!documentUploading) {
       onClose();
+      setUploadedFiles([]);
     }
   }, [documentUploading, onClose]);
 
@@ -520,6 +521,7 @@ export default function SessionDetailModal({
 
               <div className="flex gap-3 flex-wrap">
                 {sessionDocuments &&
+                sessionDocuments.session_id === session._id &&
                 !fileRemoving &&
                 sessionDocuments?.document.length > 0
                   ? sessionDocuments.document.map((file) => (

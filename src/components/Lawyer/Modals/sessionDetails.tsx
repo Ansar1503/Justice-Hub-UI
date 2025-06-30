@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useFetchSessionDocuments } from "@/store/tanstack/queries";
+import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 
 interface SessionDetailModalProps {
   session: any;
@@ -55,7 +57,11 @@ export default function SessionDetailModal({
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
-
+  const { data: sessionDocumentsData } = useFetchSessionDocuments(
+    session?._id || ""
+  );
+  const sessionDocuments = sessionDocumentsData?.data;
+  console.log("session", sessionDocuments);
   if (!isOpen || !session) return null;
 
   const formatDate = (dateString: string) => {
@@ -342,6 +348,18 @@ export default function SessionDetailModal({
               </p>
             </div>
 
+            {/* Documents */}
+            {sessionDocuments &&
+              sessionDocuments.session_id == session?._id &&
+              sessionDocuments?.document?.map((sdoc) => (
+                <SessionDocumentsPreview
+                  key={sdoc?._id}
+                  id={sdoc?._id || ""}
+                  name={sdoc?.name}
+                  type={sdoc.type}
+                  url={sdoc?.url}
+                />
+              ))}
             {/* Follow-up Information */}
             {session.follow_up_suggested && (
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
