@@ -1,12 +1,12 @@
 "use client";
 
-import { Search, MessageSquare, User } from "lucide-react";
+import { Search, MessageSquare, User, Scale } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 // import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import type {  ChatSession } from "@/types/types/ChatType";
+import type { ChatSession } from "@/types/types/ChatType";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 interface ChatListProps {
@@ -21,7 +21,6 @@ interface ChatListProps {
 }
 
 export default function ChatList({
-  // isConnected,
   sessions,
   searchTerm,
   setSearch,
@@ -44,11 +43,11 @@ export default function ChatList({
     return date.toLocaleDateString();
   };
 
-  const getSessionPartnerId = (session: ChatSession) => {
-    return session.participants?.lawyer_id === currentUserId
-      ? session.participants?.client_id
-      : session.participants?.lawyer_id;
-  };
+  // const getSessionPartnerId = (session: ChatSession) => {
+  //   return session.participants?.lawyer_id === currentUserId
+  //     ? session.participants?.client_id
+  //     : session.participants?.lawyer_id;
+  // };
 
   // const getStatusColor = (status: ChatSession["status"]) => {
   //   switch (status) {
@@ -97,7 +96,22 @@ export default function ChatList({
           ) : (
             sessions.map((session) => {
               const unreadCount = unreadCounts[session._id || ""] || 0;
-              const partnerId = getSessionPartnerId(session);
+              // const partnerId = getSessionPartnerId(session);
+              const isCurrentUserClient =
+                session?.participants?.client_id === currentUserId;
+              const mainAvatarSrc = isCurrentUserClient
+                ? session?.lawyerData?.profile_image
+                : session?.clientData?.profile_image;
+              const mainAvatarName = isCurrentUserClient
+                ? session?.lawyerData?.name
+                : session?.clientData?.name;
+              const secondaryAvatarSrc = isCurrentUserClient
+                ? session?.clientData?.profile_image
+                : session?.lawyerData?.profile_image;
+
+              const secondaryAvatarName = isCurrentUserClient
+                ? session?.clientData?.name
+                : session?.lawyerData?.name;
               return (
                 <div
                   key={session._id}
@@ -110,31 +124,51 @@ export default function ChatList({
                 >
                   <div className="flex items-start gap-3">
                     <div className="relative">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage
-                          src={
-                            session?.participants?.lawyer_id === partnerId
-                              ? session?.lawyerData?.profile_image
-                              : session?.clientData?.profile_image
-                          }
-                        />
-                        <AvatarFallback>
-                          <User className="h-5 w-5" />
-                        </AvatarFallback>
-                      </Avatar>
-                      {/* <div
-                        className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${getStatusColor(
-                          session?.sessionDetails?.status
-                        )}`}
-                      /> */}
+                      {/* Main Avatar */}
+                      <div className="relative">
+                        <Avatar className="w-12 h-12 border-2 border-background shadow-md">
+                          <AvatarImage
+                            src={mainAvatarSrc || "/placeholder.svg"}
+                            alt={mainAvatarName || "User"}
+                            className="object-cover"
+                          />
+                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                            {isCurrentUserClient ? (
+                              <Scale className="h-5 w-5" />
+                            ) : (
+                              <User className="h-5 w-5" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+
+                        {
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full" />
+                        }
+                      </div>
+
+                      {/* Secondary*/}
+                      <div className="absolute -bottom-1 -right-1">
+                        <Avatar className="w-7 h-7 border-2 border-background shadow-lg">
+                          <AvatarImage
+                            src={secondaryAvatarSrc || "/placeholder.svg"}
+                            alt={secondaryAvatarName || "User"}
+                            className="object-cover"
+                          />
+                          <AvatarFallback className="bg-gradient-to-br from-gray-500 to-gray-700 text-white text-xs">
+                            {isCurrentUserClient ? (
+                              <User className="h-3 w-3" />
+                            ) : (
+                              <Scale className="h-3 w-3" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-medium text-sm truncate text-gray-900 dark:text-white">
-                          {session?.participants?.lawyer_id === partnerId
-                            ? session?.lawyerData?.name
-                            : session?.clientData?.name || "Unknown"}
+                          {session?.name || "Unknown"}
                         </span>
                         <div className="flex items-center gap-2">
                           {unreadCount > 0 && (

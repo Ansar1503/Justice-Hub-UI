@@ -11,6 +11,7 @@ export default function ZegoVideoCall({
   userName: string;
 }) {
   const containerRef = useRef(null);
+  const zegoInstanceRef = useRef<any>(null);
 
   useEffect(() => {
     const appID = import.meta.env.VITE_ZEGO_APP_ID;
@@ -24,12 +25,25 @@ export default function ZegoVideoCall({
     );
 
     const zp = ZegoUIKitPrebuilt.create(kitToken);
+    zegoInstanceRef.current = zp;
+
     zp.joinRoom({
       container: containerRef.current,
       scenario: {
         mode: ZegoUIKitPrebuilt.VideoConference,
       },
     });
+
+    return () => {
+      if (zegoInstanceRef.current) {
+        zegoInstanceRef.current.destroy();
+        zegoInstanceRef.current = null;
+      }
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((stream) => stream.getTracks().forEach((track) => track.stop()))
+        .catch((err) => console.log("errpr", err));
+    };
   }, [roomID, userID, userName]);
 
   return (

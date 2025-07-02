@@ -9,6 +9,7 @@ import {
   useStartSession,
 } from "@/store/tanstack/mutations/sessionMutation";
 import ZegoVideoCall from "../ZegoCloud";
+import { useNavigate } from "react-router-dom";
 
 export type SessionStatus =
   | "all"
@@ -34,9 +35,7 @@ export default function SessionsListing() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showVideo, setShowVideo] = useState(false);
-  const [zegoRoomID, setZegoRoomID] = useState("");
-
+  const navigate = useNavigate();
   const { mutateAsync: startSessionMutation } = useStartSession();
 
   const handleSort = (field: SortField) => {
@@ -88,17 +87,6 @@ export default function SessionsListing() {
     }
   }, [sessionsData, itemsPerPage]);
 
-  if (showVideo && selectedSession) {
-    return (
-      <div className="w-full h-full">
-        <ZegoVideoCall
-          roomID={zegoRoomID}
-          userID={selectedSession?.userData?._id}
-          userName={selectedSession?.userData?.name}
-        />
-      </div>
-    );
-  }
   const renderStatusBadge = (status: string) => {
     const statusConfig = {
       upcoming: {
@@ -174,13 +162,12 @@ export default function SessionsListing() {
 
   const handleStartSession = async (session: any) => {
     try {
-      console.log("Starting session:", session);
+      // console.log("Starting session:", session);
       const { data } = await startSessionMutation({ sessionId: session?._id });
 
       if (data?.room_id) {
-        setZegoRoomID(data?.room_id);
+        navigate(`/lawyer/session/join/${data?.room_id}`);
         setSelectedSession(session);
-        setShowVideo(true);
       }
     } catch (err) {
       console.error("Failed to start session", err);

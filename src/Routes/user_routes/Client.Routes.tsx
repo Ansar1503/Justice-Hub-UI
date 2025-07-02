@@ -7,6 +7,7 @@ const LawyerDirectory = lazy(() => import("@/pages/client/LawyersListing"));
 const LawyersPage = lazy(() => import("@/pages/client/LawyerProfile"));
 import PaymentSuccessPage from "@/pages/client/payment_successpaeg";
 import SessionPage from "@/pages/client/sessions";
+import VideoCall from "@/pages/lawyer/VideoCall";
 const Chats_page = lazy(() => import("@/pages/client/chats_page"));
 function ClientRoutes() {
   return (
@@ -18,6 +19,7 @@ function ClientRoutes() {
         <Route path="/lawyers" element={<LawyerDirectory />} />
         <Route path="/lawyers/:id" element={<LawyersPage />} />
         <Route path="/chats" element={<Chats_page />} />
+        <Route path="/session/join/:id" element={<VideoCall />} />
         <Route
           path="/lawyers/payment_success"
           element={<PaymentSuccessPage />}

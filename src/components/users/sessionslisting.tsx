@@ -7,7 +7,7 @@ import SessionDetailModal from "@/components/users/modals/sessionDetails";
 import { useFetchsessionsForclients } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { useCancelSessionByClient } from "@/store/tanstack/mutations/sessionMutation";
-import ZegoVideoCall from "../ZegoCloud";
+import { useNavigate } from "react-router-dom";
 
 export type SessionStatus =
   | "all"
@@ -33,9 +33,7 @@ export default function SessionsListing() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showVideo, setShowVideo] = useState(false);
-  const [zegoRoomID, setZegoRoomID] = useState("");
-
+  const navigate = useNavigate();
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -125,18 +123,6 @@ export default function SessionsListing() {
     );
   };
 
-  if (showVideo && selectedSession) {
-    return (
-      <div className="w-full h-full">
-        <ZegoVideoCall
-          roomID={zegoRoomID}
-          userID={selectedSession?.userData?._id}
-          userName={selectedSession?.userData?.name}
-        />
-      </div>
-    );
-  }
-
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
     return {
@@ -171,9 +157,8 @@ export default function SessionsListing() {
 
   const handleStartSession = async (session: any) => {
     if (session?.room_id) {
-      setZegoRoomID(session?.room_id);
+      navigate(`/client/session/join/${session?.room_id}`);
       setSelectedSession(session);
-      setShowVideo(true);
     }
   };
 
@@ -261,8 +246,7 @@ export default function SessionsListing() {
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Lawyer Details
-                    {sortBy === "name" &&
-                      (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "name" && (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
@@ -271,8 +255,7 @@ export default function SessionsListing() {
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Scheduled Time
-                    {sortBy === "date" &&
-                      (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "date" && (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">

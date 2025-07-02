@@ -13,7 +13,7 @@ import {
   useInfiniteFetchMessages,
 } from "@/store/tanstack/infiniteQuery";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 
 import { getSocket, disconnectSocket } from "@/utils/socket/socket";
 
@@ -25,10 +25,11 @@ enum SocketEvents {
   DISCONNECT_EVENT = "disconnect",
   JOIN_CHAT_EVENT = "joinChat",
   TYPING_EVENT = "typing",
-  STOP_TYPING_EVENT = "stopTyping",
+  // STOP_TYPING_EVENT = "stopTyping",
   MESSAGE_RECEIVED_EVENT = "messageReceived",
   MESSAGE_DELETE_EVENT = "messageDeleted",
-  GET_MESSAGES_EVENT = "getMessages",
+  // GET_MESSAGES_EVENT = "getMessages",
+  CHANGE_CHAT_NAME_EVENT = "changeChatName",
   MESSAGES_RECEIVED_EVENT = "messagesReceived",
   SEND_MESSAGE_EVENT = "sendMessage",
 }
@@ -39,6 +40,7 @@ function ChatsPage() {
   const [selectedSession, setSelectedSession] = useState<ChatSession | null>(
     null
   );
+  const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
@@ -47,6 +49,7 @@ function ChatsPage() {
   const queryClient = useQueryClient();
 
   const socket = useRef<Socket | null>(null);
+  socket.current = getSocket(token);
 
   const onConnect = () => setIsConnected(true);
   const onDisconnect = () => setIsConnected(false);
@@ -68,22 +71,60 @@ function ChatsPage() {
     chatMessageData?.pages.flatMap((page) => page.data) || [];
   const chatSessions =
     chatSessionData?.pages.flatMap((page) => page.data) ?? [];
-
-  useEffect(() => {
+  async function handleChatNameUpdate(chatName: string, chatId: string) {
     if (!token) return;
     if (!socket.current) {
-      socket.current = getSocket(token);
+      return;
     }
-    return () => {
-      disconnectSocket();
-    };
-  }, []);
+    const isCurrentUserClient =
+      selectedSession?.participants?.client_id === currentUserId;
+    const s = socket.current;
+    s.emit(
+      SocketEvents.CHANGE_CHAT_NAME_EVENT,
+      {
+        chatName,
+        chatId,
+        userId: isCurrentUserClient
+          ? selectedSession?.participants?.lawyer_id
+          : selectedSession?.participants?.client_id,
+      },
+      (data: { success: boolean; updatedChat?: any; error?: string }) => {
+        if (data?.success && data.updatedChat) {
+          // console.log("data,dat", data);
+          queryClient.setQueryData(
+            ["client", "chatsessions"],
+            (oldData: any) => {
+              if (!oldData) return oldData;
 
+              return {
+                ...oldData,
+                pages: oldData.pages.map((page: any) => ({
+                  ...page,
+                  data: page.data.map((session: any) =>
+                    session._id === data?.updatedChat?._id
+                      ? { ...session, name: data?.updatedChat?.name }
+                      : session
+                  ),
+                })),
+              };
+            }
+          );
+          setSelectedSession((prev) =>
+            prev && prev._id === data.updatedChat?._id
+              ? { ...prev, name: data?.updatedChat?.name }
+              : prev
+          );
+        } else {
+          console.log("changename error", data.error);
+        }
+      }
+    );
+  }
+  console.log("socket ", socket.current);
   useEffect(() => {
-    // console.log("userid:", currentUserId);
-    if (!token) return;
     if (!socket.current) {
-      socket.current = getSocket(token);
+      // console.log('no socket')
+      return;
     }
     const s = socket.current;
     if (!s) return;
@@ -95,19 +136,31 @@ function ChatsPage() {
     });
     s.on(SocketEvents.SOCKET_ERROR_EVENT, (err: any) => {
       console.log("Socket error:", err);
-      if (err === "Token expired") {
-        if (!socket.current) {
-          socket.current = getSocket(token);
-        }
-      }
-      disconnectSocket();
       // toast.error(err?.message || "Socket error");
     });
     s.on(SocketEvents.ERROR, (err) => {
-      console.log("socket events error:", err);
-      disconnectSocket();
+      console.log("Socket error:", err);
     });
+    s.on(SocketEvents.CHANGE_CHAT_NAME_EVENT, (data: any) => {
+      queryClient.setQueryData(["client", "chatsessions"], (oldData: any) => {
+        if (!oldData) return oldData;
 
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            data: page.data.map((session: any) =>
+              session._id === data._id
+                ? { ...session, name: data?.name }
+                : session
+            ),
+          })),
+        };
+      });
+      setSelectedSession((prev) =>
+        prev && prev._id === data?._id ? { ...prev, name: data?.name } : prev
+      );
+    });
     s.on(SocketEvents.MESSAGE_RECEIVED_EVENT, (newMessage: ChatMessage) => {
       if (selectedSession && newMessage.session_id === selectedSession._id) {
         queryClient.setQueryData(
@@ -162,12 +215,14 @@ function ChatsPage() {
       s.off(SocketEvents.ERROR);
       s.off(SocketEvents.MESSAGE_RECEIVED_EVENT);
       s.off(SocketEvents.MESSAGES_RECEIVED_EVENT);
+      s.off(SocketEvents.CHANGE_CHAT_NAME_EVENT);
       s.off(SocketEvents.TYPING_EVENT);
     };
-  }, [token, selectedSession, currentUserId, queryClient]);
+  }, [selectedSession, currentUserId, queryClient]);
 
   const handleSelectSession = (session: ChatSession) => {
     setSelectedSession(session);
+    setSessionMessages([]);
 
     const s = socket.current;
     // console.log("s:", s);
@@ -220,13 +275,6 @@ function ChatsPage() {
                 ...oldData,
                 pages: oldData.pages.map((page: any, index: number) => {
                   if (index === oldData.pages.length - 1) {
-                    // const withoutTemp = page.data.filter(
-                    //   (msg: ChatMessage) =>
-                    //     !(
-                    //       msg.content === newMessage.content &&
-                    //       msg.senderId === newMessage.senderId
-                    //     )
-                    // );
                     return {
                       ...page,
                       data: [...page.data, response.savedMessage],
@@ -238,7 +286,7 @@ function ChatsPage() {
             }
           );
         } else {
-          toast.error("Message failed to send.");
+          // toast.error("Message failed to send.");
           queryClient.setQueryData(
             ["user", "chatMessages", selectedSession._id],
             (oldData: any) => {
@@ -285,7 +333,6 @@ function ChatsPage() {
         <div className="flex flex-1 ">
           <div className="w-80 border-r border-gray-200 dark:border-gray-700">
             <ChatList
-              isConnected={isConnected}
               searchTerm={search}
               setSearch={setSearch}
               sessions={chatSessions}
@@ -296,15 +343,17 @@ function ChatsPage() {
             />
           </div>
           <div className="flex-1 p-4">
-            <Chat
-              isConnected={isConnected}
-              selectedSession={selectedSession}
-              messages={chatMessages}
-              onSendMessage={handleSendMessage}
-              onInputMessage={handleInputMessage}
-              currentUserId={currentUserId}
-              isTyping={isTyping}
-            />
+            {Object.keys(socket.current).length > 0 && (
+              <Chat
+                onUpdateChatName={handleChatNameUpdate}
+                selectedSession={selectedSession}
+                messages={chatMessages}
+                onSendMessage={handleSendMessage}
+                onInputMessage={handleInputMessage}
+                currentUserId={currentUserId}
+                isTyping={isTyping}
+              />
+            )}
           </div>
         </div>
       </div>

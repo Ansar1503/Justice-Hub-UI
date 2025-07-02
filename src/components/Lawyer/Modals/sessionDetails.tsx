@@ -33,14 +33,16 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
+import { useNavigate } from "react-router-dom";
 
 interface SessionDetailModalProps {
   session: any;
   isOpen: boolean;
   onClose: () => void;
-  onStartSession?: (sessionId: string) => void;
+  onStartSession?: (session: any) => void;
   onEndSession?: (sessionId: string) => void;
   onCancelSession?: (sessionId: string) => void;
+  onJoinSession?: (sesssion: any) => void;
 }
 
 export default function SessionDetailModal({
@@ -50,18 +52,22 @@ export default function SessionDetailModal({
   onStartSession,
   onEndSession,
   onCancelSession,
+  onJoinSession,
 }: SessionDetailModalProps) {
   // const [notes, setNotes] = useState(session?.notes || "");
   // const [summary, setSummary] = useState(session?.summary || "");
 
   const [showStartConfirm, setShowStartConfirm] = useState(false);
+  const [joinVideoRoom, setJoinVideoRoom] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const { data: sessionDocumentsData } = useFetchSessionDocuments(
     session?._id || ""
   );
   const sessionDocuments = sessionDocumentsData?.data;
-  console.log("session", sessionDocuments);
+
+  const navigate = useNavigate();
+  // console.log("session", sessionDocuments);
   if (!isOpen || !session) return null;
 
   const formatDate = (dateString: string) => {
@@ -96,7 +102,8 @@ export default function SessionDetailModal({
     return (
       session?.status === "upcoming" &&
       currentDate >= sessionDate &&
-      currentDate < sessionEnd
+      currentDate < sessionEnd &&
+      !session?.room_id
     );
   };
 
@@ -141,6 +148,12 @@ export default function SessionDetailModal({
       default:
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
     }
+  };
+
+  const handleJoinSession = () => {
+    navigate(`/lawyer/session/join/${session?.room_id || ""}`);
+    setJoinVideoRoom(false);
+    onClose();
   };
 
   const handleStartSession = () => {
@@ -389,6 +402,7 @@ export default function SessionDetailModal({
                       Start Session
                     </Button>
                   )}
+
                   {sessionCancelable() && (
                     <Button
                       variant="destructive"
@@ -399,6 +413,17 @@ export default function SessionDetailModal({
                   )}
                 </>
               )}
+
+              {session?.status === "ongoing" &&
+                session?.room_id?.length > 0 && (
+                  <Button
+                    onClick={() => setJoinVideoRoom(true)}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Video className="h-4 w-4 mr-2" />
+                    Join Session
+                  </Button>
+                )}
 
               {session?.status === "ongoing" && (
                 <Button
@@ -413,7 +438,28 @@ export default function SessionDetailModal({
         </DialogContent>
       </Dialog>
 
-      {/* Start Session Confirmation Dialog */}
+      {/* jon sessoin */}
+      <AlertDialog open={joinVideoRoom} onOpenChange={setJoinVideoRoom}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Join Session</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you ready to Join this session?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-green-600 hover:bg-green-700"
+              onClick={handleJoinSession}
+            >
+              Yes, start session
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Start Session */}
       <AlertDialog open={showStartConfirm} onOpenChange={setShowStartConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>

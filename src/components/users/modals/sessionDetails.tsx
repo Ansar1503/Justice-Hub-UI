@@ -76,7 +76,7 @@ const ALLOWED_FILE_TYPES = [
   "image/png",
 ];
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_FILES = 3;
 
 const STATUS_CONFIG = {
@@ -185,11 +185,10 @@ export default function SessionDetailModal({
 
   // Session status checks
   const sessionStartable = useMemo(() => {
-    if (!session || session.status !== "upcoming" || !session.room_id)
-      return false;
+    if (!session || !session.room_id) return false;
 
     const currentDate = new Date();
-    const sessionDate = new Date(session.scheduled_at);
+    const sessionDate = new Date(session.scheduled_date);
     const [h, m] = session.scheduled_time
       ? session.scheduled_time.split(":").map(Number)
       : [0, 0];
@@ -197,8 +196,7 @@ export default function SessionDetailModal({
     const sessionEnd = new Date(
       sessionDate.getTime() + session.duration * 60000
     );
-
-    return currentDate >= sessionDate && currentDate < sessionEnd;
+    return currentDate < sessionEnd && session?.status == "ongoing";
   }, [session]);
 
   const sessionCancelable = useMemo(() => {
@@ -572,7 +570,7 @@ export default function SessionDetailModal({
             </div>
 
             {/* Follow-up Information */}
-            {session.follow_up_suggested && (
+            {session?.follow_up_suggested && (
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <h3 className="text-lg font-medium text-blue-900 dark:text-blue-200 mb-2">
                   Follow-up Suggested
@@ -595,16 +593,6 @@ export default function SessionDetailModal({
             <div className="flex gap-3">
               {session.status === "upcoming" && (
                 <>
-                  {sessionStartable && (
-                    <Button
-                      onClick={() => setShowStartConfirm(true)}
-                      className="bg-green-600 hover:bg-green-700"
-                      disabled={documentUploading}
-                    >
-                      <Video className="h-4 w-4 mr-2" />
-                      Join Session
-                    </Button>
-                  )}
                   {sessionCancelable && (
                     <Button
                       variant="destructive"
@@ -618,20 +606,31 @@ export default function SessionDetailModal({
               )}
 
               {session.status === "ongoing" && (
-                <Button
-                  variant="destructive"
-                  disabled={documentUploading}
-                  onClick={() => setShowEndConfirm(true)}
-                >
-                  End Session
-                </Button>
+                <>
+                  {sessionStartable && (
+                    <Button
+                      onClick={() => setShowStartConfirm(true)}
+                      className="bg-green-600 hover:bg-green-700"
+                      disabled={documentUploading}
+                    >
+                      <Video className="h-4 w-4 mr-2" />
+                      Join Session 
+                    </Button>
+                  )}
+                  <Button
+                    variant="destructive"
+                    disabled={documentUploading}
+                    onClick={() => setShowEndConfirm(true)}
+                  >
+                    End Session
+                  </Button>
+                </>
               )}
             </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Confirmation Dialogs */}
       <AlertDialog open={showStartConfirm} onOpenChange={setShowStartConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -641,7 +640,7 @@ export default function SessionDetailModal({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Join</AlertDialogCancel>
             <AlertDialogAction
               className="bg-green-600 hover:bg-green-700"
               onClick={handleStartSession}

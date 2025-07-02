@@ -7,6 +7,7 @@ import LawyerSlotProtectRoute from "./wrapper/lawyer.slot.protect.route";
 import AppointmentsPage from "@/pages/lawyer/Appointments";
 import SessionPage from "@/pages/lawyer/Sessions";
 import ChatsPage from "@/pages/lawyer/ChatPage";
+import VideoCall from "@/pages/lawyer/VideoCall";
 
 export default function LawyerRoutes() {
   return (
@@ -17,6 +18,7 @@ export default function LawyerRoutes() {
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/sessions" element={<SessionPage />} />
         <Route path="/chats" element={<ChatsPage />} />
+        <Route path="/session/join/:id" element={<VideoCall />} />
       </Route>
       <Route element={<LawyerSlotProtectRoute />}>
         <Route path="/slot-setup/:id" element={<SlotAddModal />} />
