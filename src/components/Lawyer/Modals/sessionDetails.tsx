@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +42,7 @@ interface SessionDetailModalProps {
   onStartSession?: (session: any) => void;
   onEndSession?: (sessionId: string) => void;
   onCancelSession?: (sessionId: string) => void;
-  onJoinSession?: (sesssion: any) => void;
+  // onJoinSession?: (sesssion: any) => void;
 }
 
 export default function SessionDetailModal({
@@ -52,7 +52,6 @@ export default function SessionDetailModal({
   onStartSession,
   onEndSession,
   onCancelSession,
-  onJoinSession,
 }: SessionDetailModalProps) {
   // const [notes, setNotes] = useState(session?.notes || "");
   // const [summary, setSummary] = useState(session?.summary || "");
@@ -100,7 +99,23 @@ export default function SessionDetailModal({
     // console.log("sessionEnd", sessionEnd);
     // console.log("status", session?.status);
     return (
-      session?.status === "upcoming" &&
+      session?.status === "ongoing" &&
+      currentDate >= sessionDate &&
+      currentDate < sessionEnd &&
+      !session?.room_id
+    );
+  };
+
+  const sessionJoinable = () => {
+    const currentDate = new Date();
+    const sessionDate = new Date(session?.scheduled_date);
+    const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
+    sessionDate.setHours(h, m, 0, 0);
+    const sessionEnd = new Date(
+      sessionDate.getTime() + session.duration * 60000
+    );
+    return (
+      session?.status === "ongoing" &&
       currentDate >= sessionDate &&
       currentDate < sessionEnd &&
       !session?.room_id
@@ -414,16 +429,15 @@ export default function SessionDetailModal({
                 </>
               )}
 
-              {session?.status === "ongoing" &&
-                session?.room_id?.length > 0 && (
-                  <Button
-                    onClick={() => setJoinVideoRoom(true)}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    <Video className="h-4 w-4 mr-2" />
-                    Join Session
-                  </Button>
-                )}
+              {sessionJoinable() && (
+                <Button
+                  onClick={() => setJoinVideoRoom(true)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Join Session
+                </Button>
+              )}
 
               {session?.status === "ongoing" && (
                 <Button

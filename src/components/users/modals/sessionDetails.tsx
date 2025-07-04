@@ -196,7 +196,11 @@ export default function SessionDetailModal({
     const sessionEnd = new Date(
       sessionDate.getTime() + session.duration * 60000
     );
-    return currentDate < sessionEnd && session?.status == "ongoing";
+    return (
+      currentDate >= sessionDate &&
+      currentDate < sessionEnd &&
+      session?.status == "ongoing"
+    );
   }, [session]);
 
   const sessionCancelable = useMemo(() => {
@@ -614,7 +618,7 @@ export default function SessionDetailModal({
                       disabled={documentUploading}
                     >
                       <Video className="h-4 w-4 mr-2" />
-                      Join Session 
+                      Join Session
                     </Button>
                   )}
                   <Button

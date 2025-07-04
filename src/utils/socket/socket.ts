@@ -9,6 +9,8 @@ export const getSocket = (token: string): Socket => {
     socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:8000", {
       auth: { token: `bearer ${token}` },
       withCredentials: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
     });
   }
   return socket;

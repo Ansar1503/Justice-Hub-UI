@@ -17,7 +17,6 @@ interface ChatListProps {
   setSearch: (search: string) => void;
   onSelectSession: (session: ChatSession) => void;
   unreadCounts?: Record<string, number>;
-  // isConnected:boolean
 }
 
 export default function ChatList({
@@ -140,10 +139,11 @@ export default function ChatList({
                             )}
                           </AvatarFallback>
                         </Avatar>
+                        {/*   Addd Online logic here  */}
 
-                        {
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full" />
-                        }
+                        {/* <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full" />
+
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gray-500 border-2 border-background rounded-full" /> */}
                       </div>
 
                       {/* Secondary*/}

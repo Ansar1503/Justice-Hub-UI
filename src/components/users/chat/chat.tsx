@@ -1,18 +1,34 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef, useEffect } from "react";
-import { Send, User, Paperclip, X, Scale } from "lucide-react";
+import { useState, useRef } from "react";
+import { Send, User, Paperclip, X, Scale, Trash2, Flag } from "lucide-react";
+import { IoIosArrowDown } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { ChatMessage } from "@/types/types/ChatType";
 import moment from "moment-timezone";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { ChatDetailsModal } from "./chatDetails.modal";
-// import { useNavigate } from "react-router-dom";
 
 interface ChatProps {
   selectedSession: any | null;
@@ -22,7 +38,8 @@ interface ChatProps {
   currentUserId: string;
   isTyping?: boolean;
   onUpdateChatName?: (newName: string, chatId: string) => void;
-  // isConnected: boolean;
+  onDeleteMessage?: (messageId: string, sessionId: string) => void;
+  onReportMessage?: (messageId: string, reason: string) => void;
 }
 
 function Chat({
@@ -31,34 +48,32 @@ function Chat({
   onSendMessage,
   onInputMessage,
   currentUserId,
-  isTyping = false,
+  isTyping,
   onUpdateChatName,
+  onDeleteMessage,
+  onReportMessage,
 }: ChatProps) {
   const [newMessage, setNewMessage] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isChatDetailsOpen, setIsChatDetailsOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState<string>("");
+  const [reportReason, setReportReason] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // const navigate = useNavigate();
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current;
-      // Smooth scroll to bottom
-      scrollElement.scrollTo({
-        top: scrollElement.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, [messages, isTyping]);
 
   const isCurrentUserClient =
     selectedSession?.participants?.client_id === currentUserId;
+
   const mainAvatarSrc = isCurrentUserClient
     ? selectedSession?.lawyerData?.profile_image
     : selectedSession?.clientData?.profile_image;
+
   const mainAvatarName = isCurrentUserClient
     ? selectedSession?.lawyerData?.name
     : selectedSession?.clientData?.name;
+
   const secondaryAvatarSrc = isCurrentUserClient
     ? selectedSession?.clientData?.profile_image
     : selectedSession?.lawyerData?.profile_image;
@@ -79,6 +94,7 @@ function Chat({
     e.preventDefault();
     if ((!newMessage.trim() && selectedFiles.length === 0) || !selectedSession)
       return;
+
     const message = newMessage.trim();
     setNewMessage("");
     setSelectedFiles([]);
@@ -98,15 +114,50 @@ function Chat({
     return moment(date).tz("Asia/Kolkata").format("h:mm A");
   };
 
-  // const isFromCurrentUser = (message: ChatMessage) => {
-  //   return message.senderId === currentUserId;
-  // };
+  const handleDeleteMessage = (messageId: string) => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    setTimeout(() => {
+      setSelectedMessageId(messageId);
+      setDeleteDialogOpen(true);
+    }, 10);
+  };
+
+  const handleReportMessage = (messageId: string) => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    setTimeout(() => {
+      setSelectedMessageId(messageId);
+      setReportDialogOpen(true);
+    }, 10);
+  };
+
+  const confirmDeleteMessage = () => {
+    if (onDeleteMessage && selectedMessageId) {
+      onDeleteMessage(selectedMessageId, selectedSession?._id);
+    }
+    setDeleteDialogOpen(false);
+    setSelectedMessageId("");
+  };
+
+  const confirmReportMessage = () => {
+    if (onReportMessage && selectedMessageId && reportReason.trim()) {
+      onReportMessage(selectedMessageId, reportReason.trim());
+    }
+    setReportDialogOpen(false);
+    setSelectedMessageId("");
+    setReportReason("");
+  };
 
   const renderAttachment = (
     attachment: { url: string; type: string },
     index: number
   ) => {
     if (!attachment?.url) return null;
+
     if (attachment.type.startsWith("image")) {
       return (
         <img
@@ -117,6 +168,7 @@ function Chat({
         />
       );
     }
+
     return (
       <div
         key={index}
@@ -168,10 +220,6 @@ function Chat({
                     )}
                   </AvatarFallback>
                 </Avatar>
-
-                {
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full" />
-                }
               </div>
 
               {/* Secondary Avatar (overlapping) */}
@@ -192,7 +240,6 @@ function Chat({
                 </Avatar>
               </div>
             </div>
-
             <div
               className="flex flex-col cursor-pointer"
               onClick={() => setIsChatDetailsOpen(true)}
@@ -206,7 +253,7 @@ function Chat({
         </CardHeader>
 
         <CardContent className="flex-1 flex flex-col p-0">
-          {/* Messages \Typing */}
+          {/* Messages & Typing */}
           <div className="flex-1 overflow-y-auto p-4" ref={scrollAreaRef}>
             <div className="flex flex-col space-y-4 min-h-full justify-end">
               {messages.length === 0 ? (
@@ -246,30 +293,84 @@ function Chat({
                             </AvatarFallback>
                           </Avatar>
                         )}
-
                         <div
                           className={`max-w-[70%] ${isOwn ? "order-1" : ""}`}
                         >
-                          <div
-                            className={`rounded-lg p-3 ${
-                              isOwn
-                                ? "bg-blue-500 text-white"
-                                : "bg-gray-100 dark:bg-gray-800"
-                            }`}
-                          >
-                            <p className="text-sm whitespace-pre-wrap">
-                              {message.content}
-                            </p>
+                          <div className="relative group">
+                            <div
+                              className={`rounded-lg p-3 ${
+                                isOwn
+                                  ? "bg-blue-500 text-white"
+                                  : "bg-gray-100 dark:bg-gray-800"
+                              }`}
+                            >
+                              <p className="text-sm whitespace-pre-wrap">
+                                {message.content}
+                              </p>
+                              {message.attachments &&
+                                message.attachments.length > 0 && (
+                                  <div className="mt-2 space-y-2">
+                                    {message.attachments.map(
+                                      (attachment, index) =>
+                                        renderAttachment(attachment, index)
+                                    )}
+                                  </div>
+                                )}
+                            </div>
 
-                            {message.attachments &&
-                              message.attachments.length > 0 && (
-                                <div className="mt-2 space-y-2">
-                                  {message.attachments.map(
-                                    (attachment, index) =>
-                                      renderAttachment(attachment, index)
+                            {/* Message Actions Dropdown */}
+                            <div
+                              className={`absolute top-0 right-2 opacity-0 group-hover:opacity-100 transition-opacity`}
+                            >
+                              <DropdownMenu
+                                onOpenChange={(open) => {
+                                  if (
+                                    !open &&
+                                    document.activeElement instanceof
+                                      HTMLElement
+                                  ) {
+                                    document.activeElement.blur();
+                                  }
+                                }}
+                              >
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`h-2 w-2 p-0 hover:cursor-pointer`}
+                                  >
+                                    <IoIosArrowDown className="h-3 w-3 " />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align={isOwn ? "start" : "end"}
+                                  className="absolute bottom-4 -left-24"
+                                  style={{ position: "absolute" }}
+                                >
+                                  {isOwn ? (
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleDeleteMessage(message?._id || "")
+                                      }
+                                      className="text-red-600 focus:text-red-600 cursor-pointer"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete Message
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleReportMessage(message?._id || "")
+                                      }
+                                      className="text-orange-600 focus:text-orange-600 cursor-pointer"
+                                    >
+                                      <Flag className="h-4 w-4 mr-2" />
+                                      Report Message
+                                    </DropdownMenuItem>
                                   )}
-                                </div>
-                              )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
 
                           <div
@@ -291,7 +392,6 @@ function Chat({
                             )}
                           </div>
                         </div>
-
                         {isOwn && (
                           <Avatar className="h-8 w-8 flex-shrink-0">
                             <AvatarImage
@@ -310,7 +410,6 @@ function Chat({
                       </div>
                     );
                   })}
-
                   {isTyping && (
                     <div className="flex gap-3 justify-start">
                       <Avatar className="h-8 w-8 flex-shrink-0">
@@ -372,7 +471,6 @@ function Chat({
                 ))}
               </div>
             )}
-
             <form onSubmit={handleSendMessage} className="flex gap-2">
               <input
                 ref={fileInputRef}
@@ -381,7 +479,6 @@ function Chat({
                 className="hidden"
                 onChange={handleFileSelect}
               />
-
               <Button
                 type="button"
                 variant="outline"
@@ -395,7 +492,6 @@ function Chat({
               >
                 <Paperclip className="h-4 w-4" />
               </Button>
-
               <Input
                 value={newMessage}
                 onChange={(e) => {
@@ -416,7 +512,6 @@ function Chat({
                   )
                 }
               />
-
               <Button
                 type="submit"
                 disabled={
@@ -436,6 +531,63 @@ function Chat({
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Message Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message? This action cannot
+              be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteMessage}
+              className=" cursor-pointer bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Report Message Dialog */}
+      <AlertDialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Report Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please provide a reason for reporting this message. This will help
+              us review the content.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="Enter reason for reporting..."
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setReportReason("")}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmReportMessage}
+              disabled={!reportReason.trim()}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              Report
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {selectedSession && Object.keys(selectedSession).length > 0 && (
         <ChatDetailsModal
           onUpdateChatName={onUpdateChatName}

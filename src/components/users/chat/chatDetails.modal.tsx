@@ -59,8 +59,6 @@ ChatDetailsModalProps) {
   );
   const [chatNameError, setChatNameError] = useState("");
 
-  //   if (!selectedSession) return null;
-
   const isCurrentUserClient =
     selectedSession?.participants?.client_id === currentUserId;
   const clientData = selectedSession?.clientData;
@@ -396,9 +394,8 @@ ChatDetailsModalProps) {
                     </div>
                     <div className="text-xs text-muted-foreground">Lawyer</div>
                   </div>
-                  {lawyerData?.isOnline && (
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  )}
+                  {/* implement online or offline here. */}
+                  {/* <div className="w-2 h-2 bg-green-500 rounded-full" /> */}
                 </div>
 
                 {/* Client */}
@@ -422,9 +419,8 @@ ChatDetailsModalProps) {
                     </div>
                     <div className="text-xs text-muted-foreground">Client</div>
                   </div>
-                  {clientData?.isOnline && (
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  )}
+                  {/* Implement Is Online Here
+                  <div className="w-2 h-2 bg-green-500 rounded-full" /> */}
                 </div>
               </div>
             </div>
