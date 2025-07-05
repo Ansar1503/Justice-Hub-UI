@@ -34,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MoreHorizontal, Check, X } from "lucide-react";
-import { clientDataType, LawerDataType } from "@/types/types/Client.data.type";
+import { clientDataType } from "@/types/types/Client.data.type";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserDetailsModal } from "@/components/admin/Modals/UserDetails.Modal";
 import { toast } from "react-toastify";
@@ -69,12 +69,13 @@ export function UserManagement() {
     limit: itemsPerPage,
     status: statusFilter,
   });
-  useEffect(()=>{
+  useEffect(() => {
     async function refetch() {
       await refetchUser();
     }
     refetch();
-  },[currentPage,refetchUser])
+  }, [currentPage, refetchUser]);
+  // console.log("data:", data);
   const users = useMemo(() => data?.data?.data || [], [data]);
   const totalCount = useMemo(() => data?.data?.totalCount || 0, [data]);
   const totalPages = useMemo(
@@ -319,23 +320,23 @@ export function UserManagement() {
                           <TableCell>
                             <Badge
                               className={`${
-                                (user as LawerDataType).verification_status ===
+                                (user as any).lawyerData?.verification_status ==
                                 "verified"
                                   ? "bg-green-100 text-green-800"
-                                  : (user as LawerDataType)
-                                      .verification_status === "rejected"
+                                  : (user as any).lawyerData
+                                      ?.verification_status === "rejected"
                                   ? "bg-red-100 text-red-800"
                                   : "bg-yellow-100 text-yellow-800"
                               }`}
                             >
-                              {(user as LawerDataType).verification_status
-                                ? (user as LawerDataType).verification_status
+                              {(user as any).lawyerData?.verification_status
+                                ? (user as any).lawyerData?.verification_status
                                     .charAt(0)
                                     .toUpperCase() +
                                   (
-                                    user as LawerDataType
-                                  ).verification_status.slice(1)
-                                : "Pending"}
+                                    user as any
+                                  ).lawyerData?.verification_status.slice(1)
+                                : "pending"}
                             </Badge>
                           </TableCell>
                         )}

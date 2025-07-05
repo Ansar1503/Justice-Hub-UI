@@ -1,6 +1,6 @@
 "use client";
 
-import type React from "react";
+import React, { useEffect } from "react";
 import { useState, useRef } from "react";
 import { Send, User, Paperclip, X, Scale, Trash2, Flag } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
@@ -28,7 +28,7 @@ import {
 import type { ChatMessage } from "@/types/types/ChatType";
 import moment from "moment-timezone";
 import { AvatarImage } from "@radix-ui/react-avatar";
-import { ChatDetailsModal } from "./chatDetails.modal";
+import ChatDetailsModal from "./chatDetails.modal";
 
 interface ChatProps {
   selectedSession: any | null;
@@ -53,6 +53,7 @@ function Chat({
   onDeleteMessage,
   onReportMessage,
 }: ChatProps) {
+  // console.log("istyping", isTyping);
   const [newMessage, setNewMessage] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isChatDetailsOpen, setIsChatDetailsOpen] = useState(false);
@@ -62,7 +63,14 @@ function Chat({
   const [reportReason, setReportReason] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  useEffect(() => {
+    setSelectedFiles([]);
+    setNewMessage("");
+    setIsChatDetailsOpen(false);
+    setDeleteDialogOpen(false);
+    setReportDialogOpen(false);
+    setReportReason("");
+  }, [selectedSession]);
   const isCurrentUserClient =
     selectedSession?.participants?.client_id === currentUserId;
 
@@ -256,20 +264,20 @@ function Chat({
           {/* Messages & Typing */}
           <div className="flex-1 overflow-y-auto p-4" ref={scrollAreaRef}>
             <div className="flex flex-col space-y-4 min-h-full justify-end">
-              {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
-                  <div>
-                    <h3 className="text-md font-semibold mb-1">
-                      No messages yet
-                    </h3>
-                    <p className="text-sm">
-                      Start the conversation by sending a message.
-                    </p>
+              <>
+                {messages.length === 0 ? (
+                  <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
+                    <div>
+                      <h3 className="text-md font-semibold mb-1">
+                        No messages yet
+                      </h3>
+                      <p className="text-sm">
+                        Start the conversation by sending a message.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <>
-                  {messages.map((message) => {
+                ) : (
+                  messages.map((message) => {
                     const isOwn = message.senderId === currentUserId;
                     return (
                       <div
@@ -409,39 +417,39 @@ function Chat({
                         )}
                       </div>
                     );
-                  })}
-                  {isTyping && (
-                    <div className="flex gap-3 justify-start">
-                      <Avatar className="h-8 w-8 flex-shrink-0">
-                        <AvatarImage
-                          src={
-                            selectedSession?.participants?.client_id !==
-                            currentUserId
-                              ? selectedSession?.clientData?.profile_image
-                              : selectedSession?.lawyerData?.profile_image
-                          }
-                        />
-                        <AvatarFallback>
-                          <User className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="bg-muted rounded-lg p-3">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                          <div
-                            className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                            style={{ animationDelay: "0.1s" }}
-                          ></div>
-                          <div
-                            className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                            style={{ animationDelay: "0.2s" }}
-                          ></div>
-                        </div>
+                  })
+                )}
+                {isTyping && (
+                  <div className="flex gap-3 justify-start">
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                      <AvatarImage
+                        src={
+                          selectedSession?.participants?.client_id !==
+                          currentUserId
+                            ? selectedSession?.clientData?.profile_image
+                            : selectedSession?.lawyerData?.profile_image
+                        }
+                      />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="bg-muted rounded-lg p-3">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                        <div
+                          className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
                       </div>
                     </div>
-                  )}
-                </>
-              )}
+                  </div>
+                )}
+              </>
             </div>
           </div>
 
@@ -609,4 +617,4 @@ function Chat({
   );
 }
 
-export default Chat;
+export default React.memo(Chat);

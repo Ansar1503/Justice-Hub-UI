@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   User,
   Calendar,
@@ -41,7 +41,7 @@ interface ChatDetailsModalProps {
   onUpdateChatName?: (newName: string, chatId: string) => void;
 }
 
-export function ChatDetailsModal({
+function ChatDetailsModal({
   isOpen,
   onClose,
   selectedSession,
@@ -531,3 +531,4 @@ ChatDetailsModalProps) {
     </Dialog>
   );
 }
+export default React.memo(ChatDetailsModal);

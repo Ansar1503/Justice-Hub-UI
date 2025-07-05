@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { ChatSession } from "@/types/types/ChatType";
 import { AvatarImage } from "@radix-ui/react-avatar";
+import React from "react";
 
 interface ChatListProps {
   sessions: any[];
@@ -19,7 +20,7 @@ interface ChatListProps {
   unreadCounts?: Record<string, number>;
 }
 
-export default function ChatList({
+function ChatList({
   sessions,
   searchTerm,
   setSearch,
@@ -94,7 +95,7 @@ export default function ChatList({
             </div>
           ) : (
             sessions.map((session) => {
-              const unreadCount = unreadCounts[session._id || ""] || 0;
+              const unreadCount = unreadCounts[session?._id || ""] || 0;
               // const partnerId = getSessionPartnerId(session);
               const isCurrentUserClient =
                 session?.participants?.client_id === currentUserId;
@@ -113,10 +114,10 @@ export default function ChatList({
                 : session?.lawyerData?.name;
               return (
                 <div
-                  key={session._id}
+                  key={session?._id}
                   onClick={() => onSelectSession(session)}
                   className={`w-full p-3 mb-2 rounded-lg cursor-pointer transition-colors ${
-                    selectedSession?._id === session._id
+                    selectedSession?._id === session?._id
                       ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
                       : "hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
@@ -213,3 +214,5 @@ export default function ChatList({
     </div>
   );
 }
+
+export default React.memo(ChatList);
