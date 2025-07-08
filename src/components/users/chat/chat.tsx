@@ -40,9 +40,21 @@ interface ChatProps {
   onUpdateChatName?: (newName: string, chatId: string) => void;
   onDeleteMessage?: (messageId: string, sessionId: string) => void;
   onReportMessage?: (messageId: string, reason: string) => void;
+  fetchNextPage?: () => void;
+  fetchPreviousPage?: () => void;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+  isFetchingNextPage?: boolean;
+  isFetchingPreviousPage?: boolean;
 }
 
 function Chat({
+  fetchNextPage,
+  // fetchPreviousPage,
+  hasNextPage,
+  // hasPreviousPage,
+  isFetchingNextPage,
+  // isFetchingPreviousPage,
   selectedSession,
   messages,
   onSendMessage,
@@ -53,7 +65,6 @@ function Chat({
   onDeleteMessage,
   onReportMessage,
 }: ChatProps) {
-  // console.log("istyping", isTyping);
   const [newMessage, setNewMessage] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isChatDetailsOpen, setIsChatDetailsOpen] = useState(false);
@@ -61,9 +72,15 @@ function Chat({
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string>("");
   const [reportReason, setReportReason] = useState("");
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const prevScrollHeightRef = useRef<number>(0);
+  const isInitialLoadRef = useRef(true);
+  const shouldScrollToBottomRef = useRef(true);
+
   useEffect(() => {
+    chatInputRef.current?.focus();
     setSelectedFiles([]);
     setNewMessage("");
     setIsChatDetailsOpen(false);
@@ -71,6 +88,62 @@ function Chat({
     setReportDialogOpen(false);
     setReportReason("");
   }, [selectedSession]);
+
+  useEffect(() => {
+    if (!scrollAreaRef.current) return;
+
+    if (isInitialLoadRef.current && messages.length > 0) {
+      const scrollContainer = scrollAreaRef.current;
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      isInitialLoadRef.current = false;
+    }
+  }, [messages.length]);
+
+  useEffect(() => {
+    const scrollContainer = scrollAreaRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      const isNearBottom =
+        scrollContainer.scrollHeight - scrollContainer.scrollTop <=
+        scrollContainer.clientHeight + 100;
+
+      shouldScrollToBottomRef.current = isNearBottom;
+
+      if (
+        scrollContainer.scrollTop === 0 &&
+        hasNextPage &&
+        !isFetchingNextPage
+      ) {
+        prevScrollHeightRef.current = scrollContainer.scrollHeight;
+        fetchNextPage?.();
+      }
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  useEffect(() => {
+    const scrollContainer = scrollAreaRef.current;
+    if (!scrollContainer) return;
+
+    if (isTyping && shouldScrollToBottomRef.current) {
+      requestAnimationFrame(() => {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      });
+    }
+  }, [isTyping]);
+
+  useEffect(() => {
+    const scrollContainer = scrollAreaRef.current;
+    if (!scrollContainer || isFetchingNextPage) return;
+
+    const newScrollHeight = scrollContainer.scrollHeight;
+    const scrollDiff = newScrollHeight - prevScrollHeightRef.current;
+    scrollContainer.scrollTop = scrollDiff;
+  }, [messages.length]);
+
   const isCurrentUserClient =
     selectedSession?.participants?.client_id === currentUserId;
 
@@ -205,7 +278,7 @@ function Chat({
 
   return (
     <>
-      <Card className="h-full flex flex-col">
+      <Card className="h-full flex flex-col min-h-0">
         <CardHeader className="border-b">
           <CardTitle className="flex items-center gap-2 ">
             <div
@@ -230,7 +303,7 @@ function Chat({
                 </Avatar>
               </div>
 
-              {/* Secondary Avatar (overlapping) */}
+              {/* Secondary Avatar*/}
               <div className="absolute -bottom-1 -right-1">
                 <Avatar className="w-7 h-7 border-2 border-background shadow-lg">
                   <AvatarImage
@@ -253,16 +326,19 @@ function Chat({
               onClick={() => setIsChatDetailsOpen(true)}
             >
               <span>{selectedSession?.name}</span>
-              <span className="text-sm font-normal text-muted-foreground">
+              {/* <span className="text-sm font-normal text-muted-foreground">
                 {messages.length} messages
-              </span>
+              </span> */}
             </div>
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex-1 flex flex-col p-0">
+        <CardContent className="flex-1 flex flex-col p-0 h-full min-h-0">
           {/* Messages & Typing */}
-          <div className="flex-1 overflow-y-auto p-4" ref={scrollAreaRef}>
+          <div
+            className="flex-1 overflow-y-auto p-4 scrollbar-hide"
+            ref={scrollAreaRef}
+          >
             <div className="flex flex-col space-y-4 min-h-full justify-end">
               <>
                 {messages.length === 0 ? (
@@ -501,6 +577,7 @@ function Chat({
                 <Paperclip className="h-4 w-4" />
               </Button>
               <Input
+                ref={chatInputRef}
                 value={newMessage}
                 onChange={(e) => {
                   setNewMessage(e.target.value);

@@ -242,6 +242,7 @@ export async function fetchChatMessages(cursor = 1, sessionId: string) {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+  // console.log("response-data-----:", response.data);
   return response.data;
 }
 

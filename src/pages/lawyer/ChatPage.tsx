@@ -40,13 +40,11 @@ function ChatsPage() {
   const [selectedSession, setSelectedSession] = useState<ChatSession | null>(
     null
   );
-
   // const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   // const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
-
   const { token, user } = store.getState().Auth;
   const currentUserId = user?.user_id || "";
   const queryClient = useQueryClient();
@@ -77,10 +75,15 @@ function ChatsPage() {
 
   const {
     data: chatMessageData,
-    // fetchNextPage: fetchNextMessages,
-    // hasNextPage: hasNextMessages,
+    fetchNextPage: fetchNextMessages,
+    hasNextPage: hasNextMessages,
     // isLoading: isLoadingMessages,
+    fetchPreviousPage: fetchPreviousMessages,
+    hasPreviousPage: hasPreviousMessages,
+    isFetchingNextPage: isfetchingNextMessages,
+    isFetchingPreviousPage: isFetchingPreviousMessages,
   } = useInfiniteFetchMessages(selectedSession?._id || "");
+  // console.log("chatMessagesData", chatMessageData);
   const chatMessages =
     chatMessageData?.pages.flatMap((page) => page?.data) || [];
   const chatSessions =
@@ -169,19 +172,18 @@ function ChatsPage() {
         queryClient.setQueryData(
           ["user", "chatMessages", selectedSessionRef.current._id],
           (oldData: any) => {
+            console.log("oldData,delete", oldData);
             if (!oldData) return oldData;
+            console.log("oldData,delete", oldData);
             return {
               ...oldData,
-              pages: oldData.pages.map((page: any, index: number) => {
-                if (index === oldData.pages.length - 1) {
-                  return {
-                    ...page,
-                    data: page.data.filter(
-                      (msg: any) => msg._id !== data?.messageId
-                    ),
-                  };
-                }
-                return page;
+              pages: oldData.pages.map((page: any) => {
+                return {
+                  ...page,
+                  data: page.data.filter(
+                    (msg: any) => msg._id !== data?.messageId
+                  ),
+                };
               }),
             };
           }
@@ -262,7 +264,7 @@ function ChatsPage() {
         queryClient.setQueryData(
           ["client", "chatsessions"],
           (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
-            console.log("newMessage", newMessage);
+            // console.log("newMessage", newMessage);
             if (!oldData) return oldData;
             // console.log("oldData", oldData);
             return {
@@ -305,15 +307,15 @@ function ChatsPage() {
       (data: { session_id: string; userId: string }) => {
         if (
           selectedSessionRef.current &&
-          data.session_id === selectedSessionRef.current._id &&
-          data.userId !== currentUserId
+          data.session_id == selectedSessionRef.current._id &&
+          data.userId != currentUserId
         ) {
           // console.log("itsworking typing set");
-          // console.log("Typing ON");
+          console.log("Typing ON");
           setIsTyping(true);
 
           setTimeout(() => {
-            // console.log("Typing OFF");
+            console.log("Typing OFF");
             setIsTyping(false);
           }, 5000);
         }
@@ -515,9 +517,15 @@ function ChatsPage() {
               currentUserId={currentUserId}
             />
           </div>
-          <div className="flex-1 p-4">
+          <div className="flex-1 flex flex-col h-[calc(100vh-64px-48px)] p-4">
             {isConnected && (
               <Chat
+                fetchNextPage={fetchNextMessages}
+                fetchPreviousPage={fetchPreviousMessages}
+                hasNextPage={hasNextMessages}
+                hasPreviousPage={hasPreviousMessages}
+                isFetchingNextPage={isfetchingNextMessages}
+                isFetchingPreviousPage={isFetchingPreviousMessages}
                 onDeleteMessage={handleDeleteMessage}
                 onReportMessage={handleReportMessage}
                 onUpdateChatName={handleChatNameUpdate}

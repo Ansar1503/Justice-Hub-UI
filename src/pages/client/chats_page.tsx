@@ -77,10 +77,15 @@ function ChatsPage() {
 
   const {
     data: chatMessageData,
-    // fetchNextPage: fetchNextMessages,
-    // hasNextPage: hasNextMessages,
+    fetchNextPage: fetchNextMessages,
+    hasNextPage: hasNextMessages,
     // isLoading: isLoadingMessages,
+    fetchPreviousPage: fetchPreviousMessages,
+    hasPreviousPage: hasPreviousMessages,
+    isFetchingNextPage: isfetchingNextMessages,
+    isFetchingPreviousPage: isFetchingPreviousMessages,
   } = useInfiniteFetchMessages(selectedSession?._id || "");
+  // console.log("chatMessagesData", chatMessageData);
   const chatMessages =
     chatMessageData?.pages.flatMap((page) => page?.data) || [];
   const chatSessions =
@@ -169,7 +174,9 @@ function ChatsPage() {
         queryClient.setQueryData(
           ["user", "chatMessages", selectedSessionRef.current._id],
           (oldData: any) => {
+            console.log("oldData,delete", oldData);
             if (!oldData) return oldData;
+            console.log("oldData,delete", oldData);
             return {
               ...oldData,
               pages: oldData.pages.map((page: any, index: number) => {
@@ -515,9 +522,15 @@ function ChatsPage() {
               currentUserId={currentUserId}
             />
           </div>
-          <div className="flex-1 p-4">
+          <div className="flex-1 flex flex-col h-[calc(100vh-64px-48px)] p-4">
             {isConnected && (
               <Chat
+                fetchNextPage={fetchNextMessages}
+                fetchPreviousPage={fetchPreviousMessages}
+                hasNextPage={hasNextMessages}
+                hasPreviousPage={hasPreviousMessages}
+                isFetchingNextPage={isfetchingNextMessages}
+                isFetchingPreviousPage={isFetchingPreviousMessages}
                 onDeleteMessage={handleDeleteMessage}
                 onReportMessage={handleReportMessage}
                 onUpdateChatName={handleChatNameUpdate}
