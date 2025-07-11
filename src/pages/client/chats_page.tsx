@@ -17,6 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { disconnectSocket, getSocket } from "@/utils/socket/socket";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
+import { toast } from "react-toastify";
 
 enum SocketEvents {
   CONNECTED_EVENT = "user_connected",
@@ -213,6 +214,10 @@ function ChatsPage() {
             }),
           };
         });
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [data.lastMessage?.session_id || ""]: 0,
+        }));
       }
     );
     s.on(SocketEvents.SOCKET_ERROR_EVENT, (err: any) => {
@@ -269,7 +274,7 @@ function ChatsPage() {
         queryClient.setQueryData(
           ["client", "chatsessions"],
           (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
-            console.log("newMessage", newMessage);
+            // console.log("newMessage", newMessage);
             if (!oldData) return oldData;
             // console.log("oldData", oldData);
             return {
@@ -374,7 +379,7 @@ function ChatsPage() {
         type: file.type,
       })),
     };
-    console.log("send message");
+    // console.log("send message");
     s.emit(
       SocketEvents.SEND_MESSAGE_EVENT,
       newMessage,
@@ -439,70 +444,28 @@ function ChatsPage() {
   const handleDeleteMessage = async (messageId: string, sessionId: string) => {
     const s = socket.current;
     if (!s || !selectedSessionRef.current) return;
-    s.emit(
-      SocketEvents.MESSAGE_DELETE_EVENT,
-      { messageId, sessionId },
-      (response: {
-        success: boolean;
-        message: string;
-        lastMessage: ChatMessage | null;
-      }) => {
-        if (response.success) {
-          queryClient.setQueryData(
-            ["user", "chatMessages", selectedSessionRef.current._id],
-            (oldData: any) => {
-              if (!oldData) return oldData;
-              return {
-                ...oldData,
-                pages: oldData.pages.map((page: any, index: number) => {
-                  if (index === oldData.pages.length - 1) {
-                    return {
-                      ...page,
-                      data: page.data.filter(
-                        (msg: any) => msg._id !== messageId
-                      ),
-                    };
-                  }
-                  return page;
-                }),
-              };
-            }
-          );
-          queryClient.setQueryData(
-            ["client", "chatsessions"],
-            (oldData: any) => {
-              if (!oldData) return oldData;
-              return {
-                ...oldData,
-                pages: oldData?.pages?.map((page: any) => {
-                  return {
-                    ...page,
-                    data: page.data?.map((session: any) => {
-                      if (session._id === selectedSessionRef.current._id) {
-                        return {
-                          ...session,
-                          lastMessage: response.lastMessage,
-                        };
-                      }
-                      return session;
-                    }),
-                  };
-                }),
-              };
-            }
-          );
-        } else {
-          console.log(response);
-        }
-      }
-    );
+    s.emit(SocketEvents.MESSAGE_DELETE_EVENT, { messageId, sessionId });
   };
 
   const handleReportMessage = async (messageId: string, reason: string) => {
     const s = socket.current;
     if (!s || !selectedSession) return;
     // console.log("reason", reason);
-    s.emit(SocketEvents.REPORT_MESSAGE, { messageId, reason });
+    s.emit(
+      SocketEvents.REPORT_MESSAGE,
+      { messageId, reason, reportedBy: currentUserId },
+      (response: {
+        success: boolean;
+        reportedMessage?: ChatMessage;
+        error?: string;
+      }) => {
+        if (response.success) {
+          toast.success("message reported successfully");
+        } else {
+          toast.error(response.error);
+        }
+      }
+    );
   };
 
   return (

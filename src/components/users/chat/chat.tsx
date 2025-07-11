@@ -2,7 +2,16 @@
 
 import React, { useEffect } from "react";
 import { useState, useRef } from "react";
-import { Send, User, Paperclip, X, Scale, Trash2, Flag } from "lucide-react";
+import {
+  Send,
+  User,
+  Paperclip,
+  X,
+  Scale,
+  Trash2,
+  Flag,
+  Check,
+} from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -468,9 +477,9 @@ function Chat({
                               )}
                             </p>
                             {isOwn && (
-                              <div
-                                className={`w-2 h-2 rounded-full ${
-                                  message.read ? "bg-blue-500" : "bg-gray-400"
+                              <Check
+                                className={`w-4 h-4 ${
+                                  message.read ? "text-blue-500" : "text-gray-400"
                                 }`}
                               />
                             )}
