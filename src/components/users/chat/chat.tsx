@@ -34,13 +34,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { ChatMessage } from "@/types/types/ChatType";
+import type { AggregateChatSession, ChatMessage } from "@/types/types/ChatType";
 import moment from "moment-timezone";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import ChatDetailsModal from "./chatDetails.modal";
 
 interface ChatProps {
-  selectedSession: any | null;
+  onlineUsers: Record<string, boolean> | null;
+  selectedSession: AggregateChatSession | null;
   messages: ChatMessage[];
   onSendMessage: (message: string, attachments?: File[]) => void;
   onInputMessage: () => void;
@@ -58,6 +59,7 @@ interface ChatProps {
 }
 
 function Chat({
+  onlineUsers,
   fetchNextPage,
   // fetchPreviousPage,
   hasNextPage,
@@ -179,7 +181,11 @@ function Chat({
     appointmentDate.setHours(h, m, 0, 0);
     return currentDate > appointmentDate;
   }
-
+  const getSessionPartnerId = (session: AggregateChatSession) => {
+    return session.participants?.lawyer_id === currentUserId
+      ? session.participants?.client_id
+      : session.participants?.lawyer_id;
+  };
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if ((!newMessage.trim() && selectedFiles.length === 0) || !selectedSession)
@@ -226,8 +232,8 @@ function Chat({
   };
 
   const confirmDeleteMessage = () => {
-    if (onDeleteMessage && selectedMessageId) {
-      onDeleteMessage(selectedMessageId, selectedSession?._id);
+    if (onDeleteMessage && selectedMessageId && selectedSession?._id) {
+      onDeleteMessage(selectedMessageId, selectedSession._id);
     }
     setDeleteDialogOpen(false);
     setSelectedMessageId("");
@@ -284,7 +290,7 @@ function Chat({
       </div>
     );
   }
-
+  const partnerId = getSessionPartnerId(selectedSession);
   return (
     <>
       <Card className="h-full flex flex-col min-h-0">
@@ -296,6 +302,13 @@ function Chat({
             >
               {/* Main Avatar */}
               <div className="relative">
+                <div
+                  className={`rounded-full h-2 w-2 ${
+                    onlineUsers && onlineUsers[partnerId]
+                      ? " bg-green-500"
+                      : "bg-slate-800"
+                  } absolute top-0 right-1 z-10`}
+                />
                 <Avatar className="w-12 h-12 border-2 border-background shadow-md">
                   <AvatarImage
                     src={mainAvatarSrc || "/placeholder.svg"}
@@ -314,6 +327,13 @@ function Chat({
 
               {/* Secondary Avatar*/}
               <div className="absolute -bottom-1 -right-1">
+                {/* <div
+                  className={`rounded-full h-2 w-2 ${
+                    onlineUsers && onlineUsers[currentUserId]
+                      ? " bg-green-500"
+                      : "bg-slate-800"
+                  } absolute top-0 right-1 z-10`}
+                /> */}
                 <Avatar className="w-7 h-7 border-2 border-background shadow-lg">
                   <AvatarImage
                     src={secondaryAvatarSrc || "/placeholder.svg"}
@@ -479,7 +499,9 @@ function Chat({
                             {isOwn && (
                               <Check
                                 className={`w-4 h-4 ${
-                                  message.read ? "text-blue-500" : "text-gray-400"
+                                  message.read
+                                    ? "text-blue-500"
+                                    : "text-gray-400"
                                 }`}
                               />
                             )}
@@ -684,6 +706,7 @@ function Chat({
 
       {selectedSession && Object.keys(selectedSession).length > 0 && (
         <ChatDetailsModal
+          onlineUsers={onlineUsers}
           onUpdateChatName={onUpdateChatName}
           isOpen={isChatDetailsOpen}
           onClose={() => setIsChatDetailsOpen(false)}

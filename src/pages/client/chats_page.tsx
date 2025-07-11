@@ -41,7 +41,10 @@ function ChatsPage() {
   const [search, setSearch] = useState("");
   const [selectedSession, setSelectedSession] =
     useState<AggregateChatSession | null>(null);
-
+  const [onlineUsers, setOnlineUsers] = useState<Record<
+    string,
+    boolean
+  > | null>(null);
   // const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   // const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
@@ -165,6 +168,15 @@ function ChatsPage() {
         refreshTokenRequest();
       }
     });
+    s.on(
+      SocketEvents.USER_ONLINE_EVENT,
+      (data: { userId: string; online: boolean }) => {
+        setOnlineUsers((prev) => ({
+          ...prev,
+          [`${data?.userId}`]: data.online,
+        }));
+      }
+    );
     s.on(
       SocketEvents.MESSAGE_DELETE_EVENT,
       (data: {
@@ -474,6 +486,7 @@ function ChatsPage() {
         <div className="flex flex-1 ">
           <div className="w-80 border-r border-gray-200 dark:border-gray-700">
             <ChatList
+              onlineUsers={onlineUsers}
               searchTerm={search}
               setSearch={setSearch}
               sessions={chatSessions}
@@ -486,6 +499,7 @@ function ChatsPage() {
           <div className="flex-1 flex flex-col h-[calc(100vh-64px-48px)] p-4">
             {isConnected && (
               <Chat
+                onlineUsers={onlineUsers}
                 fetchNextPage={fetchNextMessages}
                 fetchPreviousPage={fetchPreviousMessages}
                 hasNextPage={hasNextMessages}

@@ -11,6 +11,7 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import React from "react";
 
 interface ChatListProps {
+  onlineUsers: Record<string, boolean> | null;
   sessions: AggregateChatSession[];
   selectedSession: AggregateChatSession | null;
   currentUserId: string;
@@ -21,6 +22,7 @@ interface ChatListProps {
 }
 
 function ChatList({
+  onlineUsers,
   sessions,
   searchTerm,
   setSearch,
@@ -58,11 +60,11 @@ function ChatList({
     );
     return currentDate > sessionEnd;
   };
-  // const getSessionPartnerId = (session: ChatSession) => {
-  //   return session.participants?.lawyer_id === currentUserId
-  //     ? session.participants?.client_id
-  //     : session.participants?.lawyer_id;
-  // };
+  const getSessionPartnerId = (session: AggregateChatSession) => {
+    return session.participants?.lawyer_id === currentUserId
+      ? session.participants?.client_id
+      : session.participants?.lawyer_id;
+  };
 
   // const getStatusColor = (status: ChatSession["status"]) => {
   //   switch (status) {
@@ -111,7 +113,7 @@ function ChatList({
           ) : (
             sessions.map((session) => {
               const unreadCount = unreadCounts[session?._id || ""] || 0;
-              // const partnerId = getSessionPartnerId(session);
+              const partnerId = getSessionPartnerId(session);
               const isCurrentUserClient =
                 session?.participants?.client_id === currentUserId;
               const mainAvatarSrc = isCurrentUserClient
@@ -147,6 +149,15 @@ function ChatList({
                     <div className="relative">
                       {/* Main Avatar */}
                       <div className="relative">
+                        <div
+                          className={`rounded-full h-2 w-2 ${
+                            !isSessionOver &&
+                            onlineUsers &&
+                            onlineUsers[partnerId]
+                              ? " bg-green-500"
+                              : "bg-slate-800"
+                          } absolute top-0 right-1 z-10`}
+                        />
                         <Avatar
                           className={`w-12 h-12 border-2 border-background shadow-md ${
                             isSessionOver && "opacity-50 blur-[1px]"
@@ -174,6 +185,15 @@ function ChatList({
 
                       {/* Secondary*/}
                       <div className="absolute -bottom-1 -right-1">
+                        {/* <div
+                          className={`rounded-full h-2 w-2 ${
+                            !isSessionOver &&
+                            onlineUsers &&
+                            onlineUsers[currentUserId]
+                              ? " bg-green-500"
+                              : "bg-slate-800"
+                          } absolute top-0 right-1 z-10`}
+                        /> */}
                         <Avatar className="w-7 h-7 border-2 border-background shadow-lg">
                           <AvatarImage
                             src={secondaryAvatarSrc || "/placeholder.svg"}

@@ -28,20 +28,23 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import moment from "moment-timezone";
 import { Input } from "@/components/ui/input";
+import { AggregateChatSession } from "@/types/types/ChatType";
 
 interface ChatDetailsModalProps {
+  onlineUsers: Record<string, boolean> | null;
   isOpen: boolean;
   onClose: () => void;
-  selectedSession: any;
+  selectedSession: AggregateChatSession;
   messages: any[];
   currentUserId: string;
   onEndSession?: () => void;
   onMuteSession?: () => void;
-  onViewProfile?: (userId: string) => void;
+  // onViewProfile?: (userId: string) => void;
   onUpdateChatName?: (newName: string, chatId: string) => void;
 }
 
 function ChatDetailsModal({
+  onlineUsers,
   isOpen,
   onClose,
   selectedSession,
@@ -49,7 +52,7 @@ function ChatDetailsModal({
   currentUserId,
   // onEndSession,
   //   onMuteSession,
-  onViewProfile,
+  // onViewProfile,
   onUpdateChatName,
 }: //   onUpdateChatName,
 ChatDetailsModalProps) {
@@ -65,22 +68,22 @@ ChatDetailsModalProps) {
   const lawyerData = selectedSession?.lawyerData;
   const sessionDetails = selectedSession?.sessionDetails;
   const sessionStartable = useMemo(() => {
-    if (!selectedSession || selectedSession.status !== "ongoing") return false;
+    if (!sessionDetails || sessionDetails?.status !== "ongoing") return false;
     console.log("not false");
     const currentDate = new Date();
-    const sessionDate = new Date(selectedSession.scheduled_date);
-    const [h, m] = selectedSession.scheduled_time
-      ? selectedSession.scheduled_time.split(":").map(Number)
+    const sessionDate = new Date(sessionDetails.scheduled_date);
+    const [h, m] = sessionDetails.scheduled_time
+      ? sessionDetails.scheduled_time.split(":").map(Number)
       : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     const sessionEnd = new Date(
-      sessionDate.getTime() + selectedSession.duration * 60000
+      sessionDate.getTime() + sessionDetails?.duration * 60000
     );
 
     return (
       currentDate >= sessionDate &&
       currentDate < sessionEnd &&
-      selectedSession?.status === "ongoing"
+      sessionDetails?.status === "ongoing"
     );
   }, [selectedSession]);
 
@@ -130,11 +133,11 @@ ChatDetailsModalProps) {
     )
       return null;
 
-    const startTime = sessionDetails?.startedAt
-      ? new Date(sessionDetails.startedAt)
+    const startTime = sessionDetails?.start_time
+      ? new Date(sessionDetails.start_time)
       : null;
-    const endTime = sessionDetails?.endedAt
-      ? new Date(sessionDetails.endedAt)
+    const endTime = sessionDetails?.end_time
+      ? new Date(sessionDetails.end_time)
       : new Date();
 
     if (!startTime) return null;
@@ -144,7 +147,11 @@ ChatDetailsModalProps) {
     );
     return `${Math.floor(duration / 60)}h ${duration % 60}m`;
   };
-
+  const getSessionPartnerId = (session: AggregateChatSession) => {
+    return session.participants?.lawyer_id === currentUserId
+      ? session.participants?.client_id
+      : session.participants?.lawyer_id;
+  };
   // const getMessageStats = () => {
   //   const totalMessages = messages.length;
   //   const clientMessages = messages.filter(
@@ -165,7 +172,9 @@ ChatDetailsModalProps) {
     if (editedChatName?.trim()?.length < 5) {
       setChatNameError("Chat name should be at least 5 characters");
     }
-    onUpdateChatName?.(editedChatName, selectedSession?._id);
+    if (selectedSession?._id) {
+      onUpdateChatName?.(editedChatName, selectedSession._id);
+    }
     setIsEditingName(false);
     setChatNameError("");
   };
@@ -178,7 +187,7 @@ ChatDetailsModalProps) {
 
   // const stats = getMessageStats();
   const duration = getSessionDuration();
-
+  const partnerId = getSessionPartnerId(selectedSession);
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[90vh] p-0">
@@ -193,6 +202,13 @@ ChatDetailsModalProps) {
               {/* Dual Avatar */}
               <div className="relative mx-auto w-fit">
                 <div className="relative">
+                  <div
+                    className={`rounded-full h-2 w-2 ${
+                      onlineUsers && onlineUsers[partnerId]
+                        ? " bg-green-500"
+                        : "bg-slate-800"
+                    } absolute top-0 right-1 z-10`}
+                  />
                   <Avatar className="w-20 h-20 border-4 border-background shadow-lg">
                     <AvatarImage
                       src={
@@ -374,12 +390,7 @@ ChatDetailsModalProps) {
 
               <div className="space-y-3">
                 {/* Lawyer */}
-                <div
-                  className="flex items-center gap-3 p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                  onClick={() =>
-                    onViewProfile?.(selectedSession?.participants?.lawyer_id)
-                  }
-                >
+                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
                       src={lawyerData?.profile_image || "/placeholder.svg"}
@@ -392,19 +403,24 @@ ChatDetailsModalProps) {
                     <div className="text-sm font-medium">
                       {lawyerData?.name}
                     </div>
-                    <div className="text-xs text-muted-foreground">Lawyer</div>
+                    <div className="flex flex-row justify-between">
+                      <div className="text-xs text-muted-foreground">
+                        Lawyer
+                      </div>
+                      {onlineUsers &&
+                      onlineUsers[selectedSession?.participants?.lawyer_id] ? (
+                        <span className="text-xs text-green-600">online</span>
+                      ) : (
+                        <span className="text-xs text-gray-600">offline</span>
+                      )}
+                    </div>
                   </div>
                   {/* implement online or offline here. */}
                   {/* <div className="w-2 h-2 bg-green-500 rounded-full" /> */}
                 </div>
 
                 {/* Client */}
-                <div
-                  className="flex items-center gap-3 p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                  onClick={() =>
-                    onViewProfile?.(selectedSession?.participants?.client_id)
-                  }
-                >
+                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg  hover:bg-muted/80 transition-colors">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
                       src={clientData?.profile_image || "/placeholder.svg"}
@@ -417,7 +433,17 @@ ChatDetailsModalProps) {
                     <div className="text-sm font-medium">
                       {clientData?.name}
                     </div>
-                    <div className="text-xs text-muted-foreground">Client</div>
+                    <div className="flex flex-row justify-between">
+                      <div className="text-xs text-muted-foreground">
+                        Client
+                      </div>
+                      {onlineUsers &&
+                      onlineUsers[selectedSession?.participants?.client_id] ? (
+                        <span className="text-xs text-green-600">online</span>
+                      ) : (
+                        <span className="text-xs text-gray-600">offline</span>
+                      )}
+                    </div>
                   </div>
                   {/* Implement Is Online Here
                   <div className="w-2 h-2 bg-green-500 rounded-full" /> */}
