@@ -40,7 +40,7 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import ChatDetailsModal from "./chatDetails.modal";
 
 interface ChatProps {
-  onlineUsers: Record<string, boolean> | null;
+  onlineUsers: Set<string>;
   selectedSession: AggregateChatSession | null;
   messages: ChatMessage[];
   onSendMessage: (message: string, attachments?: File[]) => void;
@@ -304,7 +304,7 @@ function Chat({
               <div className="relative">
                 <div
                   className={`rounded-full h-2 w-2 ${
-                    onlineUsers && onlineUsers[partnerId]
+                    onlineUsers && onlineUsers.has(partnerId)
                       ? " bg-green-500"
                       : "bg-slate-800"
                   } absolute top-0 right-1 z-10`}
@@ -591,6 +591,7 @@ function Chat({
                 ref={fileInputRef}
                 type="file"
                 multiple
+                max={5}
                 className="hidden"
                 onChange={handleFileSelect}
               />

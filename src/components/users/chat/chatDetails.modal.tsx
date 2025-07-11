@@ -29,9 +29,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import moment from "moment-timezone";
 import { Input } from "@/components/ui/input";
 import { AggregateChatSession } from "@/types/types/ChatType";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface ChatDetailsModalProps {
-  onlineUsers: Record<string, boolean> | null;
+  onlineUsers: Set<string>;
   isOpen: boolean;
   onClose: () => void;
   selectedSession: AggregateChatSession;
@@ -193,6 +194,7 @@ ChatDetailsModalProps) {
       <DialogContent className="max-w-md max-h-[90vh] p-0">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle>Chat Session Details</DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="max-h-[calc(90vh-80px)]">
@@ -204,7 +206,7 @@ ChatDetailsModalProps) {
                 <div className="relative">
                   <div
                     className={`rounded-full h-2 w-2 ${
-                      onlineUsers && onlineUsers[partnerId]
+                      onlineUsers && onlineUsers.has(partnerId)
                         ? " bg-green-500"
                         : "bg-slate-800"
                     } absolute top-0 right-1 z-10`}
@@ -408,7 +410,9 @@ ChatDetailsModalProps) {
                         Lawyer
                       </div>
                       {onlineUsers &&
-                      onlineUsers[selectedSession?.participants?.lawyer_id] ? (
+                      onlineUsers.has(
+                        selectedSession?.participants?.lawyer_id
+                      ) ? (
                         <span className="text-xs text-green-600">online</span>
                       ) : (
                         <span className="text-xs text-gray-600">offline</span>
@@ -438,7 +442,9 @@ ChatDetailsModalProps) {
                         Client
                       </div>
                       {onlineUsers &&
-                      onlineUsers[selectedSession?.participants?.client_id] ? (
+                      onlineUsers.has(
+                        selectedSession?.participants?.client_id
+                      ) ? (
                         <span className="text-xs text-green-600">online</span>
                       ) : (
                         <span className="text-xs text-gray-600">offline</span>

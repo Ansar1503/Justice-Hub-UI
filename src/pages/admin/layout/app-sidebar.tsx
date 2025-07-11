@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  Shield,
-  // Frame,
-  // Map,
-  // PieChart,
-  User,
-} from "lucide-react";
+import { CalendarDaysIcon, Shield, User } from "lucide-react";
 
 import { NavMain } from "./nav-main";
 // import { NavProjects } from "@/layout/admin/nav-projects";
@@ -33,10 +27,6 @@ const navdata = {
           title: "Users",
           url: "/admin/",
         },
-        // {
-        //   title: "lawyers",
-        //   url: "admin/lawyers",
-        // },
       ],
     },
     {
@@ -48,11 +38,21 @@ const navdata = {
           title: "Verification Management",
           url: "/admin/lawyer-verification",
         },
-        // {
-        //   title: "Input Management",
-        //   url: "/admin/lawyer-verification/input-management",
-        // },
-        
+      ],
+    },
+    {
+      title: "Sessions Details",
+      url: "/admin/sessions",
+      icon: CalendarDaysIcon,
+      items: [
+        {
+          title: "Sessions",
+          url: "/admin/sessions",
+        },
+        {
+          title: "Appointments",
+          url: "/admin/appointments,",
+        },
       ],
     },
   ],
@@ -62,14 +62,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data } = useFetchClientData();
   const user = data?.data?.role === "admin" ? data?.data : null;
   const location = useLocation();
-  
+
   const dashItems = navdata.navMain.map((item) => {
     if (item.url === "/admin/" && location.pathname === "/admin/") {
       return { ...item, isActive: true };
     }
-    
-    const isActive = item.url !== "/admin/" && location.pathname.startsWith(item.url);
-    
+
+    const isActive =
+      item.url !== "/admin/" && location.pathname.startsWith(item.url);
+
     return {
       ...item,
       isActive,

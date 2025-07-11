@@ -41,10 +41,7 @@ function ChatsPage() {
   const [search, setSearch] = useState("");
   const [selectedSession, setSelectedSession] =
     useState<AggregateChatSession | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<Record<
-    string,
-    boolean
-  > | null>(null);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set(""));
   // const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   // const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
@@ -168,15 +165,9 @@ function ChatsPage() {
         refreshTokenRequest();
       }
     });
-    s.on(
-      SocketEvents.USER_ONLINE_EVENT,
-      (data: { userId: string; online: boolean }) => {
-        setOnlineUsers((prev) => ({
-          ...prev,
-          [`${data?.userId}`]: data.online,
-        }));
-      }
-    );
+    s.on(SocketEvents.USER_ONLINE_EVENT, (data: { users: string[] }) => {
+      setOnlineUsers(new Set(data.users));
+    });
     s.on(
       SocketEvents.MESSAGE_DELETE_EVENT,
       (data: {

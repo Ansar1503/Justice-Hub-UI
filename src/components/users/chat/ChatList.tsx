@@ -11,7 +11,7 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import React from "react";
 
 interface ChatListProps {
-  onlineUsers: Record<string, boolean> | null;
+  onlineUsers: Set<string>;
   sessions: AggregateChatSession[];
   selectedSession: AggregateChatSession | null;
   currentUserId: string;
@@ -153,7 +153,7 @@ function ChatList({
                           className={`rounded-full h-2 w-2 ${
                             !isSessionOver &&
                             onlineUsers &&
-                            onlineUsers[partnerId]
+                            onlineUsers.has(partnerId)
                               ? " bg-green-500"
                               : "bg-slate-800"
                           } absolute top-0 right-1 z-10`}
