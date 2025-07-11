@@ -6,17 +6,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 // import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import type { ChatSession } from "@/types/types/ChatType";
+import type { AggregateChatSession } from "@/types/types/ChatType";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import React from "react";
 
 interface ChatListProps {
-  sessions: any[];
-  selectedSession: ChatSession | null;
+  sessions: AggregateChatSession[];
+  selectedSession: AggregateChatSession | null;
   currentUserId: string;
   searchTerm: string;
   setSearch: (search: string) => void;
-  onSelectSession: (session: ChatSession) => void;
+  onSelectSession: (session: AggregateChatSession) => void;
   unreadCounts?: Record<string, number>;
 }
 
@@ -43,6 +43,21 @@ function ChatList({
     return date.toLocaleDateString();
   };
 
+  const checkSessionOver = (session: AggregateChatSession) => {
+    if (!session) return false;
+    const currentDate = new Date();
+    const sessionDate = new Date(session?.sessionDetails?.scheduled_date);
+    const scheduledTime = selectedSession?.sessionDetails?.scheduled_time;
+    const [h, m] =
+      scheduledTime && typeof scheduledTime === "string"
+        ? scheduledTime.split(":").map(Number)
+        : [0, 0];
+    sessionDate.setHours(h, m, 0, 0);
+    const sessionEnd = new Date(
+      sessionDate.getTime() + session?.sessionDetails?.duration * 60000
+    );
+    return currentDate > sessionEnd;
+  };
   // const getSessionPartnerId = (session: ChatSession) => {
   //   return session.participants?.lawyer_id === currentUserId
   //     ? session.participants?.client_id
@@ -112,21 +127,31 @@ function ChatList({
               const secondaryAvatarName = isCurrentUserClient
                 ? session?.clientData?.name
                 : session?.lawyerData?.name;
+              const isSessionOver = checkSessionOver(session);
               return (
                 <div
                   key={session?._id}
-                  onClick={() => onSelectSession(session)}
+                  onClick={() => !isSessionOver && onSelectSession(session)}
                   className={`w-full p-3 mb-2 rounded-lg cursor-pointer transition-colors ${
                     selectedSession?._id === session?._id
                       ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
                       : "hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
+                  }
+                        ${
+                          isSessionOver
+                            ? "pointer-events-none line-through bg-red-300 dark:bg-red-950"
+                            : ""
+                        }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="relative">
                       {/* Main Avatar */}
                       <div className="relative">
-                        <Avatar className="w-12 h-12 border-2 border-background shadow-md">
+                        <Avatar
+                          className={`w-12 h-12 border-2 border-background shadow-md ${
+                            isSessionOver && "opacity-50 blur-[1px]"
+                          }`}
+                        >
                           <AvatarImage
                             src={mainAvatarSrc || "/placeholder.svg"}
                             alt={mainAvatarName || "User"}

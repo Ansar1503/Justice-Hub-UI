@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { useNavigate } from "react-router-dom";

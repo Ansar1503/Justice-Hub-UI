@@ -6,7 +6,7 @@ import Navbar from "./layout/Navbar";
 import Sidebar from "./layout/Sidebar";
 
 import { store } from "@/store/redux/store";
-import type { ChatMessage, ChatSession } from "@/types/types/ChatType";
+import type { AggregateChatSession, ChatMessage } from "@/types/types/ChatType";
 import Chat from "@/components/users/chat/chat";
 import {
   useInfiniteFetchChatforClient,
@@ -34,13 +34,13 @@ enum SocketEvents {
   MESSAGE_DELETE_EVENT = "messageDeleted",
   CHANGE_CHAT_NAME_EVENT = "changeChatName",
   SEND_MESSAGE_EVENT = "sendMessage",
+  READ_MESSAGE_EVENT = "readMessageEvent",
 }
 
 function ChatsPage() {
   const [search, setSearch] = useState("");
-  const [selectedSession, setSelectedSession] = useState<ChatSession | null>(
-    null
-  );
+  const [selectedSession, setSelectedSession] =
+    useState<AggregateChatSession | null>(null);
 
   // const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -175,9 +175,7 @@ function ChatsPage() {
         queryClient.setQueryData(
           ["user", "chatMessages", selectedSessionRef.current._id],
           (oldData: any) => {
-            console.log("oldData,delete", oldData);
             if (!oldData) return oldData;
-            console.log("oldData,delete", oldData);
             return {
               ...oldData,
               pages: oldData.pages.map((page: any, index: number) => {
@@ -216,7 +214,7 @@ function ChatsPage() {
         });
         setUnreadCounts((prev) => ({
           ...prev,
-          [data.lastMessage?.session_id || ""]: 0,
+          [data?.messageId || ""]: 0,
         }));
       }
     );
@@ -343,7 +341,7 @@ function ChatsPage() {
     };
   }, [token]);
 
-  const handleSelectSession = (session: ChatSession) => {
+  const handleSelectSession = (session: AggregateChatSession) => {
     // console.log("sessionselected", session);
     setSelectedSession(session);
     const s = socket.current;
