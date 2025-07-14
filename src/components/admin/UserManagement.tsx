@@ -50,7 +50,7 @@ export function UserManagement() {
   const [sortBy, setSortBy] = useState<"name" | "createdAt">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(2);
+  const [itemsPerPage] = useState(10);
 
   const { mutateAsync } = useBlockUser();
 
@@ -234,7 +234,7 @@ export function UserManagement() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-100 dark:bg-slate-800">
-                    <TableHead>User</TableHead>
+                  <TableHead>User</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Email Verified</TableHead>
                     {activeTab === "lawyer" && <TableHead>Status</TableHead>}

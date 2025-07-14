@@ -8,7 +8,7 @@ import {
   useCancelSessionByLawyer,
   useStartSession,
 } from "@/store/tanstack/mutations/sessionMutation";
-import ZegoVideoCall from "../ZegoCloud";
+// import ZegoVideoCall from "../ZegoCloud";
 import { useNavigate } from "react-router-dom";
 
 export type SessionStatus =

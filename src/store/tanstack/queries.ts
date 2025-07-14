@@ -10,6 +10,7 @@ import {
 } from "@/utils/api/services/clientServices";
 import {
   fetchAllLawyers,
+  fetchAppointmentsForAdmin,
   fetchUserByRole,
 } from "@/utils/api/services/adminServices";
 import { useQuery } from "@tanstack/react-query";
@@ -21,7 +22,11 @@ import {
   fetchSessionsforLawyers,
   fetchSlotSettings,
 } from "@/utils/api/services/LawyerServices";
-import { LawyerFilterParams } from "@/types/types/Client.data.type";
+import {
+  clientDataType,
+  LawyerFilterParams,
+  userDataType,
+} from "@/types/types/Client.data.type";
 import {
   Availability,
   OverrideDateResponse,
@@ -35,6 +40,7 @@ import {
 } from "@/components/users/AppointmentsComponent";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { SessionDocument } from "@/types/types/sessionType";
+import { Appointment } from "@/types/types/AppointmentsType";
 
 export function useFetchClientData() {
   return useQuery({
@@ -211,5 +217,56 @@ export function useFetchSessionDocuments(sessionId: string) {
     queryFn: () => fetchSessionDocuments(sessionId),
     staleTime: 1000 * 60 * 10,
     enabled: !!sessionId,
+  });
+}
+
+export function useFetchAppointmentsForAdmin(payload: {
+  search: string;
+  type: "consultation" | "follow-up" | "all";
+  status:
+    | "pending"
+    | "confirmed"
+    | "completed"
+    | "cancelled"
+    | "rejected"
+    | "all";
+  sortBy: "date" | "amount" | "lawyer_name" | "client_name";
+  sortOrder: "asc" | "desc";
+  limit: number;
+  page: number;
+}) {
+  return useQuery<
+    {
+      search: string;
+      type: "consultation" | "follow-up" | "all";
+      status:
+        | "pending"
+        | "confirmed"
+        | "completed"
+        | "cancelled"
+        | "rejected"
+        | "all";
+      sortBy: "date" | "amount" | "lawyer_name" | "client_name";
+      sortOrder: "asc" | "desc";
+      limit: number;
+      page: number;
+    },
+    Error,
+    {
+      data:
+        | (Appointment & {
+            clientData: userDataType & clientDataType;
+            lawyerData: userDataType & clientDataType;
+          })[]
+        | [];
+
+      totalCount: number;
+      currentPage: number;
+      totalPage: number;
+    }
+  >({
+    queryKey: ["admin", "appointments", payload],
+    queryFn: () => fetchAppointmentsForAdmin(payload),
+    staleTime: 1000 * 60 * 10,
   });
 }

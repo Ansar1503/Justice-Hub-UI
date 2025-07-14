@@ -56,7 +56,7 @@ export function LawyersList() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(2);
+  const [itemsPerPage] = useState(10);
   const { data, refetch: lawyerrefetch } = useFetchAllLawyers({
     sort: sortBy,
     order: sortOrder,

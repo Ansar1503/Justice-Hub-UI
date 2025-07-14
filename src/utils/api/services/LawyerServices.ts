@@ -190,4 +190,3 @@ export async function StartSession(sessionId: string) {
   );
   return response.data;
 }
-

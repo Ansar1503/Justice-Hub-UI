@@ -51,7 +51,7 @@ const navdata = {
         },
         {
           title: "Appointments",
-          url: "/admin/appointments,",
+          url: "/admin/appointments",
         },
       ],
     },
