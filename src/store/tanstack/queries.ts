@@ -11,6 +11,7 @@ import {
 import {
   fetchAllLawyers,
   fetchAppointmentsForAdmin,
+  fetchSessionsForAdmin,
   fetchUserByRole,
 } from "@/utils/api/services/adminServices";
 import { useQuery } from "@tanstack/react-query";
@@ -39,7 +40,7 @@ import {
   SortOrder,
 } from "@/components/users/AppointmentsComponent";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
-import { SessionDocument } from "@/types/types/sessionType";
+import { Session, SessionDocument } from "@/types/types/sessionType";
 import { Appointment } from "@/types/types/AppointmentsType";
 
 export function useFetchClientData() {
@@ -267,6 +268,51 @@ export function useFetchAppointmentsForAdmin(payload: {
   >({
     queryKey: ["admin", "appointments", payload],
     queryFn: () => fetchAppointmentsForAdmin(payload),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchSessionsForAdmin(payload: {
+  search: string;
+  type: "consultation" | "follow-up" | "all";
+  status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed" | "all";
+  sortBy: "date" | "amount" | "lawyer_name" | "client_name";
+  sortOrder: "asc" | "desc";
+  limit: number;
+  page: number;
+}) {
+  return useQuery<
+    {
+      search: string;
+      type: "consultation" | "follow-up" | "all";
+      status:
+        | "upcoming"
+        | "ongoing"
+        | "completed"
+        | "cancelled"
+        | "missed"
+        | "all";
+      sortBy: "date" | "amount" | "lawyer_name" | "client_name";
+      sortOrder: "asc" | "desc";
+      limit: number;
+      page: number;
+    },
+    Error,
+    {
+      data:
+        | (Session & {
+            clientData: userDataType & clientDataType;
+            lawyerData: userDataType & clientDataType;
+          })[]
+        | [];
+
+      totalCount: number;
+      currentPage: number;
+      totalPage: number;
+    }
+  >({
+    queryKey: ["admin", "sessions", payload],
+    queryFn: () => fetchSessionsForAdmin(payload),
     staleTime: 1000 * 60 * 10,
   });
 }

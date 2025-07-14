@@ -104,3 +104,21 @@ export async function fetchAppointmentsForAdmin(payload: {
   );
   return response.data;
 }
+
+export async function fetchSessionsForAdmin(payload: {
+  search: string;
+  type: "consultation" | "follow-up" | "all";
+  status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed" | "all";
+  sortBy: "date" | "amount" | "lawyer_name" | "client_name";
+  sortOrder: "asc" | "desc";
+  limit: number;
+  page: number;
+}) {
+  const { search, limit, page, sortBy, sortOrder, status, type } = payload;
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/admin/sessions?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}&type=${type}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
