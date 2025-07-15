@@ -11,6 +11,7 @@ import {
 import {
   fetchAllLawyers,
   fetchAppointmentsForAdmin,
+  fetchChatDisputes,
   fetchSessionsForAdmin,
   fetchUserByRole,
 } from "@/utils/api/services/adminServices";
@@ -42,6 +43,7 @@ import {
 import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { Session, SessionDocument } from "@/types/types/sessionType";
 import { Appointment } from "@/types/types/AppointmentsType";
+import { ChatMessage, ChatSession } from "@/types/types/ChatType";
 
 export function useFetchClientData() {
   return useQuery({
@@ -313,6 +315,42 @@ export function useFetchSessionsForAdmin(payload: {
   >({
     queryKey: ["admin", "sessions", payload],
     queryFn: () => fetchSessionsForAdmin(payload),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useFetchChatDisputes(payload: {
+  search: string;
+  sortBy: "All" | "session_date" | "reported_date";
+  sortOrder: "asc" | "desc";
+  limit: number;
+  page: number;
+}) {
+  return useQuery<
+    {
+      search: string;
+      sortBy: "All" | "session_date" | "reported_date";
+      sortOrder: "asc" | "desc";
+      limit: number;
+      page: number;
+    },
+    Error,
+    {
+      totalCount: number;
+      currentPage: number;
+      totalPage: number;
+      data:
+        | ({
+            chatSession: ChatSession & {
+              clientData: userDataType & clientDataType;
+              lawyerData: userDataType & clientDataType;
+            };
+          } & ChatMessage)[]
+        | [];
+    }
+  >({
+    queryKey: ["admin", "disputes", "chat", payload],
+    queryFn: () => fetchChatDisputes(payload),
     staleTime: 1000 * 60 * 10,
   });
 }

@@ -122,3 +122,19 @@ export async function fetchSessionsForAdmin(payload: {
   );
   return response.data;
 }
+
+export async function fetchChatDisputes(payload: {
+  search: string;
+  sortBy: "All" | "session_date" | "reported_date";
+  sortOrder: "asc" | "desc";
+  limit: number;
+  page: number;
+}) {
+  const { search, limit, page, sortBy, sortOrder } = payload;
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/admin/disputes/chat?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}

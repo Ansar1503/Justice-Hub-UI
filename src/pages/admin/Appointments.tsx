@@ -320,7 +320,7 @@ export default function Appointments() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center">
-                      No users found.
+                      No Appointments found.
                     </TableCell>
                   </TableRow>
                 )}

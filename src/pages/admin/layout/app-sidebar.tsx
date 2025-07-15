@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CalendarDaysIcon, Shield, User } from "lucide-react";
+import { CalendarDaysIcon, Headset, Shield, User } from "lucide-react";
 
 import { NavMain } from "./nav-main";
 // import { NavProjects } from "@/layout/admin/nav-projects";
@@ -55,9 +55,21 @@ const navdata = {
         },
       ],
     },
-    // {
-    //   title:""
-    // }
+    {
+      title: "Disputes",
+      url: "/admin/disputes/review",
+      icon: Headset,
+      items: [
+        {
+          title: "Reviews",
+          url: "/admin/disputes/review",
+        },
+        {
+          title: "Chats",
+          url: "/admin/disputes/chat",
+        },
+      ],
+    },
   ],
 };
 

@@ -5,6 +5,8 @@ const Sessions = lazy(() => import("@/pages/admin/Sessions"));
 import { Route, Routes } from "react-router-dom";
 import { Protected } from "./wrapper/admin.protect.route";
 import Appointments from "@/pages/admin/Appointments";
+import ChatDisputes from "@/pages/admin/ChatDisputes";
+import ReviewDisputes from "@/pages/admin/ReviewDisputes";
 
 const LawyerVerfication = lazy(
   () => import("@/pages/admin/VerificationInputs")
@@ -18,6 +20,8 @@ function AdminRoutes() {
         <Route path="/lawyer-verification" element={<LawyerVerfication />} />
         <Route path="/sessions" element={<Sessions />} />
         <Route path="/appointments" element={<Appointments />} />
+        <Route path="/disputes/chat" element={<ChatDisputes />} />
+        <Route path="/disputes/review" element={<ReviewDisputes />} />
       </Route>
     </Routes>
   );

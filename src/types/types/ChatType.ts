@@ -7,14 +7,10 @@ import { Session } from "./sessionType";
 
 export interface ChatSession {
   _id?: string;
-  appointment_id: string;
-  participants: {
-    lawyer_id: string;
-    client_id: string;
-  };
-  last_message?: string;
   name: string;
-  // status: "active" | "closed" | "cancelled";
+  participants: { lawyer_id: string; client_id: string };
+  last_message: string;
+  session_id: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -30,6 +26,10 @@ export interface ChatMessage {
     url: string;
     type: string;
   }[];
+  report?: {
+    reason: string;
+    reportedAt: Date;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
