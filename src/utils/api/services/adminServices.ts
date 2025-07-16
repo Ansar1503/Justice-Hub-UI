@@ -138,3 +138,12 @@ export async function fetchChatDisputes(payload: {
   );
   return response.data;
 }
+
+export async function deleteMessage(messageId: string) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.delete(
+    `/api/admin/disputes/chat/${messageId}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}

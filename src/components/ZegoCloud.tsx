@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
+// import { useNavigate } from "react-router-dom";
 
 export default function ZegoVideoCall({
   roomID,
@@ -12,7 +13,7 @@ export default function ZegoVideoCall({
 }) {
   const containerRef = useRef(null);
   const zegoInstanceRef = useRef<any>(null);
-
+  // const navigate = useNavigate();
   useEffect(() => {
     const appID = import.meta.env.VITE_ZEGO_APP_ID;
     const serverSecret = import.meta.env.VITE_ZEGO_SERVERSECRET;
@@ -32,6 +33,7 @@ export default function ZegoVideoCall({
       scenario: {
         mode: ZegoUIKitPrebuilt.VideoConference,
       },
+      showScreenSharingButton:false
     });
 
     return () => {

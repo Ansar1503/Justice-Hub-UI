@@ -45,6 +45,7 @@ import { Session, SessionDocument } from "@/types/types/sessionType";
 import { Appointment } from "@/types/types/AppointmentsType";
 import { ChatMessage, ChatSession } from "@/types/types/ChatType";
 
+
 export function useFetchClientData() {
   return useQuery({
     queryKey: ["user"],
@@ -354,3 +355,5 @@ export function useFetchChatDisputes(payload: {
     staleTime: 1000 * 60 * 10,
   });
 }
+
+

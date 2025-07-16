@@ -27,8 +27,6 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, Mail, Phone, Clock } from "lucide-react";
-import ReviewList from "@/components/users/ReviewList";
-import ReviewForm from "@/components/users/forms/ReviewForm";
 import { useParams } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -48,6 +46,7 @@ import { toast } from "react-toastify";
 import { Riple } from "react-loading-indicators";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import Reviews from "./Reviews";
 // import { LawerDataType } from "@/types/types/Client.data.type";
 
 export default function LawyerProfile() {
@@ -104,6 +103,7 @@ export default function LawyerProfile() {
     id || "",
     date || new Date()
   );
+
   useEffect(() => {
     const { token } = store.getState().Auth;
     async function deleteSession() {
@@ -118,8 +118,7 @@ export default function LawyerProfile() {
     }
     deleteSession();
   }, [sessionId, fetchSlots, refetchslotSettings]);
-  const slotDetailsData: { isAvailable: boolean; slots: string[] | [] } =
-    slotDetails?.data;
+  const slotDetailsData = slotDetails?.data;
 
   useEffect(() => {
     if (slotDetailsData && Object.keys(slotDetailsData).length > 0) {
@@ -226,7 +225,7 @@ export default function LawyerProfile() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 relative">
+    <div className="container mx-auto px-4 py-8 relative min-h-screen">
       {isSubmitting && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
@@ -244,7 +243,7 @@ export default function LawyerProfile() {
           </div>
         )}
         <div>
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 ">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader className="pb-4">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -613,82 +612,8 @@ export default function LawyerProfile() {
             </Card>
           </div>
         </div>
-
-        {/* Reviews Section */}
-        <div className="mt-8">
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="dark:text-white">
-                {isLoading ? <TextSkeleton width="w-32" /> : "Client Reviews"}
-              </CardTitle>
-              <CardDescription className="dark:text-gray-300">
-                {isLoading ? (
-                  <TextSkeleton width="w-64" />
-                ) : (
-                  "See what others are saying about this lawyer"
-                )}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  {isLoading ? (
-                    <div className="space-y-6">
-                      {Array(3)
-                        .fill(null)
-                        .map((_, idx) => (
-                          <div
-                            key={idx}
-                            className="border p-4 rounded-lg dark:border-gray-700"
-                          >
-                            <div className="flex items-center gap-2 mb-2">
-                              <Skeleton className="w-10 h-10 rounded-full" />
-                              <div className="space-y-1">
-                                <TextSkeleton width="w-24" />
-                                <div className="flex">
-                                  {Array(5)
-                                    .fill(null)
-                                    .map((_, starIdx) => (
-                                      <Skeleton
-                                        key={starIdx}
-                                        className="w-4 h-4 mr-1"
-                                      />
-                                    ))}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <TextSkeleton width="w-full" />
-                              <TextSkeleton width="w-3/4" />
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  ) : (
-                    <ReviewList />
-                  )}
-                </div>
-                <div>
-                  {isLoading ? (
-                    <div className="border p-4 rounded-lg dark:border-gray-700 space-y-4">
-                      <TextSkeleton width="w-32" />
-                      <div className="space-y-2">
-                        <TextSkeleton width="w-full" />
-                        <TextSkeleton width="w-full" />
-                        <TextSkeleton width="w-3/4" />
-                      </div>
-                      <div className="h-8 w-full">
-                        <Skeleton className="h-full w-full rounded" />
-                      </div>
-                    </div>
-                  ) : (
-                    <ReviewForm id={lawyerDetails?.user_id} />
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* session History */}
+        <Reviews user_id={lawyerDetails?.user_id} />
       </div>
     </div>
   );

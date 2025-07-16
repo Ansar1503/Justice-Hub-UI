@@ -1,5 +1,3 @@
- 
-
 import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
 import { useAppDispatch } from "@/store/redux/Hook";
 import {
@@ -238,7 +236,7 @@ export function useAddReview() {
   return useMutation<
     ResponseType,
     Error,
-    { lawyerId: string; rating: number; review: string }
+    { lawyerId: string; rating: number; review: string; heading: string }
   >({
     mutationFn: (payload) => addReview(payload),
     onSuccess: (data) => {
@@ -339,21 +337,10 @@ export function useConfirmAppointment() {
   });
 }
 
-// export function useFetchSessionsForLawyers() {
+// export function useDeleteMessage() {
 //   const queryClient = useQueryClient();
 //   return useMutation({
-//     mutationFn: (payload: {
-//       search: string;
-//       status: string;
-//       sort: string;
-//       order: "asc" | "desc";
-//       consultation_type: string;
-//       page: number;
-//       limit: number;
-//     }) => fetchSessionsforLawyers(payload),
-//     onSuccess:(updated)=>{
-//       toast.success(updated.message || "success")
+//     mutationFn: (messageId: string) => deleteMessage(messageId),
 
-//     }
 //   });
 // }

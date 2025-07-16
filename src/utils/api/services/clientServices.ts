@@ -114,6 +114,7 @@ export async function addReview(payload: {
   review: string;
   rating: number;
   lawyerId: string;
+  heading: string ;
 }) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.post(
@@ -289,6 +290,18 @@ export async function removeDocumentFile(id: string, sessionId: string) {
     `/api/client/profile/sessions/document/${id}?session=${sessionId}`,
     {
       headers: { Authorization: `Bearer ${store.getState().Auth.token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function fetchReviews(pageParam: any, lawyer_id: string) {
+  // console.log("lawyerId", lawyer_id, "cursort", pageParam);
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/client/lawyers/reviews/${lawyer_id}?cursor=${pageParam}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
     }
   );
   return response.data;

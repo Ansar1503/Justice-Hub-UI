@@ -1,6 +1,7 @@
 import {
   fetchChatMessages,
   fetchChatsForClientApi,
+  fetchReviews,
 } from "@/utils/api/services/clientServices";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
@@ -24,5 +25,15 @@ export function useInfiniteFetchMessages(sessionId: string) {
       pages: [...data.pages].reverse(),
     }),
     enabled: sessionId ? true : false,
+  });
+}
+
+export function useInfiniteFetchReviews(lawyer_id: string) {
+  return useInfiniteQuery({
+    queryKey: ["client", "review", lawyer_id],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => fetchReviews(pageParam, lawyer_id),
+    getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
+    enabled: lawyer_id ? true : false,
   });
 }

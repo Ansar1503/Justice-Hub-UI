@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -22,13 +22,14 @@ import {
   MessageSquareIcon,
   FileIcon,
   ImageIcon,
-  CheckIcon,
+  // CheckIcon,
   XIcon,
   EyeOffIcon,
 } from "lucide-react";
 import Confirmation from "@/components/Confirmation";
 import { ChatMessage, ChatSession } from "@/types/types/ChatType";
 import { clientDataType, userDataType } from "@/types/types/Client.data.type";
+import { useBlockUser } from "@/store/tanstack/mutations";
 
 interface ChatDisputeDetailsProps {
   dispute: ChatMessage & {
@@ -40,10 +41,6 @@ interface ChatDisputeDetailsProps {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  //   onResolveDispute?: (
-  //     disputeId: string,
-  //     action: "dismiss" | "warn" | "suspend" | "delete"
-  //   ) => void;
 }
 
 export default function ChatDisputeDetailsModal({
@@ -51,18 +48,14 @@ export default function ChatDisputeDetailsModal({
   trigger,
   open,
   onOpenChange,
-}: //   onResolveDispute,
-ChatDisputeDetailsProps) {
+}: ChatDisputeDetailsProps) {
   const [isOpen, setIsOpen] = useState(open || false);
-  const [contextMessages, setContextMessages] = useState<{
-    previousMessages: any[];
-    nextMessages: any[];
-  }>({ previousMessages: [], nextMessages: [] });
-  const [loading, setLoading] = useState(false);
   const [showResolveConfirm, setShowResolveConfirm] = useState(false);
   const [resolveAction, setResolveAction] = useState<
-    "dismiss" | "warn" | "suspend" | "delete"
+    "dismiss" | "suspend" | "delete"
   >("dismiss");
+
+  const { mutateAsync: blockUser } = useBlockUser();
 
   const handleOpenChange = (newOpen: boolean) => {
     if (onOpenChange) {
@@ -71,11 +64,6 @@ ChatDisputeDetailsProps) {
       setIsOpen(newOpen);
     }
   };
-
-  //   useEffect(() => {
-  //     if ((open !== undefined ? open : isOpen) && dispute) {
-  //     }
-  //   }, [open, isOpen, dispute]);
 
   const getInitials = (name: string) => {
     return name
@@ -87,7 +75,7 @@ ChatDisputeDetailsProps) {
   };
 
   const formatTime = (date: Date) => {
-    return format(date, "HH:mm");
+    return format(date, "hh:mm a");
   };
 
   const formatDate = (date: Date) => {
@@ -106,7 +94,7 @@ ChatDisputeDetailsProps) {
       : "Client";
   };
 
-  const renderMessage = (message: any, isDisputed = false) => {
+  const renderMessage = (message: ChatMessage, isDisputed = false) => {
     const userData = getUserData(message.senderId);
     const userRole = getUserRole(message.senderId);
     const isLawyer =
@@ -137,7 +125,7 @@ ChatDisputeDetailsProps) {
               {userRole}
             </Badge>
             <span className="text-xs text-muted-foreground">
-              {formatTime(message.createdAt)}
+              {formatTime(new Date(message.createdAt || ""))}
             </span>
             {isDisputed && (
               <Badge variant="destructive" className="text-xs">
@@ -171,15 +159,15 @@ ChatDisputeDetailsProps) {
     );
   };
 
-  const handleResolveDispute = (
-    action: "dismiss" | "warn" | "suspend" | "delete"
-  ) => {
+  const handleResolveDispute = (action: "dismiss" | "suspend" | "delete") => {
     setResolveAction(action);
     setShowResolveConfirm(true);
   };
 
-  const confirmResolveDispute = () => {
-    // onResolveDispute?.(dispute._id!, resolveAction);
+  const confirmResolveDispute = async () => {
+    if (resolveAction == "suspend") {
+      await blockUser(dispute.senderId);
+    }
     setShowResolveConfirm(false);
     handleOpenChange(false);
   };
@@ -191,7 +179,7 @@ ChatDisputeDetailsProps) {
       case "warn":
         return "warn the user";
       case "suspend":
-        return "suspend the user";
+        return "Block the user";
       case "delete":
         return "delete the message";
       default:
@@ -285,26 +273,8 @@ ChatDisputeDetailsProps) {
               </h4>
               <ScrollArea className="h-96 pr-4">
                 <div className="space-y-3">
-                  {loading ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      Loading context messages...
-                    </div>
-                  ) : (
-                    <>
-                      {/* Previous Messages */}
-                      {contextMessages.previousMessages.map((message) =>
-                        renderMessage(message)
-                      )}
-
-                      {/* Disputed Message */}
-                      {renderMessage(dispute, true)}
-
-                      {/* Next Messages */}
-                      {contextMessages.nextMessages.map((message) =>
-                        renderMessage(message)
-                      )}
-                    </>
-                  )}
+                  {/* Disputed Message */}
+                  {renderMessage(dispute, true)}
                 </div>
               </ScrollArea>
             </div>
@@ -317,27 +287,27 @@ ChatDisputeDetailsProps) {
               Close
             </Button>
             <div className="flex gap-2">
-              <Button
+              {/* <Button
                 variant="secondary"
                 onClick={() => handleResolveDispute("dismiss")}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800"
               >
                 <CheckIcon className="h-4 w-4 mr-2" />
                 Dismiss
-              </Button>
-              <Button
+              </Button> */}
+              {/* <Button
                 variant="secondary"
                 onClick={() => handleResolveDispute("warn")}
                 className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800"
               >
-                {/* <AlertTriangleIcon className="h-4 w-4 mr-2" />
+                <AlertTriangleIcon className="h-4 w-4 mr-2" />
                 Warn User
-              </Button>
+              </Button> */}
               <Button
                 variant="secondary"
                 onClick={() => handleResolveDispute("suspend")}
                 className="bg-orange-100 hover:bg-orange-200 text-orange-800"
-              > */}
+              >
                 <EyeOffIcon className="h-4 w-4 mr-2" />
                 Block User
               </Button>
