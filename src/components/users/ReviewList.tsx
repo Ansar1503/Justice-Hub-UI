@@ -1,7 +1,7 @@
 "use client";
 
 import type { Review } from "@/types/types/Review";
-import { Star, MoreVertical, Edit, Flag } from "lucide-react";
+import { Star, MoreVertical, Edit, Flag, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,15 +19,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { RadioGroup } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { store } from "@/store/redux/store";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { useUpdateReview } from "@/store/tanstack/mutations";
+import {
+  useDeleteReview,
+  useReportReview,
+  useUpdateReview,
+} from "@/store/tanstack/mutations";
 
 type ReviewWithReporter = Review & {
   reviewedBy?: {
+    _id?: string;
     name?: string | null;
     profile_image?: string | null;
   };
@@ -51,9 +55,9 @@ export default function ReviewList({ reviews }: Props) {
   const { user } = store.getState().Auth;
   const currentUserId = user?.user_id;
   const [showReportModal, setShowReportModal] = useState(false);
-  const [selectedReviewId, setSelectedReviewId] = useState<string>("");
+  const [selectedReportReviewId, setSelectedReportReviewId] =
+    useState<string>("");
   const [reportReason, setReportReason] = useState("");
-  const [reportDetails, setReportDetails] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editableReviewId, setEditableReviewId] = useState<string>("");
   const [editHeading, setEditHeading] = useState("");
@@ -61,9 +65,17 @@ export default function ReviewList({ reviews }: Props) {
   const [editRating, setEditRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState<string>("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [reportedBy, setRepotedBy] = useState("");
+  const [reportedUser, setReportedUser] = useState("");
 
   const { mutateAsync: updateReviewAsync } = useUpdateReview();
+  const { mutateAsync: deleteReviewAsync } = useDeleteReview();
+  const { mutateAsync: reportReviewAsync } = useReportReview();
 
+  // console.log('review',reviews)
   const handleEditClick = (reviewId: string) => {
     const reviewToEdit = reviews?.find((r) => r._id === reviewId);
     // console.log("reviewToEdit:", reviewToEdit);
@@ -83,6 +95,31 @@ export default function ReviewList({ reviews }: Props) {
     setEditComment("");
     setEditRating(0);
     setHoveredRating(0);
+  };
+
+  const handleDeleteClick = (reviewId: string) => {
+    setReviewToDelete(reviewId);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!reviewToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteReviewAsync({ review_id: reviewToDelete });
+      setShowDeleteConfirm(false);
+      setReviewToDelete("");
+    } catch (error: any) {
+      toast.error("Failed to delete review", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false);
+    setReviewToDelete("");
   };
 
   const handleEditSubmit = async (reviewId: string) => {
@@ -108,9 +145,15 @@ export default function ReviewList({ reviews }: Props) {
     }
   };
 
-  const handleReportClick = (reviewId: string) => {
+  const handleReportClick = (
+    reviewId: string,
+    reportedBy: string,
+    reportedUser: string
+  ) => {
     setTimeout(() => {
-      setSelectedReviewId(reviewId);
+      setRepotedBy(reportedBy);
+      setReportedUser(reportedUser);
+      setSelectedReportReviewId(reviewId);
       setShowReportModal(true);
     }, 0);
   };
@@ -121,6 +164,22 @@ export default function ReviewList({ reviews }: Props) {
       return;
     }
     setIsSubmitting(true);
+    try {
+      await reportReviewAsync({
+        review_id: selectedReportReviewId,
+        reason: reportReason,
+        reportedBy: reportedBy,
+        reportedUser: reportedUser,
+      });
+    } catch (error) {
+      console.log("error reporting", error);
+    } finally {
+      setIsSubmitting(false);
+      setRepotedBy("");
+      setReportReason("");
+      setReportedUser("");
+      setShowReportModal(false);
+    }
   };
 
   return (
@@ -182,15 +241,32 @@ export default function ReviewList({ reviews }: Props) {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               {currentUserId === review.client_id ? (
-                                <DropdownMenuItem
-                                  onClick={() => handleEditClick(review._id)}
-                                >
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Edit Review
-                                </DropdownMenuItem>
+                                <>
+                                  <DropdownMenuItem
+                                    onClick={() => handleEditClick(review._id)}
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Edit Review
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleDeleteClick(review._id)
+                                    }
+                                    className="text-red-600 focus:text-red-600"
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Review
+                                  </DropdownMenuItem>
+                                </>
                               ) : (
                                 <DropdownMenuItem
-                                  onClick={() => handleReportClick(review._id)}
+                                  onClick={() =>
+                                    handleReportClick(
+                                      review._id,
+                                      review.client_id,
+                                      review.reviewedBy?._id || ""
+                                    )
+                                  }
                                 >
                                   <Flag className="mr-2 h-4 w-4" />
                                   Report Review
@@ -327,16 +403,11 @@ export default function ReviewList({ reviews }: Props) {
               <Textarea
                 id="details"
                 placeholder="Please provide more details about why you're reporting this review..."
-                value={reportDetails}
-                onChange={(e) => setReportDetails(e.target.value)}
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
                 className="mt-1"
                 rows={3}
               />
-              <RadioGroup
-                value={reportReason}
-                onValueChange={setReportReason}
-                className="mt-2"
-              ></RadioGroup>
             </div>
           </div>
           <DialogFooter>
@@ -352,6 +423,35 @@ export default function ReviewList({ reviews }: Props) {
               disabled={!reportReason || isSubmitting}
             >
               {isSubmitting ? "Reporting..." : "Submit Report"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Review</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this review? This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleDeleteCancel}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Review"}
             </Button>
           </DialogFooter>
         </DialogContent>

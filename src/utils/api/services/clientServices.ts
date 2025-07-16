@@ -331,3 +331,31 @@ export async function updateReview(payload: Partial<Review>) {
   );
   return response.data;
 }
+
+export async function deleteReview(payload: { review_id: string }) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.delete(
+    `/api/client/profile/reviews/${payload.review_id}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function reportReview(payload: {
+  review_id: string;
+  reportedBy:string;
+  reportedUser:string;
+  reason: string;
+}) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    `/api/client/profile/reviews/report/${payload.review_id}`,
+    {
+      reason: payload.reason,
+      reportedBy: payload.reportedBy,
+      reportedUser: payload.reportedUser,
+    },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}

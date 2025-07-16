@@ -61,7 +61,6 @@ export default function ReviewForm({
       setHeading("");
       setComment("");
       setRating(0);
-      toast.success("Review submitted successfully!");
       onReviewSubmitted?.();
     } catch (error: any) {
       toast.error("Failed to submit review. Please try again.", error);

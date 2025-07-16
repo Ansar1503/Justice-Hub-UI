@@ -13,6 +13,8 @@ import {
 import {
   addReview,
   cancellAppointment,
+  deleteReview,
+  reportReview,
   sendVerificationMail,
   updateAddress,
   updateBasicInfo,
@@ -350,12 +352,12 @@ export function useUpdateReview() {
   return useMutation({
     mutationFn: (payload: Partial<Review>) => updateReview(payload),
     onSuccess: (data) => {
-      console.log("data", data);
+      // console.log("data", data);
       queryClient.setQueryData(
         ["client", "reviews", data?.session_id],
         (old: any | undefined) => {
           if (!old) return old;
-          console.log("oldData while update review : ", old);
+          // console.log("oldData while update review : ", old);
           return old.map((review: any) => {
             if (review._id === data._id) {
               return {
@@ -370,6 +372,53 @@ export function useUpdateReview() {
       );
     },
     onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong!";
+      toast.error(message);
+    },
+  });
+}
+
+export function useDeleteReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { review_id: string }) => deleteReview(payload),
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ["client", "reviews", data?.session_id],
+        (old: any | undefined) => {
+          if (!old) return old;
+          return old.filter((review: any) => review._id !== data._id);
+        }
+      );
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong!";
+      toast.error(message);
+    },
+  });
+}
+
+export function useReportReview() {
+  // const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      review_id: string;
+      reportedBy: string;
+      reportedUser: string;
+      reason: string;
+    }) => reportReview(payload),
+    onSuccess: () => {
+      toast.success("Review Reported Successfully");
+      // queryClient.setQueryData(["client","reviews",data?.session])
+    },
+    onError: (error: any) => {
+      console.log("error :",error)
       const message =
         error?.response?.data?.message ||
         error?.message ||
