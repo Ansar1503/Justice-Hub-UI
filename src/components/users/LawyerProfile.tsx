@@ -613,7 +613,9 @@ export default function LawyerProfile() {
           </div>
         </div>
         {/* session History */}
-        <Reviews user_id={lawyerDetails?.user_id} />
+        <div className="mt-3">
+          <Reviews user_id={lawyerDetails?.user_id} />
+        </div>
       </div>
     </div>
   );

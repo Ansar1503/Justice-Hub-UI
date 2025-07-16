@@ -4,6 +4,7 @@ import {
   fetchLawyerDetails,
   fetchLawyersByQuery,
   fetchLawyerSlotSettings,
+  fetchReviewsBySession,
   fetchSessionDocuments,
   fetchSessionsforClients,
   fetchSlotsforClients,
@@ -44,7 +45,7 @@ import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { Session, SessionDocument } from "@/types/types/sessionType";
 import { Appointment } from "@/types/types/AppointmentsType";
 import { ChatMessage, ChatSession } from "@/types/types/ChatType";
-
+import { Review } from "@/types/types/Review";
 
 export function useFetchClientData() {
   return useQuery({
@@ -316,7 +317,7 @@ export function useFetchSessionsForAdmin(payload: {
   >({
     queryKey: ["admin", "sessions", payload],
     queryFn: () => fetchSessionsForAdmin(payload),
-    staleTime: 1000 * 60 * 10,
+    // staleTime: 1000 * 60 * 10,
   });
 }
 
@@ -352,8 +353,22 @@ export function useFetchChatDisputes(payload: {
   >({
     queryKey: ["admin", "disputes", "chat", payload],
     queryFn: () => fetchChatDisputes(payload),
-    staleTime: 1000 * 60 * 10,
+    // staleTime: 1000 * 60 * 10,
   });
 }
 
-
+export function useFetchReviewsBySession(sessionId: string) {
+  return useQuery<
+    string,
+    Error,
+    {
+      reviewedBy?: {
+        name?: string | null;
+        profile_image?: string | null;
+      };
+    } & Review[]
+  >({
+    queryKey: ["client", "reviews", sessionId],
+    queryFn: () => fetchReviewsBySession(sessionId),
+  });
+}

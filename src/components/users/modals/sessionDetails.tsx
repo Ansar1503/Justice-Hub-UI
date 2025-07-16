@@ -1,3 +1,7 @@
+"use client";
+
+import type React from "react";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   Calendar,
@@ -37,6 +41,7 @@ import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { useRemoveFile } from "@/store/tanstack/mutations/sessionMutation";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import FeedbackModal from "@/components/users/modals/Feedback";
 
 interface Session {
   _id: string;
@@ -122,6 +127,7 @@ export default function SessionDetailModal({
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -149,7 +155,7 @@ export default function SessionDetailModal({
   const formatTime = useCallback((timeString: string | undefined) => {
     if (!timeString) return "";
     const [hourStr, minute] = timeString.split(":");
-    let hour = parseInt(hourStr, 10);
+    let hour = Number.parseInt(hourStr, 10);
     const ampm = hour >= 12 ? "PM" : "AM";
     hour = hour % 12 || 12;
     return `${hour}:${minute} ${ampm}`;
@@ -326,7 +332,7 @@ export default function SessionDetailModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide">
           <DialogHeader>
             <div className="flex items-center gap-3">
               {getStatusIcon(session.status)}
@@ -584,6 +590,15 @@ export default function SessionDetailModal({
                 </p>
               </div>
             )}
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <Button
+                variant={"default"}
+                className="w-full"
+                onClick={() => setShowFeedbackModal(true)}
+              >
+                View Feedback & Reviews
+              </Button>
+            </div>
           </div>
 
           <DialogFooter className="sm:justify-between">
@@ -696,6 +711,13 @@ export default function SessionDetailModal({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <FeedbackModal
+        sessionId={session?._id || ""}
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        lawyerId={session.userData?.user_id || ""}
+        lawyerName={session.userData.name || "Unknown Lawyer"}
+      />
     </>
   );
 }

@@ -236,7 +236,13 @@ export function useAddReview() {
   return useMutation<
     ResponseType,
     Error,
-    { lawyerId: string; rating: number; review: string; heading: string }
+    {
+      lawyerId: string;
+      rating: number;
+      review: string;
+      heading: string;
+      sessionId: string;
+    }
   >({
     mutationFn: (payload) => addReview(payload),
     onSuccess: (data) => {

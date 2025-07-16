@@ -1,3 +1,5 @@
+"use client";
+
 import { useInfiniteFetchReviews } from "@/store/tanstack/infiniteQuery";
 import {
   Card,
@@ -5,24 +7,29 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Skeleton } from "../ui/skeleton";
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import ReviewList from "./ReviewList";
+import { useFetchReviewsBySession } from "@/store/tanstack/queries";
 
 type Props = {
   user_id: string;
+  sessoin_id: string;
 };
+
 const TextSkeleton = ({ width }: { width: string }) => (
   <Skeleton className={`h-5 ${width} rounded`} />
 );
 
-export default function Reviews({ user_id }: Props) {
-  //   console.log("usersid", user_id);
+export default function Reviews({ user_id, sessoin_id }: Props) {
+//   console.log("sessionId", sessoin_id);
+  const { data: ReviewDataBySession } = useFetchReviewsBySession(sessoin_id);
   const { isLoading, data: ReviewsData } = useInfiniteFetchReviews(user_id);
   const Reviews = ReviewsData?.pages.flatMap((page) => page?.data) || [];
+  console.log("ReviewsData", ReviewDataBySession);
 
   return (
-    <div className="mt-8">
+    <div>
       <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="dark:text-white">
@@ -72,26 +79,9 @@ export default function Reviews({ user_id }: Props) {
                     ))}
                 </div>
               ) : (
-                <ReviewList reviews={Reviews} />
+                <ReviewList reviews={ReviewDataBySession || Reviews} />
               )}
             </div>
-            {/* <div>
-              {isLoading ? (
-                <div className="border p-4 rounded-lg dark:border-gray-700 space-y-4">
-                  <TextSkeleton width="w-32" />
-                  <div className="space-y-2">
-                    <TextSkeleton width="w-full" />
-                    <TextSkeleton width="w-full" />
-                    <TextSkeleton width="w-3/4" />
-                  </div>
-                  <div className="h-8 w-full">
-                    <Skeleton className="h-full w-full rounded" />
-                  </div>
-                </div>
-              ) : (
-                <ReviewForm id={user_id} />
-              )}
-            </div> */}
           </div>
         </CardContent>
       </Card>
