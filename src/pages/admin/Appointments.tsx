@@ -248,7 +248,7 @@ export default function Appointments() {
                             <div className="flex items-center gap-3 cursor-pointer">
                               <Avatar>
                                 {appointment.clientData.profile_image ? (
-                                  <AvatarImage
+                                  <AvatarImage className="w-10 rounded-full "
                                     src={appointment.clientData.profile_image}
                                     alt={appointment.clientData.name}
                                   />

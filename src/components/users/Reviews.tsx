@@ -26,7 +26,7 @@ export default function Reviews({ user_id, sessoin_id }: Props) {
   const { data: ReviewDataBySession } = useFetchReviewsBySession(sessoin_id);
   const { isLoading, data: ReviewsData } = useInfiniteFetchReviews(user_id);
   const Reviews = ReviewsData?.pages.flatMap((page) => page?.data) || [];
-  console.log("ReviewsData", ReviewDataBySession);
+//   console.log("ReviewsData", ReviewDataBySession);
 
   return (
     <div>

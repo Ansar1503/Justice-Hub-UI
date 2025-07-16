@@ -12,6 +12,7 @@ import {
   SortField,
   SortOrder,
 } from "@/components/users/AppointmentsComponent";
+import { Review } from "@/types/types/Review";
 
 export async function fetchClientData() {
   const { token } = store.getState().Auth;
@@ -312,6 +313,18 @@ export async function fetchReviewsBySession(sessionId: string) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
     `/api/client/profile/sessions/reviews/${sessionId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function updateReview(payload: Partial<Review>) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.put(
+    `/api/client/profile/reviews/${payload._id}`,
+    payload,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

@@ -370,5 +370,6 @@ export function useFetchReviewsBySession(sessionId: string) {
   >({
     queryKey: ["client", "reviews", sessionId],
     queryFn: () => fetchReviewsBySession(sessionId),
+    enabled: sessionId ? true : false,
   });
 }
