@@ -191,6 +191,7 @@ export default function SessionDetailModal({
 
   // Session status checks
   const sessionStartable = useMemo(() => {
+    return true
     if (!session || !session.room_id) return false;
 
     const currentDate = new Date();

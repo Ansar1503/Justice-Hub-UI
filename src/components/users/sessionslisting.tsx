@@ -6,7 +6,10 @@ import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/users/modals/sessionDetails";
 import { useFetchsessionsForclients } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { useCancelSessionByClient } from "@/store/tanstack/mutations/sessionMutation";
+import {
+  useCancelSessionByClient,
+  useEndSession,
+} from "@/store/tanstack/mutations/sessionMutation";
 import { useNavigate } from "react-router-dom";
 
 export type SessionStatus =
@@ -43,7 +46,7 @@ export default function SessionsListing() {
     }
   };
   const { mutateAsync: sessionCancel } = useCancelSessionByClient();
-
+  const { mutateAsync: endSessionAsync } = useEndSession();
   const { data: sessionsData, refetch: sessionRefetch } =
     useFetchsessionsForclients({
       consultation_type: typeFilter,
@@ -163,11 +166,12 @@ export default function SessionsListing() {
   };
 
   const handleEndSession = async (sessionId: string) => {
-    console.log("Ending session:", sessionId);
+    // console.log("Ending session:", sessionId);
+    await endSessionAsync(sessionId);
   };
 
   const handleCancelSession = async (sessionId: string) => {
-    console.log("Cancelling session in client:", sessionId);
+    // console.log("Cancelling session in client:", sessionId);
     await sessionCancel({ id: sessionId });
     setIsModalOpen(false);
   };

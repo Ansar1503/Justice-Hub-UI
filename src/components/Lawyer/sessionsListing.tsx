@@ -6,6 +6,7 @@ import { useFetchSessionsForLawyers } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   useCancelSessionByLawyer,
+  useEndSession,
   useStartSession,
 } from "@/store/tanstack/mutations/sessionMutation";
 // import ZegoVideoCall from "../ZegoCloud";
@@ -47,6 +48,7 @@ export default function SessionsListing() {
     }
   };
   const { mutateAsync: CancelSession } = useCancelSessionByLawyer();
+  const { mutateAsync: endSessionAsync } = useEndSession();
 
   const { data: sessionsData, refetch: sessionRefetch } =
     useFetchSessionsForLawyers({
@@ -175,7 +177,7 @@ export default function SessionsListing() {
   };
 
   const handleEndSession = async (sessionId: string) => {
-    console.log("Ending session:", sessionId);
+    await endSessionAsync(sessionId);
   };
 
   const handleCancelSession = async (sessionId: string) => {

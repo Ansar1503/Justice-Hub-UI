@@ -1,3 +1,4 @@
+import { store } from "@/store/redux/store";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { SessionDocument } from "@/types/types/sessionType";
 import {
@@ -6,6 +7,7 @@ import {
 } from "@/utils/api/services/clientServices";
 import {
   cancelSessionByLawyer,
+  endSession,
   StartSession,
 } from "@/utils/api/services/LawyerServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -116,6 +118,29 @@ export function useRemoveFile(sessionId: string) {
           return old;
         }
       );
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useEndSession() {
+  const queryClient = useQueryClient();
+  const { user } = store.getState().Auth;
+  return useMutation({
+    mutationFn: (sessionId: string) => endSession(sessionId),
+    onSuccess: (data) => {
+      console.log("new data:", data);
+      if (user?.role === "lawyer") {
+        queryClient.invalidateQueries({ queryKey: ["lawyer", "sessions"] });
+      } else if (user?.role === "client") {
+        queryClient.invalidateQueries({ queryKey: ["client", "sessions"] });
+      }
     },
     onError: (error: any) => {
       const message =
