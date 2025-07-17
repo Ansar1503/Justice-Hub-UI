@@ -25,7 +25,7 @@ type Props = {
   setCurrentPage: (p: number) => void;
 };
 
-export default function ChatDiputesTable({
+export default function  ChatDiputesTable({
   setCurrentPage,
   currentPage,
   itemsPerPage,

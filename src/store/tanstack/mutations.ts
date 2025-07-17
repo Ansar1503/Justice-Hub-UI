@@ -9,6 +9,7 @@ import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
 import {
   blockUser,
   changeLawyerVerificationStatus,
+  deleteDisputeReview,
 } from "@/utils/api/services/adminServices";
 import {
   addReview,
@@ -418,7 +419,29 @@ export function useReportReview() {
       // queryClient.setQueryData(["client","reviews",data?.session])
     },
     onError: (error: any) => {
-      console.log("error :",error)
+      console.log("error :", error);
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong!";
+      toast.error(message);
+    },
+  });
+}
+
+export function useDeleteDisputeReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { reviewId: string; diputeId: string }) =>
+      deleteDisputeReview(payload),
+    onSuccess: () => {
+      // toast.success("Review Deleted Successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "disputes", "review"],
+      });
+    },
+    onError: (error: any) => {
+      console.log("error :", error);
       const message =
         error?.response?.data?.message ||
         error?.message ||

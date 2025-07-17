@@ -147,3 +147,31 @@ export async function deleteMessage(messageId: string) {
   );
   return response.data;
 }
+
+export async function fetchReviewDisputes(payload: {
+  limit: number;
+  page: number;
+  search: string;
+  sortBy: "review_date" | "reported_date" | "All";
+  sortOrder: "asc" | "desc";
+}) {
+  const { search, limit, page, sortBy, sortOrder } = payload;
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/admin/disputes/reviews?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function deleteDisputeReview(payload: {
+  reviewId: string;
+  diputeId: string;
+}) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.delete(
+    `/api/admin/disputes/reviews/${payload.reviewId}/${payload.diputeId}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}

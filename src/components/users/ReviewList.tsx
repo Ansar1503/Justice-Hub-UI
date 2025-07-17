@@ -31,7 +31,7 @@ import {
 
 type ReviewWithReporter = Review & {
   reviewedBy?: {
-    _id?: string;
+    user_id: string;
     name?: string | null;
     profile_image?: string | null;
   };
@@ -181,7 +181,7 @@ export default function ReviewList({ reviews }: Props) {
       setShowReportModal(false);
     }
   };
-
+  // console.log("review", reviews);
   return (
     <>
       <div className="space-y-6">
@@ -263,8 +263,8 @@ export default function ReviewList({ reviews }: Props) {
                                   onClick={() =>
                                     handleReportClick(
                                       review._id,
-                                      review.client_id,
-                                      review.reviewedBy?._id || ""
+                                      currentUserId || "",
+                                      review.reviewedBy?.user_id || ""
                                     )
                                   }
                                 >

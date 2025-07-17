@@ -13,6 +13,7 @@ import {
   fetchAllLawyers,
   fetchAppointmentsForAdmin,
   fetchChatDisputes,
+  fetchReviewDisputes,
   fetchSessionsForAdmin,
   fetchUserByRole,
 } from "@/utils/api/services/adminServices";
@@ -46,6 +47,7 @@ import { Session, SessionDocument } from "@/types/types/sessionType";
 import { Appointment } from "@/types/types/AppointmentsType";
 import { ChatMessage, ChatSession } from "@/types/types/ChatType";
 import { Review } from "@/types/types/Review";
+import { Disputes } from "@/types/types/Disputes";
 
 export function useFetchClientData() {
   return useQuery({
@@ -371,5 +373,39 @@ export function useFetchReviewsBySession(sessionId: string) {
     queryKey: ["client", "reviews", sessionId],
     queryFn: () => fetchReviewsBySession(sessionId),
     enabled: sessionId ? true : false,
+  });
+}
+
+export function useFetchReviewDisputes(payload: {
+  limit: number;
+  page: number;
+  search: string;
+  sortBy: "review_date" | "reported_date" | "All";
+  sortOrder: "asc" | "desc";
+}) {
+  return useQuery<
+    {
+      limit: number;
+      page: number;
+      search: string;
+      sortBy: "review_date" | "reported_date" | "All";
+      sortOrder: "asc" | "desc";
+    },
+    Error,
+    {
+      totalCount: number;
+      currentPage: number;
+      totalPage: number;
+      data:
+        | ({
+            contentData: Review;
+            reportedByuserData: userDataType & clientDataType;
+            reportedUserData: userDataType & clientDataType;
+          } & Disputes)[]
+        | [];
+    }
+  >({
+    queryKey: ["admin", "disputes", "review", payload],
+    queryFn: () => fetchReviewDisputes(payload),
   });
 }
