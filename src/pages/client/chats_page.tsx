@@ -360,8 +360,14 @@ function ChatsPage() {
   };
 
   // console.log("isconnects", isConnected);
-  const handleSendMessage = (content: string, attachments?: File[]) => {
-    if (!selectedSessionRef.current || !content.trim()) return;
+  const handleSendMessage = (
+    content: string,
+    document?: { name: string; type: string; url: string }
+  ) => {
+    console.log("working", content, document);
+    if (!selectedSessionRef.current) return;
+    if (!document && !content.trim()) return;
+    console.log("worigni`");
     const s = socket.current;
     if (!s) return;
     const partnerId =
@@ -375,10 +381,7 @@ function ChatsPage() {
       receiverId: partnerId,
       content,
       read: false,
-      attachments: attachments?.map((file) => ({
-        url: URL.createObjectURL(file),
-        type: file.type,
-      })),
+      attachments: !document ? [] : [document],
     };
     // console.log("send message");
     s.emit(

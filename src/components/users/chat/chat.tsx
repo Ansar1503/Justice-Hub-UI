@@ -10,8 +10,9 @@ import {
   Trash2,
   Flag,
   Check,
-  X,
+  // X,
   Download,
+  Upload,
 } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,6 @@ import ChatDetailsModal from "./chatDetails.modal";
 import ChatDocumentsPreview from "./ChatDocumentsPreview";
 import { toast } from "react-toastify";
 import { sendFiles } from "@/utils/api/services/Chat";
-import { OrbitProgress } from "react-loading-indicators";
 
 export type FileWithProgress = {
   id: string;
@@ -55,7 +55,10 @@ interface ChatProps {
   onlineUsers: Set<string>;
   selectedSession: AggregateChatSession | null;
   messages: ChatMessage[];
-  onSendMessage: (message: string, attachments?: File[]) => void;
+  onSendMessage: (
+    message: string,
+    attachments?: { name: string; type: string; url: string }
+  ) => void;
   onInputMessage: () => void;
   currentUserId: string;
   isTyping?: boolean;
@@ -243,18 +246,15 @@ function Chat({
       }
 
       try {
-        await sendFiles({
+        const attachment = await sendFiles({
           file: fileWithProgress.file,
           sessionId: selectedSession?._id || "",
           onProgress: handleOnProgress,
         });
         setFiles((prevFiles) =>
-          prevFiles.map((file) =>
-            file.id === fileWithProgress.id
-              ? { ...file, uploaded: true, uploading: false }
-              : file
-          )
+          prevFiles.filter((files) => files.id !== fileWithProgress.id)
         );
+        onSendMessage("", attachment);
       } catch (error) {
         console.log("Upload error:", error);
         setFiles((prevFiles) =>
@@ -275,8 +275,8 @@ function Chat({
     await Promise.all(uploadPromises);
     setUploading(false);
   }
-  // handle send files end
 
+  // handle send files end
   const handleRetryUpload = async (fileId: string) => {
     const fileToRetry = files.find((f) => f.id === fileId);
     if (!fileToRetry) return;
@@ -672,110 +672,101 @@ function Chat({
                 {files.length > 0 && (
                   <div className="flex gap-3 justify-end">
                     <div className="max-w-[80%] order-1">
-                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Paperclip className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                            Uploading {files.length} file
-                            {files.length > 1 ? "s" : ""}
-                          </span>
-                        </div>
-                        <div className="space-y-3">
-                          {files.map((fileWithProgress) => (
-                            <div
-                              key={fileWithProgress.id}
-                              className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border"
-                            >
-                              <div className="flex-shrink-0">
-                                {fileWithProgress.file.type.startsWith(
-                                  "image/"
-                                ) ? (
-                                  <img
-                                    src={
-                                      URL.createObjectURL(
-                                        fileWithProgress.file
-                                      ) || "/placeholder.svg"
-                                    }
-                                    alt={fileWithProgress.file.name}
-                                    className="w-12 h-12 object-cover rounded"
-                                  />
-                                ) : (
-                                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                                    <Paperclip className="h-5 w-5" />
-                                  </div>
-                                )}
-                              </div>
+                      <div className="space-y-3">
+                        {files.map((fileWithProgress) => (
+                          <div
+                            key={fileWithProgress.id}
+                            className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border"
+                          >
+                            <div className="flex-shrink-0">
+                              {fileWithProgress.file.type.startsWith(
+                                "image/"
+                              ) ? (
+                                <img
+                                  src={
+                                    URL.createObjectURL(
+                                      fileWithProgress.file
+                                    ) || "/placeholder.svg"
+                                  }
+                                  alt={fileWithProgress.file.name}
+                                  className="w-12 h-12 object-cover rounded"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                  <Upload className="h-5 w-5" />
+                                </div>
+                              )}
+                            </div>
 
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between mb-2">
-                                  <p className="text-sm font-medium truncate">
-                                    {fileWithProgress.file.name}
-                                  </p>
-                                  <div className="flex items-center gap-2">
-                                    {fileWithProgress.uploaded && (
-                                      <Check className="h-4 w-4 text-green-500" />
-                                    )}
-                                    {fileWithProgress.error && (
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() =>
-                                          handleRetryUpload(fileWithProgress.id)
-                                        }
-                                        className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700"
-                                      >
-                                        Retry
-                                      </Button>
-                                    )}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-sm font-medium truncate">
+                                  {fileWithProgress.file.name}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  {fileWithProgress.uploaded && (
+                                    <Check className="h-4 w-4 text-green-500" />
+                                  )}
+                                  {fileWithProgress.error && (
                                     <Button
                                       variant="ghost"
                                       size="sm"
                                       onClick={() =>
-                                        setFiles(
-                                          files.filter(
-                                            (f) => f.id !== fileWithProgress.id
-                                          )
-                                        )
+                                        handleRetryUpload(fileWithProgress.id)
                                       }
-                                      className="h-6 w-6 p-0 text-gray-400 hover:text-red-500"
+                                      className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700"
                                     >
-                                      <X className="h-3 w-3" />
+                                      Retry
                                     </Button>
-                                  </div>
+                                  )}
+                                  {/* <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      setFiles(
+                                        files.filter(
+                                          (f) => f.id !== fileWithProgress.id
+                                        )
+                                      )
+                                    }
+                                    className="h-6 w-6 p-0 text-gray-400 hover:text-red-500"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button> */}
                                 </div>
-
-                                {fileWithProgress.error ? (
-                                  <p className="text-xs text-red-500">
-                                    {fileWithProgress.error}
-                                  </p>
-                                ) : fileWithProgress.uploaded ? (
-                                  <p className="text-xs text-green-600">
-                                    Upload complete
-                                  </p>
-                                ) : fileWithProgress.uploading ? (
-                                  <div className="space-y-2">
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                      <div
-                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                        style={{
-                                          width: `${fileWithProgress.progress}%`,
-                                        }}
-                                      />
-                                    </div>
-                                    <p className="text-xs text-gray-500">
-                                      {Math.round(fileWithProgress.progress)}%
-                                      uploaded
-                                    </p>
-                                  </div>
-                                ) : (
-                                  <p className="text-xs text-gray-500">
-                                    Ready to upload
-                                  </p>
-                                )}
                               </div>
+
+                              {fileWithProgress.error ? (
+                                <p className="text-xs text-red-500">
+                                  {fileWithProgress.error}
+                                </p>
+                              ) : fileWithProgress.uploaded ? (
+                                <p className="text-xs text-green-600">
+                                  Upload complete
+                                </p>
+                              ) : fileWithProgress.uploading ? (
+                                <div className="space-y-2">
+                                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div
+                                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                      style={{
+                                        width: `${fileWithProgress.progress}%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <p className="text-xs text-gray-500">
+                                    {Math.round(fileWithProgress.progress)}%
+                                    uploaded
+                                  </p>
+                                </div>
+                              ) : (
+                                <p className="text-xs text-gray-500">
+                                  Ready to upload
+                                </p>
+                              )}
                             </div>
-                          ))}
-                        </div>
+                          </div>
+                        ))}
                       </div>
                       <div className="flex items-center gap-2 mt-1 px-1 justify-end">
                         <p className="text-xs text-muted-foreground">
