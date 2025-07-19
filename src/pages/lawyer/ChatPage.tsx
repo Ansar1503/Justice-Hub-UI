@@ -364,10 +364,8 @@ function ChatsPage() {
     content: string,
     document?: { name: string; type: string; url: string }
   ) => {
-    console.log("working", content, document);
     if (!selectedSessionRef.current) return;
     if (!document && !content.trim()) return;
-    console.log("worigni`");
     const s = socket.current;
     if (!s) return;
     const partnerId =

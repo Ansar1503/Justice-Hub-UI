@@ -377,6 +377,9 @@ function Chat({
       <div
         key={index}
         className="flex items-center gap-2 p-2 rounded-lg cursor-pointer"
+        onClick={() => {
+          window.open(attachment.url, "_blank");
+        }}
       >
         <div className="relative inline-block">
           <Download className="h-5 w-5 text-white" />
@@ -528,7 +531,7 @@ function Chat({
                             >
                               {message.attachments &&
                                 message.attachments.length > 0 && (
-                                  <div className="bg-blue-600 rounded-lg space-y-2">
+                                  <div className={`${isOwn ? "bg-blue-600":"bg-gray-900" } rounded-lg space-y-2`}>
                                     {message.attachments.map(
                                       (attachment, index) =>
                                         renderAttachment(attachment, index)
