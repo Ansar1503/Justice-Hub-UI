@@ -201,8 +201,26 @@ function Chat({
     appointmentDate.setHours(h, m, 0, 0);
     return currentDate > appointmentDate;
   }
-  // }
+  const checkSessionOver = (session: AggregateChatSession | null) => {
+    if (!session) return false;
 
+    const currentDate = new Date();
+    const sessionDate = new Date(session.sessionDetails.scheduled_date);
+
+    const scheduledTime = session.sessionDetails.scheduled_time;
+    const [h, m] = scheduledTime
+      ? scheduledTime.split(":").map(Number)
+      : [0, 0];
+
+    sessionDate.setHours(h, m, 0, 0);
+
+    const sessionEnd = new Date(
+      sessionDate.getTime() + session.sessionDetails.duration * 60000
+    );
+
+    return currentDate > sessionEnd;
+  };
+  const isSessionOver = checkSessionOver(selectedSession);
   // get session partner id
   const getSessionPartnerId = (session: AggregateChatSession) => {
     return session.participants?.lawyer_id === currentUserId
@@ -224,7 +242,7 @@ function Chat({
 
   // handle send files start
   async function handleSend(files: FileWithProgress[]) {
-    if (!files || uploading) return;
+    if (!files || uploading || isSessionOver || !selectedSession) return;
     setUploading(true);
 
     const uploadPromises = files.map(async (fileWithProgress) => {
@@ -278,6 +296,7 @@ function Chat({
 
   // handle send files end
   const handleRetryUpload = async (fileId: string) => {
+    if (!selectedSession || !fileId || isSessionOver) return;
     const fileToRetry = files.find((f) => f.id === fileId);
     if (!fileToRetry) return;
 
@@ -287,6 +306,7 @@ function Chat({
   // file select handler start
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
+    if (!selectedSession || isSessionOver) return;
     const newFiles = Array.from(e.target.files).map((file) => ({
       file,
       progress: 0,
@@ -311,6 +331,7 @@ function Chat({
 
   // handle delete message start
   const handleDeleteMessage = (messageId: string) => {
+    if (!selectedSession || isSessionOver) return;
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -324,6 +345,7 @@ function Chat({
 
   // handle report message start
   const handleReportMessage = (messageId: string) => {
+    if (!selectedSession || isSessionOver) return;
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -336,6 +358,7 @@ function Chat({
 
   // confirm Delete message start
   const confirmDeleteMessage = () => {
+    if (!selectedSession || isSessionOver) return;
     if (onDeleteMessage && selectedMessageId && selectedSession?._id) {
       onDeleteMessage(selectedMessageId, selectedSession._id);
     }
@@ -346,6 +369,7 @@ function Chat({
 
   // confirm Report message start
   const confirmReportMessage = () => {
+    if (!selectedSession || isSessionOver) return;
     if (onReportMessage && selectedMessageId && reportReason.trim()) {
       onReportMessage(selectedMessageId, reportReason.trim());
     }
@@ -378,6 +402,7 @@ function Chat({
         key={index}
         className="flex items-center gap-2 p-2 rounded-lg cursor-pointer"
         onClick={() => {
+          if (!selectedSession || isSessionOver) return;
           window.open(attachment.url, "_blank");
         }}
       >
@@ -531,7 +556,11 @@ function Chat({
                             >
                               {message.attachments &&
                                 message.attachments.length > 0 && (
-                                  <div className={`${isOwn ? "bg-blue-600":"bg-gray-900" } rounded-lg space-y-2`}>
+                                  <div
+                                    className={`${
+                                      isOwn ? "bg-blue-600" : "bg-gray-900"
+                                    } rounded-lg space-y-2`}
+                                  >
                                     {message.attachments.map(
                                       (attachment, index) =>
                                         renderAttachment(attachment, index)
@@ -818,7 +847,7 @@ function Chat({
                 disabled={
                   !["upcoming", "ongoing"].includes(
                     selectedSession?.sessionDetails?.status
-                  )
+                  ) || isSessionOver
                 }
               >
                 <Paperclip className="h-4 w-4" />
@@ -842,7 +871,7 @@ function Chat({
                 disabled={
                   !["upcoming", "ongoing"].includes(
                     selectedSession?.sessionDetails?.status
-                  )
+                  ) || isSessionOver
                 }
               />
               <Button
@@ -855,7 +884,8 @@ function Chat({
                     checkifTimeOut(
                       selectedSession?.sessionDetails?.scheduled_date,
                       selectedSession?.sessionDetails?.scheduled_time
-                    ))
+                    )) ||
+                  isSessionOver
                 }
               >
                 <Send className="h-4 w-4" />

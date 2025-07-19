@@ -45,25 +45,7 @@ function ChatList({
     return date.toLocaleDateString();
   };
 
-  const checkSessionOver = (session: AggregateChatSession) => {
-    if (!session) return false;
-
-    const currentDate = new Date();
-    const sessionDate = new Date(session.sessionDetails.scheduled_date);
-
-    const scheduledTime = session.sessionDetails.scheduled_time;
-    const [h, m] = scheduledTime
-      ? scheduledTime.split(":").map(Number)
-      : [0, 0];
-
-    sessionDate.setHours(h, m, 0, 0);
-
-    const sessionEnd = new Date(
-      sessionDate.getTime() + session.sessionDetails.duration * 60000
-    );
-
-    return currentDate > sessionEnd;
-  };
+  
 
   const getSessionPartnerId = (session: AggregateChatSession) => {
     return session.participants?.lawyer_id === currentUserId
@@ -134,21 +116,15 @@ function ChatList({
               const secondaryAvatarName = isCurrentUserClient
                 ? session?.clientData?.name
                 : session?.lawyerData?.name;
-              const isSessionOver = checkSessionOver(session);
               return (
                 <div
                   key={session?._id}
-                  onClick={() => !isSessionOver && onSelectSession(session)}
+                  onClick={() => onSelectSession(session)}
                   className={`w-full p-3 mb-2 rounded-lg cursor-pointer transition-colors ${
                     selectedSession?._id === session?._id
                       ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
                       : "hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }
-                        ${
-                          isSessionOver
-                            ? "pointer-events-none line-through bg-red-300 dark:bg-red-950"
-                            : ""
-                        }`}
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="relative">
@@ -156,17 +132,13 @@ function ChatList({
                       <div className="relative">
                         <div
                           className={`rounded-full h-2 w-2 ${
-                            !isSessionOver &&
-                            onlineUsers &&
-                            onlineUsers.has(partnerId)
+                            onlineUsers && onlineUsers.has(partnerId)
                               ? " bg-green-500"
                               : "bg-slate-800"
                           } absolute top-0 right-1 z-10`}
                         />
                         <Avatar
-                          className={`w-12 h-12 border-2 border-background shadow-md ${
-                            isSessionOver && "opacity-50 blur-[1px]"
-                          }`}
+                          className={`w-12 h-12 border-2 border-background shadow-md ${"opacity-50 blur-[1px]"}`}
                         >
                           <AvatarImage
                             src={mainAvatarSrc || "/placeholder.svg"}
