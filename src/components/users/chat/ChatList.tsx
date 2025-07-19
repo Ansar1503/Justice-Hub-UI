@@ -47,19 +47,24 @@ function ChatList({
 
   const checkSessionOver = (session: AggregateChatSession) => {
     if (!session) return false;
+
     const currentDate = new Date();
-    const sessionDate = new Date(session?.sessionDetails?.scheduled_date);
-    const scheduledTime = selectedSession?.sessionDetails?.scheduled_time;
-    const [h, m] =
-      scheduledTime && typeof scheduledTime === "string"
-        ? scheduledTime.split(":").map(Number)
-        : [0, 0];
+    const sessionDate = new Date(session.sessionDetails.scheduled_date);
+
+    const scheduledTime = session.sessionDetails.scheduled_time;
+    const [h, m] = scheduledTime
+      ? scheduledTime.split(":").map(Number)
+      : [0, 0];
+
     sessionDate.setHours(h, m, 0, 0);
+
     const sessionEnd = new Date(
-      sessionDate.getTime() + session?.sessionDetails?.duration * 60000
+      sessionDate.getTime() + session.sessionDetails.duration * 60000
     );
+
     return currentDate > sessionEnd;
   };
+
   const getSessionPartnerId = (session: AggregateChatSession) => {
     return session.participants?.lawyer_id === currentUserId
       ? session.participants?.client_id

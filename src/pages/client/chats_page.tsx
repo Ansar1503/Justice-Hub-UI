@@ -470,11 +470,11 @@ function ChatsPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FFF2F2] dark:bg-black">
+    <div className="flex flex-col min-h-screen min-w-max bg-[#FFF2F2] dark:bg-black">
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />
-        <div className="flex flex-1 ">
+        <div className="flex flex-1 overflow-scroll scrollbar-hide ">
           <div className="w-80 border-r border-gray-200 dark:border-gray-700">
             <ChatList
               onlineUsers={onlineUsers}

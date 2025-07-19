@@ -8,4 +8,4 @@ const slotSettingsSchema = z.object({
 
 export const getSlotSettingsZod = () => {
   return slotSettingsSchema;
-};
+};  

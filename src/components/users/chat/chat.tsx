@@ -6,18 +6,18 @@ import {
   Send,
   User,
   Paperclip,
-  X,
   Scale,
   Trash2,
   Flag,
   Check,
+  X,
+  Download,
 } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +38,19 @@ import type { AggregateChatSession, ChatMessage } from "@/types/types/ChatType";
 import moment from "moment-timezone";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import ChatDetailsModal from "./chatDetails.modal";
+import ChatDocumentsPreview from "./ChatDocumentsPreview";
+import { toast } from "react-toastify";
+import { sendFiles } from "@/utils/api/services/Chat";
+import { OrbitProgress } from "react-loading-indicators";
 
+export type FileWithProgress = {
+  id: string;
+  file: File;
+  progress: number;
+  uploaded: boolean;
+  error?: string;
+  uploading?: boolean;
+};
 interface ChatProps {
   onlineUsers: Set<string>;
   selectedSession: AggregateChatSession | null;
@@ -77,12 +89,14 @@ function Chat({
   onReportMessage,
 }: ChatProps) {
   const [newMessage, setNewMessage] = useState("");
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isChatDetailsOpen, setIsChatDetailsOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string>("");
   const [reportReason, setReportReason] = useState("");
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [files, setFiles] = useState<FileWithProgress[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -92,7 +106,7 @@ function Chat({
 
   useEffect(() => {
     chatInputRef.current?.focus();
-    setSelectedFiles([]);
+    setFiles([]);
     setNewMessage("");
     setIsChatDetailsOpen(false);
     setDeleteDialogOpen(false);
@@ -135,6 +149,7 @@ function Chat({
     return () => scrollContainer.removeEventListener("scroll", handleScroll);
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  // typing
   useEffect(() => {
     const scrollContainer = scrollAreaRef.current;
     if (!scrollContainer) return;
@@ -146,6 +161,7 @@ function Chat({
     }
   }, [isTyping]);
 
+  // scroll effect
   useEffect(() => {
     const scrollContainer = scrollAreaRef.current;
     if (!scrollContainer || isFetchingNextPage) return;
@@ -155,6 +171,7 @@ function Chat({
     scrollContainer.scrollTop = scrollDiff;
   }, [messages.length]);
 
+  // client values {
   const isCurrentUserClient =
     selectedSession?.participants?.client_id === currentUserId;
 
@@ -181,35 +198,118 @@ function Chat({
     appointmentDate.setHours(h, m, 0, 0);
     return currentDate > appointmentDate;
   }
+  // }
+
+  // get session partner id
   const getSessionPartnerId = (session: AggregateChatSession) => {
     return session.participants?.lawyer_id === currentUserId
       ? session.participants?.client_id
       : session.participants?.lawyer_id;
   };
+
+  // handle send message start
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!newMessage.trim() && selectedFiles.length === 0) || !selectedSession)
-      return;
+    if ((!newMessage.trim() && files.length === 0) || !selectedSession) return;
 
     const message = newMessage.trim();
     setNewMessage("");
-    setSelectedFiles([]);
-    onSendMessage(message, selectedFiles);
+    setFiles([]);
+    onSendMessage(message);
+  };
+  // handle send message end
+
+  // handle send files start
+  async function handleSend(files: FileWithProgress[]) {
+    if (!files || uploading) return;
+    setUploading(true);
+
+    const uploadPromises = files.map(async (fileWithProgress) => {
+      // Set uploading state
+      setFiles((prevFiles) =>
+        prevFiles.map((file) =>
+          file.id === fileWithProgress.id
+            ? { ...file, uploading: true, error: undefined }
+            : file
+        )
+      );
+
+      function handleOnProgress(progress: number) {
+        setFiles((prevFiles) =>
+          prevFiles.map((file) =>
+            file.id === fileWithProgress.id ? { ...file, progress } : file
+          )
+        );
+      }
+
+      try {
+        await sendFiles({
+          file: fileWithProgress.file,
+          sessionId: selectedSession?._id || "",
+          onProgress: handleOnProgress,
+        });
+        setFiles((prevFiles) =>
+          prevFiles.map((file) =>
+            file.id === fileWithProgress.id
+              ? { ...file, uploaded: true, uploading: false }
+              : file
+          )
+        );
+      } catch (error) {
+        console.log("Upload error:", error);
+        setFiles((prevFiles) =>
+          prevFiles.map((file) =>
+            file.id === fileWithProgress.id
+              ? {
+                  ...file,
+                  error: "failed",
+                  uploading: false,
+                  progress: 0,
+                }
+              : file
+          )
+        );
+      }
+    });
+
+    await Promise.all(uploadPromises);
+    setUploading(false);
+  }
+  // handle send files end
+
+  const handleRetryUpload = async (fileId: string) => {
+    const fileToRetry = files.find((f) => f.id === fileId);
+    if (!fileToRetry) return;
+
+    await handleSend([fileToRetry]);
   };
 
+  // file select handler start
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedFiles((prev) => [...prev, ...files]);
+    if (!e.target.files?.length) return;
+    const newFiles = Array.from(e.target.files).map((file) => ({
+      file,
+      progress: 0,
+      uploaded: false,
+      id: `${file.name}-${Date.now()}`,
+    }));
+    const updatedFiles = [...files, ...newFiles];
+    if (updatedFiles.length > 5) {
+      toast.error("Max 5 files allowed");
+      return;
+    }
+    setFiles(updatedFiles);
+    setIsPreviewOpen(true);
   };
+  // file select handler end
 
-  const removeFile = (index: number) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
+  // format message time start
   const formatMessageTime = (date: Date) => {
     return moment(date).tz("Asia/Kolkata").format("h:mm A");
   };
+  // format message time end
 
+  // handle delete message start
   const handleDeleteMessage = (messageId: string) => {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
@@ -220,7 +320,9 @@ function Chat({
       setDeleteDialogOpen(true);
     }, 10);
   };
+  // handle delete message end
 
+  // handle report message start
   const handleReportMessage = (messageId: string) => {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
@@ -230,7 +332,9 @@ function Chat({
       setReportDialogOpen(true);
     }, 10);
   };
+  // handle report message end
 
+  // confirm Delete message start
   const confirmDeleteMessage = () => {
     if (onDeleteMessage && selectedMessageId && selectedSession?._id) {
       onDeleteMessage(selectedMessageId, selectedSession._id);
@@ -238,7 +342,9 @@ function Chat({
     setDeleteDialogOpen(false);
     setSelectedMessageId("");
   };
+  // confirm Delete message end
 
+  // confirm Report message start
   const confirmReportMessage = () => {
     if (onReportMessage && selectedMessageId && reportReason.trim()) {
       onReportMessage(selectedMessageId, reportReason.trim());
@@ -247,9 +353,11 @@ function Chat({
     setSelectedMessageId("");
     setReportReason("");
   };
+  // confirm Report message end
 
+  // render attachment start
   const renderAttachment = (
-    attachment: { url: string; type: string },
+    attachment: { url: string; type: string; name: string },
     index: number
   ) => {
     if (!attachment?.url) return null;
@@ -264,16 +372,16 @@ function Chat({
         />
       );
     }
-
+    // render attachment end
     return (
       <div
         key={index}
-        className="flex items-center gap-2 p-2 bg-gray-100 rounded-lg"
+        className="flex items-center gap-2 p-2 rounded-lg cursor-pointer"
       >
-        <Paperclip className="h-4 w-4" />
-        <span className="text-sm truncate">
-          {attachment.url.split("/").pop()}
-        </span>
+        <div className="relative inline-block">
+          <Download className="h-5 w-5 text-white" />
+        </div>
+        <span className="text-sm truncate">{attachment.name}</span>
       </div>
     );
   };
@@ -387,9 +495,10 @@ function Chat({
                     return (
                       <div
                         key={message._id}
-                        className={`flex gap-3 ${
+                        className={`flex gap-3   ${
                           isOwn ? "justify-end" : "justify-start"
                         }`}
+                        style={{ marginTop: "0" }}
                       >
                         {!isOwn && (
                           <Avatar className="h-8 w-8 flex-shrink-0">
@@ -411,24 +520,42 @@ function Chat({
                         >
                           <div className="relative group">
                             <div
-                              className={`rounded-lg p-3 ${
+                              className={`rounded-lg p-2 ${
                                 isOwn
                                   ? "bg-blue-500 text-white"
                                   : "bg-gray-100 dark:bg-gray-800"
                               }`}
                             >
-                              <p className="text-sm whitespace-pre-wrap">
-                                {message.content}
-                              </p>
                               {message.attachments &&
                                 message.attachments.length > 0 && (
-                                  <div className="mt-2 space-y-2">
+                                  <div className="bg-blue-600 rounded-lg space-y-2">
                                     {message.attachments.map(
                                       (attachment, index) =>
                                         renderAttachment(attachment, index)
                                     )}
                                   </div>
                                 )}
+                              <div className="flex justify-between gap-4 items-center">
+                                <p className="text-sm whitespace-pre-wrap">
+                                  {message.content}
+                                </p>
+                                <div className="mt-1 flex gap-1 items-end">
+                                  <p className="text-xs text-right text-muted-foreground">
+                                    {formatMessageTime(
+                                      message?.createdAt || new Date()
+                                    )}
+                                  </p>
+                                  {isOwn && (
+                                    <Check
+                                      className={`w-4 h-4 ${
+                                        message.read
+                                          ? "text-white"
+                                          : "text-gray-400"
+                                      }`}
+                                    />
+                                  )}
+                                </div>
+                              </div>
                             </div>
 
                             {/* Message Actions Dropdown */}
@@ -490,22 +617,7 @@ function Chat({
                             className={`flex items-center gap-2 mt-1 px-1 ${
                               isOwn ? "justify-end" : "justify-start"
                             }`}
-                          >
-                            <p className="text-xs text-muted-foreground">
-                              {formatMessageTime(
-                                message?.createdAt || new Date()
-                              )}
-                            </p>
-                            {isOwn && (
-                              <Check
-                                className={`w-4 h-4 ${
-                                  message.read
-                                    ? "text-blue-500"
-                                    : "text-gray-400"
-                                }`}
-                              />
-                            )}
-                          </div>
+                          ></div>
                         </div>
                         {isOwn && (
                           <Avatar className="h-8 w-8 flex-shrink-0">
@@ -556,36 +668,145 @@ function Chat({
                     </div>
                   </div>
                 )}
+                {/* File Upload Progress */}
+                {files.length > 0 && (
+                  <div className="flex gap-3 justify-end">
+                    <div className="max-w-[80%] order-1">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Paperclip className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                            Uploading {files.length} file
+                            {files.length > 1 ? "s" : ""}
+                          </span>
+                        </div>
+                        <div className="space-y-3">
+                          {files.map((fileWithProgress) => (
+                            <div
+                              key={fileWithProgress.id}
+                              className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border"
+                            >
+                              <div className="flex-shrink-0">
+                                {fileWithProgress.file.type.startsWith(
+                                  "image/"
+                                ) ? (
+                                  <img
+                                    src={
+                                      URL.createObjectURL(
+                                        fileWithProgress.file
+                                      ) || "/placeholder.svg"
+                                    }
+                                    alt={fileWithProgress.file.name}
+                                    className="w-12 h-12 object-cover rounded"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                    <Paperclip className="h-5 w-5" />
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-2">
+                                  <p className="text-sm font-medium truncate">
+                                    {fileWithProgress.file.name}
+                                  </p>
+                                  <div className="flex items-center gap-2">
+                                    {fileWithProgress.uploaded && (
+                                      <Check className="h-4 w-4 text-green-500" />
+                                    )}
+                                    {fileWithProgress.error && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleRetryUpload(fileWithProgress.id)
+                                        }
+                                        className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700"
+                                      >
+                                        Retry
+                                      </Button>
+                                    )}
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        setFiles(
+                                          files.filter(
+                                            (f) => f.id !== fileWithProgress.id
+                                          )
+                                        )
+                                      }
+                                      className="h-6 w-6 p-0 text-gray-400 hover:text-red-500"
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+
+                                {fileWithProgress.error ? (
+                                  <p className="text-xs text-red-500">
+                                    {fileWithProgress.error}
+                                  </p>
+                                ) : fileWithProgress.uploaded ? (
+                                  <p className="text-xs text-green-600">
+                                    Upload complete
+                                  </p>
+                                ) : fileWithProgress.uploading ? (
+                                  <div className="space-y-2">
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                      <div
+                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                        style={{
+                                          width: `${fileWithProgress.progress}%`,
+                                        }}
+                                      />
+                                    </div>
+                                    <p className="text-xs text-gray-500">
+                                      {Math.round(fileWithProgress.progress)}%
+                                      uploaded
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-gray-500">
+                                    Ready to upload
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1 px-1 justify-end">
+                        <p className="text-xs text-muted-foreground">
+                          {new Date().toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                      <AvatarImage
+                        src={
+                          selectedSession?.participants?.client_id ===
+                          currentUserId
+                            ? selectedSession?.clientData?.profile_image
+                            : selectedSession?.lawyerData?.profile_image
+                        }
+                      />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                )}
               </>
             </div>
           </div>
 
           {/* Input and file preview */}
           <div className="border-t p-4">
-            {selectedFiles.length > 0 && (
-              <div className="mb-3 flex flex-wrap gap-2">
-                {selectedFiles.map((file, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="flex items-center gap-1"
-                  >
-                    <Paperclip className="h-3 w-3" />
-                    <span className="text-xs truncate max-w-20">
-                      {file.name}
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-4 w-4 p-0 hover:bg-transparent"
-                      onClick={() => removeFile(index)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-            )}
             <form onSubmit={handleSendMessage} className="flex gap-2">
               <input
                 ref={fileInputRef}
@@ -615,6 +836,7 @@ function Chat({
                   setNewMessage(e.target.value);
                   onInputMessage();
                 }}
+                max={5}
                 placeholder={
                   ["upcoming", "ongoing"].includes(
                     selectedSession?.sessionDetails?.status
@@ -632,7 +854,7 @@ function Chat({
               <Button
                 type="submit"
                 disabled={
-                  (!newMessage.trim() && selectedFiles.length === 0) ||
+                  (!newMessage.trim() && files.length === 0) ||
                   (!["upcoming", "ongoing"].includes(
                     selectedSession?.sessionDetails?.status
                   ) &&
@@ -648,6 +870,16 @@ function Chat({
           </div>
         </CardContent>
       </Card>
+
+      <ChatDocumentsPreview
+        isOpen={isPreviewOpen}
+        onClose={() => {
+          setIsPreviewOpen(false);
+        }}
+        selectedFiles={files}
+        onFilesChange={setFiles}
+        onSend={handleSend}
+      />
 
       {/* Delete Message Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

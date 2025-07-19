@@ -14,7 +14,10 @@ import { Separator } from "@/components/ui/separator";
 import { Review } from "@/types/types/Review";
 import { clientDataType, userDataType } from "@/types/types/Client.data.type";
 import { Disputes } from "@/types/types/Disputes";
-import { useDeleteDisputeReview } from "@/store/tanstack/mutations";
+import {
+  useBlockUser,
+  useDeleteDisputeReview,
+} from "@/store/tanstack/mutations";
 
 interface ReviewDisputeDetailsModalProps {
   dispute: {
@@ -32,6 +35,7 @@ export default function ReviewDisputeDetailsModal({
   onOpenChange,
 }: ReviewDisputeDetailsModalProps) {
   const { mutateAsync: deleteDisputeReview } = useDeleteDisputeReview();
+  const { mutateAsync: blockDisputeUser } = useBlockUser();
   const renderStars = (rating: number) => {
     return (
       <div className="flex items-center gap-1">
@@ -53,10 +57,14 @@ export default function ReviewDisputeDetailsModal({
   const handleResolveDispute = async (
     action: "dismiss" | "Block" | "delete"
   ) => {
-    await deleteDisputeReview({
-      diputeId: dispute._id,
-      reviewId: dispute.contentData._id,
-    });
+    if (action === "delete") {
+      await deleteDisputeReview({
+        diputeId: dispute._id,
+        reviewId: dispute.contentData._id,
+      });
+    } else if (action === "Block") {
+      await blockDisputeUser(dispute.reportedUser);
+    }
   };
   //   console.log("dispute:", dispute);
   return (
