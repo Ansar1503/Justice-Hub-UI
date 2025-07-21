@@ -1,4 +1,5 @@
 import { store } from "@/store/redux/store";
+import { CallLogs } from "@/types/types/callLogs";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { SessionDocument } from "@/types/types/sessionType";
 import {
@@ -69,24 +70,31 @@ export function useCancelSessionByClient() {
 
 export function useStartSession() {
   const queryClient = useQueryClient();
-  return useMutation<
-    ResponseType & { data?: any },
-    Error,
-    { sessionId: string }
-  >({
+  return useMutation<CallLogs, Error, { sessionId: string }>({
     mutationFn: (payload) => StartSession(payload.sessionId),
     onSuccess: (data) => {
-      toast.success(data?.message || "Session started successfully!");
-      queryClient.setQueryData(["client", "sessions"], (old: any) => {
-        return {
-          ...old,
-          data: old?.data?.map((appt: any) =>
-            appt._id === data?.data?._id
-              ? { ...appt, status: data?.data?.status }
-              : appt
-          ),
-        };
-      });
+      queryClient.setQueryData(
+        ["callLogs", data?.session_id],
+        (old: {
+          totalCount: number;
+          currentPage: number;
+          totalPage: number;
+          data: CallLogs[];
+        }) => {
+          if (!old) return old;
+          return {
+            ...old,
+            data: old?.data?.map((log) => {
+              if (log?._id == data?._id) {
+                return data;
+              } else {
+                return log;
+              }
+            }),
+          };
+        }
+      );
+      toast.success("Session started successfully!");
     },
     onError: (error: any) => {
       const message =

@@ -164,8 +164,7 @@ export default function SessionsListing() {
 
   const handleStartSession = async (session: any) => {
     try {
-      // console.log("Starting session:", session);
-      const { data } = await startSessionMutation({ sessionId: session?._id });
+      const data = await startSessionMutation({ sessionId: session?._id });
 
       if (data?.room_id) {
         navigate(`/lawyer/session/join/${data?.room_id}`);
@@ -181,7 +180,7 @@ export default function SessionsListing() {
   };
 
   const handleCancelSession = async (sessionId: string) => {
-    console.log("Cancelling session:", sessionId);
+    // console.log("Cancelling session:", sessionId);
     await CancelSession({ id: sessionId });
   };
 

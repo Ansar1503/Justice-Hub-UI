@@ -6,7 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useFetchCallLogs } from "@/store/tanstack/queries";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { CallLogs } from "@/types/types/callLogs";
 import {
@@ -17,7 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { Badge } from "lucide-react";
+import { format } from "date-fns";
+import { Badge } from "./ui/badge";
 
 type Props = {
   sessionId?: string;
@@ -29,7 +30,7 @@ function getDurationFromStartAndEndDate(
   startDate: Date | undefined,
   endDate: Date | undefined
 ) {
-  if (!startDate || !endDate) return "0.00";
+  if (!startDate || !endDate) return "0";
   const durationInMinutes =
     (endDate.getTime() - startDate.getTime()) / (1000 * 60);
   return durationInMinutes.toFixed(2);
@@ -40,19 +41,25 @@ export default function CallLogsModal({
   isOpen,
   onOpenChange,
 }: Props) {
-  const [limit, setLimit] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const { data: callLogData, isLoading: callLogLoading } = useFetchCallLogs({
+  const [limit] = useState(10);
+  const [currentPage] = useState(1);
+  const {
+    data: callLogData,
+    isLoading: callLogLoading,
+    refetch,
+  } = useFetchCallLogs({
     sessionId: sessionId || "",
     limit,
     page: currentPage,
   });
   const callLogs = callLogData?.data;
+  useEffect(() => {
+    refetch();
+  }, [refetch, isOpen]);
 
   return (
     <Dialog open={isOpen ? isOpen : false} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide">
+      <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="mb-4">
             <DialogTitle className="text-xl">Call Logs</DialogTitle>
@@ -70,8 +77,8 @@ export default function CallLogsModal({
             ))}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table className="min-w-full text-sm text-left">
+          <div className="overflow-x-auto p-1">
+            <Table className="min-w-full text-sm text-left ">
               <TableHeader className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                 <TableRow>
                   <TableHead>Status</TableHead>
@@ -89,9 +96,21 @@ export default function CallLogsModal({
                   callLogs.map((log: CallLogs) => (
                     <TableRow key={log._id}>
                       <TableCell>{log.status}</TableCell>
-                      <TableCell>{String(log?.start_time) || "N/A"}</TableCell>
-                      <TableCell>{String(log?.end_time) || "N/A"}</TableCell>
-                      <TableCell>{log.duration} min</TableCell>
+                      <TableCell>
+                        {log?.start_time
+                          ? format(new Date(log.start_time), "Pp")
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {log?.end_time
+                          ? typeof log.end_time === "string"
+                            ? log.end_time
+                            : format(new Date(log.end_time), "Pp")
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {log.duration ? log?.duration : "0"} min
+                      </TableCell>
                       <TableCell>
                         {getDurationFromStartAndEndDate(
                           log?.client_joined_at,
@@ -105,9 +124,16 @@ export default function CallLogsModal({
                         )}
                       </TableCell>
                       <TableCell>
-                        {log?.end_reason || "Network Error"}
+                        {log?.status === "ongoing"
+                          ? "session ongoing"
+                          : log?.end_reason || "N/A"}
                       </TableCell>
-                      <TableCell><Badge className="bg-green-500">Join</Badge></TableCell>
+                      <TableCell>
+                        <Badge variant={"outline"} className="bg-green-400">
+                          {" "}
+                          Join
+                        </Badge>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
