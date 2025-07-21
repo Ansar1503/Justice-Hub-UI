@@ -87,7 +87,7 @@ export default function SessionDetailModal({
   };
 
   const sessionStartable = () => {
-    return true
+    return true;
     const currentDate = new Date();
     const sessionDate = new Date(session?.scheduled_date);
     const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];

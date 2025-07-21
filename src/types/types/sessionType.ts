@@ -7,7 +7,6 @@ export interface SessionDocument {
   updatedAt: Date;
 }
 
-
 export interface Session {
   _id?: string;
   appointment_id: string;
@@ -20,11 +19,6 @@ export interface Session {
   amount: number;
   type: "consultation" | "follow-up";
   status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
-  room_id?: string;
-  start_time?: Date;
-  end_time?: Date;
-  client_joined_at?: Date;
-  lawyer_joined_at?: Date;
   notes?: string;
   summary?: string;
   follow_up_suggested?: boolean;

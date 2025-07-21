@@ -11,6 +11,8 @@ import {
   useEndSession,
 } from "@/store/tanstack/mutations/sessionMutation";
 import { useNavigate } from "react-router-dom";
+import CallLogsModal from "../CallLogsModal";
+import { Button } from "../ui/button";
 
 export type SessionStatus =
   | "all"
@@ -32,9 +34,10 @@ export default function SessionsListing() {
   const [sortBy, setSortBy] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const handleSort = (field: SortField) => {
@@ -360,15 +363,6 @@ export default function SessionsListing() {
                       </td>
                       <td className="py-4 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          {/* {session?.status === "upcoming" && (
-                            <button
-                              onClick={() => handleStartSession(session._id)}
-                              className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 dark:bg-green-900 dark:text-green-200"
-                            >
-                              <Video className="h-3 w-3" />
-                              Start
-                            </button>
-                          )} */}
                           <button
                             className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
                             onClick={() => handleViewSession(session)}
@@ -376,6 +370,15 @@ export default function SessionsListing() {
                             <Eye className="h-4 w-4" />
                             View
                           </button>
+                          <Button
+                            variant={"ghost"}
+                            onClick={() => {
+                              setSelectedSession(session);
+                              setViewCallLogsOpen(true);
+                            }}
+                          >
+                            📞 Call Logs
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -385,7 +388,11 @@ export default function SessionsListing() {
             </tbody>
           </table>
         </div>
-
+        <CallLogsModal
+          sessionId={selectedSession?._id}
+          isOpen={viewCallLogsOpen}
+          onOpenChange={(b: boolean) => setViewCallLogsOpen(b)}
+        />
         <PaginationComponent
           currentPage={currentPage}
           handlePageChange={handlePageChange}

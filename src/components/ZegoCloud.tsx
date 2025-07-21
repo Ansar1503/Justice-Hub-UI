@@ -17,7 +17,7 @@ export default function ZegoVideoCall({
   useEffect(() => {
     const appID = import.meta.env.VITE_ZEGO_APP_ID;
     const serverSecret = import.meta.env.VITE_ZEGO_SERVERSECRET;
-    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
       Number(appID),
       serverSecret,
       roomID,
@@ -33,7 +33,7 @@ export default function ZegoVideoCall({
       scenario: {
         mode: ZegoUIKitPrebuilt.VideoConference,
       },
-      showScreenSharingButton:false
+      showScreenSharingButton: false,
     });
 
     return () => {

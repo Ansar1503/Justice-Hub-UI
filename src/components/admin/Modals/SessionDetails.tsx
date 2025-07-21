@@ -1,6 +1,5 @@
 import type React from "react";
 import { useState } from "react";
-import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -51,15 +50,16 @@ export default function SessionDetails({
   trigger,
   open,
   onOpenChange,
-//   onStartSession,
-//   onEndSession,
-//   onCancelSession,
+  //   onStartSession,
+  //   onEndSession,
+  //   onCancelSession,
   onJoinSession,
 }: SessionDetailsProps) {
   const [isOpen, setIsOpen] = useState(open || false);
-//   const [showStartConfirm, setShowStartConfirm] = useState(false);
-//   const [showEndConfirm, setShowEndConfirm] = useState(false);
-//   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  
+  //   const [showStartConfirm, setShowStartConfirm] = useState(false);
+  //   const [showEndConfirm, setShowEndConfirm] = useState(false);
+  //   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -87,11 +87,6 @@ export default function SessionDetails({
       month: "long",
       day: "numeric",
     });
-  };
-
-  const formatDateTime = (date: Date | string) => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return format(dateObj, "PPp");
   };
 
   const formatTime = (timeString: string | undefined) => {
@@ -143,23 +138,23 @@ export default function SessionDetails({
   };
 
   // Session control logic
-//   const sessionStartable = () => {
-//     const currentDate = new Date();
-//     const sessionDate = new Date(session.scheduled_date);
-//     const [h, m] = session.scheduled_time
-//       ? session.scheduled_time.split(":").map(Number)
-//       : [0, 0];
-//     sessionDate.setHours(h, m, 0, 0);
-//     const sessionEnd = new Date(
-//       sessionDate.getTime() + session.duration * 60000
-//     );
+  //   const sessionStartable = () => {
+  //     const currentDate = new Date();
+  //     const sessionDate = new Date(session.scheduled_date);
+  //     const [h, m] = session.scheduled_time
+  //       ? session.scheduled_time.split(":").map(Number)
+  //       : [0, 0];
+  //     sessionDate.setHours(h, m, 0, 0);
+  //     const sessionEnd = new Date(
+  //       sessionDate.getTime() + session.duration * 60000
+  //     );
 
-//     return (
-//       session.status === "upcoming" &&
-//       currentDate >= sessionDate &&
-//       currentDate < sessionEnd
-//     );
-//   };
+  //     return (
+  //       session.status === "upcoming" &&
+  //       currentDate >= sessionDate &&
+  //       currentDate < sessionEnd
+  //     );
+  //   };
 
   const sessionJoinable = () => {
     const currentDate = new Date();
@@ -175,39 +170,38 @@ export default function SessionDetails({
     return (
       session.status === "ongoing" &&
       currentDate >= sessionDate &&
-      currentDate < sessionEnd &&
-      session.room_id
+      currentDate < sessionEnd
     );
   };
 
-//   const sessionCancelable = () => {
-//     const currentDate = new Date();
-//     const sessionDate = new Date(session.scheduled_date);
-//     const [h, m] = session.scheduled_time
-//       ? session.scheduled_time.split(":").map(Number)
-//       : [0, 0];
-//     sessionDate.setHours(h, m, 0, 0);
+  //   const sessionCancelable = () => {
+  //     const currentDate = new Date();
+  //     const sessionDate = new Date(session.scheduled_date);
+  //     const [h, m] = session.scheduled_time
+  //       ? session.scheduled_time.split(":").map(Number)
+  //       : [0, 0];
+  //     sessionDate.setHours(h, m, 0, 0);
 
-//     return session.status === "upcoming" && currentDate < sessionDate;
-//   };
+  //     return session.status === "upcoming" && currentDate < sessionDate;
+  //   };
   // Action handlers
-//   const handleStartSession = () => {
-//     onStartSession?.(session);
-//     setShowStartConfirm(false);
-//     handleOpenChange(false);
-//   };
+  //   const handleStartSession = () => {
+  //     onStartSession?.(session);
+  //     setShowStartConfirm(false);
+  //     handleOpenChange(false);
+  //   };
 
-//   const handleEndSession = () => {
-//     onEndSession?.(session._id!);
-//     setShowEndConfirm(false);
-//     handleOpenChange(false);
-//   };
+  //   const handleEndSession = () => {
+  //     onEndSession?.(session._id!);
+  //     setShowEndConfirm(false);
+  //     handleOpenChange(false);
+  //   };
 
-//   const handleCancelSession = () => {
-//     onCancelSession?.(session._id!);
-//     setShowCancelConfirm(false);
-//     handleOpenChange(false);
-//   };
+  //   const handleCancelSession = () => {
+  //     onCancelSession?.(session._id!);
+  //     setShowCancelConfirm(false);
+  //     handleOpenChange(false);
+  //   };
 
   const handleJoinSession = () => {
     onJoinSession?.(session);
@@ -288,14 +282,6 @@ export default function SessionDetails({
                       {session.lawyerData?.name || "N/A"}
                     </p>
                   </div>
-                  {session.lawyer_joined_at && (
-                    <div className="text-xs text-green-600 flex items-center space-x-1">
-                      <CheckCircleIcon className="h-3 w-3" />
-                      <span>
-                        Joined at {formatDateTime(session.lawyer_joined_at)}
-                      </span>
-                    </div>
-                  )}
                 </div>
                 <div className="space-y-2">
                   <div>
@@ -345,14 +331,6 @@ export default function SessionDetails({
                       {session.clientData?.name || "N/A"}
                     </p>
                   </div>
-                  {session.client_joined_at && (
-                    <div className="text-xs text-green-600 flex items-center space-x-1">
-                      <CheckCircleIcon className="h-3 w-3" />
-                      <span>
-                        Joined at {formatDateTime(session.client_joined_at)}
-                      </span>
-                    </div>
-                  )}
                 </div>
                 <div className="space-y-2">
                   <div>
@@ -389,7 +367,6 @@ export default function SessionDetails({
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3">
                   <ClockIcon className="h-5 w-5 text-gray-400" />
                   <div>
@@ -401,7 +378,6 @@ export default function SessionDetails({
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3">
                   <IndianRupeeIcon className="h-5 w-5 text-gray-400" />
                   <div>
@@ -413,44 +389,6 @@ export default function SessionDetails({
                     </p>
                   </div>
                 </div>
-
-                {session.room_id && (
-                  <div className="flex items-center gap-3">
-                    <VideoIcon className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Room ID
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white font-mono">
-                        {session.room_id}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                {session.start_time && (
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Started At
-                    </p>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session.start_time)}
-                    </p>
-                  </div>
-                )}
-
-                {session.end_time && (
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Ended At
-                    </p>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDateTime(session.end_time)}
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
             {/* Reason */}

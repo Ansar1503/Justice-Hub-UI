@@ -48,6 +48,8 @@ import { Appointment } from "@/types/types/AppointmentsType";
 import { ChatMessage, ChatSession } from "@/types/types/ChatType";
 import { Review } from "@/types/types/Review";
 import { Disputes } from "@/types/types/Disputes";
+import { fetchCallLogs } from "@/utils/api/services/commonServices";
+import { CallLogs } from "@/types/types/callLogs";
 
 export function useFetchClientData() {
   return useQuery({
@@ -407,5 +409,30 @@ export function useFetchReviewDisputes(payload: {
   >({
     queryKey: ["admin", "disputes", "review", payload],
     queryFn: () => fetchReviewDisputes(payload),
+  });
+}
+
+export function useFetchCallLogs(payload: {
+  limit: number;
+  page: number;
+  sessionId: string;
+}) {
+  return useQuery<
+    {
+      limit: number;
+      page: number;
+      sessionId: string;
+    },
+    Error,
+    {
+      totalCount: number;
+      currentPage: number;
+      totalPage: number;
+      data: CallLogs[];
+    }
+  >({
+    queryKey: ["callLogs", payload],
+    queryFn: () => fetchCallLogs(payload),
+    enabled: payload.sessionId ? true : false,
   });
 }

@@ -13,12 +13,10 @@ export default function ChatDisputes() {
       <Card className="bg-textLight dark:bg-stone-800 mt-5">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Chats Disputes Managment</CardTitle>
-              <CardDescription>
-                Manage clients-Lawyer Chats Disputes
-              </CardDescription>
-            </div>
+            <CardTitle>Chats Disputes Managment</CardTitle>
+            <CardDescription>
+              Manage clients-Lawyer Chats Disputes
+            </CardDescription>
           </div>
         </CardHeader>
         <ChatDisputeCardContent />

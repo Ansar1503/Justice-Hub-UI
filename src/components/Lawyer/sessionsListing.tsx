@@ -32,7 +32,7 @@ export default function SessionsListing() {
   const [sortBy, setSortBy] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

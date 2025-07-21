@@ -20,6 +20,7 @@ function ClientRoutes() {
         <Route path="/lawyers/:id" element={<LawyersPage />} />
         <Route path="/chats" element={<Chats_page />} />
         <Route path="/session/join/:id" element={<VideoCall />} />
+
         <Route
           path="/lawyers/payment_success"
           element={<PaymentSuccessPage />}
