@@ -7,12 +7,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   useCancelSessionByLawyer,
   useEndSession,
+  useJoinSession,
   useStartSession,
 } from "@/store/tanstack/mutations/sessionMutation";
 // import ZegoVideoCall from "../ZegoCloud";
 import { useNavigate } from "react-router-dom";
-// import { Button } from "../ui/button";
-// import CallLogsModal from "../CallLogsModal";
+import { Button } from "../ui/button";
+import CallLogsModal from "../CallLogsModal";
 import { SocketContext } from "@/context/SocketProvider";
 import { NotificationType } from "@/types/types/Notification";
 import { store } from "@/store/redux/store";
@@ -42,7 +43,7 @@ export default function SessionsListing() {
   const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
-  // const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
+  const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useAppDispatch();
 
@@ -59,6 +60,7 @@ export default function SessionsListing() {
     }
   };
   const { mutateAsync: CancelSession } = useCancelSessionByLawyer();
+  const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { mutateAsync: endSessionAsync } = useEndSession();
   const { user: currentUser } = store.getState().Auth;
   const { data: sessionsData, refetch: sessionRefetch } =
@@ -172,6 +174,24 @@ export default function SessionsListing() {
     setSelectedSession(session);
     setIsModalOpen(true);
   };
+
+  const handleJointSession = async (session: any) => {
+    if (session?.room_id) {
+      const data = await JoinSessionMutation({
+        sessionId: session?._id || "",
+      });
+      console.log("Joining session:", data);
+      dispatch(
+        setZcState({
+          AppId: data?.zc?.appId,
+          roomId: String(data?.room_id),
+          token: data?.zc?.token,
+        })
+      );
+      navigate(`/lawyer/session/join/${session?._id}`);
+      setSelectedSession(session);
+    }
+  };
   const handleStartSession = async (session: any) => {
     try {
       if (!socket) {
@@ -180,7 +200,7 @@ export default function SessionsListing() {
       }
 
       const data = await startSessionMutation({ sessionId: session?._id });
-      console.log("data", data);
+      // console.log("data", data);
       dispatch(
         setZcState({
           roomId: String(data?.room_id),
@@ -188,11 +208,10 @@ export default function SessionsListing() {
           AppId: data?.zc?.appId,
         })
       );
+      const { date, time } = formatDateTime(session?.start_date);
       const notificationData: NotificationType = {
         isRead: false,
-        message: `Your Session has been started by the lawyer ${
-          currentUser?.name
-        } at ${formatDateTime(session?.start_date)}`,
+        message: `Your Session has been started by the lawyer ${currentUser?.name} on ${date} at ${time} `,
         sessionId: session?._id,
         roomId: data?.room_id,
         recipientId: session?.client_id,
@@ -202,6 +221,7 @@ export default function SessionsListing() {
       };
       if (!socket.connected) {
         console.warn("Socket not yet connected. Waiting...");
+        socket.connect();
         socket.once("connect", () => {
           console.log("Connected after delay, emitting...");
           socket.emit("NOTIFICATION_SEND", notificationData);
@@ -209,13 +229,10 @@ export default function SessionsListing() {
       } else {
         socket.emit("NOTIFICATION_SEND", notificationData);
       }
-      // console.log("new notification going to emmit", notificationData);
-
-      socket.emit("NOTIFICATION_SEND", notificationData);
 
       if (data?.room_id) {
         console.log("data.roomid is available", data?.room_id);
-        navigate(`/lawyer/session/join`);
+        navigate(`/lawyer/session/join/${session?._id}`);
         setSelectedSession(session);
       }
     } catch (err) {
@@ -442,7 +459,7 @@ export default function SessionsListing() {
                               <Eye className="h-4 w-4" />
                               View
                             </button>
-                            {/* <Button
+                            <Button
                               variant={"ghost"}
                               onClick={() => {
                                 setSelectedSession(session);
@@ -450,7 +467,7 @@ export default function SessionsListing() {
                               }}
                             >
                               📞 Call Logs
-                            </Button> */}
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -561,11 +578,11 @@ export default function SessionsListing() {
             })
           )}
         </div>
-        {/* <CallLogsModal
+        <CallLogsModal
           session={selectedSession}
           isOpen={viewCallLogsOpen}
           onOpenChange={(b: boolean) => setViewCallLogsOpen(b)}
-        /> */}
+        />
         <PaginationComponent
           currentPage={currentPage}
           handlePageChange={handlePageChange}
@@ -583,6 +600,7 @@ export default function SessionsListing() {
         onStartSession={handleStartSession}
         onEndSession={handleEndSession}
         onCancelSession={handleCancelSession}
+        onJoinSession={handleJointSession}
       />
     </div>
   );

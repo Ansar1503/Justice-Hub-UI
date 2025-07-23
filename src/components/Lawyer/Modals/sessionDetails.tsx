@@ -33,7 +33,6 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
-import { useNavigate } from "react-router-dom";
 
 interface SessionDetailModalProps {
   session: any;
@@ -42,7 +41,7 @@ interface SessionDetailModalProps {
   onStartSession?: (session: any) => void;
   onEndSession?: (sessionId: string) => void;
   onCancelSession?: (sessionId: string) => void;
-  // onJoinSession?: (sesssion: any) => void;
+  onJoinSession?: (sesssion: any) => void;
 }
 
 export default function SessionDetailModal({
@@ -52,6 +51,7 @@ export default function SessionDetailModal({
   onStartSession,
   onEndSession,
   onCancelSession,
+  onJoinSession,
 }: SessionDetailModalProps) {
   // const [notes, setNotes] = useState(session?.notes || "");
   // const [summary, setSummary] = useState(session?.summary || "");
@@ -65,7 +65,7 @@ export default function SessionDetailModal({
   );
   const sessionDocuments = sessionDocumentsData?.data;
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   // console.log("session", sessionDocuments);
   if (!isOpen || !session) return null;
 
@@ -108,6 +108,7 @@ export default function SessionDetailModal({
   };
 
   const sessionJoinable = () => {
+    return true;
     const currentDate = new Date();
     const sessionDate = new Date(session?.scheduled_date);
     const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
@@ -167,9 +168,7 @@ export default function SessionDetailModal({
   };
 
   const handleJoinSession = () => {
-    navigate(`/lawyer/session/join/${session?.room_id || ""}`);
-    setJoinVideoRoom(false);
-    onClose();
+    onJoinSession?.(session);
   };
 
   const handleStartSession = () => {

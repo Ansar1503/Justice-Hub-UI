@@ -193,7 +193,6 @@ export async function StartSession(sessionId: string) {
 
 export async function endSession(sessionId: string) {
   const { token, user } = store.getState().Auth;
-  console.log("session");
   const response = await axiosinstance.patch(
     `/api/${user?.role}/profile/sessions/endSession`,
     {

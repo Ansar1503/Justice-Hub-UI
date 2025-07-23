@@ -1,21 +1,24 @@
 import { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
-// import { useNavigate } from "react-router-dom";
+import { useEndSession } from "@/store/tanstack/mutations/sessionMutation";
 
 export default function ZegoVideoCall({
+  sessionId,
   roomID,
   userID,
   userName,
   token,
   AppId,
 }: {
+  sessionId: string;
   AppId: number;
   roomID: string;
   userID: string;
   userName: string;
   token: string;
 }) {
-  console.log("zegocloud");
+  // console.log("zegocloud");
+  const { mutateAsync: endSessionMutate } = useEndSession();
   const containerRef = useRef(null);
   const zegoInstanceRef = useRef<any>(null);
   // const navigate = useNavigate();
@@ -37,8 +40,13 @@ export default function ZegoVideoCall({
         mode: ZegoUIKitPrebuilt.VideoConference,
       },
       showScreenSharingButton: false,
+      onLeaveRoom() {
+        handleLeaveRoom();
+      },
     });
-
+    async function handleLeaveRoom() {
+      await endSessionMutate(sessionId);
+    }
     return () => {
       if (zegoInstanceRef.current) {
         zegoInstanceRef.current.destroy();

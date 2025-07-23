@@ -9,10 +9,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   useCancelSessionByClient,
   useEndSession,
+  useJoinSession,
 } from "@/store/tanstack/mutations/sessionMutation";
 import { useNavigate } from "react-router-dom";
-// import CallLogsModal from "../CallLogsModal";
-// import { Button } from "../ui/button";
+import { useAppDispatch } from "@/store/redux/Hook";
+import { setZcState } from "@/store/redux/zc/zcSlice";
+import CallLogsModal from "../CallLogsModal";
+import { Button } from "../ui/button";
 
 export type SessionStatus =
   | "all"
@@ -37,7 +40,7 @@ export default function SessionsListing() {
   const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
-  // const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
+  const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const handleSort = (field: SortField) => {
@@ -48,7 +51,9 @@ export default function SessionsListing() {
       setSortOrder("asc");
     }
   };
+  const dispatch = useAppDispatch();
   const { mutateAsync: sessionCancel } = useCancelSessionByClient();
+  const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { mutateAsync: endSessionAsync } = useEndSession();
   const { data: sessionsData, refetch: sessionRefetch } =
     useFetchsessionsForclients({
@@ -163,7 +168,18 @@ export default function SessionsListing() {
 
   const handleStartSession = async (session: any) => {
     if (session?.room_id) {
-      navigate(`/client/session/join`);
+      const data = await JoinSessionMutation({
+        sessionId: session?._id || "",
+      });
+      console.log("Joining session:", data);
+      dispatch(
+        setZcState({
+          AppId: data?.zc?.appId,
+          roomId: String(data?.room_id),
+          token: data?.zc?.token,
+        })
+      );
+      navigate(`/client/session/join/${session?._id}`);
       setSelectedSession(session);
     }
   };
@@ -370,7 +386,7 @@ export default function SessionsListing() {
                             <Eye className="h-4 w-4" />
                             View
                           </button>
-                          {/* <Button
+                          <Button
                             variant={"ghost"}
                             onClick={() => {
                               setSelectedSession(session);
@@ -378,7 +394,7 @@ export default function SessionsListing() {
                             }}
                           >
                             📞 Call Logs
-                          </Button> */}
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -388,11 +404,11 @@ export default function SessionsListing() {
             </tbody>
           </table>
         </div>
-        {/* <CallLogsModal
-          sessionId={selectedSession?._id}
+        <CallLogsModal
+          session={selectedSession}
           isOpen={viewCallLogsOpen}
           onOpenChange={(b: boolean) => setViewCallLogsOpen(b)}
-        /> */}
+        />
         <PaginationComponent
           currentPage={currentPage}
           handlePageChange={handlePageChange}
