@@ -14,31 +14,31 @@ import { SocketProvider } from "./context/SocketProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor} />
-    <BrowserRouter>
-      <AuthContextProvider>
-        <ThemeProvider>
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_AUTH_CLIENT_ID}>
-            <QueryClientProvider
-              client={
-                new QueryClient({
-                  defaultOptions: {
-                    queries: {
-                      refetchOnWindowFocus: false,
-                      retry: 3,
+    <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <AuthContextProvider>
+          <ThemeProvider>
+            <GoogleOAuthProvider clientId={import.meta.env.VITE_AUTH_CLIENT_ID}>
+              <QueryClientProvider
+                client={
+                  new QueryClient({
+                    defaultOptions: {
+                      queries: {
+                        refetchOnWindowFocus: false,
+                        retry: 3,
+                      },
                     },
-                  },
-                })
-              }
-            >
-              {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-              <SocketProvider>
-                <App />
-              </SocketProvider>
-            </QueryClientProvider>
-          </GoogleOAuthProvider>
-        </ThemeProvider>
-      </AuthContextProvider>
-    </BrowserRouter>
+                  })
+                }
+              >
+                <SocketProvider>
+                  <App />
+                </SocketProvider>
+              </QueryClientProvider>
+            </GoogleOAuthProvider>
+          </ThemeProvider>
+        </AuthContextProvider>
+      </BrowserRouter>
+    </PersistGate>
   </Provider>
 );

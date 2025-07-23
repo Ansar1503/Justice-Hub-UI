@@ -19,7 +19,7 @@ import { disconnectSocket, getSocket } from "@/utils/socket/socket";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
 import { toast } from "react-toastify";
 
-enum SocketEvents {
+export enum SocketEvents {
   CONNECTED_EVENT = "user_connected",
   CONNECTED_ERROR = "connect_error",
   USER_ONLINE_EVENT = "user_online",

@@ -11,9 +11,13 @@ import {
 } from "@/store/tanstack/mutations/sessionMutation";
 // import ZegoVideoCall from "../ZegoCloud";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
-import CallLogsModal from "../CallLogsModal";
-// import { SocketContext } from "@/context/SocketProvider";
+// import { Button } from "../ui/button";
+// import CallLogsModal from "../CallLogsModal";
+import { SocketContext } from "@/context/SocketProvider";
+import { NotificationType } from "@/types/types/Notification";
+import { store } from "@/store/redux/store";
+import { useAppDispatch } from "@/store/redux/Hook";
+import { setZcState } from "@/store/redux/zc/zcSlice";
 
 export type SessionStatus =
   | "all"
@@ -38,12 +42,14 @@ export default function SessionsListing() {
   const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
-  const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
+  // const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const socket = useContext(SocketContext);
+  const dispatch = useAppDispatch();
+
+  const socket = useContext(SocketContext);
+
   const navigate = useNavigate();
   const { mutateAsync: startSessionMutation } = useStartSession();
-
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -54,7 +60,7 @@ export default function SessionsListing() {
   };
   const { mutateAsync: CancelSession } = useCancelSessionByLawyer();
   const { mutateAsync: endSessionAsync } = useEndSession();
-
+  const { user: currentUser } = store.getState().Auth;
   const { data: sessionsData, refetch: sessionRefetch } =
     useFetchSessionsForLawyers({
       consultation_type: typeFilter,
@@ -166,13 +172,50 @@ export default function SessionsListing() {
     setSelectedSession(session);
     setIsModalOpen(true);
   };
-
   const handleStartSession = async (session: any) => {
     try {
+      if (!socket) {
+        console.warn("Socket is null");
+        return;
+      }
+
       const data = await startSessionMutation({ sessionId: session?._id });
+      console.log("data", data);
+      dispatch(
+        setZcState({
+          roomId: String(data?.room_id),
+          token: data?.zc?.token,
+          AppId: data?.zc?.appId,
+        })
+      );
+      const notificationData: NotificationType = {
+        isRead: false,
+        message: `Your Session has been started by the lawyer ${
+          currentUser?.name
+        } at ${formatDateTime(session?.start_date)}`,
+        sessionId: session?._id,
+        roomId: data?.room_id,
+        recipientId: session?.client_id,
+        senderId: session?.lawyer_id,
+        title: "Session Started",
+        type: "session",
+      };
+      if (!socket.connected) {
+        console.warn("Socket not yet connected. Waiting...");
+        socket.once("connect", () => {
+          console.log("Connected after delay, emitting...");
+          socket.emit("NOTIFICATION_SEND", notificationData);
+        });
+      } else {
+        socket.emit("NOTIFICATION_SEND", notificationData);
+      }
+      // console.log("new notification going to emmit", notificationData);
+
+      socket.emit("NOTIFICATION_SEND", notificationData);
 
       if (data?.room_id) {
-        navigate(`/lawyer/session/join/${data?.room_id}`);
+        console.log("data.roomid is available", data?.room_id);
+        navigate(`/lawyer/session/join`);
         setSelectedSession(session);
       }
     } catch (err) {
@@ -399,7 +442,7 @@ export default function SessionsListing() {
                               <Eye className="h-4 w-4" />
                               View
                             </button>
-                            <Button
+                            {/* <Button
                               variant={"ghost"}
                               onClick={() => {
                                 setSelectedSession(session);
@@ -407,7 +450,7 @@ export default function SessionsListing() {
                               }}
                             >
                               📞 Call Logs
-                            </Button>
+                            </Button> */}
                           </div>
                         </td>
                       </tr>
@@ -518,11 +561,11 @@ export default function SessionsListing() {
             })
           )}
         </div>
-        <CallLogsModal
-          sessionId={selectedSession?._id}
+        {/* <CallLogsModal
+          session={selectedSession}
           isOpen={viewCallLogsOpen}
           onOpenChange={(b: boolean) => setViewCallLogsOpen(b)}
-        />
+        /> */}
         <PaginationComponent
           currentPage={currentPage}
           handlePageChange={handlePageChange}

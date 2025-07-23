@@ -18,7 +18,7 @@ export default function LawyerRoutes() {
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/sessions" element={<SessionPage />} />
         <Route path="/chats" element={<ChatsPage />} />
-        <Route path="/session/join/:id" element={<VideoCall />} />
+        <Route path="/session/join" element={<VideoCall />} />
       </Route>
       <Route element={<LawyerSlotProtectRoute />}>
         <Route path="/slot-setup/:id" element={<SlotAddModal />} />

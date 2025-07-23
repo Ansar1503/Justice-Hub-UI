@@ -6,20 +6,23 @@ export default function ZegoVideoCall({
   roomID,
   userID,
   userName,
+  token,
+  AppId,
 }: {
+  AppId: number;
   roomID: string;
   userID: string;
   userName: string;
+  token: string;
 }) {
+  console.log("zegocloud");
   const containerRef = useRef(null);
   const zegoInstanceRef = useRef<any>(null);
   // const navigate = useNavigate();
   useEffect(() => {
-    const appID = import.meta.env.VITE_ZEGO_APP_ID;
-    const serverSecret = import.meta.env.VITE_ZEGO_SERVERSECRET;
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
-      Number(appID),
-      serverSecret,
+      AppId,
+      token,
       roomID,
       userID,
       userName

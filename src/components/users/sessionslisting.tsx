@@ -11,8 +11,8 @@ import {
   useEndSession,
 } from "@/store/tanstack/mutations/sessionMutation";
 import { useNavigate } from "react-router-dom";
-import CallLogsModal from "../CallLogsModal";
-import { Button } from "../ui/button";
+// import CallLogsModal from "../CallLogsModal";
+// import { Button } from "../ui/button";
 
 export type SessionStatus =
   | "all"
@@ -37,7 +37,7 @@ export default function SessionsListing() {
   const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
-  const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
+  // const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const handleSort = (field: SortField) => {
@@ -163,7 +163,7 @@ export default function SessionsListing() {
 
   const handleStartSession = async (session: any) => {
     if (session?.room_id) {
-      navigate(`/client/session/join/${session?.room_id}`);
+      navigate(`/client/session/join`);
       setSelectedSession(session);
     }
   };
@@ -370,7 +370,7 @@ export default function SessionsListing() {
                             <Eye className="h-4 w-4" />
                             View
                           </button>
-                          <Button
+                          {/* <Button
                             variant={"ghost"}
                             onClick={() => {
                               setSelectedSession(session);
@@ -378,7 +378,7 @@ export default function SessionsListing() {
                             }}
                           >
                             📞 Call Logs
-                          </Button>
+                          </Button> */}
                         </div>
                       </td>
                     </tr>
@@ -388,11 +388,11 @@ export default function SessionsListing() {
             </tbody>
           </table>
         </div>
-        <CallLogsModal
+        {/* <CallLogsModal
           sessionId={selectedSession?._id}
           isOpen={viewCallLogsOpen}
           onOpenChange={(b: boolean) => setViewCallLogsOpen(b)}
-        />
+        /> */}
         <PaginationComponent
           currentPage={currentPage}
           handlePageChange={handlePageChange}

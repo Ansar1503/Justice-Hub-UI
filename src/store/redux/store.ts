@@ -12,11 +12,13 @@ import {
 import storage from "redux-persist/lib/storage";
 import AuthReducer from "./auth/Auth.Slice";
 import ClientReducer from "./client/ClientSlice";
+import zcReducer from "./zc/zcSlice";
 import { combineReducers } from "redux";
 
 const rootReducer = combineReducers({
   Auth: AuthReducer,
   Client: ClientReducer,
+  zc: zcReducer,
 });
 
 const persistConfig = {
@@ -26,7 +28,6 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>

@@ -3,9 +3,11 @@ import UserRoutes from "./Routes/user_routes/User.Routes";
 import { Bounce, ToastContainer } from "react-toastify";
 import { useContext } from "react";
 import { ThemeContext } from "./context/ThemeProvider";
+import { SocketContext } from "./context/SocketProvider";
 
 function App() {
   const { theme } = useContext(ThemeContext);
+  useContext(SocketContext);
   return (
     <>
       <ToastContainer

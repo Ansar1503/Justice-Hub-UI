@@ -1,11 +1,11 @@
 import { store } from "@/store/redux/store";
-import { CallLogs } from "@/types/types/callLogs";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
-import { SessionDocument } from "@/types/types/sessionType";
+import { Session, SessionDocument } from "@/types/types/sessionType";
 import {
   cancelSessionByClient,
   removeDocumentFile,
 } from "@/utils/api/services/clientServices";
+import { joinVideoSession } from "@/utils/api/services/commonServices";
 import {
   cancelSessionByLawyer,
   endSession,
@@ -70,32 +70,40 @@ export function useCancelSessionByClient() {
 
 export function useStartSession() {
   const queryClient = useQueryClient();
-  return useMutation<CallLogs, Error, { sessionId: string }>({
+  return useMutation<
+    Session & { zc: { appId: number; token: string } },
+    Error,
+    { sessionId: string }
+  >({
     mutationFn: (payload) => StartSession(payload.sessionId),
-    onSuccess: (data) => {
-      queryClient.setQueryData(
-        ["callLogs", data?.session_id],
-        (old: {
-          totalCount: number;
-          currentPage: number;
-          totalPage: number;
-          data: CallLogs[];
-        }) => {
-          if (!old) return old;
-          return {
-            ...old,
-            data: old?.data?.map((log) => {
-              if (log?._id == data?._id) {
-                return data;
-              } else {
-                return log;
-              }
-            }),
-          };
-        }
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["client", "sessions"] });
       toast.success("Session started successfully!");
     },
+
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useJoinSession() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    Session & { zc: { appId: number; token: string } },
+    Error,
+    { sessionId: string }
+  >({
+    mutationFn: (payload) => joinVideoSession(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["client", "sessions"] });
+      toast.success("Session started successfully!");
+    },
+
     onError: (error: any) => {
       const message =
         error.response.data?.message ||
