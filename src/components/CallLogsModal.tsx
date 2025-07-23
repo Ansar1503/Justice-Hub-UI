@@ -54,8 +54,8 @@ export default function CallLogsModal({
   });
   const callLogs = callLogData?.data;
   useEffect(() => {
-    refetch();
-  }, [refetch, isOpen]);
+    if (isOpen) refetch();
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen ? isOpen : false} onOpenChange={onOpenChange}>

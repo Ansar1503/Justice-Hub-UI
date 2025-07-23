@@ -5,7 +5,7 @@ import Sidebar from "@/pages/client/layout/Sidebar";
 
 function AppointmentsPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#FFF2F2] dark:bg-black">
+    <div className="flex flex-col min-h-screen  bg-[#FFF2F2] dark:bg-black">
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />

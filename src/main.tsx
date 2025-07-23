@@ -9,6 +9,7 @@ import { store, persistor } from "@/store/redux/store.ts";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { PersistGate } from "redux-persist/integration/react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { SocketProvider } from "./context/SocketProvider.tsx";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 createRoot(document.getElementById("root")!).render(
@@ -31,7 +32,9 @@ createRoot(document.getElementById("root")!).render(
               }
             >
               {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-              <App />
+              <SocketProvider>
+                <App />
+              </SocketProvider>
             </QueryClientProvider>
           </GoogleOAuthProvider>
         </ThemeProvider>

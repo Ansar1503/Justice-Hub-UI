@@ -13,7 +13,6 @@ import {
   useInfiniteFetchMessages,
 } from "@/store/tanstack/infiniteQuery";
 import { useQueryClient } from "@tanstack/react-query";
-// import { toast } from "react-toastify";
 
 import { disconnectSocket, getSocket } from "@/utils/socket/socket";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";

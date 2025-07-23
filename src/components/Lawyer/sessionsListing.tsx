@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/Lawyer/Modals/sessionDetails";
@@ -11,6 +11,9 @@ import {
 } from "@/store/tanstack/mutations/sessionMutation";
 // import ZegoVideoCall from "../ZegoCloud";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../ui/button";
+import CallLogsModal from "../CallLogsModal";
+// import { SocketContext } from "@/context/SocketProvider";
 
 export type SessionStatus =
   | "all"
@@ -35,7 +38,9 @@ export default function SessionsListing() {
   const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // const socket = useContext(SocketContext);
   const navigate = useNavigate();
   const { mutateAsync: startSessionMutation } = useStartSession();
 
@@ -386,13 +391,24 @@ export default function SessionsListing() {
                           </span>
                         </td>
                         <td className="py-4 px-4 text-right">
-                          <button
-                            className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 whitespace-nowrap"
-                            onClick={() => handleViewSession(session)}
-                          >
-                            <Eye className="h-4 w-4" />
-                            View
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+                              onClick={() => handleViewSession(session)}
+                            >
+                              <Eye className="h-4 w-4" />
+                              View
+                            </button>
+                            <Button
+                              variant={"ghost"}
+                              onClick={() => {
+                                setSelectedSession(session);
+                                setViewCallLogsOpen(true);
+                              }}
+                            >
+                              📞 Call Logs
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -502,7 +518,11 @@ export default function SessionsListing() {
             })
           )}
         </div>
-
+        <CallLogsModal
+          sessionId={selectedSession?._id}
+          isOpen={viewCallLogsOpen}
+          onOpenChange={(b: boolean) => setViewCallLogsOpen(b)}
+        />
         <PaginationComponent
           currentPage={currentPage}
           handlePageChange={handlePageChange}
