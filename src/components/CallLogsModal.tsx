@@ -32,7 +32,7 @@ function getDurationFromStartAndEndDate(
 ) {
   if (!startDate || !endDate) return "0";
   const durationInMinutes =
-    (endDate.getTime() - startDate.getTime()) / (1000 * 60);
+    (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60);
   return durationInMinutes.toFixed(2);
 }
 
@@ -98,24 +98,24 @@ export default function CallLogsModal({
                       <TableCell>
                         {log?.end_time
                           ? typeof log.end_time === "string"
-                            ? log.end_time
+                            ? format(new Date(log.end_time), "Pp")
                             : format(new Date(log.end_time), "Pp")
                           : "N/A"}
                       </TableCell>
                       <TableCell>
-                        {log.callDuration ? log?.callDuration : "0"} min
+                        {log.callDuration ? log?.callDuration : "0"} mins
                       </TableCell>
                       <TableCell>
                         {getDurationFromStartAndEndDate(
                           log?.client_joined_at,
                           log?.client_left_at
-                        )}
+                        )} mins
                       </TableCell>
                       <TableCell>
                         {getDurationFromStartAndEndDate(
                           log?.lawyer_joined_at,
                           log?.lawyer_left_at
-                        )}
+                        )} mins
                       </TableCell>
                       <TableCell>
                         {log?.status === "ongoing"

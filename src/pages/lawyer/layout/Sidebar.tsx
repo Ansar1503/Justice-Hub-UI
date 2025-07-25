@@ -1,4 +1,5 @@
 import { Calendar, Calendar1Icon, Timer, User, UserPen } from "lucide-react";
+// import { GoCodeReview } from "react-icons/go";
 import { useState } from "react";
 import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
@@ -29,6 +30,11 @@ export default function Sidebar() {
       label: "Sessions",
       icon: IoChatbubblesOutline,
     },
+    // {
+    //   path: `/${user?.role}/reviews`,
+    //   label: "Reviews",
+    //   icon: GoCodeReview,
+    // },
   ];
 
   return (
