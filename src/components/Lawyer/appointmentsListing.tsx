@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Search,
-  Filter,
-  Eye,
-  Calendar,
-  Clock,
-} from "lucide-react";
+import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
 import { useFetchAppointmentsForLawyers } from "@/store/tanstack/queries";
 import ClientAppointmentDetailModal from "@/components/Lawyer/Modals/appointmentDetails";
@@ -57,6 +51,7 @@ export default function LawyerClientAppointmentListing() {
       page: currentPage,
       search: searchTerm,
     });
+  // console.log("appointmentData ----", appointmentData);
   const appointments = appointmentData?.data;
 
   const { mutateAsync: rejectMutation } = useRejectAppointment();
@@ -128,6 +123,7 @@ export default function LawyerClientAppointmentListing() {
   };
 
   const formatTimeTo12Hour = (time: string) => {
+    if (!time) return;
     const [hourStr, minute] = time.split(":");
     let hour = Number.parseInt(hourStr, 10);
     const ampm = hour >= 12 ? "PM" : "AM";
@@ -328,23 +324,23 @@ export default function LawyerClientAppointmentListing() {
                           <Avatar className="h-8 w-8 border flex-shrink-0">
                             <AvatarImage
                               src={appointment?.clientData?.profile_image}
-                              alt={appointment?.userData?.name}
+                              alt={appointment?.clientData?.name}
                             />
                             <AvatarFallback>
-                              {appointment?.userData?.name
+                              {appointment?.clientData?.name
                                 ?.substring(0, 2)
                                 ?.toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
                             <p className="font-medium text-base text-gray-900 dark:text-white truncate">
-                              {appointment?.userData?.name}
+                              {appointment?.clientData?.name}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                              {appointment?.userData?.email}
+                              {appointment?.clientData?.email}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Phone: {appointment?.userData?.phone || "N/A"}
+                              Phone: {appointment?.clientData?.phone || "N/A"}
                             </p>
                           </div>
                         </div>
@@ -413,20 +409,20 @@ export default function LawyerClientAppointmentListing() {
                     <Avatar className="h-10 w-10 border flex-shrink-0">
                       <AvatarImage
                         src={appointment?.clientData?.profile_image}
-                        alt={appointment?.userData?.name}
+                        alt={appointment?.clientData?.name}
                       />
                       <AvatarFallback>
-                        {appointment?.userData?.name
+                        {appointment?.clientData?.name
                           ?.substring(0, 2)
                           ?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-gray-900 dark:text-white truncate">
-                        {appointment?.userData?.name}
+                        {appointment?.clientData?.name}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                        {appointment?.userData?.email}
+                        {appointment?.clientData?.email}
                       </p>
                     </div>
                   </div>
@@ -479,10 +475,10 @@ export default function LawyerClientAppointmentListing() {
                 </div>
 
                 {/* Phone Number */}
-                {appointment?.userData?.phone && (
+                {appointment?.clientData?.phone && (
                   <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Phone: {appointment?.userData?.phone}
+                      Phone: {appointment?.clientData?.phone}
                     </span>
                   </div>
                 )}

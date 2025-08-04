@@ -8,6 +8,10 @@ import { AlertDestructive } from "../ui/custom/AlertDestructive";
 import { ButtonLink } from "../ui/custom/ButtonLink";
 import { useState } from "react";
 import LawyerVerificationFormModal from "../Lawyer/Modals/LawyerVerificationFormModal";
+// import { useNavigate } from "react-router-dom";
+import { store } from "@/store/redux/store";
+import { setProfileImage, signOut } from "@/store/redux/auth/Auth.Slice";
+import { LogOut } from "@/store/redux/client/ClientSlice";
 
 function ProfileCard() {
   // const userData = useAppSelector((state) => state.Auth.user);
@@ -15,7 +19,14 @@ function ProfileCard() {
   // const [successMessage, setSuccessMessage] = useState("");
   const { data, isLoading } = useFetchClientData();
   const [verificationForm, setVerificationForm] = useState(false);
-
+  // console.log("userdata");
+  if (!data && !isLoading) {
+    store.dispatch(signOut());
+    store.dispatch(LogOut());
+  }
+  if (data && data?.data?.profile_image) {
+    store.dispatch(setProfileImage(data?.data?.profile_image));
+  }
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Success Message
@@ -40,10 +51,7 @@ function ProfileCard() {
             message="you profile is not completed, please complete your profile"
             title="Complete your Profile"
           />
-          <div
-            className="mt-3 mr-2"
-            onClick={() => setVerificationForm(true)}
-          >
+          <div className="mt-3 mr-2" onClick={() => setVerificationForm(true)}>
             <ButtonLink text="Complete Now" />
           </div>
         </div>
@@ -54,10 +62,7 @@ function ProfileCard() {
             message="Your lawyer verification was rejected. Please resubmit your details."
             title="Verification Rejected"
           />
-          <div
-            className="mt-3 mr-3"
-            onClick={() => setVerificationForm(true)}
-          >
+          <div className="mt-3 mr-3" onClick={() => setVerificationForm(true)}>
             <ButtonLink text="Resubmit" />
           </div>
         </div>

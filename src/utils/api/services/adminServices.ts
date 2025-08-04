@@ -23,6 +23,7 @@ export async function fetchUserByRole(query: {
       },
     }
   );
+  // console.log("response of users from admin : ", response);
   return response.data;
 }
 
@@ -175,4 +176,3 @@ export async function deleteDisputeReview(payload: {
   );
   return response.data;
 }
-

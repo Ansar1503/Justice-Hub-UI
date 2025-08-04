@@ -225,12 +225,12 @@ function BasicInfoForm({
                     type="text"
                     name="name"
                     disabled={!isEditingBasic}
-                    value={BasicInfo.name}
+                    value={BasicInfo?.name}
                     onChange={handleChange}
                     className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
                   />
                   {errors.name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                    <p className="text-red-500 text-sm mt-1">{errors?.name}</p>
                   )}
                 </>
               )}

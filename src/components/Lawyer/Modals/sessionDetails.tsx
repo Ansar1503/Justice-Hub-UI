@@ -255,17 +255,17 @@ export default function SessionDetailModal({
                           session?.clientData?.profile_image ||
                           "/placeholder.svg"
                         }
-                        alt={session?.userData?.name}
+                        alt={session?.clientData?.name}
                         className="h-full w-full object-cover"
                       />
                       <AvatarFallback className="h-full w-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 rounded-full">
-                        {session?.userData?.name
+                        {session?.clientData?.name
                           ?.substring(0, 2)
                           ?.toUpperCase() || "NA"}
                       </AvatarFallback>
                     </Avatar>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {session?.userData?.name || "N/A"}
+                      {session?.clientData?.name || "N/A"}
                     </p>
                   </div>
                 </div>
@@ -274,7 +274,7 @@ export default function SessionDetailModal({
                     Email
                   </p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {session?.userData?.email || "N/A"}
+                    {session?.clientData?.email || "N/A"}
                   </p>
                 </div>
                 <div>

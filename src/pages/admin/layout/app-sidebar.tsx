@@ -12,8 +12,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useFetchClientData } from "@/store/tanstack/queries";
 import { useLocation } from "react-router-dom";
+import { store } from "@/store/redux/store";
 
 const navdata = {
   navMain: [
@@ -74,8 +74,7 @@ const navdata = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data } = useFetchClientData();
-  const user = data?.data?.role === "admin" ? data?.data : null;
+  const { user } = store.getState().Auth;
   const location = useLocation();
 
   const dashItems = navdata.navMain.map((item) => {
@@ -108,9 +107,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <NavUser
           user={{
-            avatar: user?.profile_image || "",
+            avatar: user?.name.charAt(0) || "",
             email: user?.email || "",
-            name: user?.name,
+            name: user?.name || "NA",
           }}
         />
       </SidebarFooter>

@@ -49,20 +49,25 @@ import { ChatMessage, ChatSession } from "@/types/types/ChatType";
 import { Review } from "@/types/types/Review";
 import { Disputes } from "@/types/types/Disputes";
 import { fetchCallLogs } from "@/utils/api/services/commonServices";
+import { store } from "../redux/store";
 
 export function useFetchClientData() {
+  const { user } = store.getState().Auth;
   return useQuery({
     queryKey: ["user"],
     queryFn: fetchClientData,
     retry: 2,
+    enabled: user && user?.role !== "admin" ? true : false,
   });
 }
 
 export function useFetchLawyerData() {
+  const { user } = store.getState().Auth;
   return useQuery({
     queryKey: ["lawyer"],
     queryFn: fetchLawyerData,
     retry: 2,
+    enabled: user && user?.role === "lawyer" ? true : false,
   });
 }
 
@@ -78,7 +83,6 @@ export function useFetchUsersByRole(query: {
   return useQuery({
     queryKey: ["user", query.role],
     queryFn: () => fetchUserByRole(query),
-    staleTime: 1000 * 60 * 10,
     retry: 2,
   });
 }
@@ -165,7 +169,7 @@ export function useFetchAppointmentsForClients(payload: {
   limit: number;
 }) {
   return useQuery({
-    queryKey: ["client", "appointments"],
+    queryKey: ["client", "appointments", payload],
     queryFn: () => fetchAppointmentsForClient(payload),
     retry: 2,
   });
@@ -181,9 +185,9 @@ export function useFetchAppointmentsForLawyers(payload: {
   limit: number;
 }) {
   return useQuery({
-    queryKey: ["lawyer", "appointments"],
+    queryKey: ["lawyer", "appointments", payload],
     queryFn: () => fetchAppointmentsForLawyers(payload),
-    staleTime: 1000 * 60 * 10,
+    retry: 2,
   });
 }
 
@@ -199,7 +203,7 @@ export function useFetchSessionsForLawyers(payload: {
   return useQuery({
     queryKey: ["lawyer", "sessions"],
     queryFn: () => fetchSessionsforLawyers(payload),
-    staleTime: 1000 * 60 * 10,
+    retry: 2,
   });
 }
 
@@ -423,6 +427,6 @@ export function useFetchCallLogs(payload: {
     queryKey: ["callLogs", payload],
     queryFn: () => fetchCallLogs(payload),
     retry: 2,
-    enabled: payload.sessionId ? true : false,  
+    enabled: payload.sessionId ? true : false,
   });
 }

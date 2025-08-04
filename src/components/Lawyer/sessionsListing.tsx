@@ -73,7 +73,7 @@ export default function SessionsListing() {
       sort: sortBy,
       status: statusFilter,
     });
-
+  // console.log("sessionss", sessionsData);
   const sessions = sessionsData?.data;
 
   useEffect(() => {
@@ -402,21 +402,21 @@ export default function SessionsListing() {
                             <Avatar className="h-10 w-10 border flex-shrink-0 rounded-full overflow-hidden">
                               <AvatarImage
                                 src={session?.clientData?.profile_image}
-                                alt={session?.userData?.name}
+                                alt={session?.clientData?.name}
                                 className="h-full w-full object-cover"
                               />
                               <AvatarFallback className="h-full w-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-sm font-medium text-blue-600 dark:text-blue-300 rounded-full">
-                                {session?.userData?.name
+                                {session?.clientData?.name
                                   ?.substring(0, 2)
                                   ?.toUpperCase() || "NA"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0 flex-1">
                               <p className="font-medium text-base text-gray-900 dark:text-white truncate">
-                                {session?.userData?.name || "N/A"}
+                                {session?.clientData?.name || "N/A"}
                               </p>
                               <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                                {session?.userData?.email || "N/A"}
+                                {session?.clientData?.email || "N/A"}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {session?.clientData?.phone || "N/A"}
@@ -499,21 +499,21 @@ export default function SessionsListing() {
                       <Avatar className="h-12 w-12 border flex-shrink-0 rounded-full overflow-hidden">
                         <AvatarImage
                           src={session?.clientData?.profile_image}
-                          alt={session?.userData?.name}
+                          alt={session?.clientData?.name}
                           className="h-full w-full object-cover"
                         />
                         <AvatarFallback className="h-full w-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-sm font-medium text-blue-600 dark:text-blue-300 rounded-full">
-                          {session?.userData?.name
+                          {session?.clientData?.name
                             ?.substring(0, 2)
                             ?.toUpperCase() || "NA"}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
                         <p className="font-medium text-gray-900 dark:text-white truncate">
-                          {session?.userData?.name || "N/A"}
+                          {session?.clientData?.name || "N/A"}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                          {session?.userData?.email || "N/A"}
+                          {session?.clientData?.email || "N/A"}
                         </p>
                       </div>
                     </div>

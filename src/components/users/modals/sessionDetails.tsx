@@ -58,8 +58,8 @@ interface Session {
   end_time?: string;
   client_joined_at?: string;
   follow_up_suggested?: boolean;
-  userData: any;
   clientData: any;
+  lawyerData: any;
 }
 
 interface SessionDetailModalProps {
@@ -191,7 +191,7 @@ export default function SessionDetailModal({
 
   // Session status checks
   const sessionStartable = useMemo(() => {
-    return true
+    // return true;
     if (!session || !session.room_id) return false;
 
     const currentDate = new Date();
@@ -383,18 +383,18 @@ export default function SessionDetailModal({
                   <div className="flex items-center gap-3 mb-2">
                     <Avatar className="h-10 w-10 rounded-full overflow-hidden">
                       <AvatarImage
-                        src={session.userData.profile_image || ""}
-                        alt={session.userData.name}
+                        src={session?.lawyerData?.profile_image || ""}
+                        alt={session?.lawyerData?.name}
                         className="h-full w-full object-cover"
                       />
                       <AvatarFallback className="h-full w-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 rounded-full">
-                        {session.userData.name
+                        {session?.lawyerData?.name
                           ?.substring(0, 2)
                           ?.toUpperCase() || "NA"}
                       </AvatarFallback>
                     </Avatar>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {session.userData.name || "N/A"}
+                      {session?.lawyerData?.name || "N/A"}
                     </p>
                   </div>
                 </div>
@@ -403,7 +403,7 @@ export default function SessionDetailModal({
                     Email
                   </p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {session.userData.email || "N/A"}
+                    {session?.lawyerData?.email || "N/A"}
                   </p>
                 </div>
                 <div>
@@ -411,7 +411,7 @@ export default function SessionDetailModal({
                     Phone
                   </p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {session.clientData.phone || "N/A"}
+                    {session?.lawyerData?.phone || "N/A"}
                   </p>
                 </div>
               </div>
@@ -716,8 +716,8 @@ export default function SessionDetailModal({
         sessionId={session?._id || ""}
         isOpen={showFeedbackModal}
         onClose={() => setShowFeedbackModal(false)}
-        lawyerId={session.userData?.user_id || ""}
-        lawyerName={session.userData.name || "Unknown Lawyer"}
+        lawyerId={session.lawyerData?.user_id || ""}
+        lawyerName={session.lawyerData.name || "Unknown Lawyer"}
       />
     </>
   );

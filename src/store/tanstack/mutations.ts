@@ -44,7 +44,7 @@ export function useLoginMutation() {
     onSuccess: (data) => {
       // console.log("data", data);
       dispatch(setUser(data.user));
-      dispatch(setToken(data.token));
+      dispatch(setToken(data.accesstoken));
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate(`/${data.user.role}/`);
@@ -450,4 +450,3 @@ export function useDeleteDisputeReview() {
     },
   });
 }
-

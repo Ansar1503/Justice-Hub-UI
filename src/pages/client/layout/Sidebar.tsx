@@ -2,15 +2,13 @@ import { Calendar, Calendar1, User, UserPen } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
-import { useFetchClientData } from "@/store/tanstack/queries";
+// import { useFetchClientData } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { IoChatbubblesOutline } from "react-icons/io5";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const user = useAppSelector((state) => state.Auth.user);
-  const { data } = useFetchClientData();
-  const userData = data?.data;
   const location = useLocation();
   const path = location.pathname;
   const pathname = path.split("/")[path.split("/").length - 1];
@@ -93,8 +91,8 @@ export default function Sidebar() {
           <Avatar className="h-8 w-8 rounded-lg">
             <AvatarImage
               className="rounded-full"
-              src={userData?.profile_image}
-              alt={userData?.name}
+              src={user?.profile_image}
+              alt={user?.name}
             />
             <AvatarFallback className="rounded-lg">
               <User />

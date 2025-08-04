@@ -168,17 +168,17 @@ export default function ReviewDisputesTable({
                 <TableCell className="p-3 bg-white/5">
                   <div className="max-w-xs">
                     <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                      {dispute.contentData.heading}
+                      {dispute?.contentData?.heading}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                      {dispute.contentData.review}
+                      {dispute?.contentData?.review}
                     </p>
                   </div>
                 </TableCell>
 
                 {/* Rating */}
                 <TableCell className="p-3 bg-white/5">
-                  {renderStars(dispute.contentData.rating)}
+                  {renderStars(dispute?.contentData?.rating)}
                 </TableCell>
 
                 {/* Report Reason */}
@@ -193,7 +193,7 @@ export default function ReviewDisputesTable({
                 {/* Review Date */}
                 <TableCell className="p-3 bg-white/5">
                   <div className="text-sm text-gray-900 dark:text-white">
-                    {new Date(dispute.contentData.createdAt).toLocaleDateString(
+                    {new Date(dispute?.contentData?.createdAt)?.toLocaleDateString(
                       "en-US",
                       {
                         month: "short",
@@ -203,7 +203,7 @@ export default function ReviewDisputesTable({
                     )}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {new Date(dispute.contentData.createdAt).toLocaleTimeString(
+                    {new Date(dispute?.contentData?.createdAt).toLocaleTimeString(
                       "en-US",
                       {
                         hour: "2-digit",

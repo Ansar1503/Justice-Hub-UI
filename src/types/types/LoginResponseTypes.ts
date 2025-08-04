@@ -9,7 +9,7 @@ export interface ResponseType {
 export interface LoginResponse {
   success: boolean;
   message: string;
-  token: string;
+  accesstoken: string;
   user: {
     email: string;
     name: string;

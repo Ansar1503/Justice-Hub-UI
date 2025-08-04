@@ -116,7 +116,7 @@ export default function ClientAppointmentDetailModal({
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
                   <span className="text-sm font-medium text-green-600 dark:text-green-300">
-                    {appointment?.userData?.name
+                    {appointment?.clientData?.name
                       ?.split(" ")
                       .map((n: string) => n[0].toUpperCase())
                       .join("")
@@ -125,18 +125,18 @@ export default function ClientAppointmentDetailModal({
                 </div>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {appointment?.userData?.name}
+                    {appointment?.clientData?.name}
                   </p>
                   <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
                     <Mail className="h-3 w-3" />
-                    {appointment?.userData?.email}
+                    {appointment?.clientData?.email}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
                 <Phone className="h-3 w-3" />
                 <span className="font-medium">Phone:</span>{" "}
-                {appointment?.userData?.phone || "N/A"}
+                {appointment?.clientData?.phone || "N/A"}
               </div>
             </div>
 

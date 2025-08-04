@@ -59,6 +59,7 @@ export default function LawyerAppointmentListing() {
       page: currentPage,
       search: searchTerm,
     });
+  console.log("data", appointmentData);
   const { mutateAsync: cancelAppointmentMutate } = useCancellAppointment();
   const appointments = appointmentData?.data ?? [];
 

@@ -4,6 +4,7 @@ export type userDataType = {
   user_id?: string;
   name: string;
   email: string;
+  profile_image?: string;
   mobile?: string;
   password?: string;
   role?: UserEnum;
@@ -69,7 +70,7 @@ export interface LawyerFilterParams {
   experienceMax: number;
   feeMin: number;
   feeMax: number;
-  sortBy: "rating" | "experience" | "fee-low" | "fee-high" ;
+  sortBy: "rating" | "experience" | "fee-low" | "fee-high";
   page?: number;
   limit?: number;
 }

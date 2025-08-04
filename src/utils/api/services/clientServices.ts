@@ -16,7 +16,6 @@ import { Review } from "@/types/types/Review";
 
 export async function fetchClientData() {
   const { token } = store.getState().Auth;
-
   const response = await axiosinstance.get(`/api/client/profile`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -176,6 +175,7 @@ export async function fetchAppointmentsForClient(payload: {
   limit: number;
 }) {
   // console.log("payload", payload);
+
   const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
     `/api/client/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&appointmentType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
@@ -343,8 +343,8 @@ export async function deleteReview(payload: { review_id: string }) {
 
 export async function reportReview(payload: {
   review_id: string;
-  reportedBy:string;
-  reportedUser:string;
+  reportedBy: string;
+  reportedUser: string;
   reason: string;
 }) {
   const { token } = store.getState().Auth;

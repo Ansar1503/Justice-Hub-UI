@@ -65,7 +65,7 @@ export default function SessionsListing() {
       sort: sortBy,
       status: statusFilter,
     });
-  //   console.log("datad", sessionsData);
+  console.log("datad", sessionsData);
   const sessions = sessionsData?.data;
 
   useEffect(() => {
@@ -328,25 +328,25 @@ export default function SessionsListing() {
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8 rounded-full overflow-hidden">
                             <AvatarImage
-                              src={session?.clientData?.profile_image}
-                              alt={session?.userData?.name}
+                              src={session?.lawyerData?.profile_image}
+                              alt={session?.lawyerData?.name}
                               className="rounded-full"
                             />
                             <AvatarFallback className="rounded-full w-8 h-8 bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium">
-                              {session?.userData?.name
+                              {session?.lawyerData?.name
                                 ?.substring(0, 2)
                                 ?.toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-medium text-base text-gray-900 dark:text-white">
-                              {session?.userData?.name || "N/A"}
+                              {session?.lawyerData?.name || "N/A"}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {session?.userData?.email || "N/A"}
+                              {session?.lawyerData?.email || "N/A"}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {session?.clientData?.phone || "N/A"}
+                              {session?.lawyerData?.phone || "N/A"}
                             </p>
                           </div>
                         </div>

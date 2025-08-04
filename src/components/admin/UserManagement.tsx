@@ -69,15 +69,17 @@ export function UserManagement() {
     limit: itemsPerPage,
     status: statusFilter,
   });
+
   useEffect(() => {
     async function refetch() {
       await refetchUser();
     }
     refetch();
   }, [currentPage, refetchUser]);
-  // console.log("data:", data);
-  const users = useMemo(() => data?.data?.data || [], [data]);
-  const totalCount = useMemo(() => data?.data?.totalCount || 0, [data]);
+  console.log("data:", data);
+  const users = useMemo(() => data?.data || [], [data]);
+  console.log("users", users);
+  const totalCount = useMemo(() => data?.totalCount || 0, [data]);
   const totalPages = useMemo(
     () => Math.ceil(totalCount / itemsPerPage),
     [totalCount, itemsPerPage]
@@ -234,7 +236,7 @@ export function UserManagement() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-100 dark:bg-slate-800">
-                  <TableHead>User</TableHead>
+                    <TableHead>User</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Email Verified</TableHead>
                     {activeTab === "lawyer" && <TableHead>Status</TableHead>}
