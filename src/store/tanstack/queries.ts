@@ -66,7 +66,7 @@ export function useFetchLawyerData() {
   return useQuery({
     queryKey: ["lawyer"],
     queryFn: fetchLawyerData,
-    retry: 2,
+    retry: 1,
     enabled: user && user?.role === "lawyer" ? true : false,
   });
 }
