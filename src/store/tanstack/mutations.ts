@@ -7,7 +7,7 @@ import {
 } from "@/utils/api/services/LawyerServices";
 import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
 import {
-  blockUser,
+  ChangeBlockStatusUser,
   changeLawyerVerificationStatus,
   deleteDisputeReview,
 } from "@/utils/api/services/adminServices";
@@ -153,13 +153,16 @@ export function useUpdateAddressMutation() {
 export function useBlockUser() {
   const queryClient = useQueryClient();
   return useMutation<
-    ResponseType & { data: { role: "admin" | "client" | "lawyer" } },
+    ResponseType & {
+      data: { role: "admin" | "client" | "lawyer"; status: boolean };
+    },
     Error,
-    string
+    { user_id: string; status: boolean }
   >({
-    mutationFn: (user_id) => blockUser(user_id),
+    mutationFn: (payload) =>
+      ChangeBlockStatusUser(payload.user_id, payload.status),
     onSuccess: (data) => {
-      console.log('data',data)
+      console.log("data", data);
       toast.success(data.message);
       const role = data.data.role;
       queryClient.invalidateQueries({ queryKey: ["user", role] });

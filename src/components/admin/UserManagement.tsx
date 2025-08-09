@@ -379,7 +379,10 @@ export function UserManagement() {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     if (!user.user_id) return;
-                                    await mutateAsync(user.user_id);
+                                    await mutateAsync({
+                                      status: false,
+                                      user_id: user.user_id,
+                                    });
                                     document.body.click();
                                   }}
                                 >
@@ -393,7 +396,10 @@ export function UserManagement() {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     if (!user.user_id) return;
-                                    await mutateAsync(user.user_id);
+                                    await mutateAsync({
+                                      status: false,
+                                      user_id: user.user_id,
+                                    });
                                     document.body.click();
                                   }}
                                 >

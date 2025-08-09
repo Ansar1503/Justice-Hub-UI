@@ -52,11 +52,11 @@ export async function fetchAllLawyers(query: {
   return response.data;
 }
 
-export async function blockUser(user_id: string) {
+export async function ChangeBlockStatusUser(user_id: string, status: boolean) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.patch(
     "/api/admin/user/",
-    { user_id },
+    { user_id, status },
     {
       headers: {
         Authorization: `Bearer ${token}`,
