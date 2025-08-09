@@ -86,9 +86,9 @@ export function useDeleteOverrideSlot() {
   return useMutation<
     ResponseType & { data: OverrideDateResponse },
     Error,
-    string
+    Date
   >({
-    mutationFn: (payload: string) => removeOverrideSlot(payload),
+    mutationFn: (payload) => removeOverrideSlot(payload),
     onSuccess: (data) => {
       toast.success(data.message);
       queryClient.setQueryData(["schedule", "overrides"], data.data);

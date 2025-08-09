@@ -95,10 +95,10 @@ export async function fetchOverrideslots() {
   return response.data;
 }
 
-export async function removeOverrideSlot(overrideId: string) {
+export async function removeOverrideSlot(overrideDate: Date) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.delete(
-    `/api/lawyer/schedule/override/${overrideId}`,
+    `/api/lawyer/schedule/override?date=${overrideDate}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

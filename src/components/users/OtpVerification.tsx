@@ -86,6 +86,7 @@ function OtpVerification() {
   const handleResend = async () => {
     setLoading(true);
     try {
+      setError("");
       await axiosinstance.post("/api/user/resend-otp", { email });
       setOtp(Array(6).fill(""));
       inputRefs.current[0]?.focus();
@@ -97,7 +98,7 @@ function OtpVerification() {
         toast.error(error.message);
       } else if (error.response) {
         if (error.response.data) {
-          setError(error.response.data?.message);
+          setError(error.response.data?.error);
         }
       }
     }
@@ -117,10 +118,9 @@ function OtpVerification() {
         setLoading(false);
         navigate("/login");
       } catch (error: any) {
-        console.log(error);
         if (error.response) {
           if (error.response.data) {
-            setError(error.response.data?.message);
+            setError(error.response.data?.error);
           }
         }
         setLoading(false);

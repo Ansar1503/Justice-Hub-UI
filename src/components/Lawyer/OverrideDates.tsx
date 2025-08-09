@@ -299,9 +299,9 @@ export default function OverrideDates() {
     setTimeRanges([{ start: "09:00", end: "17:00" }]);
   }, [selectedDates.length]);
 
-  const removeOverrideDate = async (overrideId: string) => {
+  const removeOverrideDate = async (date: Date) => {
     try {
-      await DeleteOverrideSlot(overrideId);
+      await DeleteOverrideSlot(date);
     } catch (error) {
       console.error("Failed to remove override date", error);
     }
@@ -497,7 +497,7 @@ export default function OverrideDates() {
                         type="button"
                         variant="destructive"
                         size="icon"
-                        onClick={() => removeOverrideDate(override._id)}
+                        onClick={() => removeOverrideDate(override.date)}
                         className="h-8 w-8 ml-2"
                         aria-label={`Remove override for ${format(
                           new Date(override.date),

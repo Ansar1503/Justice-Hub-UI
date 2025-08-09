@@ -90,12 +90,12 @@ function SignupComponent() {
         };
         setLoading(true);
         const response = await axiosinstance.post(`/api/user/signup`, postData);
-        // console.log(response.data?.userData?.email);
-        navigate(`/otp?email=${response.data.userData.email}`);
+        console.log(response.data);
+        navigate(`/otp?email=${response.data?.email}`);
         setLoading(false);
       } catch (error: any) {
         setLoading(false);
-        // console.log(error);
+        console.log(error);
         if (error.code === "ERR_NETWORK") {
           toast.error(error.message);
         } else if (error.response) {

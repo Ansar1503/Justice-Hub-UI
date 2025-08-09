@@ -51,8 +51,7 @@ export function useLoginMutation() {
     },
     onError: (error: any) => {
       console.log("error", error);
-      const message =
-        error.response?.data?.message || "Login failed. Try again.";
+      const message = error.response?.data?.error || "Login failed. Try again.";
       error.message = message;
       toast.error(message);
     },
@@ -87,8 +86,9 @@ export function useUpdateEmailMutation() {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (error: any) => {
+      console.log("error in update email", error);
       const message =
-        error.response?.data?.message || "update failed! Try again.";
+        error.response?.data?.error || "update failed! Try again.";
       error.message = message;
       toast.error(message);
     },
@@ -126,7 +126,7 @@ export function useUpdatePasswordMutation() {
     },
     onError: (error: any) => {
       const message =
-        error.response?.data?.message || "update failed! Try again.";
+        error.response?.data?.error || "update failed! Try again.";
       error.message = message;
       toast.error(message);
     },
