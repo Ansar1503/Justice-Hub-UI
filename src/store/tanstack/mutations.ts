@@ -159,6 +159,7 @@ export function useBlockUser() {
   >({
     mutationFn: (user_id) => blockUser(user_id),
     onSuccess: (data) => {
+      console.log('data',data)
       toast.success(data.message);
       const role = data.data.role;
       queryClient.invalidateQueries({ queryKey: ["user", role] });
