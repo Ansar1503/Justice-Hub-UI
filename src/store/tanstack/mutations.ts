@@ -186,7 +186,7 @@ export function useLawyerVerification() {
     },
     onError: (error: any) => {
       const message =
-        error.response.data?.message || "lawyer verification failed!";
+        error.response.data?.error || "lawyer verification failed!";
       error.message = message;
       toast.error(message);
     },
@@ -201,6 +201,7 @@ export function useChangeLawyerVerificationStatus() {
     {
       user_id: string;
       status: "verified" | "rejected" | "pending" | "requested";
+      rejectReason?: string;
     }
   >({
     mutationFn: (payload) => changeLawyerVerificationStatus(payload),

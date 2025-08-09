@@ -93,8 +93,8 @@ function LawyerVerificationForm({
     });
   };
   const { data } = useFetchLawyerData();
-  const lawyerData = data ? data?.data._doc : "";
-  console.log("lawyerData:", lawyerData);
+  const lawyerData = data ? data : "";
+
   useEffect(() => {
     setLoading(isPending);
   }, [isPending, setLoading]);

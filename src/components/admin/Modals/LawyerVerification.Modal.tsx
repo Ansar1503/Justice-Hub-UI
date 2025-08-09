@@ -97,7 +97,11 @@ export function LawyerVerificationModal({
 
     try {
       setStatusAction("reject");
-      await mutateAsync({ user_id, status: "rejected" });
+      await mutateAsync({
+        user_id,
+        status: "rejected",
+        rejectReason: rejectionReason,
+      });
       setIsRejectionDialogOpen(false);
       onClose();
     } catch (error) {
@@ -120,7 +124,6 @@ export function LawyerVerificationModal({
 
   const handleDownloadDocument = (url: string, name: string) => {
     if (url) {
-      
       const link = document.createElement("a");
       link.href = url;
       link.download = `${name}.${url.split(".").pop() || "pdf"}`;
@@ -336,8 +339,7 @@ export function LawyerVerificationModal({
                         Email Address
                       </Label>
                       <p className="mt-1 font-medium">
-                        {lawyer.email}{" "}
-                        {lawyer.is_verified}
+                        {lawyer.email} {lawyer.is_verified}
                       </p>
                     </div>
                     <div>

@@ -69,14 +69,16 @@ export async function ChangeBlockStatusUser(user_id: string, status: boolean) {
 export async function changeLawyerVerificationStatus({
   user_id,
   status,
+  rejectReason,
 }: {
+  rejectReason?: string;
   user_id: string;
   status: "verified" | "rejected" | "pending" | "requested";
 }) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.patch(
     "/api/admin/lawyer/",
-    { user_id, status },
+    { user_id, status, rejectReason },
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
