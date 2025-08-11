@@ -37,6 +37,7 @@ const days = [
 export function AvailabilityForm() {
   const { id } = useParams();
   const { data } = useFetchAvailableSlots();
+  // console.log("availabielitydata ::", data);
   const availabilityData = data?.data as Availability;
   const [availability, setAvailability] = useState<Availability>({
     monday: { enabled: true, timeSlots: [{ start: "09:00", end: "17:00" }] },
@@ -75,40 +76,37 @@ export function AvailabilityForm() {
     }
   }, [queryClient]);
 
- const timeOptions = useMemo(() => {
-  const duration = Number(slotSettings?.slotDuration);
+  const timeOptions = useMemo(() => {
+    const duration = Number(slotSettings?.slotDuration);
 
-  const times = [];
+    const times = [];
 
-  if (!duration || duration <= 0) {
-    // Default: every 30 minutes
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const timeString = `${hour.toString().padStart(2, "0")}:${minute
-          .toString()
-          .padStart(2, "0")}`;
-        times.push(timeString);
+    if (!duration || duration <= 0) {
+      for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+          const timeString = `${hour.toString().padStart(2, "0")}:${minute
+            .toString()
+            .padStart(2, "0")}`;
+          times.push(timeString);
+        }
       }
+      return times;
     }
+
+    const totalMinutesInDay = 24 * 60;
+
+    for (let minutes = 0; minutes < totalMinutesInDay; minutes += duration) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+
+      const timeString = `${hours.toString().padStart(2, "0")}:${mins
+        .toString()
+        .padStart(2, "0")}`;
+      times.push(timeString);
+    }
+
     return times;
-  }
-
-  // Custom duration
-  const totalMinutesInDay = 24 * 60;
-
-  for (let minutes = 0; minutes < totalMinutesInDay; minutes += duration) {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-
-    const timeString = `${hours.toString().padStart(2, "0")}:${mins
-      .toString()
-      .padStart(2, "0")}`;
-    times.push(timeString);
-  }
-
-  return times;
-}, [slotSettings?.slotDuration]);
-
+  }, [slotSettings?.slotDuration]);
 
   const formatTime = useCallback((time24: string) => {
     const [hours, minutes] = time24.split(":");

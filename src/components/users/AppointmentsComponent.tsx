@@ -59,7 +59,6 @@ export default function LawyerAppointmentListing() {
       page: currentPage,
       search: searchTerm,
     });
-  console.log("data", appointmentData);
   const { mutateAsync: cancelAppointmentMutate } = useCancellAppointment();
   const appointments = appointmentData?.data ?? [];
 
@@ -165,7 +164,7 @@ export default function LawyerAppointmentListing() {
     try {
       await cancelAppointmentMutate({ id: appointmentId, status: "cancelled" });
     } catch (error) {
-      console.error("Error cancelling appointment:", error);
+      console.log("error,", error);
     }
   };
 

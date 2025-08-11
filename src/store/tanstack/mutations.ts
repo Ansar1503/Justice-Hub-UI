@@ -276,12 +276,15 @@ export function useCancellAppointment() {
       cancellAppointment(payload),
     onSuccess: (updated) => {
       toast.success("Appointment cancelled!");
+      // console.log("new data", updated);
       queryClient.setQueryData(["client", "appointments"], (old: any) => {
+        // console.log("old data", old);
+        if (!old) return old;
         return {
           ...old,
           data: old.data.map((appt: any) =>
-            appt._id === updated.data._id
-              ? { ...appt, status: updated.data.status }
+            appt?._id === updated?._id
+              ? { ...appt, status: updated?.status }
               : appt
           ),
         };
@@ -289,7 +292,7 @@ export function useCancellAppointment() {
     },
     onError: (error: any) => {
       const message =
-        error?.response?.data?.message ||
+        error?.response?.data?.error ||
         error?.message ||
         "Something went wrong!";
       toast.error(message);
@@ -303,12 +306,13 @@ export function useRejectAppointment() {
     mutationFn: (payload: { id: string; status: string }) =>
       rejectClientAppointment(payload),
     onSuccess: (updated) => {
+      console.log("updatged", updated);
       toast.success(updated.message);
       queryClient.setQueryData(["lawyer", "appointments"], (old: any) => {
         return {
           ...old,
           data: old?.data?.map((appt: any) =>
-            appt._id === updated?.data?._id
+            appt?._id === updated?.data?._id
               ? { ...appt, status: updated?.data?.status }
               : appt
           ),
@@ -336,8 +340,8 @@ export function useConfirmAppointment() {
         return {
           ...old,
           data: old?.data?.map((appt: any) =>
-            appt._id === updated?.data?._id
-              ? { ...appt, status: updated?.data?.status }
+            appt._id === updated?._id
+              ? { ...appt, status: updated?.status }
               : appt
           ),
         };

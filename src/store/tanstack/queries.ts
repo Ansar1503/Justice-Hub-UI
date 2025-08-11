@@ -143,7 +143,7 @@ export function useFetchAvailableSlots() {
 }
 
 export function useFetchOverrideSlots() {
-  return useQuery<ResponseType & { data: OverrideDateResponse }, Error>({
+  return useQuery<OverrideDateResponse, Error>({
     queryKey: ["schedule", "overrides"],
     queryFn: () => fetchOverrideslots(),
     retry: 2,
@@ -169,7 +169,7 @@ export function useFetchAppointmentsForClients(payload: {
   limit: number;
 }) {
   return useQuery({
-    queryKey: ["client", "appointments", payload],
+    queryKey: ["client", "appointments"],
     queryFn: () => fetchAppointmentsForClient(payload),
     retry: 2,
   });
@@ -185,7 +185,7 @@ export function useFetchAppointmentsForLawyers(payload: {
   limit: number;
 }) {
   return useQuery({
-    queryKey: ["lawyer", "appointments", payload],
+    queryKey: ["lawyer", "appointments"],
     queryFn: () => fetchAppointmentsForLawyers(payload),
     retry: 2,
   });

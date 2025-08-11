@@ -33,7 +33,6 @@ export function SlotSettingsForm() {
   const cacheData: (ResponseType & { data: slotSettings }) | undefined =
     queryClient.getQueryData(["schedule", "settings"]);
   const cachedSlotSettings = cacheData?.data;
-
   useEffect(() => {
     if (cachedSlotSettings && Object.keys(cachedSlotSettings).length > 0) {
       setFormData({

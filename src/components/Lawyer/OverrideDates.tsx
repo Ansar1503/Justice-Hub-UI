@@ -69,7 +69,8 @@ export default function OverrideDates() {
 
   const { data: overrideData, refetch: fetchOverrideData } =
     useFetchOverrideSlots();
-  const overrideSlots = overrideData?.data;
+
+  const overrideSlots = overrideData;
   const { mutateAsync: DeleteOverrideSlot } = useDeleteOverrideSlot();
   const { data, refetch } = useFetchSlotSettings();
   const { mutateAsync: AddOverrideSlots } = useAddOverrideSlots();
@@ -90,7 +91,7 @@ export default function OverrideDates() {
       if (overrideSlots) {
         setOverrideDates({
           lawyer_id: overrideSlots.lawyer_id,
-          _id: overrideSlots._id || "",
+          id: overrideSlots.id || "",
           overrideDates: overrideSlots.overrideDates,
         });
       } else {

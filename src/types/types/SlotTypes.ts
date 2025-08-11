@@ -36,6 +36,6 @@ export interface OverrideDate {
 
 export interface OverrideDateResponse {
   lawyer_id: string;
-  _id: string;
+  id: string;
   overrideDates: OverrideDate[];
 }

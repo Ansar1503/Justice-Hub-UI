@@ -65,6 +65,7 @@ export default function LawyerProfile() {
   // const {mutateAsync:bookingMutate} = useBookingMutation()
   const { data: slotSettingsData, refetch: refetchslotSettings } =
     useFetchLawyerSlotSettings(id || "");
+
   const slotSettings = slotSettingsData?.data;
   const {
     data,
@@ -614,7 +615,7 @@ export default function LawyerProfile() {
         </div>
         {/* session History */}
         <div className="mt-3">
-          <Reviews sessoin_id=""  user_id={lawyerDetails?.user_id} />
+          <Reviews sessoin_id="" user_id={lawyerDetails?.user_id} />
         </div>
       </div>
     </div>
