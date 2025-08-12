@@ -1,10 +1,7 @@
 import { store } from "@/store/redux/store";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
-import { Session, SessionDocument } from "@/types/types/sessionType";
-import {
-  cancelSessionByClient,
-  removeDocumentFile,
-} from "@/utils/api/services/clientServices";
+import { Session } from "@/types/types/sessionType";
+import { cancelSessionByClient } from "@/utils/api/services/clientServices";
 import { joinVideoSession } from "@/utils/api/services/commonServices";
 import {
   cancelSessionByLawyer,
@@ -104,37 +101,6 @@ export function useJoinSession() {
       toast.success("Session started successfully!");
     },
 
-    onError: (error: any) => {
-      const message =
-        error.response.data?.message ||
-        "Something went wrong please try again later!";
-      error.message = message;
-      toast.error(message);
-    },
-  });
-}
-
-export function useRemoveFile(sessionId: string) {
-  const queryClient = useQueryClient();
-  return useMutation<ResponseType & { data?: SessionDocument }, Error, string>({
-    mutationFn: (id) => removeDocumentFile(id, sessionId),
-    onSuccess: (data) => {
-      toast.success(data?.message || "Session started successfully!");
-      console.log("data after remove", data);
-      queryClient.setQueryData(
-        ["session", "documents", sessionId],
-        (old: ResponseType & { data?: SessionDocument }) => {
-          old.data =
-            !old?.data || !data?.data
-              ? undefined
-              : {
-                  ...old.data,
-                  document: data.data.document,
-                };
-          return old;
-        }
-      );
-    },
     onError: (error: any) => {
       const message =
         error.response.data?.message ||

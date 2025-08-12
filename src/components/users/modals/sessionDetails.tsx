@@ -36,10 +36,9 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@radix-ui/react-progress";
 import { useRef, useState, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
-import { useDocumentUpdateMutation } from "@/store/tanstack/mutations/DocumentMutation";
+import { useDocumentUpdateMutation, useRemoveFile } from "@/store/tanstack/mutations/DocumentMutation";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
-import { useRemoveFile } from "@/store/tanstack/mutations/sessionMutation";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import FeedbackModal from "@/components/users/modals/Feedback";
 
@@ -135,6 +134,7 @@ export default function SessionDetailModal({
     session?._id || ""
   );
   const sessionDocuments = sessionDocumentsData;
+  // console.log("session Documents : : ", sessionDocuments);
   const { mutateAsync: uploadDocuments, isPending: documentUploading } =
     useDocumentUpdateMutation();
 
@@ -508,7 +508,8 @@ export default function SessionDetailModal({
 
             {/* Upload Documents */}
             <div>
-              {(!sessionDocuments || sessionDocuments.document.length === 0) &&
+              {(!sessionDocuments ||
+                sessionDocuments?.document?.length === 0) &&
                 sessionCancelable && (
                   <>
                     <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
@@ -558,7 +559,8 @@ export default function SessionDetailModal({
                       );
                     })}
               </div>
-              {(!sessionDocuments || sessionDocuments.document.length === 0) &&
+              {(!sessionDocuments ||
+                sessionDocuments?.document?.length === 0) &&
                 sessionCancelable && (
                   <Button
                     className="mt-5"

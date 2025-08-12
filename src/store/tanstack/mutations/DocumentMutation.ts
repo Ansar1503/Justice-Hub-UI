@@ -1,6 +1,8 @@
-import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { SessionDocument } from "@/types/types/sessionType";
-import { uploadDocuments } from "@/utils/api/services/clientServices";
+import {
+  removeDocumentFile,
+  uploadDocuments,
+} from "@/utils/api/services/clientServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
@@ -20,15 +22,11 @@ export function useDocumentUpdateMutation() {
     }) => uploadDocuments(payload, setProgress),
     onSuccess: (data) => {
       toast.success("Document uploaded successfully");
-      // console.log("data", data);
+      console.log("uopload document data", data);
       queryClient.setQueryData(
         ["session", "documents", data?.session_id],
-        (old: ResponseType & { data: SessionDocument }) => {
-          // console.log("old", old);
-          return {
-            ...old,
-            data: data,
-          };
+        () => {
+          return data;
         }
       );
     },
@@ -36,6 +34,27 @@ export function useDocumentUpdateMutation() {
       const message =
         error.response?.data?.message ||
         "Document Upload Failed! Try again later.";
+      error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useRemoveFile(sessionId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<SessionDocument, Error, string>({
+    mutationFn: (id) => removeDocumentFile(id, sessionId),
+    onSuccess: (data) => {
+      toast.success("Document removed successfully!");
+      // console.log("data after remove", data);
+      queryClient.setQueryData(["session", "documents", sessionId], () => {
+        return data;
+      });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response.data?.message ||
+        "Something went wrong please try again later!";
       error.message = message;
       toast.error(message);
     },
