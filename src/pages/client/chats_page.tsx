@@ -380,7 +380,7 @@ function ChatsPage() {
       read: false,
       attachments: !document ? [] : [document],
     };
-    // console.log("send message");
+    // console.log("send message", newMessage);
     s.emit(
       SocketEvents.SEND_MESSAGE_EVENT,
       newMessage,
