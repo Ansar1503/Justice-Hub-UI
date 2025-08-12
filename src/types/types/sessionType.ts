@@ -8,7 +8,7 @@ export interface SessionDocument {
 }
 
 export interface Session {
-  _id?: string;
+  id?: string;
   appointment_id: string;
   lawyer_id: string;
   client_id: string;

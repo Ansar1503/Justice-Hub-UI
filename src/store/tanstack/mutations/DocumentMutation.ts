@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 export function useDocumentUpdateMutation() {
   const queryClient = useQueryClient();
   return useMutation<
-    ResponseType & { data: SessionDocument },
+    SessionDocument,
     Error,
     { payload: FormData; setProgress?: (value: number) => void }
   >({
@@ -19,13 +19,15 @@ export function useDocumentUpdateMutation() {
       setProgress?: (value: number) => void;
     }) => uploadDocuments(payload, setProgress),
     onSuccess: (data) => {
-      toast.success(data.message || "Document uploaded successfully");
+      toast.success("Document uploaded successfully");
+      console.log("data", data);
       queryClient.setQueryData(
-        ["session", "documents", data?.data?.session_id],
+        ["session", "documents", data?.session_id],
         (old: ResponseType & { data: SessionDocument }) => {
+          console.log("old", old);
           return {
             ...old,
-            data: data.data,
+            data: data,
           };
         }
       );
