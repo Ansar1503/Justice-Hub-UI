@@ -56,6 +56,9 @@ export function useFetchClientData() {
   return useQuery({
     queryKey: ["user"],
     queryFn: fetchClientData,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 1000 * 60 * 5,
     retry: 2,
     enabled: user && user?.role !== "admin" ? true : false,
   });
@@ -66,6 +69,9 @@ export function useFetchLawyerData() {
   return useQuery({
     queryKey: ["lawyer"],
     queryFn: fetchLawyerData,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 1000 * 60 * 5,
     retry: 1,
     enabled: user && user?.role === "lawyer" ? true : false,
   });
@@ -106,6 +112,9 @@ export function useFetchLawyersByQuery(query: LawyerFilterParams) {
   return useQuery({
     queryKey: ["lawyers", "queries"],
     queryFn: () => fetchLawyersByQuery(query),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 1000 * 60 * 5,
     retry: 2,
   });
 }
@@ -114,6 +123,9 @@ export function useFetchLawyerDetails(user_id: string) {
   return useQuery({
     queryKey: ["lawyer", "details", user_id],
     queryFn: () => fetchLawyerDetails(user_id),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 1000 * 60 * 5,
     retry: 2,
   });
 }

@@ -10,7 +10,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { PersistGate } from "redux-persist/integration/react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { SocketProvider } from "./context/SocketProvider.tsx";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
@@ -25,12 +25,16 @@ createRoot(document.getElementById("root")!).render(
                     defaultOptions: {
                       queries: {
                         refetchOnWindowFocus: false,
-                        retry: 3,
+                        retry: 1,
                       },
                     },
                   })
                 }
               >
+                <ReactQueryDevtools
+                  initialIsOpen={false}
+                  buttonPosition="bottom-left"
+                />
                 <SocketProvider>
                   <App />
                 </SocketProvider>

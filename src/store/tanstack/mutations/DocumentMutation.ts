@@ -2,7 +2,7 @@ import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { SessionDocument } from "@/types/types/sessionType";
 import { uploadDocuments } from "@/utils/api/services/clientServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 export function useDocumentUpdateMutation() {
   const queryClient = useQueryClient();

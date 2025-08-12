@@ -31,6 +31,6 @@ export interface BasicUpdatePayload {
   gender?: Gender;
 }
 
-export interface BasicUpdateResponse extends ResponseType {
+export interface BasicUpdateResponse {
   data: clientDataType;
 }

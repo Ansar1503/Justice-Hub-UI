@@ -12,7 +12,7 @@ import {
   StartSession,
 } from "@/utils/api/services/LawyerServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 export function useCancelSessionByLawyer() {
   const queryClient = useQueryClient();
