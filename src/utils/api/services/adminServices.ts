@@ -121,7 +121,7 @@ export async function fetchSessionsForAdmin(payload: {
   const { search, limit, page, sortBy, sortOrder, status, type } = payload;
   const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/admin/sessions?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}&type=${type}`,
+    `/api/admin/sessions?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}&consultation_type=${type}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
