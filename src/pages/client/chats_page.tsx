@@ -60,11 +60,10 @@ function ChatsPage() {
 
   // console.log("soccetcurtent", socket.current);
   const onConnect = () => {
-    console.log("connected..");
+    // console.log("connected..");
     setIsConnected(true);
   };
-  const onDisconnect = (data: any) => {
-    console.log("disconnecting...", data);
+  const onDisconnect = () => {
     setIsConnected(false);
   };
 
