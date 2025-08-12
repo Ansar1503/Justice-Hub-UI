@@ -236,7 +236,7 @@ export function useFetchsessionsForclients(payload: {
 }
 
 export function useFetchSessionDocuments(sessionId: string) {
-  return useQuery<string, Error, ResponseType & { data: SessionDocument }>({
+  return useQuery<string, Error, SessionDocument>({
     queryKey: ["session", "documents", sessionId],
     queryFn: () => fetchSessionDocuments(sessionId),
     enabled: !!sessionId,

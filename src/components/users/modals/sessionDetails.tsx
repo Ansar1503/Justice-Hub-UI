@@ -134,7 +134,7 @@ export default function SessionDetailModal({
   const { data: sessionDocumentsData } = useFetchSessionDocuments(
     session?._id || ""
   );
-  const sessionDocuments = sessionDocumentsData?.data;
+  const sessionDocuments = sessionDocumentsData;
   const { mutateAsync: uploadDocuments, isPending: documentUploading } =
     useDocumentUpdateMutation();
 

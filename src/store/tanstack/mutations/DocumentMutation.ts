@@ -20,11 +20,11 @@ export function useDocumentUpdateMutation() {
     }) => uploadDocuments(payload, setProgress),
     onSuccess: (data) => {
       toast.success("Document uploaded successfully");
-      console.log("data", data);
+      // console.log("data", data);
       queryClient.setQueryData(
         ["session", "documents", data?.session_id],
         (old: ResponseType & { data: SessionDocument }) => {
-          console.log("old", old);
+          // console.log("old", old);
           return {
             ...old,
             data: data,
