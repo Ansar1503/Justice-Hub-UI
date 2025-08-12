@@ -40,7 +40,7 @@ import moment from "moment-timezone";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import ChatDetailsModal from "./chatDetails.modal";
 import ChatDocumentsPreview from "./ChatDocumentsPreview";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { sendFiles } from "@/utils/api/services/Chat";
 
 export type FileWithProgress = {
@@ -335,7 +335,6 @@ function Chat({
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-
     setTimeout(() => {
       setSelectedMessageId(messageId);
       setDeleteDialogOpen(true);
@@ -522,7 +521,7 @@ function Chat({
                     const isOwn = message.senderId === currentUserId;
                     return (
                       <div
-                        key={message._id}
+                        key={message.id}
                         className={`flex gap-3   ${
                           isOwn ? "justify-end" : "justify-start"
                         }`}
@@ -621,9 +620,9 @@ function Chat({
                                 >
                                   {isOwn ? (
                                     <DropdownMenuItem
-                                      onClick={() =>
-                                        handleDeleteMessage(message?._id || "")
-                                      }
+                                      onClick={() => {
+                                        handleDeleteMessage(message?.id || "");
+                                      }}
                                       className="text-red-600 focus:text-red-600 cursor-pointer"
                                     >
                                       <Trash2 className="h-4 w-4 mr-2" />
@@ -632,7 +631,7 @@ function Chat({
                                   ) : (
                                     <DropdownMenuItem
                                       onClick={() =>
-                                        handleReportMessage(message?._id || "")
+                                        handleReportMessage(message?.id || "")
                                       }
                                       className="text-orange-600 focus:text-orange-600 cursor-pointer"
                                     >

@@ -185,7 +185,7 @@ function ChatsPage() {
                   return {
                     ...page,
                     data: page.data.filter(
-                      (msg: any) => msg._id !== data?.messageId
+                      (msg: any) => msg.id !== data?.messageId
                     ),
                   };
                 }

@@ -16,7 +16,7 @@ export interface ChatSession {
 }
 
 export interface ChatMessage {
-  _id?: string;
+  id?: string;
   session_id: string;
   senderId: string;
   receiverId: string;

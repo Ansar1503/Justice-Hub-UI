@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import LawyerDashboard from "@/pages/lawyer/Dashboard";
 import { Route, Routes } from "react-router-dom";
 import LawyerProtected from "./wrapper/lawyer.protected.route";
@@ -6,7 +7,7 @@ import SlotAddModal from "@/components/Lawyer/Modals/slot-add-modal";
 import LawyerSlotProtectRoute from "./wrapper/lawyer.slot.protect.route";
 import AppointmentsPage from "@/pages/lawyer/Appointments";
 import SessionPage from "@/pages/lawyer/Sessions";
-import ChatsPage from "@/pages/lawyer/ChatPage";
+const Chats_page = lazy(() => import("@/pages/client/chats_page"));
 import VideoCall from "@/pages/lawyer/VideoCall";
 
 export default function LawyerRoutes() {
@@ -17,7 +18,7 @@ export default function LawyerRoutes() {
         <Route path="/schedule" element={<LawyerSchedulePage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/sessions" element={<SessionPage />} />
-        <Route path="/chats" element={<ChatsPage />} />
+        <Route path="/chats" element={<Chats_page />} />
         <Route path="/session/join/:id" element={<VideoCall />} />
       </Route>
       <Route element={<LawyerSlotProtectRoute />}>
