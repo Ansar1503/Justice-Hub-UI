@@ -246,7 +246,7 @@ export function useFetchSessionDocuments(sessionId: string) {
 
 export function useFetchAppointmentsForAdmin(payload: {
   search: string;
-  type: "consultation" | "follow-up" | "all";
+  consultation_type: "consultation" | "follow-up" | "all";
   status:
     | "pending"
     | "confirmed"
@@ -262,7 +262,7 @@ export function useFetchAppointmentsForAdmin(payload: {
   return useQuery<
     {
       search: string;
-      type: "consultation" | "follow-up" | "all";
+      consultation_type: "consultation" | "follow-up" | "all";
       status:
         | "pending"
         | "confirmed"

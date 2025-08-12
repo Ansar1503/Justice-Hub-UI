@@ -52,7 +52,7 @@ export default function Appointments() {
     sortBy,
     sortOrder,
     status,
-    type: consultationType,
+    consultation_type: consultationType,
     limit: itemsPerPage,
     page: currentPage,
   });
@@ -248,7 +248,8 @@ export default function Appointments() {
                             <div className="flex items-center gap-3 cursor-pointer">
                               <Avatar>
                                 {appointment.clientData.profile_image ? (
-                                  <AvatarImage className="w-10 rounded-full "
+                                  <AvatarImage
+                                    className="w-10 rounded-full "
                                     src={appointment.clientData.profile_image}
                                     alt={appointment.clientData.name}
                                   />

@@ -86,7 +86,7 @@ export async function changeLawyerVerificationStatus({
 
 export async function fetchAppointmentsForAdmin(payload: {
   search: string;
-  type: "consultation" | "follow-up" | "all";
+  consultation_type: "consultation" | "follow-up" | "all";
   status:
     | "pending"
     | "confirmed"
@@ -99,10 +99,11 @@ export async function fetchAppointmentsForAdmin(payload: {
   limit: number;
   page: number;
 }) {
-  const { search, limit, page, sortBy, sortOrder, status, type } = payload;
+  const { search, limit, page, sortBy, sortOrder, status, consultation_type } =
+    payload;
   const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/admin/appointments?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}&type=${type}`,
+    `/api/admin/appointments?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}&consultation_type=${consultation_type}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

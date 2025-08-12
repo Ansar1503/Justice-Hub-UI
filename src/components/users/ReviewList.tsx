@@ -43,13 +43,6 @@ type Props = {
   reviews: reviews;
 };
 
-// const REPORT_REASONS = [
-//   { value: "spam", label: "Spam or fake review" },
-//   { value: "inappropriate", label: "Inappropriate content" },
-//   { value: "harassment", label: "Harassment or abuse" },
-//   { value: "misleading", label: "Misleading information" },
-//   { value: "other", label: "Other" },
-// ];
 
 export default function ReviewList({ reviews }: Props) {
   const { user } = store.getState().Auth;
