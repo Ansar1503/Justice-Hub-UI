@@ -40,7 +40,6 @@ import { useDocumentUpdateMutation, useRemoveFile } from "@/store/tanstack/mutat
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import FeedbackModal from "@/components/users/modals/Feedback";
 
 interface Session {
   _id: string;
@@ -126,7 +125,6 @@ export default function SessionDetailModal({
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -594,13 +592,6 @@ export default function SessionDetailModal({
               </div>
             )}
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-              <Button
-                variant={"default"}
-                className="w-full"
-                onClick={() => setShowFeedbackModal(true)}
-              >
-                View Feedback & Reviews
-              </Button>
             </div>
           </div>
 
@@ -714,13 +705,6 @@ export default function SessionDetailModal({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <FeedbackModal
-        sessionId={session?._id || ""}
-        isOpen={showFeedbackModal}
-        onClose={() => setShowFeedbackModal(false)}
-        lawyerId={session.lawyerData?.user_id || ""}
-        lawyerName={session.lawyerData.name || "Unknown Lawyer"}
-      />
     </>
   );
 }
