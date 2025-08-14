@@ -310,9 +310,9 @@ export async function fetchReviews(pageParam: any, lawyer_id: string) {
 }
 
 export async function fetchReviewsBySession(sessionId: string) {
-  const { token } = store.getState().Auth;
+  const { token, user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/client/profile/sessions/reviews/${sessionId}`,
+    `/api/${user?.role}/profile/sessions/reviews/${sessionId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

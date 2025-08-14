@@ -9,6 +9,7 @@ import AppointmentsPage from "@/pages/lawyer/Appointments";
 import SessionPage from "@/pages/lawyer/Sessions";
 const Chats_page = lazy(() => import("@/pages/client/chats_page"));
 import VideoCall from "@/pages/lawyer/VideoCall";
+import ReviewPage from "@/pages/lawyer/ReviewPage";
 
 export default function LawyerRoutes() {
   return (
@@ -19,6 +20,7 @@ export default function LawyerRoutes() {
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/sessions" element={<SessionPage />} />
         <Route path="/chats" element={<Chats_page />} />
+        <Route path="/reviews" element={<ReviewPage />} />
         <Route path="/session/join/:id" element={<VideoCall />} />
       </Route>
       <Route element={<LawyerSlotProtectRoute />}>
