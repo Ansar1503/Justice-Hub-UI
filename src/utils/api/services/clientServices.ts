@@ -323,7 +323,7 @@ export async function fetchReviewsBySession(sessionId: string) {
 export async function updateReview(payload: Partial<Review>) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.put(
-    `/api/client/profile/reviews/${payload._id}`,
+    `/api/client/profile/reviews/${payload.id}`,
     payload,
     {
       headers: { Authorization: `Bearer ${token}` },

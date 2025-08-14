@@ -48,7 +48,10 @@ import { Appointment } from "@/types/types/AppointmentsType";
 import { ChatMessage, ChatSession } from "@/types/types/ChatType";
 import { Review } from "@/types/types/Review";
 import { Disputes } from "@/types/types/Disputes";
-import { fetchCallLogs } from "@/utils/api/services/commonServices";
+import {
+  fetchCallLogs,
+  FetchClientOrLawyerReviews,
+} from "@/utils/api/services/commonServices";
 import { store } from "../redux/store";
 
 export function useFetchClientData() {
@@ -392,6 +395,48 @@ export function useFetchReviewsBySession(sessionId: string) {
     queryFn: () => fetchReviewsBySession(sessionId),
     enabled: sessionId ? true : false,
     retry: 2,
+  });
+}
+
+export function useFetchReviewsListClientOrLawyer(payload: {
+  search: string;
+  limit: number;
+  page: number;
+  sortBy: "date" | "rating";
+  sortOrder: "asc" | "desc";
+}) {
+  return useQuery<
+    {
+      search: string;
+      limit: number;
+      page: number;
+      sortBy: "date" | "rating";
+      sortOrder: "asc" | "desc";
+    },
+    Error,
+    {
+      data: {
+        id: string;
+        session_id: string;
+        heading: string;
+        rating: number;
+        review: string;
+        client_id: string;
+        lawyer_id: string;
+        reviewedBy: { name: string; profile_image: string };
+        reviewedFor: { name: string; profile_image: string };
+        createdAt: string;
+        updatedAt: string;
+      }[];
+      totalCount: number;
+      currentPage: number;
+      totalPage: number;
+    }
+  >({
+    queryKey: ["reviews", payload],
+    queryFn: () => FetchClientOrLawyerReviews(payload),
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
   });
 }
 

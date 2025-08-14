@@ -28,12 +28,12 @@ export function useInfiniteFetchMessages(sessionId: string) {
   });
 }
 
-export function useInfiniteFetchReviews(lawyer_id: string) {
+export function useInfiniteFetchReviews(user_id: string) {
   return useInfiniteQuery({
-    queryKey: ["client", "review", lawyer_id],
+    queryKey: ["client", "review", user_id],
     initialPageParam: 1,
-    queryFn: ({ pageParam }) => fetchReviews(pageParam, lawyer_id),
+    queryFn: ({ pageParam }) => fetchReviews(pageParam, user_id),
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
-    enabled: lawyer_id ? true : false,
+    enabled: user_id ? true : false,
   });
 }

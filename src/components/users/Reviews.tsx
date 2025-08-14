@@ -22,11 +22,10 @@ const TextSkeleton = ({ width }: { width: string }) => (
 );
 
 export default function Reviews({ user_id, sessoin_id }: Props) {
-//   console.log("sessionId", sessoin_id);
+  // console.log("user_id", user_id);
   const { data: ReviewDataBySession } = useFetchReviewsBySession(sessoin_id);
   const { isLoading, data: ReviewsData } = useInfiniteFetchReviews(user_id);
   const Reviews = ReviewsData?.pages.flatMap((page) => page?.data) || [];
-//   console.log("ReviewsData", ReviewDataBySession);
 
   return (
     <div>

@@ -60,7 +60,7 @@ export default function FeedbackModal({
             value="reviews"
             className="mt-4 overflow-y-auto max-h-[60vh]"
           >
-            <Reviews user_id={""} sessoin_id={sessionId} />
+            <Reviews user_id={lawyerId} sessoin_id={""} />
           </TabsContent>
 
           <TabsContent

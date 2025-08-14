@@ -1,5 +1,3 @@
-"use client";
-
 import type { Review } from "@/types/types/Review";
 import { Star, MoreVertical, Edit, Flag, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,7 +29,7 @@ import {
 
 type ReviewWithReporter = Review & {
   reviewedBy?: {
-    user_id: string;
+    userid: string;
     name?: string | null;
     profile_image?: string | null;
   };
@@ -42,7 +40,6 @@ type reviews = ReviewWithReporter[] | undefined;
 type Props = {
   reviews: reviews;
 };
-
 
 export default function ReviewList({ reviews }: Props) {
   const { user } = store.getState().Auth;
@@ -70,8 +67,7 @@ export default function ReviewList({ reviews }: Props) {
 
   // console.log('review',reviews)
   const handleEditClick = (reviewId: string) => {
-    const reviewToEdit = reviews?.find((r) => r._id === reviewId);
-    // console.log("reviewToEdit:", reviewToEdit);
+    const reviewToEdit = reviews?.find((r) => r.id === reviewId);
     if (reviewToEdit) {
       setTimeout(() => {
         setEditableReviewId(reviewId);
@@ -124,7 +120,7 @@ export default function ReviewList({ reviews }: Props) {
     setIsEditSubmitting(true);
     try {
       await updateReviewAsync({
-        _id: reviewId,
+        id: reviewId,
         heading: editHeading,
         review: editComment,
         rating: editRating,
@@ -174,14 +170,13 @@ export default function ReviewList({ reviews }: Props) {
       setShowReportModal(false);
     }
   };
-  // console.log("review", reviews);
   return (
     <>
       <div className="space-y-6">
         {reviews && reviews.length > 0 ? (
           reviews.map((review) => (
             <div
-              key={review._id}
+              key={review.id}
               className="border-b pb-4 last:border-0 dark:border-gray-700"
             >
               <div className="flex justify-between items-start">
@@ -236,15 +231,13 @@ export default function ReviewList({ reviews }: Props) {
                               {currentUserId === review.client_id ? (
                                 <>
                                   <DropdownMenuItem
-                                    onClick={() => handleEditClick(review._id)}
+                                    onClick={() => handleEditClick(review.id)}
                                   >
                                     <Edit className="mr-2 h-4 w-4" />
                                     Edit Review
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() =>
-                                      handleDeleteClick(review._id)
-                                    }
+                                    onClick={() => handleDeleteClick(review.id)}
                                     className="text-red-600 focus:text-red-600"
                                   >
                                     <Trash2 className="mr-2 h-4 w-4" />
@@ -255,9 +248,9 @@ export default function ReviewList({ reviews }: Props) {
                                 <DropdownMenuItem
                                   onClick={() =>
                                     handleReportClick(
-                                      review._id,
+                                      review.id,
                                       currentUserId || "",
-                                      review.reviewedBy?.user_id || ""
+                                      review.reviewedBy?.userid || ""
                                     )
                                   }
                                 >
@@ -283,17 +276,17 @@ export default function ReviewList({ reviews }: Props) {
                       </div>
                     </div>
                   </div>
-                  {editableReviewId === review._id ? (
+                  {editableReviewId === review.id ? (
                     <div className="space-y-3">
                       <div>
                         <Label
-                          htmlFor={`edit-heading-${review._id}`}
+                          htmlFor={`edit-heading-${review.id}`}
                           className="text-sm font-medium"
                         >
                           Heading
                         </Label>
                         <input
-                          id={`edit-heading-${review._id}`}
+                          id={`edit-heading-${review.id}`}
                           type="text"
                           value={editHeading}
                           onChange={(e) => setEditHeading(e.target.value)}
@@ -323,13 +316,13 @@ export default function ReviewList({ reviews }: Props) {
 
                       <div>
                         <Label
-                          htmlFor={`edit-comment-${review._id}`}
+                          htmlFor={`edit-comment-${review.id}`}
                           className="text-sm font-medium"
                         >
                           Review
                         </Label>
                         <Textarea
-                          id={`edit-comment-${review._id}`}
+                          id={`edit-comment-${review.id}`}
                           value={editComment}
                           onChange={(e) => setEditComment(e.target.value)}
                           className="mt-1"
@@ -341,7 +334,7 @@ export default function ReviewList({ reviews }: Props) {
                       <div className="flex gap-2 pt-2">
                         <Button
                           size="sm"
-                          onClick={() => handleEditSubmit(review._id)}
+                          onClick={() => handleEditSubmit(review.id)}
                           disabled={isEditSubmitting}
                           className="bg-emerald-600 hover:bg-emerald-700"
                         >

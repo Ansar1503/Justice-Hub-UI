@@ -201,7 +201,7 @@ export default function Sessions() {
               <TableBody>
                 {sessions && sessions.length > 0 ? (
                   sessions.map((session) => (
-                    <TableRow key={session?._id}>
+                    <TableRow key={session?.id}>
                       {/* lawyer */}
                       <TableCell className="p-3  bg-white/5 ">
                         <UserDetailsModal
