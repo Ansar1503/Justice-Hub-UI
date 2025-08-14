@@ -257,7 +257,7 @@ export function useAddReview() {
     mutationFn: (payload) => addReview(payload),
     onSuccess: (data) => {
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: [""] });
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
     },
     onError: (error: any) => {
       const message =
@@ -362,22 +362,20 @@ export function useUpdateReview() {
   return useMutation({
     mutationFn: (payload: Partial<Review>) => updateReview(payload),
     onSuccess: (data) => {
-      queryClient.setQueryData(
-        ["client", "review", data?.lawyer_id],
-        (oldData: any) => {
-          if (!oldData) return oldData;
+      queryClient.setQueryData(["review", data?.lawyer_id], (oldData: any) => {
+        if (!oldData) return oldData;
 
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page: any) => ({
-              ...page,
-              data: page.data.map((review: any) =>
-                review.id === data?.id ? { ...review, ...data } : review
-              ),
-            })),
-          };
-        }
-      );
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            data: page.data.map((review: any) =>
+              review.id === data?.id ? { ...review, ...data } : review
+            ),
+          })),
+        };
+      });
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
     },
     onError: (error: any) => {
       const message =
@@ -392,13 +390,18 @@ export function useDeleteReview() {
   return useMutation({
     mutationFn: (payload: { review_id: string }) => deleteReview(payload),
     onSuccess: (data) => {
-      queryClient.setQueryData(
-        ["client", "reviews", data?.session_id],
-        (old: any | undefined) => {
-          if (!old) return old;
-          return old.filter((review: any) => review._id !== data._id);
-        }
-      );
+      queryClient.setQueryData(["review", data?.lawyer_id], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            data: page.data.filter((r: any) => r.id !== data.id),
+          })),
+        };
+      });
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
     },
     onError: (error: any) => {
       const message =

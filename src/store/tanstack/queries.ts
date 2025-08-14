@@ -391,7 +391,7 @@ export function useFetchReviewsBySession(sessionId: string) {
       };
     } & Review[]
   >({
-    queryKey: ["client", "reviews", sessionId],
+    queryKey: ["reviews", sessionId],
     queryFn: () => fetchReviewsBySession(sessionId),
     enabled: sessionId ? true : false,
     retry: 2,
@@ -435,7 +435,6 @@ export function useFetchReviewsListClientOrLawyer(payload: {
   >({
     queryKey: ["reviews", payload],
     queryFn: () => FetchClientOrLawyerReviews(payload),
-    staleTime: 1000 * 60 * 5,
     retry: 1,
   });
 }

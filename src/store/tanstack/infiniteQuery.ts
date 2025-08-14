@@ -30,7 +30,7 @@ export function useInfiniteFetchMessages(sessionId: string) {
 
 export function useInfiniteFetchReviews(user_id: string) {
   return useInfiniteQuery({
-    queryKey: ["client", "review", user_id],
+    queryKey: ["review", user_id],
     initialPageParam: 1,
     queryFn: ({ pageParam }) => fetchReviews(pageParam, user_id),
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
