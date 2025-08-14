@@ -362,30 +362,26 @@ export function useUpdateReview() {
   return useMutation({
     mutationFn: (payload: Partial<Review>) => updateReview(payload),
     onSuccess: (data) => {
-      // console.log("data", data);
       queryClient.setQueryData(
-        ["client", "reviews", data?.session_id],
-        (old: any | undefined) => {
-          if (!old) return old;
-          // console.log("oldData while update review : ", old);
-          return old.map((review: any) => {
-            if (review._id === data._id) {
-              return {
-                ...review,
-                ...data,
-                reviewedBy: review.reviewedBy,
-              };
-            }
-            return review;
-          });
+        ["client", "review", data?.lawyer_id],
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => ({
+              ...page,
+              data: page.data.map((review: any) =>
+                review.id === data?.id ? { ...review, ...data } : review
+              ),
+            })),
+          };
         }
       );
     },
     onError: (error: any) => {
       const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Something went wrong!";
+        error?.response?.data?.error || error?.error || "Something went wrong!";
       toast.error(message);
     },
   });
