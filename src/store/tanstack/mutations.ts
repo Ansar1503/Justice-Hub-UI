@@ -335,13 +335,14 @@ export function useConfirmAppointment() {
     mutationFn: (payload: { id: string; status: string }) =>
       confirmAppointment(payload),
     onSuccess: (updated) => {
+      console.log("updated", updated);
       toast.success(updated.message);
       queryClient.setQueryData(["lawyer", "appointments"], (old: any) => {
         return {
           ...old,
           data: old?.data?.map((appt: any) =>
-            appt._id === updated?._id
-              ? { ...appt, status: updated?.status }
+            appt._id === updated?.data?.id
+              ? { ...appt, status: updated?.data?.status }
               : appt
           ),
         };
