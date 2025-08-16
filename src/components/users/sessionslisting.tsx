@@ -65,7 +65,7 @@ export default function SessionsListing() {
       sort: sortBy,
       status: statusFilter,
     });
-  console.log("datad", sessionsData);
+  // console.log("datad", sessionsData);
   const sessions = sessionsData?.data;
 
   useEffect(() => {

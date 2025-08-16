@@ -30,8 +30,7 @@ export function useCancelSessionByLawyer() {
     },
     onError: (error: any) => {
       const message =
-        error.response.data?.message ||
-        "Something went wrong please try again later!";
+        error.response.data || "Something went wrong please try again later!";
       error.message = message;
       toast.error(message);
     },
@@ -40,25 +39,24 @@ export function useCancelSessionByLawyer() {
 
 export function useCancelSessionByClient() {
   const queryClient = useQueryClient();
-  return useMutation<ResponseType & { data?: any }, Error, { id: string }>({
+  return useMutation<any, Error, { id: string }>({
     mutationFn: (payload) => cancelSessionByClient(payload),
     onSuccess: (data) => {
+      console.log("data:", data);
       toast.success(data?.message || "Session cancelled successfully!");
       queryClient.setQueryData(["client", "sessions"], (old: any) => {
+        console.log("old:", old);
         return {
           ...old,
           data: old?.data?.map((appt: any) =>
-            appt._id === data?.data?._id
-              ? { ...appt, status: data?.data?.status }
-              : appt
+            appt._id === data?.id ? { ...appt, status: data?.status } : appt
           ),
         };
       });
     },
     onError: (error: any) => {
       const message =
-        error.response.data?.message ||
-        "Something went wrong please try again later!";
+        error.response.data || "Something went wrong please try again later!";
       error.message = message;
       toast.error(message);
     },

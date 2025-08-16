@@ -36,7 +36,10 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@radix-ui/react-progress";
 import { useRef, useState, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
-import { useDocumentUpdateMutation, useRemoveFile } from "@/store/tanstack/mutations/DocumentMutation";
+import {
+  useDocumentUpdateMutation,
+  useRemoveFile,
+} from "@/store/tanstack/mutations/DocumentMutation";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { DialogDescription } from "@radix-ui/react-dialog";
@@ -224,12 +227,12 @@ export default function SessionDetailModal({
   // Status components
   const getStatusIcon = useCallback((status: Session["status"]) => {
     const config = STATUS_CONFIG[status];
-    const IconComponent = config.icon;
-    return <IconComponent className={`h-5 w-5 ${config.iconColor}`} />;
+    const IconComponent = config?.icon;
+    return <IconComponent className={`h-5 w-5 ${config?.iconColor}`} />;
   }, []);
 
   const getStatusColor = useCallback((status: Session["status"]) => {
-    return STATUS_CONFIG[status].color;
+    return STATUS_CONFIG[status]?.color;
   }, []);
 
   // File handling
@@ -327,7 +330,7 @@ export default function SessionDetailModal({
   }, [documentUploading, onClose]);
 
   if (!isOpen || !session) return null;
-
+  // console.log("session", session);
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -591,8 +594,7 @@ export default function SessionDetailModal({
                 </p>
               </div>
             )}
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-            </div>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg"></div>
           </div>
 
           <DialogFooter className="sm:justify-between">
