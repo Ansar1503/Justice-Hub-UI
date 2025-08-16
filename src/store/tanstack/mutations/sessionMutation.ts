@@ -42,10 +42,10 @@ export function useCancelSessionByClient() {
   return useMutation<any, Error, { id: string }>({
     mutationFn: (payload) => cancelSessionByClient(payload),
     onSuccess: (data) => {
-      console.log("data:", data);
+      // console.log("data:", data);
       toast.success(data?.message || "Session cancelled successfully!");
       queryClient.setQueryData(["client", "sessions"], (old: any) => {
-        console.log("old:", old);
+        // console.log("old:", old);
         return {
           ...old,
           data: old?.data?.map((appt: any) =>
@@ -78,8 +78,7 @@ export function useStartSession() {
 
     onError: (error: any) => {
       const message =
-        error.response.data?.message ||
-        "Something went wrong please try again later!";
+        error.response.data || "Something went wrong please try again later!";
       error.message = message;
       toast.error(message);
     },
@@ -101,8 +100,7 @@ export function useJoinSession() {
 
     onError: (error: any) => {
       const message =
-        error.response.data?.message ||
-        "Something went wrong please try again later!";
+        error.response.data || "Something went wrong please try again later!";
       error.message = message;
       toast.error(message);
     },
@@ -124,8 +122,7 @@ export function useEndSession() {
     },
     onError: (error: any) => {
       const message =
-        error.response.data?.message ||
-        "Something went wrong please try again later!";
+        error.response.data || "Something went wrong please try again later!";
       error.message = message;
       toast.error(message);
     },
