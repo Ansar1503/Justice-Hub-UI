@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Dialog,
   DialogContent,
@@ -9,6 +7,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatDisputesData } from "@/types/types/Disputes";
+import { AlertTriangle, Trash2, UserX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useBlockUser } from "@/store/tanstack/mutations";
 
 interface ChatDisputeDetailsModalProps {
   dispute: ChatDisputesData;
@@ -21,6 +22,12 @@ export default function ChatDisputeDetailsModal({
   open,
   onOpenChange,
 }: ChatDisputeDetailsModalProps) {
+  const { mutateAsync: blockUser } = useBlockUser();
+  
+  function onDeleteMessage(messageId: string) {}
+  async function onBlocUser(userId: string) {
+    await blockUser({ status: true, user_id: userId });
+  }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -97,7 +104,29 @@ export default function ChatDisputeDetailsModal({
 
           {/* Message Content */}
           <div className="space-y-2">
-            <h3 className="font-medium">Reported Message</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">Reported Message</h3>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onDeleteMessage(dispute.chatMessage.id)}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete Message
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onBlocUser(dispute.reportedUser.email)}
+                  className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                >
+                  <UserX className="h-4 w-4 mr-1" />
+                  Block User
+                </Button>
+              </div>
+            </div>
             <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <p className="text-sm">
                 {dispute.chatMessage.content || "No content"}
@@ -114,9 +143,12 @@ export default function ChatDisputeDetailsModal({
           {/* Report Reason */}
           <div className="space-y-2">
             <h3 className="font-medium">Report Reason</h3>
-            <p className="text-sm text-red-600 dark:text-red-400 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-              {dispute.reason || "No reason provided"}
-            </p>
+            <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-red-600 dark:text-red-400">
+                {dispute.reason || "No reason provided"}
+              </p>
+            </div>
           </div>
 
           {/* Timestamps */}
