@@ -129,7 +129,7 @@ export async function fetchSessionsForAdmin(payload: {
 
 export async function fetchChatDisputes(payload: {
   search: string;
-  sortBy: "All" | "session_date" | "reported_date";
+  sortBy: "message_date" | "reported_date";
   sortOrder: "asc" | "desc";
   limit: number;
   page: number;

@@ -6,21 +6,17 @@ import { SelectComponent } from "../SelectComponent";
 import { useState } from "react";
 import ChatDiputesTable from "./ChatDiputesTable";
 
-type SortByType = "All" | "reported_date" | "session_date";
+type SortByType = "reported_date" | "message_date";
 
 export default function ChatDisputeCardContent() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<SortByType>("All");
+  const [sortBy, setSortBy] = useState<SortByType>("reported_date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
   // constants
-  const sortByValues = [
-    "All",
-    "reported_date",
-    "session_date",
-  ];
+  const sortByValues = ["reported_date", "message_date"];
   return (
     <CardContent>
       <div className="flex flex-1 flex-col gap-4 p-6">

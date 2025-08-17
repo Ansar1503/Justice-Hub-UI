@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 
@@ -14,6 +15,18 @@ export default function SearchComponent({
   placeholder = "Search...",
   className = "",
 }: Props) {
+  const [localValue, setLocalValue] = useState(searchTerm);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchTerm(localValue);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [localValue, setSearchTerm]);
+
   return (
     <div className={`relative ${className}`}>
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
@@ -21,8 +34,8 @@ export default function SearchComponent({
         type="text"
         placeholder={placeholder}
         className="pl-10 bg-white/10"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
       />
     </div>
   );

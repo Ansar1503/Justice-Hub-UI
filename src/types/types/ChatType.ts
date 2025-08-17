@@ -5,6 +5,12 @@ import {
 } from "./Client.data.type";
 import { Session } from "./sessionType";
 
+interface Attachment {
+  name: string;
+  url: string;
+  type: string;
+}
+
 export interface ChatSession {
   _id?: string;
   name: string;
@@ -40,4 +46,16 @@ export interface AggregateChatSession extends ChatSession {
   lawyerData: userDataType & clientDataType & LawerDataType;
   sessionDetails: Session;
   lastMessage: ChatMessage;
+}
+
+export interface ChatMessageOutputDto {
+  id: string;
+  session_id: string;
+  senderId: string;
+  receiverId: string;
+  content?: string;
+  read: boolean;
+  attachments?: Attachment[];
+  createdAt: Date;
+  updatedAt: Date;
 }
