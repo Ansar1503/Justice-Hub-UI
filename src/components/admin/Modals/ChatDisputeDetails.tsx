@@ -10,6 +10,7 @@ import { ChatDisputesData } from "@/types/types/Disputes";
 import { AlertTriangle, Trash2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBlockUser } from "@/store/tanstack/mutations";
+import toast from "react-hot-toast";
 
 interface ChatDisputeDetailsModalProps {
   dispute: ChatDisputesData;
@@ -23,9 +24,13 @@ export default function ChatDisputeDetailsModal({
   onOpenChange,
 }: ChatDisputeDetailsModalProps) {
   const { mutateAsync: blockUser } = useBlockUser();
-  
+
   function onDeleteMessage(messageId: string) {}
   async function onBlocUser(userId: string) {
+    if (!userId) {
+      toast.error("user id required");
+      return;
+    }
     await blockUser({ status: true, user_id: userId });
   }
   return (
@@ -119,7 +124,7 @@ export default function ChatDisputeDetailsModal({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onBlocUser(dispute.reportedUser.email)}
+                  onClick={() => onBlocUser(dispute.reportedUser.user_id)}
                   className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
                 >
                   <UserX className="h-4 w-4 mr-1" />
