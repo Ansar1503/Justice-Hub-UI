@@ -1,4 +1,5 @@
 import { store } from "@/store/redux/store";
+import { Disputes } from "@/types/types/Disputes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 
 export async function fetchUserByRole(query: {
@@ -175,6 +176,20 @@ export async function deleteDisputeReview(payload: {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.delete(
     `/api/admin/disputes/reviews/${payload.reviewId}/${payload.diputeId}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function updateDisputesStatus(payload: {
+  action: Disputes["resolveAction"];
+  status: Disputes["status"];
+  disputesId: string;
+}) {
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.put(
+    `/api/admin/disputes/status/${payload.disputesId}`,
+    payload,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

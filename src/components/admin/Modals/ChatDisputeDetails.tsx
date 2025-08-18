@@ -1,16 +1,18 @@
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChatDisputesData } from "@/types/types/Disputes";
-import { AlertTriangle, Trash2, UserX } from "lucide-react";
+import { ChatDisputesData, Disputes } from "@/types/types/Disputes";
+import { AlertTriangle, Flag, Trash2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBlockUser } from "@/store/tanstack/mutations";
 import toast from "react-hot-toast";
+import { useUpdateDisputeStatus } from "@/store/tanstack/mutations/DisputesMutation";
 
 interface ChatDisputeDetailsModalProps {
   dispute: ChatDisputesData;
@@ -24,14 +26,26 @@ export default function ChatDisputeDetailsModal({
   onOpenChange,
 }: ChatDisputeDetailsModalProps) {
   const { mutateAsync: blockUser } = useBlockUser();
-
-  function onDeleteMessage(messageId: string) {}
-  async function onBlocUser(userId: string) {
-    if (!userId) {
+  const { mutateAsync: updateStatus } = useUpdateDisputeStatus();
+  function onDeleteMessage(messageId: string, disputesId: string) {}
+  async function onBlocUser(userId: string, disputesId: string) {
+    if (!userId || !disputesId) {
       toast.error("user id required");
       return;
     }
-    await blockUser({ status: false, user_id: userId });
+    await blockUser({ status: true, user_id: userId });
+    await updateDisputeStatus("blocked", "resolved", disputesId);
+  }
+  async function updateDisputeStatus(
+    action: Disputes["resolveAction"],
+    status: Disputes["status"],
+    disputesId: string
+  ) {
+    if (!action || !status || !disputesId) {
+      toast.error("action and status required");
+      return;
+    }
+    await updateStatus({ action, status, disputesId });
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -115,7 +129,13 @@ export default function ChatDisputeDetailsModal({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onDeleteMessage(dispute.chatMessage.id)}
+                  disabled={
+                    dispute.status === "resolved" ||
+                    dispute.status === "rejected"
+                  }
+                  onClick={() =>
+                    onDeleteMessage(dispute.chatMessage.id, dispute.id)
+                  }
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
                   <Trash2 className="h-4 w-4 mr-1" />
@@ -124,7 +144,13 @@ export default function ChatDisputeDetailsModal({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onBlocUser(dispute.reportedUser.user_id)}
+                  disabled={
+                    dispute.status === "resolved" ||
+                    dispute.status === "rejected"
+                  }
+                  onClick={() =>
+                    onBlocUser(dispute.reportedUser.user_id, dispute.id)
+                  }
                   className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
                 >
                   <UserX className="h-4 w-4 mr-1" />
@@ -155,7 +181,20 @@ export default function ChatDisputeDetailsModal({
               </p>
             </div>
           </div>
-
+          {/* action took */}
+          <div>
+            <h3 className="font-medium mb-1">Action</h3>
+            <div className="flex items-start gap-2 p-3 bg-white/5 rounded-lg">
+              <Flag className="h-4 w-4" />
+              <p className="text-sm">
+                {dispute.resolveAction
+                  ? dispute.resolveAction === "blocked"
+                    ? dispute.reportedUser.name + " has been " + "blocked"
+                    : "message deleted"
+                  : "No action taken"}
+              </p>
+            </div>
+          </div>
           {/* Timestamps */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -172,6 +211,16 @@ export default function ChatDisputeDetailsModal({
             </div>
           </div>
         </div>
+        <DialogFooter>
+          <Button
+            variant="destructive"
+            disabled={
+              dispute.status === "rejected" || dispute.status === "resolved"
+            }
+          >
+            Reject
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
