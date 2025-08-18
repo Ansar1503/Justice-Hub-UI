@@ -31,7 +31,7 @@ export default function ChatDisputeDetailsModal({
       toast.error("user id required");
       return;
     }
-    await blockUser({ status: true, user_id: userId });
+    await blockUser({ status: false, user_id: userId });
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

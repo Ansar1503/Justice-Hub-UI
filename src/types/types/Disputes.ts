@@ -8,6 +8,7 @@ export interface Disputes {
   reportedUser: string;
   reason: string;
   status: "pending" | "resolved" | "rejected";
+  resolveAction?: "deleted" | "blocked";
   createdAt: string;
   updatedAt: string;
 }
