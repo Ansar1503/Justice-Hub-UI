@@ -397,7 +397,7 @@ export function UserManagement() {
                                     e.stopPropagation();
                                     if (!user.user_id) return;
                                     await mutateAsync({
-                                      status: false,
+                                      status: true,
                                       user_id: user.user_id,
                                     });
                                     document.body.click();
