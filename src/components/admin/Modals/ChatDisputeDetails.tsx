@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { useBlockUser } from "@/store/tanstack/mutations";
 import toast from "react-hot-toast";
 import { useUpdateDisputeStatus } from "@/store/tanstack/mutations/DisputesMutation";
+import { useContext } from "react";
+import { SocketContext } from "@/context/SocketProvider";
+import { SocketEvents } from "@/pages/lawyer/ChatPage";
 
 interface ChatDisputeDetailsModalProps {
   dispute: ChatDisputesData;
@@ -25,9 +28,34 @@ export default function ChatDisputeDetailsModal({
   open,
   onOpenChange,
 }: ChatDisputeDetailsModalProps) {
+  const socket = useContext(SocketContext);
   const { mutateAsync: blockUser } = useBlockUser();
   const { mutateAsync: updateStatus } = useUpdateDisputeStatus();
-  function onDeleteMessage(messageId: string, disputesId: string) {}
+  async function onDeleteMessage(
+    messageId: string,
+    sessionId: string,
+    disputesId: string
+  ) {
+    console.log(dispute.chatMessage)
+    if (!messageId) {
+      toast.error("message id required");
+      return;
+    }
+    if (!sessionId) {
+      toast.error("session id required");
+      return;
+    }
+    if (!disputesId) {
+      toast.error("disputes id required");
+      return;
+    }
+    if (!socket) {
+      toast.error("socket not working");
+      return;
+    }
+    socket.emit(SocketEvents.MESSAGE_DELETE_EVENT, { messageId, sessionId });
+    await updateDisputeStatus("deleted", "resolved", disputesId);
+  }
   async function onBlocUser(userId: string, disputesId: string) {
     if (!userId || !disputesId) {
       toast.error("user id required");
@@ -134,7 +162,11 @@ export default function ChatDisputeDetailsModal({
                     dispute.status === "rejected"
                   }
                   onClick={() =>
-                    onDeleteMessage(dispute.chatMessage.id, dispute.id)
+                    onDeleteMessage(
+                      dispute.chatMessage.id,
+                      dispute.chatMessage.session_id,
+                      dispute.id
+                    )
                   }
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
