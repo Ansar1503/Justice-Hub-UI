@@ -1,8 +1,8 @@
-import { SocketEvents } from "@/pages/lawyer/ChatPage";
 import { useAppDispatch } from "@/store/redux/Hook";
 import { RootState } from "@/store/redux/store";
 import { setZcState } from "@/store/redux/zc/zcSlice";
 import { useJoinSession } from "@/store/tanstack/mutations/sessionMutation";
+import { SocketEvents } from "@/types/enums/socket";
 import { NotificationType } from "@/types/types/Notification";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
 import { getSocket } from "@/utils/socket/socket";

@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
 import { useUpdateDisputeStatus } from "@/store/tanstack/mutations/DisputesMutation";
 import { useContext } from "react";
 import { SocketContext } from "@/context/SocketProvider";
-import { SocketEvents } from "@/pages/lawyer/ChatPage";
+import { SocketEvents } from "@/types/enums/socket";
 
 interface ChatDisputeDetailsModalProps {
   dispute: ChatDisputesData;
@@ -36,7 +36,7 @@ export default function ChatDisputeDetailsModal({
     sessionId: string,
     disputesId: string
   ) {
-    console.log(dispute.chatMessage)
+    console.log(dispute.chatMessage);
     if (!messageId) {
       toast.error("message id required");
       return;

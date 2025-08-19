@@ -17,24 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { disconnectSocket, getSocket } from "@/utils/socket/socket";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
 import { toast } from "react-toastify";
-
-enum SocketEvents {
-  CONNECTED_EVENT = "user_connected",
-  CONNECTED_ERROR = "connect_error",
-  USER_ONLINE_EVENT = "user_online",
-  USER_OFFLINE_EVENT = "user_offline",
-  ERROR = "error",
-  SOCKET_ERROR_EVENT = "socketError",
-  DISCONNECT_EVENT = "disconnect",
-  JOIN_CHAT_EVENT = "joinChat",
-  TYPING_EVENT = "typing",
-  MESSAGE_RECEIVED_EVENT = "messageReceived",
-  REPORT_MESSAGE = "report_message",
-  MESSAGE_DELETE_EVENT = "messageDeleted",
-  CHANGE_CHAT_NAME_EVENT = "changeChatName",
-  SEND_MESSAGE_EVENT = "sendMessage",
-  READ_MESSAGE_EVENT = "readMessageEvent",
-}
+import { SocketEvents } from "@/types/enums/socket";
 
 function ChatsPage() {
   const [search, setSearch] = useState("");
@@ -174,6 +157,7 @@ function ChatsPage() {
         messageId: string;
         sessionId: string;
       }) => {
+        // console.log("deleting message ....");
         queryClient.setQueryData(
           ["user", "chatMessages", selectedSessionRef.current._id],
           (oldData: any) => {
@@ -182,6 +166,8 @@ function ChatsPage() {
               ...oldData,
               pages: oldData.pages.map((page: any, index: number) => {
                 if (index === oldData.pages.length - 1) {
+                  // console.log("data", page?.data);
+                  // console.log("response  ::: 000", data);
                   return {
                     ...page,
                     data: page.data.filter(
@@ -199,10 +185,15 @@ function ChatsPage() {
           return {
             ...oldData,
             pages: oldData?.pages?.map((page: any) => {
+              // console.log("pages.data", page.data);
               return {
                 ...page,
                 data: page.data?.map((session: any) => {
-                  if (session._id === selectedSessionRef?.current?._id) {
+                  // console.log("sessiondi", session._id);
+                  // console.log("lastmessage", data.lastMessage);
+                  if (session._id === data.lastMessage?.session_id) {
+                    // console.log("sessssion,", session);
+                    // console.log("new sessio ndata", data);
                     return {
                       ...session,
                       lastMessage: data?.lastMessage,
@@ -378,7 +369,7 @@ function ChatsPage() {
       receiverId: partnerId,
       content,
       read: false,
-      active:true,
+      active: true,
       attachments: !document ? [] : [document],
     };
     // console.log("send message", newMessage);

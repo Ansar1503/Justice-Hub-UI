@@ -1,0 +1,17 @@
+export enum SocketEvents {
+  CONNECTED_EVENT = "user_connected",
+  CONNECTED_ERROR = "connect_error",
+  USER_ONLINE_EVENT = "user_online",
+  USER_OFFLINE_EVENT = "user_offline",
+  ERROR = "error",
+  SOCKET_ERROR_EVENT = "socketError",
+  DISCONNECT_EVENT = "disconnect",
+  JOIN_CHAT_EVENT = "joinChat",
+  TYPING_EVENT = "typing",
+  MESSAGE_RECEIVED_EVENT = "messageReceived",
+  REPORT_MESSAGE = "report_message",
+  MESSAGE_DELETE_EVENT = "messageDeleted",
+  CHANGE_CHAT_NAME_EVENT = "changeChatName",
+  SEND_MESSAGE_EVENT = "sendMessage",
+  READ_MESSAGE_EVENT = "readMessageEvent",
+}
