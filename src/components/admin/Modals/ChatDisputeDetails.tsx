@@ -17,6 +17,7 @@ import { useContext, useState } from "react";
 import { SocketContext } from "@/context/SocketProvider";
 import { SocketEvents } from "@/types/enums/socket";
 import Confirmation from "@/components/Confirmation";
+import ChatDocumentsPreview from "../ChatDisputesDocumentPreview";
 
 interface ChatDisputeDetailsModalProps {
   dispute: ChatDisputesData;
@@ -29,6 +30,7 @@ export default function ChatDisputeDetailsModal({
   open,
   onOpenChange,
 }: ChatDisputeDetailsModalProps) {
+  const [attachmentPreview, setAttachmentPreview] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
   const [confirmRejectOpen, setConfirmRejectOpen] = useState(false);
@@ -41,7 +43,7 @@ export default function ChatDisputeDetailsModal({
     sessionId: string,
     disputesId: string
   ) {
-    console.log(dispute.chatMessage);
+    // console.log(dispute.chatMessage);
     if (!messageId) {
       toast.error("message id required");
       return;
@@ -82,215 +84,232 @@ export default function ChatDisputeDetailsModal({
     await updateStatus({ action, status, disputesId });
   }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Chat Dispute Details</DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Chat Dispute Details</DialogTitle>
+          </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Dispute Status */}
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Status:</span>
-            <Badge
-              variant={
-                dispute.status === "resolved"
-                  ? "default"
-                  : dispute.status === "rejected"
-                  ? "destructive"
-                  : "secondary"
-              }
-            >
-              {dispute.status}
-            </Badge>
-          </div>
+          <div className="space-y-6">
+            {/* Dispute Status */}
+            <div className="flex items-center gap-2">
+              <span className="font-medium">Status:</span>
+              <Badge
+                variant={
+                  dispute.status === "resolved"
+                    ? "default"
+                    : dispute.status === "rejected"
+                    ? "destructive"
+                    : "secondary"
+                }
+              >
+                {dispute.status}
+              </Badge>
+            </div>
 
-          {/* Reporter Information */}
-          <div className="space-y-2">
-            <h3 className="font-medium">Reporter</h3>
-            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <Avatar>
-                <AvatarImage
-                  src={dispute.reportedBy.profile_image || "/placeholder.svg"}
-                  alt={dispute.reportedBy.name}
-                />
-                <AvatarFallback>
-                  {dispute.reportedBy.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{dispute.reportedBy.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {dispute.reportedBy.email}
+            {/* Reporter Information */}
+            <div className="space-y-2">
+              <h3 className="font-medium">Reporter</h3>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <Avatar>
+                  <AvatarImage
+                    src={dispute.reportedBy.profile_image || "/placeholder.svg"}
+                    alt={dispute.reportedBy.name}
+                  />
+                  <AvatarFallback>
+                    {dispute.reportedBy.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{dispute.reportedBy.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {dispute.reportedBy.email}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {dispute.reportedBy.mobile}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Reported User Information */}
+            <div className="space-y-2">
+              <h3 className="font-medium">Reported User</h3>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <Avatar>
+                  <AvatarImage
+                    src={
+                      dispute.reportedUser.profile_image || "/placeholder.svg"
+                    }
+                    alt={dispute.reportedUser.name}
+                  />
+                  <AvatarFallback>
+                    {dispute.reportedUser.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{dispute.reportedUser.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {dispute.reportedUser.email}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {dispute.reportedUser.mobile}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Message Content */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium">Reported Message</h3>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={
+                      dispute.status === "resolved" ||
+                      dispute.status === "rejected"
+                    }
+                    onClick={() => setConfirmDeleteOpen(true)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete Message
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={
+                      dispute.status === "resolved" ||
+                      dispute.status === "rejected"
+                    }
+                    onClick={() => setConfirmBlockOpen(true)}
+                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                  >
+                    <UserX className="h-4 w-4 mr-1" />
+                    Block User
+                  </Button>
+                </div>
+              </div>
+              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <p className="text-sm">
+                  {dispute.chatMessage.content || "No content"}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  {dispute.reportedBy.mobile}
+                {dispute.chatMessage.attachments &&
+                  dispute.chatMessage.attachments.length > 0 && (
+                    <div
+                      className="mt-2 text-xs text-muted-foreground cursor-pointer underline"
+                      onClick={() => setAttachmentPreview(true)}
+                    >
+                      📎 {dispute.chatMessage.attachments.length} attachment(s)
+                      – Click to preview
+                    </div>
+                  )}
+              </div>
+            </div>
+
+            {/* Report Reason */}
+            <div className="space-y-2">
+              <h3 className="font-medium">Report Reason</h3>
+              <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {dispute.reason || "No reason provided"}
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* Reported User Information */}
-          <div className="space-y-2">
-            <h3 className="font-medium">Reported User</h3>
-            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <Avatar>
-                <AvatarImage
-                  src={dispute.reportedUser.profile_image || "/placeholder.svg"}
-                  alt={dispute.reportedUser.name}
-                />
-                <AvatarFallback>
-                  {dispute.reportedUser.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{dispute.reportedUser.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {dispute.reportedUser.email}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {dispute.reportedUser.mobile}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Message Content */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium">Reported Message</h3>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={
-                    dispute.status === "resolved" ||
-                    dispute.status === "rejected"
-                  }
-                  onClick={() => setConfirmDeleteOpen(true)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Delete Message
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={
-                    dispute.status === "resolved" ||
-                    dispute.status === "rejected"
-                  }
-                  onClick={() => setConfirmBlockOpen(true)}
-                  className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-                >
-                  <UserX className="h-4 w-4 mr-1" />
-                  Block User
-                </Button>
-              </div>
-            </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-sm">
-                {dispute.chatMessage.content || "No content"}
-              </p>
-              {dispute.chatMessage.attachments &&
-                dispute.chatMessage.attachments.length > 0 && (
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    📎 {dispute.chatMessage.attachments.length} attachment(s)
-                  </div>
-                )}
-            </div>
-          </div>
-
-          {/* Report Reason */}
-          <div className="space-y-2">
-            <h3 className="font-medium">Report Reason</h3>
-            <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-              <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-red-600 dark:text-red-400">
-                {dispute.reason || "No reason provided"}
-              </p>
-            </div>
-          </div>
-          {/* action took */}
-          <div>
-            <h3 className="font-medium mb-1">Action</h3>
-            <div className="flex items-start gap-2 p-3 bg-white/5 rounded-lg">
-              <Flag className="h-4 w-4" />
-              <p className="text-sm">
-                {dispute.resolveAction
-                  ? dispute.resolveAction === "blocked"
-                    ? dispute.reportedUser.name + " has been " + "blocked"
-                    : "message deleted"
-                  : "No action taken"}
-              </p>
-            </div>
-          </div>
-          {/* Timestamps */}
-          <div className="grid grid-cols-2 gap-4 text-sm">
+            {/* action took */}
             <div>
-              <span className="font-medium">Reported At:</span>
-              <p className="text-muted-foreground">
-                {new Date(dispute.createdAt).toLocaleString()}
-              </p>
+              <h3 className="font-medium mb-1">Action</h3>
+              <div className="flex items-start gap-2 p-3 bg-white/5 rounded-lg">
+                <Flag className="h-4 w-4" />
+                <p className="text-sm">
+                  {dispute.resolveAction
+                    ? dispute.resolveAction === "blocked"
+                      ? dispute.reportedUser.name + " has been " + "blocked"
+                      : "message deleted"
+                    : "No action taken"}
+                </p>
+              </div>
             </div>
-            <div>
-              <span className="font-medium">Messaged Date:</span>
-              <p className="text-muted-foreground">
-                {new Date(dispute.chatMessage.createdAt).toLocaleString()}
-              </p>
+            {/* Timestamps */}
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="font-medium">Reported At:</span>
+                <p className="text-muted-foreground">
+                  {new Date(dispute.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <span className="font-medium">Messaged Date:</span>
+                <p className="text-muted-foreground">
+                  {new Date(dispute.chatMessage.createdAt).toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-        {/* Confirmations */}
-        <Confirmation
-          open={confirmDeleteOpen}
-          setOpen={setConfirmDeleteOpen}
-          title="Delete Message?"
-          description="Are you sure you want to delete this message? This action cannot be undone."
-          handleAction={() =>
-            onDeleteMessage(
-              dispute.chatMessage.id,
-              dispute.chatMessage.session_id,
-              dispute.id
-            )
-          }
-          className="bg-red-600 text-white hover:bg-red-700"
-          actionText="Yes, delete"
-        />
-        <Confirmation
-          open={confirmBlockOpen}
-          setOpen={setConfirmBlockOpen}
-          title="Block User?"
-          description={`Are you sure you want to block ${dispute.reportedUser.name}?`}
-          handleAction={() =>
-            onBlocUser(dispute.reportedUser.user_id, dispute.id)
-          }
-          className="bg-orange-600 text-white hover:bg-orange-700"
-          actionText="Yes, block"
-        />
-        <Confirmation
-          open={confirmRejectOpen}
-          setOpen={setConfirmRejectOpen}
-          title="Reject Dispute?"
-          description="Are you sure you want to reject this dispute? It will be marked as rejected."
-          handleAction={() => updateDisputeStatus("rejected", dispute.id)}
-          className="bg-gray-600 text-white hover:bg-gray-700"
-          actionText="Yes, reject"
-        />
-        <DialogFooter>
-          <Button
-            variant="destructive"
-            disabled={
-              dispute.status === "rejected" || dispute.status === "resolved"
+          {/* Confirmations */}
+          <Confirmation
+            open={confirmDeleteOpen}
+            setOpen={setConfirmDeleteOpen}
+            title="Delete Message?"
+            description="Are you sure you want to delete this message? This action cannot be undone."
+            handleAction={() =>
+              onDeleteMessage(
+                dispute.chatMessage.id,
+                dispute.chatMessage.session_id,
+                dispute.id
+              )
             }
-            onClick={() => {
-              setConfirmRejectOpen(true);
-            }}
-          >
-            Reject
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            className="bg-red-600 text-white hover:bg-red-700"
+            actionText="Yes, delete"
+          />
+          <Confirmation
+            open={confirmBlockOpen}
+            setOpen={setConfirmBlockOpen}
+            title="Block User?"
+            description={`Are you sure you want to block ${dispute.reportedUser.name}?`}
+            handleAction={() =>
+              onBlocUser(dispute.reportedUser.user_id, dispute.id)
+            }
+            className="bg-orange-600 text-white hover:bg-orange-700"
+            actionText="Yes, block"
+          />
+          <Confirmation
+            open={confirmRejectOpen}
+            setOpen={setConfirmRejectOpen}
+            title="Reject Dispute?"
+            description="Are you sure you want to reject this dispute? It will be marked as rejected."
+            handleAction={() => updateDisputeStatus("rejected", dispute.id)}
+            className="bg-gray-600 text-white hover:bg-gray-700"
+            actionText="Yes, reject"
+          />
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              disabled={
+                dispute.status === "rejected" || dispute.status === "resolved"
+              }
+              onClick={() => {
+                setConfirmRejectOpen(true);
+              }}
+            >
+              Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {dispute.chatMessage.attachments && (
+        <ChatDocumentsPreview
+          files={dispute.chatMessage.attachments}
+          isOpen={attachmentPreview}
+          onClose={() => {
+            setAttachmentPreview(false);
+          }}
+        />
+      )}
+    </>
   );
 }
