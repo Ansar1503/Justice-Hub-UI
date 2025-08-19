@@ -19,6 +19,7 @@ export function useUpdateDisputeStatus() {
       console.log("disputes status data : ", data);
       queryClient.invalidateQueries({
         queryKey: ["admin", "disputes", "chat"],
+        exact: false,
       });
     },
     onError: (error: any) => {

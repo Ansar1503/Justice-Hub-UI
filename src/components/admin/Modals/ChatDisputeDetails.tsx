@@ -13,9 +13,10 @@ import { Button } from "@/components/ui/button";
 import { useBlockUser } from "@/store/tanstack/mutations";
 import toast from "react-hot-toast";
 import { useUpdateDisputeStatus } from "@/store/tanstack/mutations/DisputesMutation";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { SocketContext } from "@/context/SocketProvider";
 import { SocketEvents } from "@/types/enums/socket";
+import Confirmation from "@/components/Confirmation";
 
 interface ChatDisputeDetailsModalProps {
   dispute: ChatDisputesData;
@@ -28,7 +29,11 @@ export default function ChatDisputeDetailsModal({
   open,
   onOpenChange,
 }: ChatDisputeDetailsModalProps) {
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+  const [confirmRejectOpen, setConfirmRejectOpen] = useState(false);
   const socket = useContext(SocketContext);
+
   const { mutateAsync: blockUser } = useBlockUser();
   const { mutateAsync: updateStatus } = useUpdateDisputeStatus();
   async function onDeleteMessage(
@@ -54,7 +59,7 @@ export default function ChatDisputeDetailsModal({
       return;
     }
     socket.emit(SocketEvents.MESSAGE_DELETE_EVENT, { messageId, sessionId });
-    await updateDisputeStatus("deleted", "resolved", disputesId);
+    await updateDisputeStatus("resolved", disputesId, "deleted");
   }
   async function onBlocUser(userId: string, disputesId: string) {
     if (!userId || !disputesId) {
@@ -62,17 +67,18 @@ export default function ChatDisputeDetailsModal({
       return;
     }
     await blockUser({ status: true, user_id: userId });
-    await updateDisputeStatus("blocked", "resolved", disputesId);
+    await updateDisputeStatus("resolved", disputesId, "blocked");
   }
   async function updateDisputeStatus(
-    action: Disputes["resolveAction"],
     status: Disputes["status"],
-    disputesId: string
+    disputesId: string,
+    action?: Disputes["resolveAction"]
   ) {
-    if (!action || !status || !disputesId) {
+    if (!status || !disputesId) {
       toast.error("action and status required");
       return;
     }
+    onOpenChange(false);
     await updateStatus({ action, status, disputesId });
   }
   return (
@@ -161,13 +167,7 @@ export default function ChatDisputeDetailsModal({
                     dispute.status === "resolved" ||
                     dispute.status === "rejected"
                   }
-                  onClick={() =>
-                    onDeleteMessage(
-                      dispute.chatMessage.id,
-                      dispute.chatMessage.session_id,
-                      dispute.id
-                    )
-                  }
+                  onClick={() => setConfirmDeleteOpen(true)}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
                   <Trash2 className="h-4 w-4 mr-1" />
@@ -180,9 +180,7 @@ export default function ChatDisputeDetailsModal({
                     dispute.status === "resolved" ||
                     dispute.status === "rejected"
                   }
-                  onClick={() =>
-                    onBlocUser(dispute.reportedUser.user_id, dispute.id)
-                  }
+                  onClick={() => setConfirmBlockOpen(true)}
                   className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
                 >
                   <UserX className="h-4 w-4 mr-1" />
@@ -243,12 +241,51 @@ export default function ChatDisputeDetailsModal({
             </div>
           </div>
         </div>
+        {/* Confirmations */}
+        <Confirmation
+          open={confirmDeleteOpen}
+          setOpen={setConfirmDeleteOpen}
+          title="Delete Message?"
+          description="Are you sure you want to delete this message? This action cannot be undone."
+          handleAction={() =>
+            onDeleteMessage(
+              dispute.chatMessage.id,
+              dispute.chatMessage.session_id,
+              dispute.id
+            )
+          }
+          className="bg-red-600 text-white hover:bg-red-700"
+          actionText="Yes, delete"
+        />
+        <Confirmation
+          open={confirmBlockOpen}
+          setOpen={setConfirmBlockOpen}
+          title="Block User?"
+          description={`Are you sure you want to block ${dispute.reportedUser.name}?`}
+          handleAction={() =>
+            onBlocUser(dispute.reportedUser.user_id, dispute.id)
+          }
+          className="bg-orange-600 text-white hover:bg-orange-700"
+          actionText="Yes, block"
+        />
+        <Confirmation
+          open={confirmRejectOpen}
+          setOpen={setConfirmRejectOpen}
+          title="Reject Dispute?"
+          description="Are you sure you want to reject this dispute? It will be marked as rejected."
+          handleAction={() => updateDisputeStatus("rejected", dispute.id)}
+          className="bg-gray-600 text-white hover:bg-gray-700"
+          actionText="Yes, reject"
+        />
         <DialogFooter>
           <Button
             variant="destructive"
             disabled={
               dispute.status === "rejected" || dispute.status === "resolved"
             }
+            onClick={() => {
+              setConfirmRejectOpen(true);
+            }}
           >
             Reject
           </Button>
