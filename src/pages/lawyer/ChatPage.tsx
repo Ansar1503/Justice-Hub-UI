@@ -378,6 +378,7 @@ function ChatsPage() {
       senderId: currentUserId,
       receiverId: partnerId,
       content,
+      active:true,
       read: false,
       attachments: !document ? [] : [document],
     };

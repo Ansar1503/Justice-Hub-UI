@@ -378,6 +378,7 @@ function ChatsPage() {
       receiverId: partnerId,
       content,
       read: false,
+      active:true,
       attachments: !document ? [] : [document],
     };
     // console.log("send message", newMessage);

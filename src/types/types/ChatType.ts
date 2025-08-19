@@ -28,15 +28,12 @@ export interface ChatMessage {
   receiverId: string;
   content: string;
   read: boolean;
+  active: boolean;
   attachments?: {
     name: string;
     url: string;
     type: string;
   }[];
-  report?: {
-    reason: string;
-    reportedAt: Date;
-  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -55,6 +52,7 @@ export interface ChatMessageOutputDto {
   receiverId: string;
   content?: string;
   read: boolean;
+  active: boolean;
   attachments?: Attachment[];
   createdAt: Date;
   updatedAt: Date;
