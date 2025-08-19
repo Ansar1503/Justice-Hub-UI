@@ -45,8 +45,6 @@ function ChatList({
     return date.toLocaleDateString();
   };
 
-  
-
   const getSessionPartnerId = (session: AggregateChatSession) => {
     return session.participants?.lawyer_id === currentUserId
       ? session.participants?.client_id
@@ -210,7 +208,11 @@ function ChatList({
 
                       <div className="flex items-center justify-between">
                         <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 flex-1">
-                          {session?.lastMessage?.content || "No messages yet"}
+                          {session?.lastMessage?.attachments?.length
+                            ? session.lastMessage?.attachments[0]?.name
+                            : session?.lastMessage?.content
+                            ? session.lastMessage?.content
+                            : "No Messages"}
                         </p>
                         {/* <Badge
                           variant="outline"

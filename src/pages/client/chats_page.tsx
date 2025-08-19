@@ -191,6 +191,12 @@ function ChatsPage() {
                 data: page.data?.map((session: any) => {
                   // console.log("sessiondi", session._id);
                   // console.log("lastmessage", data.lastMessage);
+                  if (!data.lastMessage) {
+                    return {
+                      ...session,
+                      lastMessage: null,
+                    };
+                  }
                   if (session._id === data.lastMessage?.session_id) {
                     // console.log("sessssion,", session);
                     // console.log("new sessio ndata", data);
