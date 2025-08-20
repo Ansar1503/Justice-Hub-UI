@@ -1,5 +1,5 @@
 export interface NotificationType {
-  _id?: string;
+  id: string;
   recipientId: string;
   senderId: string;
   type: "message" | "session";

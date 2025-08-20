@@ -209,7 +209,7 @@ export default function SessionsListing() {
         })
       );
       const { date, time } = formatDateTime(session?.start_date);
-      const notificationData: NotificationType = {
+      const notificationData: Omit<NotificationType, "id"> = {
         isRead: false,
         message: `Your Session has been started by the lawyer ${currentUser?.name} on ${date} at ${time} `,
         sessionId: session?._id,
