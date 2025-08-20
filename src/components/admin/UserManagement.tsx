@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -40,6 +40,7 @@ import { UserDetailsModal } from "@/components/admin/Modals/UserDetails.Modal";
 import { toast } from "react-toastify";
 import { Paginations } from "../ui/custom/Pagination";
 import { useBlockUser } from "@/store/tanstack/mutations";
+import SearchComponent from "../SearchComponent";
 
 export function UserManagement() {
   const [activeTab, setActiveTab] = useState<"client" | "lawyer">("client");
@@ -76,9 +77,9 @@ export function UserManagement() {
     }
     refetch();
   }, [currentPage, refetchUser]);
-  console.log("data:", data);
+  // console.log("data:", data);
   const users = useMemo(() => data?.data || [], [data]);
-  console.log("users", users);
+  // console.log("users", users);
   const totalCount = useMemo(() => data?.totalCount || 0, [data]);
   const totalPages = useMemo(
     () => Math.ceil(totalCount / itemsPerPage),
@@ -103,9 +104,9 @@ export function UserManagement() {
     }
   }, [isError, error]);
 
-  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearch(e.target.value);
-  }
+  // function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    // setSearch(e.target.value);
+  // }0
 
   function handleTabChange(tab: "client" | "lawyer") {
     setActiveTab(tab);
@@ -167,12 +168,10 @@ export function UserManagement() {
         <div className="space-y-4">
           {/* Search and Filters */}
           <div className="flex items-center gap-2">
-            <Input
-              type="search"
-              placeholder="Search users..."
-              value={search}
-              onChange={handleSearch}
-              className="pl-8"
+            <SearchComponent
+              searchTerm={search}
+              setSearchTerm={setSearch}
+              className="w-full"
             />
             <Select
               value={statusFilter}

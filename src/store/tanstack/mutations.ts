@@ -9,7 +9,7 @@ import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
 import {
   ChangeBlockStatusUser,
   changeLawyerVerificationStatus,
-  deleteDisputeReview,
+  // deleteDisputeReview,
 } from "@/utils/api/services/adminServices";
 import {
   addReview,
@@ -162,10 +162,8 @@ export function useBlockUser() {
     mutationFn: (payload) =>
       ChangeBlockStatusUser(payload.user_id, payload.status),
     onSuccess: (data) => {
-      console.log("data", data);
       toast.success(data.message);
-      const role = data.data.role;
-      queryClient.invalidateQueries({ queryKey: ["user", role] });
+      queryClient.invalidateQueries({ queryKey: ["user"], exact: false });
     },
     onError: (error: any) => {
       const message =
@@ -438,24 +436,24 @@ export function useReportReview() {
   });
 }
 
-export function useDeleteDisputeReview() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: { reviewId: string; diputeId: string }) =>
-      deleteDisputeReview(payload),
-    onSuccess: () => {
-      // toast.success("Review Deleted Successfully");
-      queryClient.invalidateQueries({
-        queryKey: ["admin", "disputes", "review"],
-      });
-    },
-    onError: (error: any) => {
-      console.log("error :", error);
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Something went wrong!";
-      toast.error(message);
-    },
-  });
-}
+// export function useDeleteDisputeReview() {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: (payload: { reviewId: string; diputeId: string }) =>
+//       deleteDisputeReview(payload),
+//     onSuccess: () => {
+//       // toast.success("Review Deleted Successfully");
+//       queryClient.invalidateQueries({
+//         queryKey: ["admin", "disputes", "review"],
+//       });
+//     },
+//     onError: (error: any) => {
+//       console.log("error :", error);
+//       const message =
+//         error?.response?.data?.message ||
+//         error?.message ||
+//         "Something went wrong!";
+//       toast.error(message);
+//     },
+//   });
+// }

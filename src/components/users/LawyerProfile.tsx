@@ -109,7 +109,7 @@ export default function LawyerProfile() {
     const { token } = store.getState().Auth;
     async function deleteSession() {
       if (!sessionId) return;
-      console.log("sessionId", sessionId);
+      // console.log("sessionId", sessionId);
       await axiosinstance.delete(
         `/api/client/lawyer/slots/session/${sessionId}`,
         { headers: { Authorization: `Bearer ${token}` } }

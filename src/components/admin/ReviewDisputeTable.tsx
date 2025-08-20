@@ -70,7 +70,6 @@ export default function ReviewDisputesTable({
       </div>
     );
   };
-
   return (
     <>
       <Table>
@@ -89,7 +88,7 @@ export default function ReviewDisputesTable({
         <TableBody>
           {reviewDisputes && reviewDisputes.length > 0 ? (
             reviewDisputes.map((dispute, index) => (
-              <TableRow key={dispute._id || index}>
+              <TableRow key={(dispute as any)._id || index}>
                 {/* Reporter */}
                 <TableCell className="p-3 bg-white/5">
                   <UserDetailsModal
@@ -193,23 +192,21 @@ export default function ReviewDisputesTable({
                 {/* Review Date */}
                 <TableCell className="p-3 bg-white/5">
                   <div className="text-sm text-gray-900 dark:text-white">
-                    {new Date(dispute?.contentData?.createdAt)?.toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      }
-                    )}
+                    {new Date(
+                      dispute?.contentData?.createdAt
+                    )?.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {new Date(dispute?.contentData?.createdAt).toLocaleTimeString(
-                      "en-US",
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }
-                    )}
+                    {new Date(
+                      dispute?.contentData?.createdAt
+                    ).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </div>
                 </TableCell>
 

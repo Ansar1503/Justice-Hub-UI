@@ -9,7 +9,7 @@ export function useUpdateDisputeStatus() {
     any,
     Error,
     {
-      action: Disputes["resolveAction"];
+      action?: Disputes["resolveAction"];
       status: Disputes["status"];
       disputesId: string;
     }
@@ -19,6 +19,10 @@ export function useUpdateDisputeStatus() {
       console.log("disputes status data : ", data);
       queryClient.invalidateQueries({
         queryKey: ["admin", "disputes", "chat"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "disputes", "review"],
         exact: false,
       });
     },

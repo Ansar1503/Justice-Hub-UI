@@ -169,20 +169,21 @@ export async function fetchReviewDisputes(payload: {
   return response.data;
 }
 
-export async function deleteDisputeReview(payload: {
-  reviewId: string;
-  diputeId: string;
-}) {
-  const { token } = store.getState().Auth;
-  const response = await axiosinstance.delete(
-    `/api/admin/disputes/reviews/${payload.reviewId}/${payload.diputeId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  return response.data;
-}
+// export async function deleteDisputeReview(payload: {
+//   reviewId: string;
+//   diputeId: string;
+// }) {
+//   const { token } = store.getState().Auth;
+//   const response = await axiosinstance.patch(
+//     `/api/admin/disputes/reviews/`,
+//     payload,
+//     { headers: { Authorization: `Bearer ${token}` } }
+//   );
+//   return response.data;
+// }
 
 export async function updateDisputesStatus(payload: {
-  action: Disputes["resolveAction"];
+  action?: Disputes["resolveAction"];
   status: Disputes["status"];
   disputesId: string;
 }) {

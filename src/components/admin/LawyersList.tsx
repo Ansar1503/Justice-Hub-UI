@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Search,
+  // Search,
   Filter,
   Check,
   X,
@@ -10,7 +10,7 @@ import {
   Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -40,6 +40,7 @@ import { LawerDataType } from "@/types/types/Client.data.type";
 import { useFetchAllLawyers } from "@/store/tanstack/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PaginationComponent from "../pagination";
+import SearchComponent from "../SearchComponent";
 
 export function LawyersList() {
   const [lawyers, setLawyers] = useState<any[]>([]);
@@ -157,7 +158,7 @@ export function LawyersList() {
         <CardContent>
           {/* Filters and Search */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
+            {/* <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by name or email"
@@ -168,7 +169,11 @@ export function LawyersList() {
                   setCurrentPage(1);
                 }}
               />
-            </div>
+            </div> */}
+            <SearchComponent
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm} className="w-full"
+            />
             <div className="flex gap-2">
               <Select
                 value={statusFilter}

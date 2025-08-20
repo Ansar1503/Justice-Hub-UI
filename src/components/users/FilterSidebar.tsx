@@ -19,7 +19,7 @@ interface FiltersSidebarProps {
     specialisation: string[];
     experienceRange: number[];
     feeRange: number[];
-    sortBy:   "rating" | "experience" | "fee-low" | "fee-high";
+    sortBy: "rating" | "experience" | "fee-low" | "fee-high";
   };
   setFilters: React.Dispatch<
     React.SetStateAction<FiltersSidebarProps["filters"]>
@@ -48,36 +48,56 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
       };
     });
   };
+  const availablePracticeAreas = [
+    "Civil Law",
+    "Criminal Law",
+    "Corporate Law",
+    "Family Law",
+    "Intellectual Property",
+    "Tax Law",
+    "Constitutional Law",
+    "Environmental Law",
+    "Labor Law",
+    "Real Estate Law",
+  ];
 
+  const availableSpecializations = [
+    "Divorce",
+    "Child Custody",
+    "Wills & Trusts",
+    "Personal Injury",
+    "Medical Malpractice",
+    "Bankruptcy",
+    "Immigration",
+    "Mergers & Acquisitions",
+    "Patent Law",
+    "Criminal Defense",
+  ];
   return (
     <div className="w-full lg:w-[250px] space-y-4">
       <Accordion type="multiple" className="w-full">
         <AccordionItem value="practice">
           <AccordionTrigger>Practice Area</AccordionTrigger>
           <AccordionContent>
-            {["Corporate Law", "Family Law", "Criminal Law", "Civil Law"].map(
-              (area) => (
-                <div key={area} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={area}
-                    checked={filters.practiceAreas.includes(area)}
-                    onCheckedChange={() =>
-                      toggleCheckbox("practiceAreas", area)
-                    }
-                  />
-                  <label htmlFor={area} className="text-sm">
-                    {area}
-                  </label>
-                </div>
-              )
-            )}
+            {availablePracticeAreas.map((area) => (
+              <div key={area} className="flex items-center space-x-2">
+                <Checkbox
+                  id={area}
+                  checked={filters.practiceAreas.includes(area)}
+                  onCheckedChange={() => toggleCheckbox("practiceAreas", area)}
+                />
+                <label htmlFor={area} className="text-sm">
+                  {area}
+                </label>
+              </div>
+            ))}
           </AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="specialisation">
           <AccordionTrigger>Specialisation</AccordionTrigger>
           <AccordionContent>
-            {["Divorce", "Property", "Contracts", "Cybercrime"].map((spec) => (
+            {availableSpecializations.map((spec) => (
               <div key={spec} className="flex items-center space-x-2">
                 <Checkbox
                   id={spec}

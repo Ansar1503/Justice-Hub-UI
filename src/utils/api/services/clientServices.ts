@@ -347,6 +347,7 @@ export async function reportReview(payload: {
   reportedUser: string;
   reason: string;
 }) {
+  console.log("report payload", payload);
   const { token } = store.getState().Auth;
   const response = await axiosinstance.post(
     `/api/client/profile/reviews/report/${payload.review_id}`,

@@ -5,7 +5,7 @@ import { useLocation, Link } from "react-router-dom";
 // import { useFetchClientData } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { IoChatbubblesOutline } from "react-icons/io5";
-import { MdOutlineRateReview } from "react-icons/md";
+// import { MdOutlineRateReview } from "react-icons/md";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,11 +27,11 @@ export default function Sidebar() {
       label: "chats",
       icon: IoChatbubblesOutline,
     },
-    {
-      path: `/${user?.role}/reviews`,
-      label: "Reviews",
-      icon: MdOutlineRateReview,
-    },
+    // {
+    //   path: `/${user?.role}/reviews`,
+    //   label: "Reviews",
+    //   icon: MdOutlineRateReview,
+    // },
   ];
 
   return (

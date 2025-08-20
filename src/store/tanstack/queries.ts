@@ -89,7 +89,7 @@ export function useFetchUsersByRole(query: {
   status: "all" | "verified" | "blocked";
 }) {
   return useQuery({
-    queryKey: ["user", query.role],
+    queryKey: ["user", query],
     queryFn: () => fetchUserByRole(query),
     retry: 2,
   });

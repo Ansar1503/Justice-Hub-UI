@@ -43,6 +43,8 @@ import {
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import FeedbackModal from "./Feedback";
+// import Reviews from "../Reviews";
 
 interface Session {
   _id: string;
@@ -127,6 +129,7 @@ export default function SessionDetailModal({
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -594,7 +597,15 @@ export default function SessionDetailModal({
                 </p>
               </div>
             )}
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg"></div>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <Button
+                variant={"default"}
+                className="w-full"
+                onClick={() => setShowFeedbackModal(true)}
+              >
+                View Feedback & Reviews
+              </Button>
+            </div>
           </div>
 
           <DialogFooter className="sm:justify-between">
@@ -645,7 +656,6 @@ export default function SessionDetailModal({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <AlertDialog open={showStartConfirm} onOpenChange={setShowStartConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -707,6 +717,13 @@ export default function SessionDetailModal({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <FeedbackModal
+        sessionId={session?._id || ""}
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        lawyerId={session.lawyerData?.user_id || ""}
+        lawyerName={session.lawyerData.name || "Unknown Lawyer"}
+      />
     </>
   );
 }

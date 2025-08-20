@@ -29,7 +29,7 @@ import {
 
 type ReviewWithReporter = Review & {
   reviewedBy?: {
-    userid: string;
+    user_id: string;
     name?: string | null;
     profile_image?: string | null;
   };
@@ -154,6 +154,7 @@ export default function ReviewList({ reviews }: Props) {
     }
     setIsSubmitting(true);
     try {
+      console.log("reporteduser", reportedUser);
       await reportReviewAsync({
         review_id: selectedReportReviewId,
         reason: reportReason,
@@ -246,13 +247,13 @@ export default function ReviewList({ reviews }: Props) {
                                 </>
                               ) : (
                                 <DropdownMenuItem
-                                  onClick={() =>
+                                  onClick={() => {
                                     handleReportClick(
                                       review.id,
                                       currentUserId || "",
-                                      review.reviewedBy?.userid || ""
-                                    )
-                                  }
+                                      review.reviewedBy?.user_id || ""
+                                    );
+                                  }}
                                 >
                                   <Flag className="mr-2 h-4 w-4" />
                                   Report Review

@@ -16,8 +16,10 @@ import { clientDataType, userDataType } from "@/types/types/Client.data.type";
 import { Disputes } from "@/types/types/Disputes";
 import {
   useBlockUser,
-  useDeleteDisputeReview,
+  // useDeleteDisputeReview,
+  useDeleteReview,
 } from "@/store/tanstack/mutations";
+import { useUpdateDisputeStatus } from "@/store/tanstack/mutations/DisputesMutation";
 
 interface ReviewDisputeDetailsModalProps {
   dispute: {
@@ -34,8 +36,10 @@ export default function ReviewDisputeDetailsModal({
   open,
   onOpenChange,
 }: ReviewDisputeDetailsModalProps) {
-  const { mutateAsync: deleteDisputeReview } = useDeleteDisputeReview();
+  // const { mutateAsync: deleteDisputeReview } = useDeleteDisputeReview();
+  const { mutateAsync: deleteReview } = useDeleteReview();
   const { mutateAsync: blockDisputeUser } = useBlockUser();
+  const { mutateAsync: updateStatus } = useUpdateDisputeStatus();
   const renderStars = (rating: number) => {
     return (
       <div className="flex items-center gap-1">
@@ -58,15 +62,31 @@ export default function ReviewDisputeDetailsModal({
     action: "dismiss" | "Block" | "delete"
   ) => {
     if (action === "delete") {
-      await deleteDisputeReview({
-        diputeId: dispute._id,
-        reviewId: dispute.contentData._id,
+      await deleteReview({ review_id: dispute.contentData.id });
+      await updateStatus({
+        action: "deleted",
+        disputesId: dispute.id,
+        status: "resolved",
       });
     } else if (action === "Block") {
-      await blockDisputeUser(dispute.reportedUser);
+      await blockDisputeUser({
+        status: true,
+        user_id: dispute.reportedByuserData.user_id ?? "",
+      });
+      await updateStatus({
+        action: "blocked",
+        disputesId: dispute.id,
+        status: "resolved",
+      });
+    } else if (action === "dismiss") {
+      await updateStatus({
+        disputesId: dispute.id,
+        status: "rejected",
+      });
     }
+    onOpenChange(false);
   };
-  //   console.log("dispute:", dispute);
+  // console.log("dispute:", dispute);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -103,7 +123,7 @@ export default function ReviewDisputeDetailsModal({
               </Badge>
             </div>
             <div className="text-sm text-muted-foreground">
-              Dispute ID: {dispute._id}
+              Dispute ID: {dispute.id}
             </div>
           </div>
 
@@ -215,7 +235,10 @@ export default function ReviewDisputeDetailsModal({
                     }
                   )}
                 </div>
-                <div>Session ID: {dispute.contentData.session_id}</div>
+                <div>
+                  Session ID:
+                  {dispute.contentData.session_id}
+                </div>
               </div>
             </div>
           </div>
@@ -239,13 +262,13 @@ export default function ReviewDisputeDetailsModal({
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold">Resolution Actions</h3>
                 <div className="flex flex-wrap gap-2">
-                  {/* <Button
+                  <Button
                     variant="outline"
                     onClick={() => handleResolveDispute("dismiss")}
                     className="text-green-600 border-green-600 hover:bg-green-50"
                   >
                     Dismiss Report
-                  </Button> */}
+                  </Button>
                   <Button
                     variant="outline"
                     onClick={() => handleResolveDispute("Block")}
