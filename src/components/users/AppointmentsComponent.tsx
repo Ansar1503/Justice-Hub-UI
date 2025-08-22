@@ -8,7 +8,9 @@ import {
   Clock,
 } from "lucide-react";
 import PaginationComponent from "../pagination";
-import { useFetchAppointmentsForClients } from "@/store/tanstack/queries";
+import {
+  useFetchAppointments,
+} from "@/store/tanstack/queries";
 import AppointmentDetailModal from "@/components/users/modals/AppointmentDetails.modal";
 import { useCancellAppointment } from "@/store/tanstack/mutations";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
@@ -50,7 +52,7 @@ export default function LawyerAppointmentListing() {
   };
 
   const { data: appointmentData, refetch: refetchAppointment } =
-    useFetchAppointmentsForClients({
+    useFetchAppointments({
       appointmentStatus: statusFilter,
       appointmentType: typeFilter,
       sortField: sortBy,
@@ -314,34 +316,28 @@ export default function LawyerAppointmentListing() {
                   </td>
                 </tr>
               ) : (
-                appointments.map((appointment: any) => (
+                appointments.map((appointment) => (
                   <tr
-                    key={appointment?._id}
+                    key={appointment?.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
                     <td className="py-4 px-4 rounded-full">
                       <div className="flex items-center gap-3 ">
                         <Avatar className="h-8 w-8 rounded-full overflow-hidden">
                           <AvatarImage
-                            src={appointment?.clientData?.profile_image}
-                            alt={appointment?.userData?.name}
+                            src={appointment?.lawyerData?.profile_image}
+                            alt={appointment?.lawyerData?.name}
                             className="rounded-full"
                           />
                           <AvatarFallback className="rounded-full w-8 h-8 bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium">
-                            {appointment?.userData?.name
+                            {appointment?.lawyerData?.name
                               ?.substring(0, 2)
                               ?.toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="font-medium text-base text-gray-900 dark:text-white">
-                            {appointment?.userData?.name}
-                          </p>
-                          <p className="text-sm text-blue-600 dark:text-blue-400">
-                            {appointment?.lawyerData?.specialisation}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {appointment?.lawyerData?.experience} experience
+                            {appointment?.lawyerData?.name}
                           </p>
                         </div>
                       </div>
@@ -367,7 +363,7 @@ export default function LawyerAppointmentListing() {
                     </td>
                     <td className="py-4 px-4">
                       <span className="font-medium text-gray-900 dark:text-white">
-                        ₹{appointment?.lawyerData?.consultation_fee}
+                        ₹{appointment?.amount}
                       </span>
                     </td>
                     <td className="py-4 px-4 text-right">

@@ -28,9 +28,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-
+import { appointmentOutputDto } from "@/types/types/AppointmentsType";
 interface AppointmentDetailModalProps {
-  appointment: any;
+  appointment: appointmentOutputDto;
   isOpen: boolean;
   onClose: () => void;
   onCancel: (appointmentId: string) => void;
@@ -62,7 +62,7 @@ export default function AppointmentDetailModal({
   };
 
   const handleCancelAppointment = () => {
-    onCancel(appointment?._id);
+    onCancel(appointment?.id);
     setShowCancelConfirm(false);
     onClose();
   };
@@ -101,32 +101,26 @@ export default function AppointmentDetailModal({
               <div className="flex items-center gap-3 mb-2">
                 <Avatar className="h-10 w-10 rounded-full overflow-hidden">
                   <AvatarImage
-                    src={appointment?.clientData?.profile_image}
-                    alt={appointment?.userData?.name}
+                    src={appointment?.lawyerData?.profile_image}
+                    alt={appointment?.lawyerData?.name}
                     className="h-full w-full object-cover"
                   />
                   <AvatarFallback className="h-full w-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 rounded-full">
-                    {appointment?.userData?.name
+                    {appointment?.lawyerData?.name
                       ?.substring(0, 2)
                       ?.toUpperCase() || "NA"}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {appointment?.userData?.name}
-                  </p>
-                  <p className="text-sm text-blue-600 dark:text-blue-400">
-                    {appointment?.lawyerData?.specialisation}
+                    {appointment?.lawyerData?.name}
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                <span className="font-medium">Experience:</span>{" "}
-                {appointment?.lawyerData?.experience}
-              </p>
+
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 <span className="font-medium">Consultation Fee:</span> ₹
-                {appointment?.lawyerData?.consultation_fee}
+                {appointment?.amount}
               </p>
             </div>
 
@@ -175,18 +169,6 @@ export default function AppointmentDetailModal({
                 </span>
               </div>
             </div>
-
-            {/* Additional Information */}
-            {appointment?.notes && (
-              <div className="border-t pt-3">
-                <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-                  Notes
-                </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {appointment?.notes}
-                </p>
-              </div>
-            )}
           </div>
 
           <DialogFooter className="sm:justify-between">

@@ -29,14 +29,13 @@ import {
   XCircleIcon,
   AlertCircleIcon,
 } from "lucide-react";
-import type { Appointment } from "@/types/types/AppointmentsType";
-import { clientDataType, userDataType } from "@/types/types/Client.data.type";
+import type {
+  Appointment,
+  appointmentOutputDto,
+} from "@/types/types/AppointmentsType";
 
 interface AppointmentDetailsProps {
-  appointment: Appointment & {
-    clientData: userDataType & clientDataType;
-    lawyerData: userDataType & clientDataType;
-  };
+  appointment: appointmentOutputDto;
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -153,7 +152,7 @@ export default function AppointmentDetails({
               <div className="text-sm text-muted-foreground">
                 Appointment ID
               </div>
-              <div className="font-mono text-sm">{appointment._id}</div>
+              <div className="font-mono text-sm">{appointment.id}</div>
             </div>
           </div>
 

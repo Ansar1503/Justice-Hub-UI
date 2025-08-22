@@ -118,7 +118,7 @@ export async function fetchAppointmentsForLawyers(payload: {
   // console.log("payload", payload);
   const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/lawyer/profile/appointments?search=${payload.search}&status=${payload.appointmentStatus}&consultation_type=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
+    `/api/lawyer/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&consultationType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

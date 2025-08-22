@@ -8,7 +8,6 @@ import {
   Briefcase,
   Tag,
   NotepadText,
-  Phone,
   Mail,
   CircleDollarSign,
 } from "lucide-react";
@@ -31,9 +30,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { appointmentOutputDto } from "@/types/types/AppointmentsType";
 
 interface ClientAppointmentDetailModalProps {
-  appointment: any;
+  appointment: appointmentOutputDto;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (appointmentId: string) => void;
@@ -68,13 +68,13 @@ export default function ClientAppointmentDetailModal({
   };
 
   const handleConfirmAppointment = () => {
-    onConfirm(appointment?._id);
+    onConfirm(appointment?.id);
     setShowConfirmDialog(false);
     onClose();
   };
 
   const handleRejectAppointment = () => {
-    onReject(appointment?._id);
+    onReject(appointment?.id);
     setShowRejectDialog(false);
     onClose();
   };
@@ -132,11 +132,6 @@ export default function ClientAppointmentDetailModal({
                     {appointment?.clientData?.email}
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
-                <Phone className="h-3 w-3" />
-                <span className="font-medium">Phone:</span>{" "}
-                {appointment?.clientData?.phone || "N/A"}
               </div>
             </div>
 
@@ -199,18 +194,6 @@ export default function ClientAppointmentDetailModal({
                 </span>
               </div>
             </div>
-
-            {/* Additional Information */}
-            {appointment?.notes && (
-              <div className="border-t pt-3">
-                <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-                  Notes
-                </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {appointment?.notes}
-                </p>
-              </div>
-            )}
           </div>
 
           <DialogFooter className="sm:justify-between">

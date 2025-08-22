@@ -3,7 +3,6 @@
 import type React from "react";
 
 import { useState } from "react";
-import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -15,22 +14,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import {
-  CalendarIcon,
-  MapPinIcon,
-  PhoneIcon,
-  MailIcon,
-  UserIcon,
-  ShieldIcon,
-  ClockIcon,
-} from "lucide-react";
-import { clientDataType } from "@/types/types/Client.data.type";
+import { CalendarIcon, PhoneIcon, MailIcon, UserIcon } from "lucide-react";
+
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { UserProfile } from "@/types/types/AppointmentsType";
 
 interface UserDetailsModalProps {
-  user: clientDataType;
+  user: UserProfile;
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -59,11 +50,6 @@ export function UserDetailsModal({
       .join("")
       .toUpperCase()
       .substring(0, 2);
-  };
-
-  const formatDate = (date?: Date) => {
-    if (!date) return "N/A";
-    return format(date, "PPP");
   };
 
   return (
@@ -96,22 +82,6 @@ export function UserDetailsModal({
               <h3 className="text-lg font-semibold">{user.name}</h3>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <span>{user.email}</span>
-                {user.is_verified && (
-                  <Badge
-                    variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
-                  >
-                    Verified
-                  </Badge>
-                )}
-                {user.is_blocked && (
-                  <Badge
-                    variant="outline"
-                    className="bg-red-50 text-red-700 border-red-200"
-                  >
-                    Blocked
-                  </Badge>
-                )}
               </div>
             </div>
           </div>
@@ -127,14 +97,6 @@ export function UserDetailsModal({
                   <UserIcon className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">ID:</span>
                   <span>{user.user_id}</span>
-                </div>
-              )}
-
-              {user.role && (
-                <div className="flex items-center space-x-2">
-                  <ShieldIcon className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Role:</span>
-                  <span className="capitalize">{user.role}</span>
                 </div>
               )}
 
@@ -168,63 +130,6 @@ export function UserDetailsModal({
               </div>
             </div>
           </div>
-
-          {user.address &&
-            Object.values(user.address).some((value) => value) && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Address</h4>
-                  <div className="grid grid-cols-1 gap-1 text-sm">
-                    <div className="flex items-start space-x-2">
-                      <MapPinIcon className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div>
-                        {user.address.locality && (
-                          <div>{user.address.locality}</div>
-                        )}
-                        {(user.address.city || user.address.state) && (
-                          <div>
-                            {user.address.city && `${user.address.city}, `}
-                            {user.address.state}
-                          </div>
-                        )}
-                        {(user.address.state || user.address.pincode) && (
-                          <div>
-                            {user.address.state && `${user.address.state} `}
-                            {user.address.pincode && `${user.address.pincode}`}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-          {(user.createdAt || user.updatedAt) && (
-            <>
-              <Separator />
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Timestamps</h4>
-                <div className="grid grid-cols-1 gap-1 text-sm">
-                  {user.createdAt && (
-                    <div className="flex items-center space-x-2">
-                      <ClockIcon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Created:</span>
-                      <span>{formatDate(user.createdAt)}</span>
-                    </div>
-                  )}
-                  {user.updatedAt && (
-                    <div className="flex items-center space-x-2">
-                      <ClockIcon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Updated:</span>
-                      <span>{formatDate(user.updatedAt)}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
         </div>
 
         <DialogFooter>

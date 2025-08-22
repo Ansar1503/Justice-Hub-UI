@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
-import { useFetchAppointmentsForLawyers } from "@/store/tanstack/queries";
+import { useFetchAppointments } from "@/store/tanstack/queries";
 import ClientAppointmentDetailModal from "@/components/Lawyer/Modals/appointmentDetails";
 import {
   useConfirmAppointment,
@@ -42,7 +42,7 @@ export default function LawyerClientAppointmentListing() {
   };
 
   const { data: appointmentData, refetch: refetchAppointment } =
-    useFetchAppointmentsForLawyers({
+    useFetchAppointments({
       appointmentStatus: statusFilter,
       appointmentType: typeFilter,
       sortField: sortBy,
@@ -314,9 +314,9 @@ export default function LawyerClientAppointmentListing() {
                   </tr>
                 ) : (
                   appointments &&
-                  appointments?.map((appointment: any) => (
+                  appointments?.map((appointment) => (
                     <tr
-                      key={appointment?._id}
+                      key={appointment?.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <td className="py-4 px-4">
@@ -338,9 +338,6 @@ export default function LawyerClientAppointmentListing() {
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                               {appointment?.clientData?.email}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Phone: {appointment?.clientData?.phone || "N/A"}
                             </p>
                           </div>
                         </div>

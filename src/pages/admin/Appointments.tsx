@@ -17,7 +17,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { useFetchAppointmentsForAdmin } from "@/store/tanstack/queries";
 import PaginationComponent from "@/components/pagination";
 import { UserDetailsModal } from "@/components/admin/Modals/UserDetails.Modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
@@ -26,6 +25,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { Appointment } from "@/types/types/AppointmentsType";
 import { Badge } from "@/components/ui/badge";
 import AppointmentDetails from "@/components/admin/Modals/AppointmentDetails";
+import { useFetchAppointments } from "@/store/tanstack/queries";
 type consultationsType = "consultation" | "follow-up" | "all";
 type statusType =
   | "pending"
@@ -34,7 +34,7 @@ type statusType =
   | "cancelled"
   | "rejected"
   | "all";
-type sortByType = "date" | "amount" | "lawyer_name" | "client_name";
+type sortByType = "name" | "date" | "amount" | "created_at";
 type sortOrderType = "asc" | "desc";
 export default function Appointments() {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -47,12 +47,12 @@ export default function Appointments() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [detailsModalOpen, setDetailsModalOpen] = useState<boolean>(false);
 
-  const { data: AppointmentsData } = useFetchAppointmentsForAdmin({
+  const { data: AppointmentsData } = useFetchAppointments({
     search: searchTerm,
-    sortBy,
+    sortField: sortBy,
     sortOrder,
-    status,
-    consultation_type: consultationType,
+    appointmentStatus: status,
+    appointmentType: consultationType,
     limit: itemsPerPage,
     page: currentPage,
   });
@@ -205,7 +205,7 @@ export default function Appointments() {
               <TableBody>
                 {appointments && appointments.length > 0 ? (
                   appointments.map((appointment) => (
-                    <TableRow key={appointment?._id}>
+                    <TableRow key={appointment?.id}>
                       {/* lawyer */}
                       <TableCell className="p-3  bg-white/5 ">
                         <UserDetailsModal

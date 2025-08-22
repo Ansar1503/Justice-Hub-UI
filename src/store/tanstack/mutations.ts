@@ -282,21 +282,9 @@ export function useCancellAppointment() {
   return useMutation({
     mutationFn: (payload: { id: string; status: string }) =>
       cancellAppointment(payload),
-    onSuccess: (updated) => {
+    onSuccess: () => {
       toast.success("Appointment cancelled!");
-      // console.log("new data", updated);
-      queryClient.setQueryData(["client", "appointments"], (old: any) => {
-        // console.log("old data", old);
-        if (!old) return old;
-        return {
-          ...old,
-          data: old.data.map((appt: any) =>
-            appt?._id === updated?._id
-              ? { ...appt, status: updated?.status }
-              : appt
-          ),
-        };
-      });
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
     onError: (error: any) => {
       const message =
@@ -314,18 +302,8 @@ export function useRejectAppointment() {
     mutationFn: (payload: { id: string; status: string }) =>
       rejectClientAppointment(payload),
     onSuccess: (updated) => {
-      console.log("updatged", updated);
       toast.success(updated.message);
-      queryClient.setQueryData(["lawyer", "appointments"], (old: any) => {
-        return {
-          ...old,
-          data: old?.data?.map((appt: any) =>
-            appt?._id === updated?.data?._id
-              ? { ...appt, status: updated?.data?.status }
-              : appt
-          ),
-        };
-      });
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
     onError: (error: any) => {
       const message =
@@ -343,18 +321,8 @@ export function useConfirmAppointment() {
     mutationFn: (payload: { id: string; status: string }) =>
       confirmAppointment(payload),
     onSuccess: (updated) => {
-      console.log("updated", updated);
       toast.success(updated.message);
-      queryClient.setQueryData(["lawyer", "appointments"], (old: any) => {
-        return {
-          ...old,
-          data: old?.data?.map((appt: any) =>
-            appt._id === updated?.data?.id
-              ? { ...appt, status: updated?.data?.status }
-              : appt
-          ),
-        };
-      });
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
     onError: (error: any) => {
       const message =

@@ -1,6 +1,11 @@
 import { store } from "@/store/redux/store";
 import axiosinstance from "../axios/axios.instance";
 import { CallLogs } from "@/types/types/callLogs";
+import {
+  AppointmentStatus,
+  AppointmentType,
+} from "@/components/Lawyer/appointmentsListing";
+import { SortOrder } from "@/components/users/AppointmentsComponent";
 
 export async function joinVideoSession(payload: { sessionId: string }) {
   const { user, token } = store.getState().Auth;
@@ -46,6 +51,24 @@ export async function FetchClientOrLawyerReviews(payload: {
   if (!user) return;
   const response = await axiosinstance.get(
     `api/${user.role}/profile/reviews/?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function fetchAppointments(payload: {
+  search?: string;
+  appointmentStatus: AppointmentStatus;
+  appointmentType: AppointmentType;
+  sortField: string;
+  sortOrder: SortOrder;
+  page: number;
+  limit: number;
+}) {
+  // console.log("payload", payload);
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/${user?.role}/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&consultationType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

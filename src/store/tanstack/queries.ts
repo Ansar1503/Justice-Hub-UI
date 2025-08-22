@@ -1,5 +1,4 @@
 import {
-  fetchAppointmentsForClient,
   fetchClientData,
   fetchLawyerDetails,
   fetchLawyersByQuery,
@@ -11,7 +10,6 @@ import {
 } from "@/utils/api/services/clientServices";
 import {
   fetchAllLawyers,
-  fetchAppointmentsForAdmin,
   fetchChatDisputes,
   fetchReviewDisputes,
   fetchSessionsForAdmin,
@@ -19,7 +17,6 @@ import {
 } from "@/utils/api/services/adminServices";
 import { useQuery } from "@tanstack/react-query";
 import {
-  fetchAppointmentsForLawyers,
   fetchAvailableSlots,
   fetchLawyerData,
   fetchOverrideslots,
@@ -40,15 +37,15 @@ import {
 import {
   AppointmentStatus,
   AppointmentType,
-  SortField,
   SortOrder,
 } from "@/components/users/AppointmentsComponent";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { Session, SessionDocument } from "@/types/types/sessionType";
-import { Appointment } from "@/types/types/AppointmentsType";
+import { FetchAppointmentsOutputDto } from "@/types/types/AppointmentsType";
 import { Review } from "@/types/types/Review";
 import { Disputes, FetchChatDisputesResponseDto } from "@/types/types/Disputes";
 import {
+  fetchAppointments,
   fetchCallLogs,
   FetchClientOrLawyerReviews,
 } from "@/utils/api/services/commonServices";
@@ -176,23 +173,7 @@ export function useFetchSlotsforClients(id: string, date: Date) {
   });
 }
 
-export function useFetchAppointmentsForClients(payload: {
-  search?: string;
-  appointmentStatus: AppointmentStatus;
-  appointmentType: AppointmentType;
-  sortField: SortField;
-  sortOrder: SortOrder;
-  page: number;
-  limit: number;
-}) {
-  return useQuery({
-    queryKey: ["client", "appointments"],
-    queryFn: () => fetchAppointmentsForClient(payload),
-    retry: 1,
-  });
-}
-
-export function useFetchAppointmentsForLawyers(payload: {
+export function useFetchAppointments(payload: {
   search?: string;
   appointmentStatus: AppointmentStatus;
   appointmentType: AppointmentType;
@@ -201,9 +182,9 @@ export function useFetchAppointmentsForLawyers(payload: {
   page: number;
   limit: number;
 }) {
-  return useQuery({
-    queryKey: ["lawyer", "appointments"],
-    queryFn: () => fetchAppointmentsForLawyers(payload),
+  return useQuery<FetchAppointmentsOutputDto>({
+    queryKey: ["appointments", payload],
+    queryFn: () => fetchAppointments(payload),
     retry: 1,
   });
 }
@@ -245,57 +226,6 @@ export function useFetchSessionDocuments(sessionId: string) {
     queryKey: ["session", "documents", sessionId],
     queryFn: () => fetchSessionDocuments(sessionId),
     enabled: !!sessionId,
-    retry: 1,
-  });
-}
-
-export function useFetchAppointmentsForAdmin(payload: {
-  search: string;
-  consultation_type: "consultation" | "follow-up" | "all";
-  status:
-    | "pending"
-    | "confirmed"
-    | "completed"
-    | "cancelled"
-    | "rejected"
-    | "all";
-  sortBy: "date" | "amount" | "lawyer_name" | "client_name";
-  sortOrder: "asc" | "desc";
-  limit: number;
-  page: number;
-}) {
-  return useQuery<
-    {
-      search: string;
-      consultation_type: "consultation" | "follow-up" | "all";
-      status:
-        | "pending"
-        | "confirmed"
-        | "completed"
-        | "cancelled"
-        | "rejected"
-        | "all";
-      sortBy: "date" | "amount" | "lawyer_name" | "client_name";
-      sortOrder: "asc" | "desc";
-      limit: number;
-      page: number;
-    },
-    Error,
-    {
-      data:
-        | (Appointment & {
-            clientData: userDataType & clientDataType;
-            lawyerData: userDataType & clientDataType;
-          })[]
-        | [];
-
-      totalCount: number;
-      currentPage: number;
-      totalPage: number;
-    }
-  >({
-    queryKey: ["admin", "appointments", payload],
-    queryFn: () => fetchAppointmentsForAdmin(payload),
     retry: 1,
   });
 }
