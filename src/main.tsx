@@ -11,6 +11,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { SocketProvider } from "./context/SocketProvider.tsx";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { LawyerVerificationProvider } from "./context/LawyerVerificationContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
@@ -24,7 +25,7 @@ createRoot(document.getElementById("root")!).render(
                   new QueryClient({
                     defaultOptions: {
                       queries: {
-                        refetchOnWindowFocus: false,
+                        retryDelay: 3000,
                       },
                     },
                   })
@@ -35,7 +36,9 @@ createRoot(document.getElementById("root")!).render(
                   buttonPosition="bottom-left"
                 />
                 <SocketProvider>
-                  <App />
+                  <LawyerVerificationProvider>
+                    <App />
+                  </LawyerVerificationProvider>
                 </SocketProvider>
               </QueryClientProvider>
             </GoogleOAuthProvider>
