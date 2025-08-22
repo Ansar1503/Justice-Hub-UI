@@ -53,6 +53,7 @@ import {
   FetchClientOrLawyerReviews,
 } from "@/utils/api/services/commonServices";
 import { store } from "../redux/store";
+import { FetchLawyerResponseType } from "@/types/types/LawyerTypes";
 
 export function useFetchClientData() {
   const { user } = store.getState().Auth;
@@ -70,8 +71,8 @@ export function useFetchClientData() {
 
 export function useFetchLawyerData() {
   const { user } = store.getState().Auth;
-  return useQuery({
-    queryKey: ["lawyer"],
+  return useQuery<FetchLawyerResponseType>({
+    queryKey: ["lawyer", user?.user_id],
     queryFn: fetchLawyerData,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
