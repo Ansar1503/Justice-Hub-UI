@@ -45,7 +45,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("reconnecting to socket");
       });
     });
-    s.on("NOTIFICATION_RECEIVE", (data: NotificationType) => {
+    s.on(SocketEvents.NOTIFICATION_RECEIVED, (data: NotificationType) => {
       console.log("notificatio received", data);
       if (Notification.permission === "granted") {
         showNotification();

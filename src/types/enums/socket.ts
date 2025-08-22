@@ -14,4 +14,5 @@ export enum SocketEvents {
   CHANGE_CHAT_NAME_EVENT = "changeChatName",
   SEND_MESSAGE_EVENT = "sendMessage",
   READ_MESSAGE_EVENT = "readMessageEvent",
+  NOTIFICATION_RECEIVED = "NOTIFICATION_RECEIVE",
 }
