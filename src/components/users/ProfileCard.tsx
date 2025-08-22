@@ -9,6 +9,7 @@ import { store } from "@/store/redux/store";
 import { setProfileImage, signOut } from "@/store/redux/auth/Auth.Slice";
 import { LogOut } from "@/store/redux/client/ClientSlice";
 import { useLawyerVerification } from "@/hooks/lawyerVerificationContextHook";
+import { TriangleAlert } from "lucide-react";
 
 function ProfileCard() {
   const { openModal } = useLawyerVerification();
@@ -23,35 +24,57 @@ function ProfileCard() {
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full">
-      {data && data?.lawyerVerfication === "pending" && (
-        <div className="flex border rounded-lg mb-3 border-yellow-600">
-          <AlertDestructive
-            message="Your profile is not completed, please complete your profile"
-            title="Complete your Profile"
-          />
-          <div className="mt-3 mr-2" onClick={openModal}>
-            <ButtonLink text="Complete Now" />
-          </div>
+    <>
+      {data?.lawyerVerfication === "pending" ? (
+        <div className="flex items-center justify-center  font-bold text-red-600">
+          <TriangleAlert />
+          Lawyer Verification Pending. please goto the profile to verify your
+          account.
         </div>
-      )}
-
-      {data && data?.lawyerVerfication === "rejected" && (
-        <div className="flex items-center border rounded-lg mb-3 border-red-600 p-4">
-          <AlertDestructive
-            message={`Due to ${data?.rejectReason} your lawyer verification was rejected. Please resubmit your details.`}
-            title="Verification Rejected"
-          />
-          <div className="mt-3 mr-3" onClick={openModal}>
-            <ButtonLink text="Resubmit" />
-          </div>
+      ) : data?.lawyerVerfication === "rejected" ? (
+        <div className="flex items-center justify-center font-bold text-red-600">
+          <TriangleAlert />
+          Lawyer Verification Rejected. try verification again.
         </div>
+      ) : data?.lawyerVerfication === "requested" ? (
+        <div className="flex items-center justify-center  font-bold text-yellow-600">
+          <TriangleAlert />
+          Your Verification Request is Under Review. Wait until the admin
+          verifies your lawyer account.
+        </div>
+      ) : (
+        ""
       )}
+      <div className="flex flex-col gap-6 w-full">
+        {data && data?.lawyerVerfication === "pending" && (
+          <div className="flex border rounded-lg mb-3 border-yellow-600">
+            <AlertDestructive
+              message="Your profile is not completed, please complete your profile"
+              title="Complete your Profile"
+            />
+            <div className="mt-3 mr-2" onClick={openModal}>
+              <ButtonLink text="Complete Now" />
+            </div>
+          </div>
+        )}
 
-      <BasicInfoForm data={data} isLoading={isLoading} />
-      <PersonalInfoForm data={data} isLoading={isLoading} />
-      <AddressInfoForm data={data} isLoading={isLoading} />
-    </div>
+        {data && data?.lawyerVerfication === "rejected" && (
+          <div className="flex items-center border rounded-lg mb-3 border-red-600 p-4">
+            <AlertDestructive
+              message={`Due to ${data?.rejectReason} your lawyer verification was rejected. Please resubmit your details.`}
+              title="Verification Rejected"
+            />
+            <div className="mt-3 mr-3" onClick={openModal}>
+              <ButtonLink text="Resubmit" />
+            </div>
+          </div>
+        )}
+
+        <BasicInfoForm data={data} isLoading={isLoading} />
+        <PersonalInfoForm data={data} isLoading={isLoading} />
+        <AddressInfoForm data={data} isLoading={isLoading} />
+      </div>
+    </>
   );
 }
 export default ProfileCard;

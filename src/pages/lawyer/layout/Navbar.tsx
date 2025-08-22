@@ -9,9 +9,8 @@ import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 import { LogOut } from "@/store/redux/client/ClientSlice";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
 import { motion } from "motion/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { fetchClientDataType } from "@/types/types/Client.data.type";
 import { TriangleAlert } from "lucide-react";
+import { useFetchClientData } from "@/store/tanstack/queries";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -20,11 +19,7 @@ function Navbar() {
   const { setUserRole } = useContext(AuthContext);
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.Auth.user);
-  const queryClient = useQueryClient();
-  const clientData: fetchClientDataType | undefined = queryClient.getQueryData([
-    "user",
-    user?.user_id,
-  ]);
+  const { data: clientData } = useFetchClientData();
 
   const dispatch = useAppDispatch();
   const handleLogout = () => {

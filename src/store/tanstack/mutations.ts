@@ -23,7 +23,10 @@ import {
   updatePassword,
   updateReview,
 } from "@/utils/api/services/clientServices";
-import { AddressType } from "@/types/types/Client.data.type";
+import {
+  AddressType,
+  fetchClientDataType,
+} from "@/types/types/Client.data.type";
 import {
   LoginPayload,
   LoginResponse,
@@ -34,6 +37,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Review } from "@/types/types/Review";
+import { FetchLawyerResponseType } from "@/types/types/LawyerTypes";
 
 export function useLoginMutation() {
   const queryClient = useQueryClient();
@@ -176,11 +180,17 @@ export function useBlockUser() {
 
 export function useLawyerVerification() {
   const queryClient = useQueryClient();
-  return useMutation<ResponseType, Error, any>({
+  return useMutation<FetchLawyerResponseType, Error, any>({
     mutationFn: (formData) => LawyerVerification(formData),
     onSuccess: (data) => {
-      toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.setQueryData(
+        ["user", data?.user_id],
+        (old: fetchClientDataType) => ({
+          ...old,
+          rejectReason: data?.rejectReason,
+          lawyerVerfication: data?.verification_status,
+        })
+      );
     },
     onError: (error: any) => {
       const message =
