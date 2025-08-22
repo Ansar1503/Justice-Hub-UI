@@ -6,7 +6,7 @@ import { AuthContext } from "../../../context/AuthContextPovider";
 import { useNavigate } from "react-router-dom";
 import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
-import { LogOut } from "@/store/redux/client/ClientSlice";
+// import { LogOut } from "@/store/redux/client/ClientSlice";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
 import { motion } from "motion/react";
 import { TriangleAlert } from "lucide-react";
@@ -23,7 +23,7 @@ function Navbar() {
 
   const dispatch = useAppDispatch();
   const handleLogout = () => {
-    dispatch(LogOut());
+    // dispatch(LogOut());
     dispatch(signOut());
     navigate("/login");
   };

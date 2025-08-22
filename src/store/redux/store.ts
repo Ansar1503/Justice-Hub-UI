@@ -11,13 +11,13 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import AuthReducer from "./auth/Auth.Slice";
-import ClientReducer from "./client/ClientSlice";
+// import ClientReducer from "./client/ClientSlice";
 import zcReducer from "./zc/zcSlice";
 import { combineReducers } from "redux";
 
 const rootReducer = combineReducers({
   Auth: AuthReducer,
-  Client: ClientReducer,
+  // Client: ClientReducer,
   zc: zcReducer,
 });
 

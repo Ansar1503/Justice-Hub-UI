@@ -41,9 +41,9 @@ axiosinstance.interceptors.response.use(
         // console.log("refreshErrir", refresherror);
         const { store } = await import("@/store/redux/store");
         const { signOut } = await import("@/store/redux/auth/Auth.Slice");
-        const { LogOut } = await import("@/store/redux/client/ClientSlice");
+        // const { LogOut } = await import("@/store/redux/client/ClientSlice");
         store.dispatch(signOut());
-        store.dispatch(LogOut());
+        // store.dispatch(LogOut());
         persistStore(store).purge();
         return Promise.reject(refresherror);
       }
