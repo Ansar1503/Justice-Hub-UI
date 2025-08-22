@@ -56,13 +56,14 @@ import { store } from "../redux/store";
 export function useFetchClientData() {
   const { user } = store.getState().Auth;
   return useQuery({
-    queryKey: ["user"],
+    queryKey: ["user", user?.user_id],
     queryFn: fetchClientData,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: 1000 * 60 * 5,
     retry: 2,
-    enabled: user && user?.role !== "admin" ? true : false,
+    enabled:
+      user && user?.role !== "admin" && user.user_id != null ? true : false,
   });
 }
 
