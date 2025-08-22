@@ -1,4 +1,3 @@
-
 import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
@@ -8,8 +7,11 @@ export const getSocket = (token: string): Socket => {
     socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:8000", {
       auth: { token: `bearer ${token}` },
       withCredentials: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 2000,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 10000,
+      autoConnect: false,
     });
   }
   return socket;
