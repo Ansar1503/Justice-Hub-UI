@@ -47,14 +47,6 @@ axiosinstance.interceptors.response.use(
         persistStore(store).purge();
         return Promise.reject(refresherror);
       }
-    } else if (error?.response?.status === 403) {
-      const { store } = await import("@/store/redux/store");
-      const { signOut } = await import("@/store/redux/auth/Auth.Slice");
-      const { LogOut } = await import("@/store/redux/client/ClientSlice");
-      store.dispatch(signOut());
-      store.dispatch(LogOut());
-      persistStore(store).purge();
-      return Promise.reject(error);
     }
     return Promise.reject(error);
   }
