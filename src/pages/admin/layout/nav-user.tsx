@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAppDispatch } from "@/store/redux/Hook";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
-import { LogOut as LogOutAction } from "@/store/redux/client/ClientSlice";
+// import { LogOut as LogOutAction } from "@/store/redux/client/ClientSlice";
 import { useNavigate } from "react-router-dom";
 
 export function NavUser({
@@ -114,8 +114,7 @@ export function NavUser({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log("Logout clicked");
-                  dispatch(LogOutAction());
+                  // dispatch(LogOutAction());
                   dispatch(signOut());
                   navigate("/login");
                 }}

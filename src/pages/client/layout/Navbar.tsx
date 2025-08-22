@@ -7,7 +7,7 @@ import { AuthContext } from "../../../context/AuthContextPovider";
 import { NavLink, useNavigate } from "react-router-dom";
 import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
-import { LogOut } from "@/store/redux/client/ClientSlice";
+// import { LogOut } from "@/store/redux/client/ClientSlice";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
 
 function Navbar() {
@@ -19,7 +19,7 @@ function Navbar() {
   const user = useAppSelector((state) => state.Auth.user);
   const dispatch = useAppDispatch();
   const handleLogout = () => {
-    dispatch(LogOut());
+    // dispatch(LogOut());
     dispatch(signOut());
     navigate("/login");
   };
