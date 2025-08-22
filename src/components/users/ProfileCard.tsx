@@ -6,7 +6,11 @@ import { useFetchClientData } from "@/store/tanstack/queries";
 import { AlertDestructive } from "../ui/custom/AlertDestructive";
 import { ButtonLink } from "../ui/custom/ButtonLink";
 import { store } from "@/store/redux/store";
-import { setProfileImage, signOut } from "@/store/redux/auth/Auth.Slice";
+import {
+  setLawyerData,
+  setProfileImage,
+  signOut,
+} from "@/store/redux/auth/Auth.Slice";
 // import { LogOut } from "@/store/redux/client/ClientSlice";
 import { useLawyerVerification } from "@/hooks/lawyerVerificationContextHook";
 import { TriangleAlert } from "lucide-react";
@@ -21,6 +25,14 @@ function ProfileCard() {
   }
   if (data && data?.profile_image) {
     store.dispatch(setProfileImage(data?.profile_image));
+  }
+  if (data && data?.lawyerVerfication) {
+    store.dispatch(
+      setLawyerData({
+        rejectReason: data?.rejectReason || "",
+        verification_status: data.lawyerVerfication,
+      })
+    );
   }
 
   return (

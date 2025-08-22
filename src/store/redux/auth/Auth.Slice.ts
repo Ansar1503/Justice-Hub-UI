@@ -1,8 +1,23 @@
-import { userDataType } from "@/types/types/Client.data.type";
+import { UserEnum } from "@/types/enums/user.enums";
+import { VerificationStatus } from "@/types/types/LawyerTypes";
 import { createSlice } from "@reduxjs/toolkit";
 
+type AuthUserDataType = {
+  user_id?: string;
+  name: string;
+  email: string;
+  profile_image?: string;
+  mobile?: string;
+  password?: string;
+  role?: UserEnum;
+  is_verified: boolean;
+  is_blocked: boolean;
+  lawyer_verification_status?: VerificationStatus;
+  lawyer_reject_reason?: string;
+};
+
 interface AuthState {
-  user: userDataType | null;
+  user: AuthUserDataType | null;
   token: string;
   loading: boolean;
   error: string | null;
@@ -36,9 +51,26 @@ const authSlice = createSlice({
         state.user = { ...state.user, profile_image: action.payload };
       }
     },
+    setLawyerData: (
+      state,
+      action: {
+        payload: {
+          rejectReason?: string;
+          verification_status?: VerificationStatus;
+        };
+      }
+    ) => {
+      if (state.user) {
+        state.user = {
+          ...state.user,
+          lawyer_reject_reason: action.payload.rejectReason,
+          lawyer_verification_status: action.payload.verification_status,
+        };
+      }
+    },
   },
 });
 
-export const { setUser, signOut, setToken, setProfileImage } =
+export const { setUser, signOut, setToken, setProfileImage, setLawyerData } =
   authSlice.actions;
 export default authSlice.reducer;
