@@ -28,6 +28,7 @@ import {
 } from "@/utils/api/services/LawyerServices";
 import {
   clientDataType,
+  fetchClientDataType,
   LawyerFilterParams,
   userDataType,
 } from "@/types/types/Client.data.type";
@@ -55,13 +56,13 @@ import { store } from "../redux/store";
 
 export function useFetchClientData() {
   const { user } = store.getState().Auth;
-  return useQuery({
+  return useQuery<fetchClientDataType, Error>({
     queryKey: ["user", user?.user_id],
     queryFn: fetchClientData,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: 1000 * 60 * 5,
-    retry: 2,
+    retry: 1,
     enabled:
       user && user?.role !== "admin" && user.user_id != null ? true : false,
   });
@@ -92,7 +93,7 @@ export function useFetchUsersByRole(query: {
   return useQuery({
     queryKey: ["user", query],
     queryFn: () => fetchUserByRole(query),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -107,7 +108,7 @@ export function useFetchAllLawyers(query: {
   return useQuery({
     queryKey: ["lawyers"],
     queryFn: () => fetchAllLawyers(query),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -118,7 +119,7 @@ export function useFetchLawyersByQuery(query: LawyerFilterParams) {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: 1000 * 60 * 5,
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -129,7 +130,7 @@ export function useFetchLawyerDetails(user_id: string) {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: 1000 * 60 * 5,
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -137,7 +138,7 @@ export function useFetchSlotSettings() {
   return useQuery<ResponseType & { data: slotSettings }, Error>({
     queryKey: ["schedule", "settings"],
     queryFn: fetchSlotSettings,
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -145,7 +146,7 @@ export function useFetchLawyerSlotSettings(lawyer_id: string) {
   return useQuery<ResponseType & { data: slotSettings }, Error>({
     queryKey: ["schedule", "settings", lawyer_id],
     queryFn: () => fetchLawyerSlotSettings(lawyer_id),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -153,7 +154,7 @@ export function useFetchAvailableSlots() {
   return useQuery<ResponseType & { data: Availability }, Error>({
     queryKey: ["schedule", "availability"],
     queryFn: () => fetchAvailableSlots(),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -161,7 +162,7 @@ export function useFetchOverrideSlots() {
   return useQuery<OverrideDateResponse, Error>({
     queryKey: ["schedule", "overrides"],
     queryFn: () => fetchOverrideslots(),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -169,7 +170,7 @@ export function useFetchSlotsforClients(id: string, date: Date) {
   return useQuery({
     queryKey: ["schedule", "slots", id, date],
     queryFn: () => fetchSlotsforClients(id, date),
-    retry: 2,
+    retry: 1,
     enabled: id !== "" && !date,
   });
 }
@@ -186,7 +187,7 @@ export function useFetchAppointmentsForClients(payload: {
   return useQuery({
     queryKey: ["client", "appointments"],
     queryFn: () => fetchAppointmentsForClient(payload),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -202,7 +203,7 @@ export function useFetchAppointmentsForLawyers(payload: {
   return useQuery({
     queryKey: ["lawyer", "appointments"],
     queryFn: () => fetchAppointmentsForLawyers(payload),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -218,7 +219,7 @@ export function useFetchSessionsForLawyers(payload: {
   return useQuery({
     queryKey: ["lawyer", "sessions"],
     queryFn: () => fetchSessionsforLawyers(payload),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -234,7 +235,7 @@ export function useFetchsessionsForclients(payload: {
   return useQuery({
     queryKey: ["client", "sessions"],
     queryFn: () => fetchSessionsforClients(payload),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -243,7 +244,7 @@ export function useFetchSessionDocuments(sessionId: string) {
     queryKey: ["session", "documents", sessionId],
     queryFn: () => fetchSessionDocuments(sessionId),
     enabled: !!sessionId,
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -294,7 +295,7 @@ export function useFetchAppointmentsForAdmin(payload: {
   >({
     queryKey: ["admin", "appointments", payload],
     queryFn: () => fetchAppointmentsForAdmin(payload),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -340,7 +341,7 @@ export function useFetchSessionsForAdmin(payload: {
     queryKey: ["admin", "sessions", payload],
     queryFn: () => fetchSessionsForAdmin(payload),
     // staleTime: 1000 * 60 * 10,
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -364,7 +365,7 @@ export function useFetchChatDisputes(payload: {
   >({
     queryKey: ["admin", "disputes", "chat", payload],
     queryFn: () => fetchChatDisputes(payload),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -382,7 +383,7 @@ export function useFetchReviewsBySession(sessionId: string) {
     queryKey: ["reviews", sessionId],
     queryFn: () => fetchReviewsBySession(sessionId),
     enabled: sessionId ? true : false,
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -458,7 +459,7 @@ export function useFetchReviewDisputes(payload: {
   >({
     queryKey: ["admin", "disputes", "review", payload],
     queryFn: () => fetchReviewDisputes(payload),
-    retry: 2,
+    retry: 1,
   });
 }
 
@@ -470,7 +471,7 @@ export function useFetchCallLogs(payload: {
   return useQuery({
     queryKey: ["callLogs", payload],
     queryFn: () => fetchCallLogs(payload),
-    retry: 2,
+    retry: 1,
     enabled: payload.sessionId ? true : false,
   });
 }

@@ -3,14 +3,14 @@ import { Skeleton } from "../../ui/skeleton";
 import { CircleUser } from "lucide-react";
 import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation";
 
-import { clientDataType } from "@/types/types/Client.data.type";
+import { fetchClientDataType } from "@/types/types/Client.data.type";
 import { useBasicInfoUpdateMutation } from "@/store/tanstack/mutations";
 
 function BasicInfoForm({
   data,
   isLoading,
 }: {
-  data: clientDataType;
+  data: fetchClientDataType | undefined;
   isLoading: boolean;
 }) {
   const [isEditingBasic, setIsEditingBasic] = useState(false);
@@ -125,7 +125,6 @@ function BasicInfoForm({
   );
 
   return (
-    
     <>
       <form
         onSubmit={handleBasicInfoUpdate}

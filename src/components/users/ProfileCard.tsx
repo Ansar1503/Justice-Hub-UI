@@ -24,8 +24,8 @@ function ProfileCard() {
     store.dispatch(signOut());
     store.dispatch(LogOut());
   }
-  if (data && data?.data?.profile_image) {
-    store.dispatch(setProfileImage(data?.data?.profile_image));
+  if (data && data?.profile_image) {
+    store.dispatch(setProfileImage(data?.profile_image));
   }
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -41,11 +41,11 @@ function ProfileCard() {
         />
       )}
 
-      {data && data.data?.lawyerVerfication === "pending" && (
+      {data && data?.lawyerVerfication === "pending" && (
         <AlertVerificationModal setVerificationForm={setVerificationForm} />
       )}
 
-      {data && data.data?.lawyerVerfication === "pending" && (
+      {data && data?.lawyerVerfication === "pending" && (
         <div className="flex border rounded-lg mb-3  border-yellow-600">
           <AlertDestructive
             message="you profile is not completed, please complete your profile"
@@ -56,7 +56,7 @@ function ProfileCard() {
           </div>
         </div>
       )}
-      {data && data.data?.lawyerVerfication === "rejected" && (
+      {data && data?.lawyerVerfication === "rejected" && (
         <div className="flex items-center border rounded-lg mb-3 border-red-600 p-4">
           <AlertDestructive
             message="Your lawyer verification was rejected. Please resubmit your details."
@@ -67,11 +67,11 @@ function ProfileCard() {
           </div>
         </div>
       )}
-      <BasicInfoForm data={data?.data} isLoading={isLoading} />
+      <BasicInfoForm data={data} isLoading={isLoading} />
 
-      <PersonalInfoForm data={data?.data} isLoading={isLoading} />
+      <PersonalInfoForm data={data} isLoading={isLoading} />
 
-      <AddressInfoForm data={data?.data} isLoading={isLoading} />
+      <AddressInfoForm data={data} isLoading={isLoading} />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Skeleton } from "../../ui/skeleton";
 import { AlertDestructive } from "../../ui/custom/AlertDestructive";
 import { ButtonLink } from "../../ui/custom/ButtonLink";
-import { clientDataType } from "@/types/types/Client.data.type";
+import { fetchClientDataType } from "@/types/types/Client.data.type";
 import { VerifiedBadge } from "../../ui/custom/VerifiedBadge";
 import {
   useSendVerificationMailMutation,
@@ -17,7 +17,7 @@ function PersonalInfoForm({
   data,
   isLoading,
 }: {
-  data: clientDataType;
+  data: fetchClientDataType | undefined;
   isLoading: boolean;
 }) {
   // const { client: data, loading } = useAppSelector(
@@ -217,7 +217,7 @@ function PersonalInfoForm({
                       disabled={!editEmail}
                       type="email"
                       name="email"
-                      value={data.email}
+                      value={data?.email}
                       onChange={handleChange}
                       className="flex-grow p-2 border rounded dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:dark:bg-gray-800"
                     />

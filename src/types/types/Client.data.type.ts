@@ -1,5 +1,27 @@
 import { Gender, UserEnum } from "../enums/user.enums";
 
+type VerificationStatus = "verified" | "rejected" | "pending" | "requested";
+
+export type fetchClientDataType = {
+  email: string;
+  mobile: string;
+  name: string;
+  role: "lawyer" | "client" | "admin";
+  user_id: string;
+  dob?: string;
+  gender?: string;
+  profile_image?: string;
+  is_blocked: boolean;
+  is_verified: boolean;
+  address: {
+    city: string;
+    locality: string;
+    state: string;
+    pincode: string;
+  };
+  lawyerVerfication?: VerificationStatus;
+};
+
 export type userDataType = {
   user_id?: string;
   name: string;
@@ -55,12 +77,6 @@ export type AddressType = {
   locality?: string;
   pincode?: string;
 };
-
-export type VerificationStatus =
-  | "verified"
-  | "rejected"
-  | "pending"
-  | "requested";
 
 export interface LawyerFilterParams {
   search: string;

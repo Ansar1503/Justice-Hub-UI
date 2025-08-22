@@ -3,14 +3,14 @@ import { validateAddressFields } from "@/utils/validations/ProfileFormValidation
 import React, { useEffect, useState } from "react";
 import { Skeleton } from "../../ui/skeleton";
 // import { useFetchClientData } from "@/hooks/tanstack/queries";
-import { clientDataType } from "@/types/types/Client.data.type";
+import { fetchClientDataType } from "@/types/types/Client.data.type";
 import { useUpdateAddressMutation } from "@/store/tanstack/mutations";
 
 function AddressInfoForm({
   data,
   isLoading,
 }: {
-  data: clientDataType;
+  data: fetchClientDataType | undefined;
   isLoading: boolean;
 }) {
   // const dispatch = useAppDispatch();
@@ -32,7 +32,7 @@ function AddressInfoForm({
         locality: data.address?.locality || "",
         pincode: data.address?.pincode || "",
       });
-      // console.log("address fetche", address);  
+      // console.log("address fetche", address);
     }
   }, [data]);
 
