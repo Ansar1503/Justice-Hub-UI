@@ -22,8 +22,7 @@ import { Slider } from "@/components/ui/slider";
 import VerificationInputs from "@/utils/validations/LawyerVerification.Input.Validation";
 import { useLawyerVerification } from "@/store/tanstack/mutations";
 import { useFetchLawyerData } from "@/store/tanstack/queries";
-
-type VerificationStatus = "verified" | "rejected" | "pending";
+import { VerificationStatus } from "@/types/types/LawyerTypes";
 
 interface LawyerVerificationFormProps {
   setLoading: (loading: boolean) => void;
@@ -93,7 +92,26 @@ function LawyerVerificationForm({
     });
   };
   const { data } = useFetchLawyerData();
-  const lawyerData = data ? data : "";
+  const lawyerData = data ? data : undefined;
+
+  useEffect(() => {
+    if (lawyerData) {
+      setFormData({
+        ...formData,
+        barcouncil_number: lawyerData?.barcouncil_number,
+        certificate_of_practice_number:
+          lawyerData?.certificate_of_practice_number,
+        consultation_fee: lawyerData?.consultation_fee,
+        description: lawyerData?.description,
+        enrollment_certificate_number:
+          lawyerData?.enrollment_certificate_number,
+        experience: lawyerData?.experience,
+        practice_areas: lawyerData?.practice_areas,
+        specialisation: lawyerData?.specialisation,
+        verification_status: lawyerData?.verification_status,
+      });
+    }
+  }, [lawyerData]);
 
   useEffect(() => {
     setLoading(isPending);
@@ -202,7 +220,7 @@ function LawyerVerificationForm({
                   <Textarea
                     id="description"
                     name="description"
-                    value={formData.description || lawyerData.description}
+                    value={formData.description}
                     onChange={handleInputChange}
                     placeholder="Tell us about yourself and your professional background"
                     className="min-h-[100px] bg-neutral-300 dark:bg-slate-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
@@ -229,9 +247,7 @@ function LawyerVerificationForm({
                   <Input
                     id="barcouncil_number"
                     name="barcouncil_number"
-                    value={
-                      formData.barcouncil_number || lawyerData.barcouncil_number
-                    }
+                    value={formData.barcouncil_number}
                     onChange={handleInputChange}
                     placeholder="Enter bar council number"
                     className="bg-neutral-300 dark:bg-slate-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
@@ -288,10 +304,7 @@ function LawyerVerificationForm({
                   <Input
                     id="enrollment_certificate_number"
                     name="enrollment_certificate_number"
-                    value={
-                      formData.enrollment_certificate_number ||
-                      lawyerData.enrollment_certificate_number
-                    }
+                    value={formData.enrollment_certificate_number}
                     onChange={handleInputChange}
                     placeholder="Enter enrollment certificate number"
                     className="bg-neutral-300 dark:bg-slate-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
@@ -352,10 +365,7 @@ function LawyerVerificationForm({
                   <Input
                     id="certificate_of_practice_number"
                     name="certificate_of_practice_number"
-                    value={
-                      formData.certificate_of_practice_number ||
-                      lawyerData.certificate_of_practice_number
-                    }
+                    value={formData.certificate_of_practice_number}
                     onChange={handleInputChange}
                     placeholder="Enter certificate of practice number"
                     className="bg-neutral-300 dark:bg-slate-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
@@ -482,7 +492,7 @@ function LawyerVerificationForm({
                       min={0}
                       max={30}
                       step={1}
-                      value={[formData.experience || lawyerData.experience]}
+                      value={[formData.experience]}
                       onValueChange={(value) =>
                         handleNumberChange(value[0], "experience")
                       }
@@ -508,11 +518,7 @@ function LawyerVerificationForm({
                       id="consultation_fee"
                       name="consultation_fee"
                       type="number"
-                      value={
-                        formData.consultation_fee ||
-                        lawyerData.consultation_fee ||
-                        ""
-                      }
+                      value={formData.consultation_fee || ""}
                       onChange={(e) => {
                         const value = e.target.value;
                         if (value === "" || /^[0-9]+$/.test(value)) {
