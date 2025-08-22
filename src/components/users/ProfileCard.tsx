@@ -39,7 +39,7 @@ function ProfileCard() {
       {data && data?.lawyerVerfication === "rejected" && (
         <div className="flex items-center border rounded-lg mb-3 border-red-600 p-4">
           <AlertDestructive
-            message="Your lawyer verification was rejected. Please resubmit your details."
+            message={`Due to ${data?.rejectReason} your lawyer verification was rejected. Please resubmit your details.`}
             title="Verification Rejected"
           />
           <div className="mt-3 mr-3" onClick={openModal}>

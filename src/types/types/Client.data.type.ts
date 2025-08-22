@@ -20,6 +20,7 @@ export type fetchClientDataType = {
     pincode: string;
   };
   lawyerVerfication?: VerificationStatus;
+  rejectReason?: string;
 };
 
 export type userDataType = {

@@ -8,6 +8,10 @@ import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 import { LogOut } from "@/store/redux/client/ClientSlice";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
+import { motion } from "motion/react";
+import { useQueryClient } from "@tanstack/react-query";
+import { fetchClientDataType } from "@/types/types/Client.data.type";
+import { TriangleAlert } from "lucide-react";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -16,6 +20,11 @@ function Navbar() {
   const { setUserRole } = useContext(AuthContext);
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.Auth.user);
+  const queryClient = useQueryClient();
+  const clientData: fetchClientDataType | undefined = queryClient.getQueryData([
+    "user",
+    user?.user_id,
+  ]);
 
   const dispatch = useAppDispatch();
   const handleLogout = () => {
@@ -34,7 +43,7 @@ function Navbar() {
         theme === "dark"
           ? "bg-brandBlack text-[#E0E0E0]"
           : "bg-brandPrimary text-white"
-      }` }
+      }`}
     >
       <div className="flex justify-between items-center p-2 ml-5 ">
         {/* Logo */}
@@ -251,6 +260,40 @@ function Navbar() {
           >
             {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
           </button>
+        </div>
+      )}
+      {clientData?.lawyerVerfication !== "verified" && (
+        <div className="overflow-hidden w-full bg-black mt-3">
+          <motion.div
+            className="text-red-600 whitespace-nowrap"
+            animate={{ x: ["100%", "-100%"] }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            {clientData?.lawyerVerfication === "pending" ? (
+              <div className="flex items-center justify-center  font-bold text-red-600">
+                <TriangleAlert />
+                Lawyer Verification Pending. please goto the profile to verify
+                your account.
+              </div>
+            ) : clientData?.lawyerVerfication === "rejected" ? (
+              <div className="flex items-center justify-center font-bold text-red-600">
+                <TriangleAlert />
+                Lawyer Verification Rejected. try verification again.
+              </div>
+            ) : clientData?.lawyerVerfication === "requested" ? (
+              <div className="flex items-center justify-center  font-bold text-yellow-600">
+                <TriangleAlert />
+                Your Verification Request is Under Review. Wait until the admin
+                verifies your lawyer account.
+              </div>
+            ) : (
+              ""
+            )}
+          </motion.div>
         </div>
       )}
     </nav>

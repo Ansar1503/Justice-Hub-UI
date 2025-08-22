@@ -10,8 +10,8 @@ import { IoChatbubblesOutline } from "react-icons/io5";
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const user = useAppSelector((state) => state.Auth.user);
-  const { data } = useFetchClientData();
-  const userData = data?.data;
+  const { data: userData } = useFetchClientData();
+
   const location = useLocation();
   const path = location.pathname;
   const pathname = path.split("/")[path.split("/").length - 1];
@@ -78,8 +78,7 @@ export default function Sidebar() {
           )}
         </button>
       )}
-      {/* Sidebar content */}
-      {/* Sidebar content */}
+
       <aside
         className={`
           bg-brandForm2 dark:bg-black
