@@ -54,11 +54,13 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
           if (permission === "granted") {
             showNotification();
           } else if (permission === "denied") {
-            alert("Please enable notifications in your browser settings.");
+            toast.info("Please enable notifications in your browser settings.");
           }
         });
       } else {
-        alert("Notifications are blocked. Please allow them in your browser.");
+        toast.info(
+          "Notifications are blocked. Please allow them in your browser."
+        );
       }
 
       function showNotification() {
