@@ -7,22 +7,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
+
 interface VerificationModalProps {
-  setVerificationForm: (open: boolean) => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  setVerificationForm?: (open: boolean) => void;
 }
 
 export function AlertVerificationModal({
   setVerificationForm,
+  isOpen,
+  setIsOpen,
 }: VerificationModalProps) {
-  const [isopen, setIsOpen] = useState(false);
-  useEffect(() => {
-    setIsOpen(true);
-  }, []);
-
   return (
     <>
-      <Dialog open={isopen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100">
@@ -48,7 +47,7 @@ export function AlertVerificationModal({
                 e.preventDefault();
                 e.stopPropagation();
                 setIsOpen(false);
-                setVerificationForm(true);
+                setVerificationForm?.(true);
               }}
             >
               Verify Now

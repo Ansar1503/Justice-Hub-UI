@@ -7,7 +7,6 @@ import {
 import LawyerVerificationForm from "../Forms/Verification";
 import { useState } from "react";
 import { FourSquare } from "react-loading-indicators";
-import { useLawyerVerification } from "@/store/tanstack/mutations";
 
 interface LawyerVerificationFormProps {
   setVerificationModalOpen: (open: boolean) => void;
@@ -16,9 +15,8 @@ interface LawyerVerificationFormProps {
 function LawyerVerificationFormModal({
   setVerificationModalOpen,
 }: LawyerVerificationFormProps) {
-  const {isPending} = useLawyerVerification()
-  const [loading, setLoading] = useState(isPending);
-  
+  const [loading, setLoading] = useState(false);
+
   return (
     <Dialog open={true} onOpenChange={() => setVerificationModalOpen(false)}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 shadow-lg p-6 ">
