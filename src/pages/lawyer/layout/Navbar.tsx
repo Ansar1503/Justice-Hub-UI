@@ -10,7 +10,6 @@ import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
 import { motion } from "motion/react";
 import { TriangleAlert } from "lucide-react";
-import { useFetchClientData } from "@/store/tanstack/queries";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -19,7 +18,6 @@ function Navbar() {
   const { setUserRole } = useContext(AuthContext);
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.Auth.user);
-  const { data: clientData } = useFetchClientData();
 
   const dispatch = useAppDispatch();
   const handleLogout = () => {
@@ -257,7 +255,7 @@ function Navbar() {
           </button>
         </div>
       )}
-      {clientData?.lawyerVerfication !== "verified" && (
+      {user?.lawyer_verification_status !== "verified" && (
         <div className="overflow-hidden w-full bg-black mt-3">
           <motion.div
             className="text-red-600 whitespace-nowrap"
@@ -268,18 +266,18 @@ function Navbar() {
               ease: "linear",
             }}
           >
-            {clientData?.lawyerVerfication === "pending" ? (
+            {user?.lawyer_verification_status === "pending" ? (
               <div className="flex items-center justify-center  font-bold text-red-600">
                 <TriangleAlert />
                 Lawyer Verification Pending. please goto the profile to verify
                 your account.
               </div>
-            ) : clientData?.lawyerVerfication === "rejected" ? (
+            ) : user?.lawyer_verification_status === "rejected" ? (
               <div className="flex items-center justify-center font-bold text-red-600">
                 <TriangleAlert />
                 Lawyer Verification Rejected. try verification again.
               </div>
-            ) : clientData?.lawyerVerfication === "requested" ? (
+            ) : user?.lawyer_verification_status === "requested" ? (
               <div className="flex items-center justify-center  font-bold text-yellow-600">
                 <TriangleAlert />
                 Your Verification Request is Under Review. Wait until the admin

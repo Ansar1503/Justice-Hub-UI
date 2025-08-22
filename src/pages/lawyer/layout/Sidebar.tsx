@@ -3,14 +3,12 @@ import { GoCodeReview } from "react-icons/go";
 import { useState } from "react";
 import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
-import { useFetchClientData } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { IoChatbubblesOutline } from "react-icons/io5";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const user = useAppSelector((state) => state.Auth.user);
-  const { data: userData } = useFetchClientData();
 
   const location = useLocation();
   const path = location.pathname;
@@ -97,16 +95,17 @@ export default function Sidebar() {
       >
         {/* User Info Section */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <Avatar className="h-8 w-8 rounded-lg">
+          <Avatar className="rounded-full overflow-hidden w-8 h-8">
             <AvatarImage
-              className="rounded-full"
-              src={userData?.profile_image}
-              alt={userData?.name}
+              className="object-cover w-full h-full"
+              src={user?.profile_image}
+              alt={user?.name}
             />
-            <AvatarFallback className="rounded-lg">
+            <AvatarFallback className="rounded-full">
               <User />
             </AvatarFallback>
           </Avatar>
+
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
             {user?.name || "User Name"}
           </h2>
