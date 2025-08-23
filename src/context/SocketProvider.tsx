@@ -6,7 +6,7 @@ import { SocketEvents } from "@/types/enums/socket";
 import { NotificationType } from "@/types/types/Notification";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
 import { getSocket } from "@/utils/socket/socket";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -14,8 +14,6 @@ import { Socket } from "socket.io-client";
 
 // context/SocketContext.tsx
 export const SocketContext = createContext<Socket | null>(null);
-
-export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -26,6 +24,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!token) return;
     const s = getSocket(token);
+    s.connect();
     setSocket(s);
     s.on(SocketEvents.CONNECTED_EVENT, () => {
       console.log("connected to socket");
