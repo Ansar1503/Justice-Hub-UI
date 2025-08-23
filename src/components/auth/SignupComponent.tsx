@@ -90,7 +90,6 @@ function SignupComponent() {
         };
         setLoading(true);
         const response = await axiosinstance.post(`/api/user/signup`, postData);
-        console.log(response.data);
         navigate(`/otp?email=${response.data?.email}`);
         setLoading(false);
       } catch (error: any) {
@@ -100,7 +99,7 @@ function SignupComponent() {
           toast.error(error.message);
         } else if (error.response) {
           if (error.response.data) {
-            setError(error.response.data?.message);
+            setError(error.response.data?.error);
           }
         }
       }
