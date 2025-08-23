@@ -179,7 +179,6 @@ export default function SessionsListing() {
         console.warn("Socket is null");
         return;
       }
-
       const data = await startSessionMutation({ sessionId: session?._id });
       // console.log("data", data);
       dispatch(

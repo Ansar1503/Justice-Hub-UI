@@ -346,6 +346,7 @@ function ChatsPage() {
     const s = socket.current;
     // console.log("s is here : ", s);
     if (!s) return;
+    if (!s.connected) s.connect();
     s.emit(SocketEvents.JOIN_CHAT_EVENT, { sessionId: session._id });
     console.log("joint emitted");
     // s.emit(SocketEvents.GET_MESSAGES_EVENT, { session_id: session._id });

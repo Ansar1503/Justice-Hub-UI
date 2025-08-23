@@ -39,10 +39,10 @@ interface SessionDetailModalProps {
   session: SessionDataType;
   isOpen: boolean;
   onClose: () => void;
-  onStartSession?: (session: any) => void;
+  onStartSession?: (session: SessionDataType) => void;
   onEndSession?: (sessionId: string) => void;
   onCancelSession?: (sessionId: string) => void;
-  onJoinSession?: (sesssion: any) => void;
+  onJoinSession?: (sesssion: SessionDataType) => void;
 }
 
 export default function SessionDetailModal({
