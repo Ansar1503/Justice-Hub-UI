@@ -25,7 +25,7 @@ axiosinstance.interceptors.response.use(
       try {
         // console.log("refres posting....");
         const result = await axiosinstance.get("api/user/refresh");
-        console.log("refresh result", result);
+        // console.log("refresh result", result);
         const newToken = result.data;
         if (originalRequest && originalRequest.headers) {
           // console.log("new token :", newToken);
