@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PaginationComponent from "@/components/pagination";
 import { UserDetailsModal } from "@/components/admin/Modals/UserDetails.Modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
@@ -34,7 +34,7 @@ type statusType =
   | "cancelled"
   | "rejected"
   | "all";
-type sortByType = "name" | "date" | "amount" | "created_at";
+type sortByType = "lawyer_name" | "client_name" | "date" | "fee";
 type sortOrderType = "asc" | "desc";
 export default function Appointments() {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -57,11 +57,7 @@ export default function Appointments() {
     page: currentPage,
   });
   const appointments = AppointmentsData?.data;
-  useEffect(() => {
-    if (AppointmentsData) {
-      setCurrentPage(AppointmentsData.currentPage);
-    }
-  }, [AppointmentsData]);
+
   const totalPages = AppointmentsData?.totalPage || 1;
   const totalCount = AppointmentsData?.totalCount || 1;
 
@@ -109,7 +105,7 @@ export default function Appointments() {
     "rejected",
     "all",
   ];
-  const sortByValues = ["date", "amount", "lawyer_name", "client_name"];
+  const sortByValues = ["date", "fee", "lawyer_name", "client_name"];
   return (
     <AdminLayout>
       <Card className="bg-textLight dark:bg-stone-800 mt-5">

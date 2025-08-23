@@ -8,9 +8,7 @@ import {
   Clock,
 } from "lucide-react";
 import PaginationComponent from "../pagination";
-import {
-  useFetchAppointments,
-} from "@/store/tanstack/queries";
+import { useFetchAppointments } from "@/store/tanstack/queries";
 import AppointmentDetailModal from "@/components/users/modals/AppointmentDetails.modal";
 import { useCancellAppointment } from "@/store/tanstack/mutations";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
@@ -23,11 +21,7 @@ export type AppointmentStatus =
   | "cancelled"
   | "rejected";
 export type AppointmentType = "all" | "consultation" | "follow-up";
-export type SortField =
-  | "lawyer_name"
-  | "date"
-  | "consultation_fee"
-  | "created_at";
+export type SortField = "lawyer_name" | "date" | "fee";
 export type SortOrder = "asc" | "desc";
 
 export default function LawyerAppointmentListing() {
@@ -248,12 +242,12 @@ export default function LawyerAppointmentListing() {
                 }}
                 className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md pl-8 pr-8 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white min-w-[140px]"
               >
-                <option value="appointment_date-desc">Date (Newest)</option>
-                <option value="appointment_date-asc">Date (Oldest)</option>
+                <option value="date-desc">Date (Newest)</option>
+                <option value="date-asc">Date (Oldest)</option>
                 <option value="lawyer_name-asc">Lawyer (A-Z)</option>
                 <option value="lawyer_name-desc">Lawyer (Z-A)</option>
-                <option value="consultation_fee-asc">Fee (Low-High)</option>
-                <option value="consultation_fee-desc">Fee (High-Low)</option>
+                <option value="fee-asc">Fee (Low-High)</option>
+                <option value="fee-desc">Fee (High-Low)</option>
               </select>
               <ArrowUpDown className="absolute left-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>
@@ -292,12 +286,11 @@ export default function LawyerAppointmentListing() {
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("consultation_fee")}
+                    onClick={() => handleSort("fee")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Fee
-                    {sortBy === "consultation_fee" &&
-                      (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "fee" && (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white">

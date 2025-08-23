@@ -17,7 +17,11 @@ export type AppointmentStatus =
   | "cancelled"
   | "rejected";
 export type AppointmentType = "all" | "consultation" | "follow-up";
-export type SortField = "name" | "date" | "consultation_fee" | "created_at";
+export type SortField =
+  | "client_name"
+  | "date"
+  | "fee"
+  | "created_at";
 export type SortOrder = "asc" | "desc";
 
 export default function LawyerClientAppointmentListing() {
@@ -242,10 +246,9 @@ export default function LawyerClientAppointmentListing() {
                 setCurrentPage(1);
               }}
             >
-              <option value="consultation_fee">Sort by Fee</option>
+              <option value="fee">Sort by Fee</option>
               <option value="date">Sort by Date</option>
-              <option value="created_at">Sort by Created</option>
-              <option value="name">Sort by Name</option>
+              <option value="client_name">Sort by Name</option>
             </select>
 
             <button
@@ -265,11 +268,12 @@ export default function LawyerClientAppointmentListing() {
                 <tr>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[200px]">
                     <button
-                      onClick={() => handleSort("name")}
+                      onClick={() => handleSort("client_name")}
                       className="flex items-center gap-1 hover:text-blue-600"
                     >
                       Client Details
-                      {sortBy === "name" && (sortOrder === "asc" ? " ↑" : " ↓")}
+                      {sortBy === "client_name" &&
+                        (sortOrder === "asc" ? " ↑" : " ↓")}
                     </button>
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[150px]">
@@ -289,12 +293,11 @@ export default function LawyerClientAppointmentListing() {
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                     <button
-                      onClick={() => handleSort("consultation_fee")}
+                      onClick={() => handleSort("fee")}
                       className="flex items-center gap-1 hover:text-blue-600"
                     >
                       Fee
-                      {sortBy === "consultation_fee" &&
-                        (sortOrder === "asc" ? " ↑" : " ↓")}
+                      {sortBy === "fee" && (sortOrder === "asc" ? " ↑" : " ↓")}
                     </button>
                   </th>
                   <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[100px]">

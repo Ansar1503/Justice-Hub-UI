@@ -69,7 +69,7 @@ export async function fetchAppointments(payload: {
   // console.log("payload", payload);
   const { token, user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/${user?.role}/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&consultationType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
+    `/api/${user?.role}/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&consultationType=${payload.appointmentType}&sortBy=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
