@@ -24,18 +24,11 @@ import {
   ArrowRightIcon,
   StickyNoteIcon,
 } from "lucide-react";
-import type { Session } from "@/types/types/sessionType";
-import type {
-  clientDataType,
-  userDataType,
-} from "@/types/types/Client.data.type";
+import type { Session, SessionDataType } from "@/types/types/sessionType";
 import Confirmation from "@/components/Confirmation";
 
 interface SessionDetailsProps {
-  session: Session & {
-    clientData: userDataType & clientDataType;
-    lawyerData: userDataType & clientDataType;
-  };
+  session: SessionDataType;
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -50,16 +43,9 @@ export default function SessionDetails({
   trigger,
   open,
   onOpenChange,
-  //   onStartSession,
-  //   onEndSession,
-  //   onCancelSession,
   onJoinSession,
 }: SessionDetailsProps) {
   const [isOpen, setIsOpen] = useState(open || false);
-  
-  //   const [showStartConfirm, setShowStartConfirm] = useState(false);
-  //   const [showEndConfirm, setShowEndConfirm] = useState(false);
-  //   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -137,25 +123,6 @@ export default function SessionDetails({
     }
   };
 
-  // Session control logic
-  //   const sessionStartable = () => {
-  //     const currentDate = new Date();
-  //     const sessionDate = new Date(session.scheduled_date);
-  //     const [h, m] = session.scheduled_time
-  //       ? session.scheduled_time.split(":").map(Number)
-  //       : [0, 0];
-  //     sessionDate.setHours(h, m, 0, 0);
-  //     const sessionEnd = new Date(
-  //       sessionDate.getTime() + session.duration * 60000
-  //     );
-
-  //     return (
-  //       session.status === "upcoming" &&
-  //       currentDate >= sessionDate &&
-  //       currentDate < sessionEnd
-  //     );
-  //   };
-
   const sessionJoinable = () => {
     const currentDate = new Date();
     const sessionDate = new Date(session.scheduled_date);
@@ -173,35 +140,6 @@ export default function SessionDetails({
       currentDate < sessionEnd
     );
   };
-
-  //   const sessionCancelable = () => {
-  //     const currentDate = new Date();
-  //     const sessionDate = new Date(session.scheduled_date);
-  //     const [h, m] = session.scheduled_time
-  //       ? session.scheduled_time.split(":").map(Number)
-  //       : [0, 0];
-  //     sessionDate.setHours(h, m, 0, 0);
-
-  //     return session.status === "upcoming" && currentDate < sessionDate;
-  //   };
-  // Action handlers
-  //   const handleStartSession = () => {
-  //     onStartSession?.(session);
-  //     setShowStartConfirm(false);
-  //     handleOpenChange(false);
-  //   };
-
-  //   const handleEndSession = () => {
-  //     onEndSession?.(session._id!);
-  //     setShowEndConfirm(false);
-  //     handleOpenChange(false);
-  //   };
-
-  //   const handleCancelSession = () => {
-  //     onCancelSession?.(session._id!);
-  //     setShowCancelConfirm(false);
-  //     handleOpenChange(false);
-  //   };
 
   const handleJoinSession = () => {
     onJoinSession?.(session);
@@ -454,28 +392,6 @@ export default function SessionDetails({
               Close
             </Button>
             <div className="flex gap-3">
-              {session.status === "upcoming" && (
-                <>
-                  {/* {sessionStartable() && (
-                    <Button
-                      onClick={() => setShowStartConfirm(true)}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <VideoIcon className="h-4 w-4 mr-2" />
-                      Start Session
-                    </Button>
-                  )} */}
-                  {/* {sessionCancelable() && (
-                    <Button
-                      variant="destructive"
-                      onClick={() => setShowCancelConfirm(true)}
-                    >
-                      Cancel Session
-                    </Button>
-                  )} */}
-                </>
-              )}
-
               {sessionJoinable() && (
                 <Button
                   onClick={() => setShowJoinConfirm(true)}
@@ -485,31 +401,10 @@ export default function SessionDetails({
                   Join Session
                 </Button>
               )}
-
-              {/* {session.status === "ongoing" && (
-                <Button
-                  variant="destructive"
-                  onClick={() => setShowEndConfirm(true)}
-                >
-                  End Session
-                </Button>
-              )} */}
             </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Start Session Confirmation */}
-      {/* <Confirmation
-        description="Are you ready to start this session? The client will be notified
-              and the session will begin."
-        handleAction={handleStartSession}
-        open={showStartConfirm}
-        setOpen={setShowStartConfirm}
-        title="Start Session"
-        className="bg-green-600 hover:bg-green-700"
-        actionText="Yes, start session"
-      /> */}
 
       {/* Join Session Confirmation */}
       <Confirmation
@@ -521,30 +416,6 @@ export default function SessionDetails({
         className="bg-green-600 hover:bg-green-700"
         actionText="Yes, join session"
       />
-
-      {/* End Session Confirmation */}
-      {/* <Confirmation
-        description=" Are you sure you want to end this session? This action cannot be
-              undone and the session will be marked as completed."
-        handleAction={handleEndSession}
-        open={showEndConfirm}
-        setOpen={setShowEndConfirm}
-        title="End Session"
-        className="bg-red-600 hover:bg-red-700"
-        actionText="Yes, end session"
-      /> */}
-
-      {/* Cancel Session Confirmation */}
-      {/* <Confirmation
-        description=" Are you sure you want to cancel this session? This action cannot be undone and the client will be
-              notified."
-        handleAction={handleCancelSession}
-        open={showCancelConfirm}
-        setOpen={setShowCancelConfirm}
-        title="Cancel Session"
-        className="bg-red-600 hover:bg-red-700"
-        actionText="Yes, cancel session"
-      /> */}
     </>
   );
 }

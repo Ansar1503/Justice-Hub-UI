@@ -9,7 +9,6 @@ import { AdminLayout } from "./layout/admin.layout";
 import SearchComponent from "@/components/SearchComponent";
 import { useState } from "react";
 import { SelectComponent } from "@/components/SelectComponent";
-import { useFetchSessionsForAdmin } from "@/store/tanstack/queries";
 
 import {
   Table,
@@ -28,6 +27,7 @@ import { Session } from "@/types/types/sessionType";
 import { Badge } from "@/components/ui/badge";
 import SessionDetails from "@/components/admin/Modals/SessionDetails";
 import PaginationComponent from "@/components/pagination";
+import { useFetchSessions } from "@/store/tanstack/queries";
 
 type consultationsType = "consultation" | "follow-up" | "all";
 type statusType =
@@ -51,7 +51,7 @@ export default function Sessions() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [detailsModalOpen, setDetailsModalOpen] = useState<boolean>(false);
 
-  const { data: sessionData } = useFetchSessionsForAdmin({
+  const { data: sessionData } = useFetchSessions({
     limit: itemsPerPage,
     page: currentPage,
     search: searchTerm,

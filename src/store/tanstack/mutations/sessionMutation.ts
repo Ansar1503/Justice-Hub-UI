@@ -1,4 +1,3 @@
-import { store } from "@/store/redux/store";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { Session } from "@/types/types/sessionType";
 import { cancelSessionByClient } from "@/utils/api/services/clientServices";
@@ -17,16 +16,7 @@ export function useCancelSessionByLawyer() {
     mutationFn: (payload) => cancelSessionByLawyer(payload),
     onSuccess: (data) => {
       toast.success(data?.message || "Session cancelled successfully!");
-      queryClient.setQueryData(["lawyer", "sessions"], (old: any) => {
-        return {
-          ...old,
-          data: old?.data?.map((appt: any) =>
-            appt._id === data?.data?._id
-              ? { ...appt, status: data?.data?.status }
-              : appt
-          ),
-        };
-      });
+      queryClient.invalidateQueries({ queryKey: ["sessions"] });
     },
     onError: (error: any) => {
       const message =
@@ -44,15 +34,7 @@ export function useCancelSessionByClient() {
     onSuccess: (data) => {
       // console.log("data:", data);
       toast.success(data?.message || "Session cancelled successfully!");
-      queryClient.setQueryData(["client", "sessions"], (old: any) => {
-        // console.log("old:", old);
-        return {
-          ...old,
-          data: old?.data?.map((appt: any) =>
-            appt._id === data?.id ? { ...appt, status: data?.status } : appt
-          ),
-        };
-      });
+      queryClient.invalidateQueries({ queryKey: ["sessions"] });
     },
     onError: (error: any) => {
       const message =
@@ -72,7 +54,7 @@ export function useStartSession() {
   >({
     mutationFn: (payload) => StartSession(payload.sessionId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["client", "sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["sessions"] });
       toast.success("Session started successfully!");
     },
 
@@ -94,7 +76,7 @@ export function useJoinSession() {
   >({
     mutationFn: (payload) => joinVideoSession(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["client", "sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["sessions"] });
       toast.success("Session started successfully!");
     },
 
@@ -109,16 +91,10 @@ export function useJoinSession() {
 
 export function useEndSession() {
   const queryClient = useQueryClient();
-  const { user } = store.getState().Auth;
   return useMutation({
     mutationFn: (sessionId: string) => endSession(sessionId),
-    onSuccess: (data) => {
-      console.log("new data:", data);
-      if (user?.role === "lawyer") {
-        queryClient.invalidateQueries({ queryKey: ["lawyer", "sessions"] });
-      } else if (user?.role === "client") {
-        queryClient.invalidateQueries({ queryKey: ["client", "sessions"] });
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sessions"] });
     },
     onError: (error: any) => {
       const message =

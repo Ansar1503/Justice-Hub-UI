@@ -395,9 +395,9 @@ export default function LawyerClientAppointmentListing() {
             </div>
           ) : (
             appointments &&
-            appointments?.map((appointment: any) => (
+            appointments?.map((appointment) => (
               <div
-                key={appointment?._id}
+                key={appointment?.id}
                 className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
               >
                 {/* Client Info Header */}
@@ -472,10 +472,10 @@ export default function LawyerClientAppointmentListing() {
                 </div>
 
                 {/* Phone Number */}
-                {appointment?.clientData?.phone && (
+                {appointment?.clientData?.mobile && (
                   <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Phone: {appointment?.clientData?.phone}
+                      Phone: {appointment?.clientData?.mobile}
                     </span>
                   </div>
                 )}

@@ -5,14 +5,12 @@ import {
   fetchLawyerSlotSettings,
   fetchReviewsBySession,
   fetchSessionDocuments,
-  fetchSessionsforClients,
   fetchSlotsforClients,
 } from "@/utils/api/services/clientServices";
 import {
   fetchAllLawyers,
   fetchChatDisputes,
   fetchReviewDisputes,
-  fetchSessionsForAdmin,
   fetchUserByRole,
 } from "@/utils/api/services/adminServices";
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +18,6 @@ import {
   fetchAvailableSlots,
   fetchLawyerData,
   fetchOverrideslots,
-  fetchSessionsforLawyers,
   fetchSlotSettings,
 } from "@/utils/api/services/LawyerServices";
 import {
@@ -40,7 +37,11 @@ import {
   SortOrder,
 } from "@/components/users/AppointmentsComponent";
 import { ResponseType } from "@/types/types/LoginResponseTypes";
-import { Session, SessionDocument } from "@/types/types/sessionType";
+import {
+  FetchSessionsPayloadType,
+  FetchSessionsResponse,
+  SessionDocument,
+} from "@/types/types/sessionType";
 import { FetchAppointmentsOutputDto } from "@/types/types/AppointmentsType";
 import { Review } from "@/types/types/Review";
 import { Disputes, FetchChatDisputesResponseDto } from "@/types/types/Disputes";
@@ -48,6 +49,7 @@ import {
   fetchAppointments,
   fetchCallLogs,
   FetchClientOrLawyerReviews,
+  fetchSessions,
 } from "@/utils/api/services/commonServices";
 import { store } from "../redux/store";
 import { FetchLawyerResponseType } from "@/types/types/LawyerTypes";
@@ -189,38 +191,6 @@ export function useFetchAppointments(payload: {
   });
 }
 
-export function useFetchSessionsForLawyers(payload: {
-  search: string;
-  status: string;
-  sort: string;
-  order: "asc" | "desc";
-  consultation_type: string;
-  page: number;
-  limit: number;
-}) {
-  return useQuery({
-    queryKey: ["lawyer", "sessions"],
-    queryFn: () => fetchSessionsforLawyers(payload),
-    retry: 1,
-  });
-}
-
-export function useFetchsessionsForclients(payload: {
-  search: string;
-  status: string;
-  sort: string;
-  order: "asc" | "desc";
-  consultation_type: string;
-  page: number;
-  limit: number;
-}) {
-  return useQuery({
-    queryKey: ["client", "sessions"],
-    queryFn: () => fetchSessionsforClients(payload),
-    retry: 1,
-  });
-}
-
 export function useFetchSessionDocuments(sessionId: string) {
   return useQuery<string, Error, SessionDocument>({
     queryKey: ["session", "documents", sessionId],
@@ -230,47 +200,10 @@ export function useFetchSessionDocuments(sessionId: string) {
   });
 }
 
-export function useFetchSessionsForAdmin(payload: {
-  search: string;
-  type: "consultation" | "follow-up" | "all";
-  status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed" | "all";
-  sortBy: "date" | "amount" | "lawyer_name" | "client_name";
-  sortOrder: "asc" | "desc";
-  limit: number;
-  page: number;
-}) {
-  return useQuery<
-    {
-      search: string;
-      type: "consultation" | "follow-up" | "all";
-      status:
-        | "upcoming"
-        | "ongoing"
-        | "completed"
-        | "cancelled"
-        | "missed"
-        | "all";
-      sortBy: "date" | "amount" | "lawyer_name" | "client_name";
-      sortOrder: "asc" | "desc";
-      limit: number;
-      page: number;
-    },
-    Error,
-    {
-      data:
-        | (Session & {
-            clientData: userDataType & clientDataType;
-            lawyerData: userDataType & clientDataType;
-          })[]
-        | [];
-
-      totalCount: number;
-      currentPage: number;
-      totalPage: number;
-    }
-  >({
-    queryKey: ["admin", "sessions", payload],
-    queryFn: () => fetchSessionsForAdmin(payload),
+export function useFetchSessions(payload: FetchSessionsPayloadType) {
+  return useQuery<FetchSessionsPayloadType, Error, FetchSessionsResponse>({
+    queryKey: ["sessions", payload],
+    queryFn: () => fetchSessions(payload),
     // staleTime: 1000 * 60 * 10,
     retry: 1,
   });

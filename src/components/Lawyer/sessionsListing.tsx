@@ -2,7 +2,6 @@ import { useState, useEffect, useContext } from "react";
 import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/Lawyer/Modals/sessionDetails";
-import { useFetchSessionsForLawyers } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   useCancelSessionByLawyer,
@@ -19,6 +18,7 @@ import { NotificationType } from "@/types/types/Notification";
 import { store } from "@/store/redux/store";
 import { useAppDispatch } from "@/store/redux/Hook";
 import { setZcState } from "@/store/redux/zc/zcSlice";
+import { useFetchSessions } from "@/store/tanstack/queries";
 
 export type SessionStatus =
   | "all"
@@ -30,7 +30,7 @@ export type SessionStatus =
 
 export type SessionType = "all" | "consultation" | "follow-up";
 export type PaymentStatus = "all" | "pending" | "success" | "failed";
-export type SortField = "name" | "date" | "amount" | "created_at";
+export type SortField = "date" | "amount" | "lawyer_name" | "client_name";
 export type SortOrder = "asc" | "desc";
 
 export default function SessionsListing() {
@@ -41,7 +41,6 @@ export default function SessionsListing() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-  const [totalPages, setTotalPages] = useState(1);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [viewCallLogsOpen, setViewCallLogsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,18 +62,18 @@ export default function SessionsListing() {
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { mutateAsync: endSessionAsync } = useEndSession();
   const { user: currentUser } = store.getState().Auth;
-  const { data: sessionsData, refetch: sessionRefetch } =
-    useFetchSessionsForLawyers({
-      consultation_type: typeFilter,
-      limit: itemsPerPage,
-      order: sortOrder,
-      page: currentPage,
-      search: searchTerm,
-      sort: sortBy,
-      status: statusFilter,
-    });
+  const { data: sessionsData, refetch: sessionRefetch } = useFetchSessions({
+    type: typeFilter,
+    limit: itemsPerPage,
+    sortOrder,
+    page: currentPage,
+    search: searchTerm,
+    sortBy,
+    status: statusFilter,
+  });
   // console.log("sessionss", sessionsData);
   const sessions = sessionsData?.data;
+  const totalPages = sessionsData?.totalPage ?? 0;
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -83,24 +82,6 @@ export default function SessionsListing() {
 
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, sessionRefetch]);
-
-  useEffect(() => {
-    sessionRefetch();
-  }, [
-    statusFilter,
-    typeFilter,
-    sortBy,
-    sortOrder,
-    itemsPerPage,
-    currentPage,
-    sessionRefetch,
-  ]);
-
-  useEffect(() => {
-    if (sessionsData?.totalCount) {
-      setTotalPages(Math.ceil(sessionsData.totalCount / itemsPerPage));
-    }
-  }, [sessionsData, itemsPerPage]);
 
   const renderStatusBadge = (status: string) => {
     const statusConfig = {
@@ -319,10 +300,9 @@ export default function SessionsListing() {
                 setCurrentPage(1);
               }}
             >
-              <option value="scheduled_date">Sort by Time</option>
+              <option value="date">Sort by Time</option>
               <option value="amount">Sort by Amount</option>
               <option value="client_name">Sort by Name</option>
-              <option value="created_at">Sort by Created</option>
             </select>
 
             <button
@@ -342,11 +322,12 @@ export default function SessionsListing() {
                 <tr>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[200px]">
                     <button
-                      onClick={() => handleSort("name")}
+                      onClick={() => handleSort("client_name")}
                       className="flex items-center gap-1 hover:text-blue-600"
                     >
                       Client Details
-                      {sortBy === "name" && (sortOrder === "asc" ? " ↑" : " ↓")}
+                      {sortBy === "client_name" &&
+                        (sortOrder === "asc" ? " ↑" : " ↓")}
                     </button>
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[150px]">
@@ -390,11 +371,13 @@ export default function SessionsListing() {
                     </td>
                   </tr>
                 ) : (
-                  sessions?.map((session: any) => {
-                    const { date } = formatDateTime(session?.scheduled_date);
+                  sessions?.map((session) => {
+                    const { date } = formatDateTime(
+                      session?.scheduled_date.toString()
+                    );
                     return (
                       <tr
-                        key={session._id}
+                        key={session.id}
                         className="hover:bg-gray-50 dark:hover:bg-gray-800"
                       >
                         <td className="py-4 px-4">
@@ -419,7 +402,7 @@ export default function SessionsListing() {
                                 {session?.clientData?.email || "N/A"}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {session?.clientData?.phone || "N/A"}
+                                {session?.clientData?.mobile || "N/A"}
                               </p>
                             </div>
                           </div>
@@ -486,11 +469,13 @@ export default function SessionsListing() {
               No sessions found matching your criteria
             </div>
           ) : (
-            sessions?.map((session: any) => {
-              const { date, time } = formatDateTime(session?.scheduled_date);
+            sessions?.map((session) => {
+              const { date, time } = formatDateTime(
+                session?.scheduled_date.toString()
+              );
               return (
                 <div
-                  key={session._id}
+                  key={session.id}
                   className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
                 >
                   {/* Client Info Header */}
@@ -566,10 +551,10 @@ export default function SessionsListing() {
                   </div>
 
                   {/* Phone Number */}
-                  {session?.clientData?.phone && (
+                  {session?.clientData?.mobile && (
                     <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Phone: {session?.clientData?.phone}
+                        Phone: {session?.clientData?.mobile}
                       </span>
                     </div>
                   )}

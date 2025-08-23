@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Search, Filter, Eye, Calendar, Clock } from "lucide-react";
 import PaginationComponent from "../pagination";
 import SessionDetailModal from "@/components/users/modals/sessionDetails";
-import { useFetchsessionsForclients } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   useCancelSessionByClient,
@@ -16,6 +15,7 @@ import { useAppDispatch } from "@/store/redux/Hook";
 import { setZcState } from "@/store/redux/zc/zcSlice";
 import CallLogsModal from "../CallLogsModal";
 import { Button } from "../ui/button";
+import { useFetchSessions } from "@/store/tanstack/queries";
 
 export type SessionStatus =
   | "all"
@@ -27,7 +27,7 @@ export type SessionStatus =
 
 export type SessionType = "all" | "consultation" | "follow-up";
 export type PaymentStatus = "all" | "pending" | "success" | "failed";
-export type SortField = "name" | "date" | "amount" | "created_at";
+export type SortField = "date" | "amount" | "lawyer_name" | "client_name";
 export type SortOrder = "asc" | "desc";
 
 export default function SessionsListing() {
@@ -55,17 +55,15 @@ export default function SessionsListing() {
   const { mutateAsync: sessionCancel } = useCancelSessionByClient();
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { mutateAsync: endSessionAsync } = useEndSession();
-  const { data: sessionsData, refetch: sessionRefetch } =
-    useFetchsessionsForclients({
-      consultation_type: typeFilter,
-      limit: itemsPerPage,
-      order: sortOrder,
-      page: currentPage,
-      search: searchTerm,
-      sort: sortBy,
-      status: statusFilter,
-    });
-  // console.log("datad", sessionsData);
+  const { data: sessionsData, refetch: sessionRefetch } = useFetchSessions({
+    type: typeFilter,
+    sortOrder,
+    limit: itemsPerPage,
+    page: currentPage,
+    search: searchTerm,
+    sortBy: sortBy,
+    status: statusFilter,
+  });
   const sessions = sessionsData?.data;
 
   useEffect(() => {
@@ -75,17 +73,6 @@ export default function SessionsListing() {
 
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, sessionRefetch]);
-  useEffect(() => {
-    sessionRefetch();
-  }, [
-    statusFilter,
-    typeFilter,
-    sortBy,
-    sortOrder,
-    itemsPerPage,
-    currentPage,
-    sessionRefetch,
-  ]);
 
   useEffect(() => {
     if (sessionsData?.totalCount) {
@@ -265,11 +252,12 @@ export default function SessionsListing() {
               <tr>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
-                    onClick={() => handleSort("name")}
+                    onClick={() => handleSort("lawyer_name")}
                     className="flex items-center gap-1 hover:text-blue-600"
                   >
                     Lawyer Details
-                    {sortBy === "name" && (sortOrder === "asc" ? " ↑" : " ↓")}
+                    {sortBy === "lawyer_name" &&
+                      (sortOrder === "asc" ? " ↑" : " ↓")}
                   </button>
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
@@ -315,13 +303,13 @@ export default function SessionsListing() {
                   </td>
                 </tr>
               ) : (
-                sessions?.map((session: any) => {
+                sessions?.map((session) => {
                   const { date, time } = formatDateTime(
-                    session?.scheduled_date
+                    session?.scheduled_date?.toString()
                   );
                   return (
                     <tr
-                      key={session._id}
+                      key={session.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <td className="py-4 px-4">
@@ -346,7 +334,7 @@ export default function SessionsListing() {
                               {session?.lawyerData?.email || "N/A"}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {session?.lawyerData?.phone || "N/A"}
+                              {session?.lawyerData?.mobile || "N/A"}
                             </p>
                           </div>
                         </div>

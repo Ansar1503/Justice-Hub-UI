@@ -44,32 +44,14 @@ import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import FeedbackModal from "./Feedback";
+import { SessionDataType } from "@/types/types/sessionType";
 // import Reviews from "../Reviews";
 
-interface Session {
-  _id: string;
-  status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
-  type: "consultation" | "follow-up";
-  scheduled_date: string;
-  scheduled_time: string;
-  scheduled_at: string;
-  duration: number;
-  amount: number;
-  reason: string;
-  room_id?: string;
-  start_time?: string;
-  end_time?: string;
-  client_joined_at?: string;
-  follow_up_suggested?: boolean;
-  clientData: any;
-  lawyerData: any;
-}
-
 interface SessionDetailModalProps {
-  session: Session | null;
+  session: SessionDataType | null;
   isOpen: boolean;
   onClose: () => void;
-  onStartSession?: (session: Session) => void;
+  onStartSession?: (session: SessionDataType) => void;
   onEndSession?: (sessionId: string) => void;
   onCancelSession?: (sessionId: string) => void;
 }
@@ -135,7 +117,7 @@ export default function SessionDetailModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: sessionDocumentsData } = useFetchSessionDocuments(
-    session?._id || ""
+    session?.id || ""
   );
   const sessionDocuments = sessionDocumentsData;
   // console.log("session Documents : : ", sessionDocuments);
@@ -228,13 +210,13 @@ export default function SessionDetailModal({
   }, [session]);
 
   // Status components
-  const getStatusIcon = useCallback((status: Session["status"]) => {
+  const getStatusIcon = useCallback((status: SessionDataType["status"]) => {
     const config = STATUS_CONFIG[status];
     const IconComponent = config?.icon;
     return <IconComponent className={`h-5 w-5 ${config?.iconColor}`} />;
   }, []);
 
-  const getStatusColor = useCallback((status: Session["status"]) => {
+  const getStatusColor = useCallback((status: SessionDataType["status"]) => {
     return STATUS_CONFIG[status]?.color;
   }, []);
 
@@ -281,7 +263,7 @@ export default function SessionDetailModal({
 
     const formData = new FormData();
     uploadedFiles.forEach((file) => formData.append("documents", file));
-    formData.append("session_id", session._id);
+    formData.append("session_id", session.id);
 
     setUploadProgress(0);
 
@@ -311,7 +293,7 @@ export default function SessionDetailModal({
 
   const handleEndSession = useCallback(() => {
     if (session) {
-      onEndSession?.(session._id);
+      onEndSession?.(session.id);
       setShowEndConfirm(false);
       onClose();
     }
@@ -319,7 +301,7 @@ export default function SessionDetailModal({
 
   const handleCancelSession = useCallback(() => {
     if (session) {
-      onCancelSession?.(session._id);
+      onCancelSession?.(session.id);
       setShowCancelConfirm(false);
       onClose();
     }
@@ -415,7 +397,7 @@ export default function SessionDetailModal({
                     Phone
                   </p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {session?.lawyerData?.phone || "N/A"}
+                    {session?.lawyerData?.mobile || "N/A"}
                   </p>
                 </div>
               </div>
@@ -431,7 +413,7 @@ export default function SessionDetailModal({
                       Scheduled At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session.scheduled_date)},{" "}
+                      {formatDate(session.scheduled_date?.toString())},{" "}
                       {formatTime(session.scheduled_time)}
                     </p>
                   </div>
@@ -469,7 +451,7 @@ export default function SessionDetailModal({
                       Started At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session.start_time)}
+                      {formatDate(session.start_time?.toString())}
                     </p>
                   </div>
                 )}
@@ -480,7 +462,7 @@ export default function SessionDetailModal({
                       Ended At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session.end_time)}
+                      {formatDate(session.end_time?.toString())}
                     </p>
                   </div>
                 )}
@@ -491,7 +473,7 @@ export default function SessionDetailModal({
                       Client Joined At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session.scheduled_date)} at{" "}
+                      {formatDate(session.scheduled_date.toString())} at{" "}
                       {formatTime(session.scheduled_time)}
                     </p>
                   </div>
@@ -535,7 +517,7 @@ export default function SessionDetailModal({
 
               <div className="flex gap-3 flex-wrap">
                 {sessionDocuments &&
-                sessionDocuments.session_id === session._id &&
+                sessionDocuments.session_id === session.id &&
                 !fileRemoving &&
                 sessionDocuments?.document.length > 0
                   ? sessionDocuments.document.map((file) => (
@@ -718,7 +700,7 @@ export default function SessionDetailModal({
         </AlertDialogContent>
       </AlertDialog>
       <FeedbackModal
-        sessionId={session?._id || ""}
+        sessionId={session?.id || ""}
         isOpen={showFeedbackModal}
         onClose={() => setShowFeedbackModal(false)}
         lawyerId={session.lawyerData?.user_id || ""}

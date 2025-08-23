@@ -33,9 +33,10 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useFetchSessionDocuments } from "@/store/tanstack/queries";
 import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
+import { SessionDataType } from "@/types/types/sessionType";
 
 interface SessionDetailModalProps {
-  session: any;
+  session: SessionDataType;
   isOpen: boolean;
   onClose: () => void;
   onStartSession?: (session: any) => void;
@@ -61,9 +62,9 @@ export default function SessionDetailModal({
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const { data: sessionDocumentsData } = useFetchSessionDocuments(
-    session?._id || ""
+    session?.id || ""
   );
-  const sessionDocuments = sessionDocumentsData
+  const sessionDocuments = sessionDocumentsData;
 
   // const navigate = useNavigate();
   // console.log("session", sessionDocuments);
@@ -90,7 +91,9 @@ export default function SessionDetailModal({
     return true;
     const currentDate = new Date();
     const sessionDate = new Date(session?.scheduled_date);
-    const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
+    const [h, m] = session?.scheduled_time
+      ? session.scheduled_time.split(":").map(Number)
+      : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     const sessionEnd = new Date(
       sessionDate.getTime() + session.duration * 60000
@@ -111,7 +114,9 @@ export default function SessionDetailModal({
     return true;
     const currentDate = new Date();
     const sessionDate = new Date(session?.scheduled_date);
-    const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
+    const [h, m] = session?.scheduled_time
+      ? session.scheduled_time.split(":").map(Number)
+      : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     const sessionEnd = new Date(
       sessionDate.getTime() + session.duration * 60000
@@ -127,7 +132,9 @@ export default function SessionDetailModal({
   const sessionCancelable = () => {
     const currentDate = new Date();
     const sessionDate = new Date(session?.scheduled_date);
-    const [h, m] = session?.time ? session.time.split(":").map(Number) : [0, 0];
+    const [h, m] = session?.scheduled_time
+      ? session.scheduled_time.split(":").map(Number)
+      : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     return session?.status === "upcoming" && currentDate < sessionDate;
   };
@@ -178,13 +185,13 @@ export default function SessionDetailModal({
   };
 
   const handleEndSession = () => {
-    onEndSession?.(session._id);
+    onEndSession?.(session.id);
     setShowEndConfirm(false);
     onClose();
   };
 
   const handleCancelSession = () => {
-    onCancelSession?.(session._id);
+    onCancelSession?.(session.id);
     setShowCancelConfirm(false);
     onClose();
   };
@@ -202,7 +209,7 @@ export default function SessionDetailModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide">
           <DialogHeader>
             <div className="flex items-center gap-3">
               {getStatusIcon(session?.status)}
@@ -210,7 +217,7 @@ export default function SessionDetailModal({
             </div>
           </DialogHeader>
 
-          <div className="space-y-6 py-4">
+          <div className="space-y-6 py-4 ">
             {/* Status and Payment Info */}
             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
               <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
@@ -282,7 +289,7 @@ export default function SessionDetailModal({
                     Phone
                   </p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {session?.clientData?.phone || "N/A"}
+                    {session?.clientData?.mobile || "N/A"}
                   </p>
                 </div>
               </div>
@@ -298,7 +305,7 @@ export default function SessionDetailModal({
                       Scheduled At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.scheduled_date)},
+                      {formatDate(session?.scheduled_date.toString())},
                       {formatTime(session?.scheduled_time)}
                     </p>
                   </div>
@@ -336,7 +343,7 @@ export default function SessionDetailModal({
                       Started At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.start_time)}
+                      {formatDate(session?.start_time.toString())}
                     </p>
                   </div>
                 )}
@@ -347,7 +354,7 @@ export default function SessionDetailModal({
                       Ended At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.end_time)}
+                      {formatDate(session?.end_time.toString())}
                     </p>
                   </div>
                 )}
@@ -358,7 +365,7 @@ export default function SessionDetailModal({
                       Client Joined At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.client_joined_at)}
+                      {formatDate(session?.client_joined_at.toString())}
                     </p>
                   </div>
                 )}
@@ -378,7 +385,7 @@ export default function SessionDetailModal({
 
             {/* Documents */}
             {sessionDocuments &&
-              sessionDocuments.session_id == session?._id &&
+              sessionDocuments.session_id == session?.id &&
               sessionDocuments?.document?.map((sdoc) => (
                 <SessionDocumentsPreview
                   key={sdoc?._id}

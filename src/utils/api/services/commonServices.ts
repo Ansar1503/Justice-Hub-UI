@@ -6,6 +6,7 @@ import {
   AppointmentType,
 } from "@/components/Lawyer/appointmentsListing";
 import { SortOrder } from "@/components/users/AppointmentsComponent";
+import { FetchSessionsPayloadType } from "@/types/types/sessionType";
 
 export async function joinVideoSession(payload: { sessionId: string }) {
   const { user, token } = store.getState().Auth;
@@ -69,6 +70,16 @@ export async function fetchAppointments(payload: {
   const { token, user } = store.getState().Auth;
   const response = await axiosinstance.get(
     `/api/${user?.role}/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&consultationType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function fetchSessions(payload: FetchSessionsPayloadType) {
+  const { search, limit, page, sortBy, sortOrder, status, type } = payload;
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/${user?.role}/profile/sessions?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}&consultation_type=${type}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

@@ -150,25 +150,6 @@ export async function confirmAppointment(payload: {
   return response.data;
 }
 
-export async function fetchSessionsforLawyers(payload: {
-  search: string;
-  status: string;
-  sort: string;
-  order: "asc" | "desc";
-  consultation_type: string;
-  page: number;
-  limit: number;
-}) {
-  const { token } = store.getState().Auth;
-  const { consultation_type, limit, order, page, search, sort, status } =
-    payload;
-  const response = await axiosinstance.get(
-    `/api/lawyer/profile/sessions?search=${search}&sort=${sort}&status=${status}&consultation_type=${consultation_type}&limit=${limit}&order=${order}&page=${page}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  return response.data;
-}
-
 export async function cancelSessionByLawyer(payload: { id: string }) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.patch(
