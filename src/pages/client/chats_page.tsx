@@ -90,6 +90,9 @@ function ChatsPage() {
     const isCurrentUserClient =
       selectedSessionRef.current?.participants?.client_id === currentUserId;
     const s = socket.current;
+    if (!s.connected) {
+      s.connect();
+    }
     s.emit(
       SocketEvents.CHANGE_CHAT_NAME_EVENT,
       {
@@ -138,6 +141,9 @@ function ChatsPage() {
     }
     const s = socket.current;
     if (!s) return;
+    if (!s.connected) {
+      s.connect();
+    }
     console.log("events listening...");
     s.on(SocketEvents.CONNECTED_EVENT, onConnect);
     s.on(SocketEvents.DISCONNECT_EVENT, onDisconnect);
@@ -365,6 +371,9 @@ function ChatsPage() {
     if (!document && !content.trim()) return;
     const s = socket.current;
     if (!s) return;
+    if (!s.connected) {
+      s.connect();
+    }
     const partnerId =
       selectedSessionRef.current.participants.lawyer_id === currentUserId
         ? selectedSessionRef.current.participants.client_id
@@ -444,12 +453,18 @@ function ChatsPage() {
   const handleDeleteMessage = async (messageId: string, sessionId: string) => {
     const s = socket.current;
     if (!s || !selectedSessionRef.current) return;
+    if (!s.connected) {
+      s.connect();
+    }
     s.emit(SocketEvents.MESSAGE_DELETE_EVENT, { messageId, sessionId });
   };
 
   const handleReportMessage = async (messageId: string, reason: string) => {
     const s = socket.current;
     if (!s || !selectedSession) return;
+    if (!s.connected) {
+      s.connect();
+    }
     // console.log("reason", reason);
     s.emit(
       SocketEvents.REPORT_MESSAGE,
