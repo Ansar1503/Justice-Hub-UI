@@ -45,41 +45,44 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       });
     });
     s.on(SocketEvents.NOTIFICATION_RECEIVED, (data: NotificationType) => {
-      
-      if (Notification.permission === "granted") {
-        showNotification();
-      } else if (Notification.permission === "default") {
-        Notification.requestPermission().then((permission) => {
-          if (permission === "granted") {
-            showNotification();
-          } else if (permission === "denied") {
-            toast.info("Please enable notifications in your browser settings.");
-          }
-        });
-      } else {
-        toast.info(
-          "Notifications are blocked. Please allow them in your browser."
-        );
-      }
-
-      function showNotification() {
-        const notifi = new Notification(data?.title, {
-          body: data.message,
-        });
-        notifi.onclick = async () => {
-          window.focus();
-          const result = await JoinSessionMutation({
-            sessionId: data?.sessionId || "",
+      if (data.type === "session") {
+        if (Notification.permission === "granted") {
+          showNotification();
+        } else if (Notification.permission === "default") {
+          Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              showNotification();
+            } else if (permission === "denied") {
+              toast.info(
+                "Please enable notifications in your browser settings."
+              );
+            }
           });
-          dispatch(
-            setZcState({
-              AppId: Number(result.zc.appId),
-              roomId: String(result.room_id),
-              token: result.zc.token,
-            })
+        } else {
+          toast.info(
+            "Notifications are blocked. Please allow them in your browser."
           );
-          navigate(`/client/session/join/${data?.sessionId}`);
-        };
+        }
+
+        function showNotification() {
+          const notifi = new Notification(data?.title, {
+            body: data.message,
+          });
+          notifi.onclick = async () => {
+            window.focus();
+            const result = await JoinSessionMutation({
+              sessionId: data?.sessionId || "",
+            });
+            dispatch(
+              setZcState({
+                AppId: Number(result.zc.appId),
+                roomId: String(result.room_id),
+                token: result.zc.token,
+              })
+            );
+            navigate(`/client/session/join/${data?.sessionId}`);
+          };
+        }
       }
     });
     return () => {
