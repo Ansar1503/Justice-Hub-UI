@@ -84,3 +84,17 @@ export async function fetchSessions(payload: FetchSessionsPayloadType) {
   );
   return response.data;
 }
+
+export async function updateNotificationStatus(payload: {
+  id: string;
+  status: boolean;
+}) {
+  const { token, user } = store.getState().Auth;
+  const { id, status } = payload;
+  const response = await axiosinstance.patch(
+    `/api/${user?.role}/notification/${id}/status`,
+    { status },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
