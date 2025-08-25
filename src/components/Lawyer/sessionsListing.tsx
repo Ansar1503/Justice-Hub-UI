@@ -19,6 +19,7 @@ import { store } from "@/store/redux/store";
 import { useAppDispatch } from "@/store/redux/Hook";
 import { setZcState } from "@/store/redux/zc/zcSlice";
 import { useFetchSessions } from "@/store/tanstack/queries";
+import { SocketEvents } from "@/types/enums/socket";
 
 export type SessionStatus =
   | "all"
@@ -203,15 +204,15 @@ export default function SessionsListing() {
         console.warn("Socket not yet connected. Waiting...");
         socket.connect();
         socket.once("connect", () => {
-          console.log("Connected after delay, emitting...");
-          socket.emit("NOTIFICATION_SEND", notificationData);
+          // console.log("Connected after delay, emitting...");
+          socket.emit(SocketEvents.NOTIFICATION_SEND, notificationData);
         });
       } else {
-        socket.emit("NOTIFICATION_SEND", notificationData);
+        socket.emit(SocketEvents.NOTIFICATION_SEND, notificationData);
       }
 
       if (data?.room_id) {
-        console.log("data.roomid is available", data?.room_id);
+        // console.log("data.roomid is available", data?.room_id);
         navigate(`/lawyer/session/join/${session?._id}`);
         setSelectedSession(session);
       }
