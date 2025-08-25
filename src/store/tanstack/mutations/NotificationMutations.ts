@@ -7,6 +7,7 @@ export function UpdateReadNotification() {
   return useMutation<NotificationType, Error, { id: string; status: boolean }>({
     mutationFn: (payload) => updateNotificationStatus(payload),
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["notification"] });
       console.log(data);
     },
     onError: (err) => {
