@@ -41,7 +41,7 @@ export function useInfiniteFetchReviews(user_id: string) {
   });
 }
 
-export function useInfiniteFetchAllNotifications() {
+export function useInfiniteFetchAllNotifications(enabled: boolean) {
   const { user } = store.getState().Auth;
   return useInfiniteQuery<
     { data: NotificationType; nextCursor?: number },
@@ -51,5 +51,9 @@ export function useInfiniteFetchAllNotifications() {
     initialPageParam: 1,
     queryFn: ({ pageParam }) => fetchAllNotifications(pageParam),
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
+    enabled: user?.user_id && enabled ? true : false,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retryDelay: 30000,
   });
 }

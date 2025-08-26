@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "./ui/button";
@@ -7,10 +5,14 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@radix-ui/react-popover";
+} from "@/components/ui/popover";
 import { ScrollArea } from "./ui/scroll-area";
 import { Badge } from "./ui/badge";
 import { useInfiniteFetchAllNotifications } from "@/store/tanstack/infiniteQuery";
+import { useAppDispatch } from "@/store/redux/Hook";
+import { useJoinSession } from "@/store/tanstack/mutations/sessionMutation";
+import { setZcState } from "@/store/redux/zc/zcSlice";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   onMarkAsRead?: (id: string) => void;
@@ -22,7 +24,10 @@ export default function NotificationComponent({
   onMarkAllAsRead,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: notificationsData } = useInfiniteFetchAllNotifications();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { mutateAsync: JoinSessionMutation } = useJoinSession();
+  const { data: notificationsData } = useInfiniteFetchAllNotifications(isOpen);
   console.log(notificationsData);
   const unreadCount = notificationsData?.pages?.filter(
     (n) => !n?.data?.isRead
@@ -66,7 +71,10 @@ export default function NotificationComponent({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
+      <PopoverContent
+        className="w-80 p-0 dark:bg-black border bg-white shadow-lg z-50"
+        align="end"
+      >
         <div className="p-4 border-b">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Notifications</h3>
@@ -82,53 +90,73 @@ export default function NotificationComponent({
             )}
           </div>
         </div>
-        <ScrollArea className="h-80">
+        <ScrollArea className="h-80 ">
           {notifications && notifications.length === 0 ? (
-            <div className="p-4 text-center text-muted-foreground">
+            <div className="p-4 text-center text-muted-foreground ">
               No notifications yet
             </div>
           ) : (
-            <div className="divide-y">
+            <div className="divide-y bg-dark">
               {notifications &&
-                notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-4 hover:bg-muted/50 cursor-pointer transition-colors ${
-                      !notification.isRead ? "bg-blue-50/50" : ""
-                    }`}
-                    onClick={() => onMarkAsRead?.(notification.id)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="text-lg">
-                        {getNotificationIcon(notification.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm truncate">
-                            {notification.title}
-                          </p>
-                          {!notification.isRead && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-                          )}
+                notifications.map((notification, i) => (
+                  <>
+                    <div
+                      key={notification.id}
+                      className={`p-4 hover:bg-muted/50 cursor-pointer 
+                      `}
+                      onClick={async () => {
+                        onMarkAsRead?.(notification.id);
+                        if (notification.roomId) {
+                          const data = await JoinSessionMutation({
+                            sessionId: notification?.sessionId || "",
+                          });
+                          dispatch(
+                            setZcState({
+                              AppId: data?.zc?.appId,
+                              roomId: String(data?.room_id),
+                              token: data?.zc?.token,
+                            })
+                          );
+                          navigate(
+                            `/client/session/join/${notification?.sessionId}`
+                          );
+                        }
+                      }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-lg">
+                          {getNotificationIcon(notification.type)}
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                          {notification.message}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                          <span className="capitalize">
-                            {notification.type}
-                          </span>
-                          {notification.roomId && (
-                            <span>• Room: {notification.roomId}</span>
-                          )}
-                          {notification.sessionId && (
-                            <span>• Session: {notification.sessionId}</span>
-                          )}
-                          <span>• {formatTime(notification.createdAt)}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-sm truncate">
+                              {notification.title}
+                            </p>
+                            {!notification.isRead && (
+                              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                            {notification.message}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                            <span className="capitalize">
+                              {notification.type}
+                            </span>
+                            {notification.sessionId && (
+                              <span>{notification.sessionId.slice(0, 8)}</span>
+                            )}
+                            <span>• {formatTime(notification.createdAt)}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                    {i === notifications.length - 1 && (
+                      <div className="flex items-center justify-center mt-4">
+                        <Button variant={"link"}>view More</Button>
+                      </div>
+                    )}
+                  </>
                 ))}
             </div>
           )}

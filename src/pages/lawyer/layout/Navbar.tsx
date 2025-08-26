@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { lazy, useContext, useState } from "react";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { VscLaw } from "react-icons/vsc";
 import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
@@ -11,7 +11,9 @@ import { signOut } from "@/store/redux/auth/Auth.Slice";
 import { motion } from "framer-motion";
 import { Bell, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import NotificationComponent from "@/components/NotificationComponent";
+const NotificationComponent = lazy(
+  () => import("@/components/NotificationComponent")
+);
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
