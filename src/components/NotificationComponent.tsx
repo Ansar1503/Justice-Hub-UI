@@ -28,7 +28,6 @@ export default function NotificationComponent({
   const navigate = useNavigate();
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { data: notificationsData } = useInfiniteFetchAllNotifications(isOpen);
-  console.log(notificationsData);
   const unreadCount = notificationsData?.pages?.filter(
     (n) => !n?.data?.isRead
   )?.length;
@@ -99,9 +98,8 @@ export default function NotificationComponent({
             <div className="divide-y bg-dark">
               {notifications &&
                 notifications.map((notification, i) => (
-                  <>
+                  <div key={notification.id}>
                     <div
-                      key={notification.id}
                       className={`p-4 hover:bg-muted/50 cursor-pointer 
                       `}
                       onClick={async () => {
@@ -156,7 +154,7 @@ export default function NotificationComponent({
                         <Button variant={"link"}>view More</Button>
                       </div>
                     )}
-                  </>
+                  </div>
                 ))}
             </div>
           )}
