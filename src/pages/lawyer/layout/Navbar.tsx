@@ -12,7 +12,7 @@ import { motion } from "framer-motion";
 import { Bell, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 const NotificationComponent = lazy(
-  () => import("@/components/NotificationComponent")
+  () => import("@/components/NotificationPopover")
 );
 
 function Navbar() {
@@ -37,7 +37,9 @@ function Navbar() {
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
   };
+  function handleMarkAsRead(id: string) {}
 
+  function handleMarkAllAsRead() {}
   return (
     <>
       <nav
@@ -80,7 +82,10 @@ function Navbar() {
             <div className="hidden md:flex gap-4 items-center">
               {user?.name ? (
                 <div className="flex items-center gap-3">
-                  <NotificationComponent />
+                  <NotificationComponent
+                    onMarkAllAsRead={handleMarkAllAsRead}
+                    onMarkAsRead={handleMarkAsRead}
+                  />
 
                   <div className="relative">
                     <button

@@ -9,7 +9,7 @@ import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 // import { LogOut } from "@/store/redux/client/ClientSlice";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
-import NotificationComponent from "@/components/NotificationComponent";
+import NotificationComponent from "@/components/NotificationPopover";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -28,7 +28,9 @@ function Navbar() {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+  function handleMarkAsRead(id: string) {}
 
+  function handleMarkAllAsRead() {}
   return (
     <nav
       className={`p-4 transition-all duration-300 ${
@@ -67,7 +69,10 @@ function Navbar() {
           <div className="hidden md:flex gap-4 items-center">
             {user?.name ? (
               <div className="flex items-center gap-3">
-                <NotificationComponent />
+                <NotificationComponent
+                  onMarkAllAsRead={handleMarkAllAsRead}
+                  onMarkAsRead={handleMarkAsRead}
+                />
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}
