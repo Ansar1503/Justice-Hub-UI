@@ -30,12 +30,13 @@ export default function NotificationComponent({
   const navigate = useNavigate();
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { data: notificationsData } = useInfiniteFetchAllNotifications(isOpen);
-  const unreadCount = notificationsData?.pages?.filter(
-    (n) => !n?.data?.isRead
-  )?.length;
+
   const notifications = notificationsData?.pages?.flatMap(
     (page) => page?.data ?? []
   );
+  const unreadCount = notifications?.filter(
+    (notification) => !notification.isRead
+  ).length;
   const formatTime = (dateString?: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
