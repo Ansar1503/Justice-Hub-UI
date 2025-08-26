@@ -37,9 +37,7 @@ function Navbar() {
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
   };
-  function handleMarkAsRead(id: string) {}
 
-  function handleMarkAllAsRead() {}
   return (
     <>
       <nav
@@ -82,10 +80,7 @@ function Navbar() {
             <div className="hidden md:flex gap-4 items-center">
               {user?.name ? (
                 <div className="flex items-center gap-3">
-                  <NotificationComponent
-                    onMarkAllAsRead={handleMarkAllAsRead}
-                    onMarkAsRead={handleMarkAsRead}
-                  />
+                  <NotificationComponent />
 
                   <div className="relative">
                     <button

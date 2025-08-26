@@ -28,9 +28,7 @@ function Navbar() {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-  function handleMarkAsRead(id: string) {}
 
-  function handleMarkAllAsRead() {}
   return (
     <nav
       className={`p-4 transition-all duration-300 ${
@@ -69,10 +67,7 @@ function Navbar() {
           <div className="hidden md:flex gap-4 items-center">
             {user?.name ? (
               <div className="flex items-center gap-3">
-                <NotificationComponent
-                  onMarkAllAsRead={handleMarkAllAsRead}
-                  onMarkAsRead={handleMarkAsRead}
-                />
+                <NotificationComponent />
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}

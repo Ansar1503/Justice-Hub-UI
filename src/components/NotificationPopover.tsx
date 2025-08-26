@@ -14,23 +14,16 @@ import { useJoinSession } from "@/store/tanstack/mutations/sessionMutation";
 import { setZcState } from "@/store/redux/zc/zcSlice";
 import { useNavigate } from "react-router-dom";
 import NotificationModal from "./NotificationModal";
+import { useUpdateReadNotification } from "@/store/tanstack/mutations/NotificationMutations";
 
-type Props = {
-  onMarkAsRead?: (id: string) => void;
-  onMarkAllAsRead?: () => void;
-};
-
-export default function NotificationComponent({
-  onMarkAsRead,
-  onMarkAllAsRead,
-}: Props) {
+export default function NotificationComponent() {
   const [isOpen, setIsOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { data: notificationsData } = useInfiniteFetchAllNotifications(isOpen);
-
+  const { mutateAsync: MarkAsRead } = useUpdateReadNotification();
   const notifications = notificationsData?.pages?.flatMap(
     (page) => page?.data ?? []
   );
@@ -85,7 +78,7 @@ export default function NotificationComponent({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onMarkAllAsRead}
+                  // onClick={}
                   className="text-xs"
                 >
                   Mark all read
@@ -104,10 +97,16 @@ export default function NotificationComponent({
                   notifications.map((notification, i) => (
                     <div key={notification.id}>
                       <div
-                        className={`p-4 hover:bg-muted/50 cursor-pointer 
-                      `}
+                        className={`p-4 cursor-pointer transition-colors duration-200 ${
+                          notification.isRead
+                            ? "bg-background hover:bg-muted/30"
+                            : "bg-accent/20 hover:bg-accent/40 border-l-2 border-l-primary/50"
+                        }`}
                         onClick={async () => {
-                          onMarkAsRead?.(notification.id);
+                          await MarkAsRead({
+                            id: notification.id,
+                            status: true,
+                          });
                           if (notification.roomId) {
                             const data = await JoinSessionMutation({
                               sessionId: notification?.sessionId || "",
