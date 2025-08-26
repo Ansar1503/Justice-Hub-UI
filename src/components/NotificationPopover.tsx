@@ -15,6 +15,7 @@ import { setZcState } from "@/store/redux/zc/zcSlice";
 import { useNavigate } from "react-router-dom";
 import NotificationModal from "./NotificationModal";
 import { useUpdateReadNotification } from "@/store/tanstack/mutations/NotificationMutations";
+import { NotificationType } from "@/types/types/Notification";
 
 export default function NotificationComponent() {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +47,25 @@ export default function NotificationComponent() {
   const getNotificationIcon = (type: "message" | "session") => {
     return type === "message" ? "💬" : "🎯";
   };
+  async function handleNotificationClick(notification: NotificationType) {
+    await MarkAsRead({
+      id: notification.id,
+      status: true,
+    });
+    if (notification.roomId) {
+      const data = await JoinSessionMutation({
+        sessionId: notification?.sessionId || "",
+      });
+      dispatch(
+        setZcState({
+          AppId: data?.zc?.appId,
+          roomId: String(data?.room_id),
+          token: data?.zc?.token,
+        })
+      );
+      navigate(`/client/session/join/${notification?.sessionId}`);
+    }
+  }
 
   return (
     <>
@@ -103,25 +123,7 @@ export default function NotificationComponent() {
                             : "bg-accent/20 hover:bg-accent/40 border-l-2 border-l-primary/50"
                         }`}
                         onClick={async () => {
-                          await MarkAsRead({
-                            id: notification.id,
-                            status: true,
-                          });
-                          if (notification.roomId) {
-                            const data = await JoinSessionMutation({
-                              sessionId: notification?.sessionId || "",
-                            });
-                            dispatch(
-                              setZcState({
-                                AppId: data?.zc?.appId,
-                                roomId: String(data?.room_id),
-                                token: data?.zc?.token,
-                              })
-                            );
-                            navigate(
-                              `/client/session/join/${notification?.sessionId}`
-                            );
-                          }
+                          handleNotificationClick(notification);
                         }}
                       >
                         <div className="flex items-start gap-3">
@@ -176,6 +178,8 @@ export default function NotificationComponent() {
       <NotificationModal
         isOpen={isNotificationModalOpen}
         onOpenChange={setIsNotificationModalOpen}
+        onMarkAsRead={handleNotificationClick}
+        
       />
     </>
   );

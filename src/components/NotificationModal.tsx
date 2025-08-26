@@ -5,11 +5,12 @@ import { Dialog, DialogContent, DialogHeader } from "./ui/dialog";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
 import { useInfiniteFetchAllNotifications } from "@/store/tanstack/infiniteQuery";
+import { NotificationType } from "@/types/types/Notification";
 
 interface NotificationModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onMarkAsRead?: (id: string) => void;
+  onMarkAsRead?: (notification: NotificationType) => void;
   onMarkAllAsRead?: () => void;
 }
 
@@ -92,7 +93,9 @@ export default function NotificationModal({
                   className={`p-4 hover:bg-muted/50 cursor-pointer transition-colors ${
                     !notification.isRead ? "bg-muted/20" : ""
                   }`}
-                  onClick={() => onMarkAsRead?.(notification.id)}
+                  onClick={async () => {
+                    onMarkAsRead?.(notification);
+                  }}
                 >
                   <div className="flex items-start gap-3">
                     <div className="text-lg">
