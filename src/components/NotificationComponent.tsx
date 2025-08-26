@@ -10,23 +10,31 @@ import {
 } from "@radix-ui/react-popover";
 import { ScrollArea } from "./ui/scroll-area";
 import { Badge } from "./ui/badge";
-import { NotificationType } from "@/types/types/Notification";
+import { useInfiniteFetchAllNotifications } from "@/store/tanstack/infiniteQuery";
 
 type Props = {
-  notifications?: NotificationType[];
   onMarkAsRead?: (id: string) => void;
   onMarkAllAsRead?: () => void;
 };
 
 export default function NotificationComponent({
-  notifications = [],
   onMarkAsRead,
   onMarkAllAsRead,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-
+  const {
+    data: notificationsData,
+    hasNextPage: hasNextNotifications,
+    isFetchingNextPage: isfetchingNextNotifications,
+    fetchNextPage: fetchNextNotifications,
+  } = useInfiniteFetchAllNotifications();
+console.log(notificationsData)
+  const unreadCount = notificationsData?.pages?.filter(
+    (n) => !n?.data?.isRead
+  )?.length;
+  const notifications = notificationsData?.pages?.flatMap(
+    (page) => page?.data ?? []
+  );
   const formatTime = (dateString?: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -53,7 +61,7 @@ export default function NotificationComponent({
           className="relative p-2 hover:bg-white hover:bg-opacity-20 transition-all duration-200"
         >
           <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
+          {unreadCount && unreadCount > 0 && (
             <Badge
               variant="destructive"
               className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
@@ -67,7 +75,7 @@ export default function NotificationComponent({
         <div className="p-4 border-b">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Notifications</h3>
-            {unreadCount > 0 && (
+            {unreadCount && unreadCount > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -80,50 +88,53 @@ export default function NotificationComponent({
           </div>
         </div>
         <ScrollArea className="h-80">
-          {notifications.length === 0 ? (
+          {notifications && notifications.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
               No notifications yet
             </div>
           ) : (
             <div className="divide-y">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`p-4 hover:bg-muted/50 cursor-pointer transition-colors ${
-                    !notification.isRead ? "bg-blue-50/50" : ""
-                  }`}
-                  onClick={() => onMarkAsRead?.(notification.id)}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="text-lg">
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-sm truncate">
-                          {notification.title}
-                        </p>
-                        {!notification.isRead && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-                        )}
+              {notifications &&
+                notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`p-4 hover:bg-muted/50 cursor-pointer transition-colors ${
+                      !notification.isRead ? "bg-blue-50/50" : ""
+                    }`}
+                    onClick={() => onMarkAsRead?.(notification.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="text-lg">
+                        {getNotificationIcon(notification.type)}
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {notification.message}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                        <span className="capitalize">{notification.type}</span>
-                        {notification.roomId && (
-                          <span>• Room: {notification.roomId}</span>
-                        )}
-                        {notification.sessionId && (
-                          <span>• Session: {notification.sessionId}</span>
-                        )}
-                        <span>• {formatTime(notification.createdAt)}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm truncate">
+                            {notification.title}
+                          </p>
+                          {!notification.isRead && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                          {notification.message}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                          <span className="capitalize">
+                            {notification.type}
+                          </span>
+                          {notification.roomId && (
+                            <span>• Room: {notification.roomId}</span>
+                          )}
+                          {notification.sessionId && (
+                            <span>• Session: {notification.sessionId}</span>
+                          )}
+                          <span>• {formatTime(notification.createdAt)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </ScrollArea>

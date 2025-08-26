@@ -98,3 +98,24 @@ export async function updateNotificationStatus(payload: {
   );
   return response.data;
 }
+
+export async function fetchReviews(pageParam: any, lawyer_id: string) {
+  // console.log("lawyerId", lawyer_id, "cursort", pageParam);
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/client/lawyers/reviews/${lawyer_id}?cursor=${pageParam}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function fetchAllNotifications(pageParams: any) {
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/${user?.role}/notifications?cursor=${pageParams}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}

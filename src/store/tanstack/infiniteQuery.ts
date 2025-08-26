@@ -1,8 +1,10 @@
+import { NotificationType } from "@/types/types/Notification";
 import {
   fetchChatMessages,
   fetchChatsForClientApi,
   fetchReviews,
 } from "@/utils/api/services/clientServices";
+import { fetchAllNotifications } from "@/utils/api/services/commonServices";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export function useInfiniteFetchChatforClient(search: string) {
@@ -35,5 +37,17 @@ export function useInfiniteFetchReviews(user_id: string) {
     queryFn: ({ pageParam }) => fetchReviews(pageParam, user_id),
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
     enabled: user_id ? true : false,
+  });
+}
+
+export function useInfiniteFetchAllNotifications() {
+  return useInfiniteQuery<
+    { data: NotificationType; nextCursor?: number },
+    Error
+  >({
+    queryKey: ["notifications"],
+    initialPageParam: 1,
+    queryFn: fetchAllNotifications,
+    getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
   });
 }
