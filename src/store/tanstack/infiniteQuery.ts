@@ -6,6 +6,7 @@ import {
 } from "@/utils/api/services/clientServices";
 import { fetchAllNotifications } from "@/utils/api/services/commonServices";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { store } from "../redux/store";
 
 export function useInfiniteFetchChatforClient(search: string) {
   return useInfiniteQuery({
@@ -41,13 +42,14 @@ export function useInfiniteFetchReviews(user_id: string) {
 }
 
 export function useInfiniteFetchAllNotifications() {
+  const { user } = store.getState().Auth;
   return useInfiniteQuery<
     { data: NotificationType; nextCursor?: number },
     Error
   >({
-    queryKey: ["notifications"],
+    queryKey: ["notifications", user?.user_id],
     initialPageParam: 1,
-    queryFn: fetchAllNotifications,
+    queryFn: ({ pageParam }) => fetchAllNotifications(pageParam),
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
   });
 }

@@ -111,10 +111,10 @@ export async function fetchReviews(pageParam: any, lawyer_id: string) {
   return response.data;
 }
 
-export async function fetchAllNotifications(pageParams: any) {
+export async function fetchAllNotifications(pageParam: any) {
   const { token, user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/${user?.role}/notifications?cursor=${pageParams}`,
+    `/api/${user?.role}/notifications?cursor=${pageParam}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
