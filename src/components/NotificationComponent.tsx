@@ -22,13 +22,8 @@ export default function NotificationComponent({
   onMarkAllAsRead,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    data: notificationsData,
-    hasNextPage: hasNextNotifications,
-    isFetchingNextPage: isfetchingNextNotifications,
-    fetchNextPage: fetchNextNotifications,
-  } = useInfiniteFetchAllNotifications();
-console.log(notificationsData)
+  const { data: notificationsData } = useInfiniteFetchAllNotifications();
+  console.log(notificationsData);
   const unreadCount = notificationsData?.pages?.filter(
     (n) => !n?.data?.isRead
   )?.length;
