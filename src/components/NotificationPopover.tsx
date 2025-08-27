@@ -27,7 +27,7 @@ export default function NotificationComponent() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
-  const { data: notificationsData } = useInfiniteFetchAllNotifications(isOpen);
+  const { data: notificationsData } = useInfiniteFetchAllNotifications(true);
   const { mutateAsync: MarkAsRead } = useUpdateReadNotification();
   const { mutateAsync: MarkAllAsRead } = useUpdateMarkAllAsRead();
   const notifications = notificationsData?.pages?.flatMap(
