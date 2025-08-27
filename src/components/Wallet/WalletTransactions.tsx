@@ -1,0 +1,103 @@
+import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import type { Transaction } from "./Wallet";
+
+interface TransactionTableProps {
+  transactions: Transaction[];
+}
+
+export function TransactionTable({ transactions }: TransactionTableProps) {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
+
+  return (
+    <Card className="rounded-2xl shadow-md">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold">
+          Recent Transactions
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <ScrollArea className="h-[400px]">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[140px]">Date & Time</TableHead>
+                <TableHead className="w-[100px]">Type</TableHead>
+                <TableHead className="w-[120px] text-right">Amount</TableHead>
+                <TableHead>Description</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {transactions.map((transaction) => (
+                <TableRow key={transaction.id}>
+                  <TableCell className="font-medium text-sm">
+                    {formatDate(transaction.date)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        transaction.type === "credit" ? "default" : "secondary"
+                      }
+                      className={`flex items-center gap-1 w-fit ${
+                        transaction.type === "credit"
+                          ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400"
+                          : "bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400"
+                      }`}
+                    >
+                      {transaction.type === "credit" ? (
+                        <ArrowUpRight className="h-3 w-3" />
+                      ) : (
+                        <ArrowDownLeft className="h-3 w-3" />
+                      )}
+                      {transaction.type === "credit" ? "Credit" : "Debit"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell
+                    className={`text-right font-semibold ${
+                      transaction.type === "credit"
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {transaction.type === "credit" ? "+" : "-"}
+                    {formatCurrency(transaction.amount)}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {transaction.description}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  );
+}
