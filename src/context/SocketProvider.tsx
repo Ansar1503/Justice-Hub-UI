@@ -1,3 +1,4 @@
+import SessionNotificationAlert from "@/components/SessionNotificationAlert";
 import { useAppDispatch } from "@/store/redux/Hook";
 import { RootState } from "@/store/redux/store";
 import { setZcState } from "@/store/redux/zc/zcSlice";
@@ -14,15 +15,19 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 
 // context/SocketContext.tsx
-export const SocketContext = createContext<Socket | null>(null);
 
+export const SocketContext = createContext<Socket | null>(null);
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [notificationData, setNotificationData] =
+    useState<NotificationType | null>(null);
+  const [isNotificationAlertOpen, setIsNotificationAlertOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { token, user } = useSelector((state: RootState) => state.Auth);
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
+
   useEffect(() => {
     if (!token) return;
     const s = getSocket(token);
@@ -47,6 +52,8 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       });
     });
     s.on(SocketEvents.NOTIFICATION_RECEIVED, (data: NotificationType) => {
+      setNotificationData(data);
+      setIsNotificationAlertOpen(true);
       queryClient.invalidateQueries({
         queryKey: ["notifications", user?.user_id],
       });
@@ -75,17 +82,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
           });
           notifi.onclick = async () => {
             window.focus();
-            const result = await JoinSessionMutation({
-              sessionId: data?.sessionId || "",
-            });
-            dispatch(
-              setZcState({
-                AppId: Number(result.zc.appId),
-                roomId: String(result.room_id),
-                token: result.zc.token,
-              })
-            );
-            navigate(`/client/session/join/${data?.sessionId}`);
+            await InitiateJoinSession(data);
           };
         }
       }
@@ -95,8 +92,31 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       s.disconnect();
     };
   }, [token]);
+  async function InitiateJoinSession(data: NotificationType) {
+    const result = await JoinSessionMutation({
+      sessionId: data?.sessionId || "",
+    });
+    dispatch(
+      setZcState({
+        AppId: Number(result.zc.appId),
+        roomId: String(result.room_id),
+        token: result.zc.token,
+      })
+    );
+    navigate(`/client/session/join/${data?.sessionId}`);
+  }
 
   return (
-    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={socket}>
+      {children}
+      {notificationData && (
+        <SessionNotificationAlert
+          handleAction={() => InitiateJoinSession(notificationData)}
+          notifcation={notificationData}
+          open={isNotificationAlertOpen}
+          setOpen={setIsNotificationAlertOpen}
+        />
+      )}
+    </SocketContext.Provider>
   );
 };
