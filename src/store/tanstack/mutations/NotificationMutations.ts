@@ -1,7 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NotificationType } from "@/types/types/Notification";
 import { store } from "@/store/redux/store";
-import { updateNotificationStatus } from "@/utils/api/services/commonServices";
+import {
+  MarkAllNotificationsAsRead,
+  updateNotificationStatus,
+} from "@/utils/api/services/commonServices";
 
 export function useUpdateReadNotification() {
   const queryClient = useQueryClient();
@@ -32,3 +35,19 @@ export function useUpdateReadNotification() {
     },
   });
 }
+
+export function useUpdateMarkAllAsRead() {
+  const queryClient = useQueryClient();
+  const { user } = store.getState().Auth;
+  const queryKey = ["notifications", user?.user_id];
+  return useMutation<NotificationType, Error>({
+    mutationFn: () => MarkAllNotificationsAsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+    onError: (err) => {
+      console.error("Failed to update notification read status:", err);
+    },
+  });
+}
+  

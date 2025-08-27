@@ -99,6 +99,15 @@ export async function updateNotificationStatus(payload: {
   return response.data;
 }
 
+export async function MarkAllNotificationsAsRead() {
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.put(
+    `/api/${user?.role}/notification/status`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 export async function fetchReviews(pageParam: any, lawyer_id: string) {
   // console.log("lawyerId", lawyer_id, "cursort", pageParam);
   const { token } = store.getState().Auth;
