@@ -18,7 +18,6 @@ interface WalletProps {
   transactions?: Transaction[];
 }
 
-// Mock transaction data
 const mockTransactions: Transaction[] = [
   {
     id: "1",
@@ -41,55 +40,6 @@ const mockTransactions: Transaction[] = [
     amount: 750,
     description: "Consultation with Advocate Smith",
   },
-  {
-    id: "4",
-    date: "2024-01-12T14:15:00Z",
-    type: "credit",
-    amount: 2000,
-    description: "Refund for Cancelled Session",
-  },
-  {
-    id: "5",
-    date: "2024-01-11T11:30:00Z",
-    type: "debit",
-    amount: 300,
-    description: "Document Review Service",
-  },
-  {
-    id: "6",
-    date: "2024-01-10T16:45:00Z",
-    type: "credit",
-    amount: 1500,
-    description: "Wallet Top-up via Card",
-  },
-  {
-    id: "7",
-    date: "2024-01-09T13:20:00Z",
-    type: "debit",
-    amount: 450,
-    description: "Legal Advice Session",
-  },
-  {
-    id: "8",
-    date: "2024-01-08T10:10:00Z",
-    type: "credit",
-    amount: 800,
-    description: "Cashback Reward",
-  },
-  {
-    id: "9",
-    date: "2024-01-07T17:30:00Z",
-    type: "debit",
-    amount: 600,
-    description: "Contract Review with Lawyer XYZ",
-  },
-  {
-    id: "10",
-    date: "2024-01-06T12:45:00Z",
-    type: "credit",
-    amount: 1200,
-    description: "Wallet Top-up via Netbanking",
-  },
 ];
 
 export function Wallet({
@@ -105,12 +55,21 @@ export function Wallet({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">My Wallet</h1>
+        <p className="text-muted-foreground">
+          Manage your funds and view transaction history
+        </p>
+      </div>
+
       <WalletCard
         balance={currentBalance}
         onAddFunds={() => setIsAddFundsOpen(true)}
       />
+
       <TransactionTable transactions={transactions} />
+
       <AddFundsDialog
         open={isAddFundsOpen}
         onOpenChange={setIsAddFundsOpen}

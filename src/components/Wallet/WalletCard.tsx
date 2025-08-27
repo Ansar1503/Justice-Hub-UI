@@ -19,7 +19,7 @@ export function WalletCard({ balance, onAddFunds }: WalletCardProps) {
   };
 
   return (
-    <Card className="relative overflow-hidden rounded-2xl shadow-md">
+    <Card className="relative overflow-hidden rounded-2xl shadow-md ">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10" />
       <CardHeader className="relative pb-2">
         <CardTitle className="flex items-center gap-2 text-lg font-semibold">

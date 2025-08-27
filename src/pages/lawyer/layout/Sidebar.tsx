@@ -1,4 +1,11 @@
-import { Calendar, Calendar1Icon, Timer, User, UserPen } from "lucide-react";
+import {
+  Calendar,
+  Calendar1Icon,
+  Timer,
+  User,
+  UserPen,
+  Wallet,
+} from "lucide-react";
 import { GoCodeReview } from "react-icons/go";
 import { useState } from "react";
 import { useAppSelector } from "@/store/redux/Hook";
@@ -33,6 +40,7 @@ export default function Sidebar() {
       label: "Reviews",
       icon: GoCodeReview,
     },
+    { path: `/${user?.role}/wallet`, label: "wallets", icon: Wallet },
   ];
 
   return (

@@ -10,6 +10,7 @@ import SessionPage from "@/pages/lawyer/Sessions";
 const Chats_page = lazy(() => import("@/pages/client/chats_page"));
 import VideoCall from "@/pages/lawyer/VideoCall";
 import ReviewPage from "@/pages/lawyer/ReviewPage";
+import WalletPage from "@/pages/lawyer/WalletPage";
 
 export default function LawyerRoutes() {
   return (
@@ -22,7 +23,9 @@ export default function LawyerRoutes() {
         <Route path="/chats/:id?" element={<Chats_page />} />
         <Route path="/reviews" element={<ReviewPage />} />
         <Route path="/session/join/:id" element={<VideoCall />} />
+        <Route path="/wallet" element={<WalletPage />} />
       </Route>
+
       <Route element={<LawyerSlotProtectRoute />}>
         <Route path="/slot-setup/:id" element={<SlotAddModal />} />
       </Route>
