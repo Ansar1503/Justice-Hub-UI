@@ -19,6 +19,7 @@ import { store } from "@/store/redux/store";
 import { useAppDispatch } from "@/store/redux/Hook";
 import { setZcState } from "@/store/redux/zc/zcSlice";
 import { useFetchSessions } from "@/store/tanstack/queries";
+import { SocketEvents } from "@/types/enums/socket";
 
 export type SessionStatus =
   | "all"
@@ -179,7 +180,7 @@ export default function SessionsListing() {
         console.warn("Socket is null");
         return;
       }
-      const data = await startSessionMutation({ sessionId: session?._id });
+      const data = await startSessionMutation({ sessionId: session?.id });
       // console.log("data", data);
       dispatch(
         setZcState({
@@ -188,31 +189,32 @@ export default function SessionsListing() {
           AppId: data?.zc?.appId,
         })
       );
-      const { date, time } = formatDateTime(session?.start_date);
+      const { date, time } = formatDateTime(new Date().toString());
       const notificationData: Omit<NotificationType, "id"> = {
         isRead: false,
         message: `Your Session has been started by the lawyer ${currentUser?.name} on ${date} at ${time} `,
-        sessionId: session?._id,
+        sessionId: session?.id,
         roomId: data?.room_id,
         recipientId: session?.client_id,
         senderId: session?.lawyer_id,
         title: "Session Started",
         type: "session",
       };
+      console.log("new ntofiication", notificationData);
       if (!socket.connected) {
         console.warn("Socket not yet connected. Waiting...");
         socket.connect();
         socket.once("connect", () => {
-          console.log("Connected after delay, emitting...");
-          socket.emit("NOTIFICATION_SEND", notificationData);
+          // console.log("Connected after delay, emitting...");
+          socket.emit(SocketEvents.NOTIFICATION_SEND, notificationData);
         });
       } else {
-        socket.emit("NOTIFICATION_SEND", notificationData);
+        socket.emit(SocketEvents.NOTIFICATION_SEND, notificationData);
       }
 
       if (data?.room_id) {
-        console.log("data.roomid is available", data?.room_id);
-        navigate(`/lawyer/session/join/${session?._id}`);
+        // console.log("data.roomid is available", data?.room_id);
+        navigate(`/lawyer/session/join/${session?.id}`);
         setSelectedSession(session);
       }
     } catch (err) {

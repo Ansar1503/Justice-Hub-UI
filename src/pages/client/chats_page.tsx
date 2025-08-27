@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import ChatList from "@/components/users/chat/ChatList";
 import Footer from "./layout/Footer";
@@ -18,6 +18,8 @@ import { disconnectSocket, getSocket } from "@/utils/socket/socket";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
 import { toast } from "react-toastify";
 import { SocketEvents } from "@/types/enums/socket";
+import { NotificationType } from "@/types/types/Notification";
+import { useParams } from "react-router-dom";
 
 function ChatsPage() {
   const [search, setSearch] = useState("");
@@ -29,7 +31,7 @@ function ChatsPage() {
   // const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
-
+  const { id } = useParams();
   const { token, user } = store.getState().Auth;
   const currentUserId = user?.user_id || "";
   const queryClient = useQueryClient();
@@ -39,6 +41,19 @@ function ChatsPage() {
 
   useEffect(() => {
     selectedSessionRef.current = selectedSession;
+    if (selectedSession) {
+      const s = socket.current;
+      if (!s) return;
+      if (!s.connected) {
+        s.connect();
+      }
+      s.emit(SocketEvents.JOIN_CHAT_EVENT, { sessionId: selectedSession._id });
+      console.log("joint emitted");
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [selectedSession._id!]: 0,
+      }));
+    }
   }, [selectedSession]);
 
   // console.log("soccetcurtent", socket.current);
@@ -71,8 +86,17 @@ function ChatsPage() {
   // console.log("chatMessagesData", chatMessageData);
   const chatMessages =
     chatMessageData?.pages.flatMap((page) => page?.data) || [];
-  const chatSessions =
-    chatSessionData?.pages.flatMap((page) => page?.data) ?? [];
+  const chatSessions = useMemo(() => {
+    return chatSessionData?.pages.flatMap((page) => page?.data) || [];
+  }, [chatSessionData]);
+
+  useEffect(() => {
+    if (!id || !chatSessions.length) return;
+    const sessionToSelect = chatSessions.find((cs) => cs._id === id);
+    if (sessionToSelect) {
+      setSelectedSession(sessionToSelect);
+    }
+  }, [id, chatSessions]);
   // console.log("chatsessions", chatSessions);
   const handleInputMessage = useCallback(() => {
     if (!socket.current || !selectedSession) return;
@@ -348,7 +372,6 @@ function ChatsPage() {
       console.log("Socket disconnected & cleaned up");
     };
   }, [token]);
-
   const handleSelectSession = (session: AggregateChatSession) => {
     // console.log("sessionselected", session);
     setSelectedSession(session);
@@ -453,6 +476,16 @@ function ChatsPage() {
         }
       }
     );
+    const notificationData: Omit<NotificationType, "id"> = {
+      isRead: false,
+      message: newMessage.content,
+      sessionId: newMessage?.session_id,
+      recipientId: newMessage?.receiverId,
+      senderId: newMessage.senderId,
+      title: "New Message Received",
+      type: "message",
+    };
+    s.emit(SocketEvents.NOTIFICATION_SEND, notificationData);
   };
 
   const handleDeleteMessage = async (messageId: string, sessionId: string) => {

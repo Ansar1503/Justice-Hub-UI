@@ -11,12 +11,13 @@ import {
   setProfileImage,
   signOut,
 } from "@/store/redux/auth/Auth.Slice";
-// import { LogOut } from "@/store/redux/client/ClientSlice";
-import { useLawyerVerification } from "@/hooks/lawyerVerificationContextHook";
 import { TriangleAlert } from "lucide-react";
+import { useContext } from "react";
+import { LawyerVerificationContext } from "@/context/LawyerVerificationContext";
 
 function ProfileCard() {
-  const { openModal } = useLawyerVerification();
+  const verificationContext = useContext(LawyerVerificationContext);
+
   const { data, isLoading } = useFetchClientData();
 
   if (!data && !isLoading) {
@@ -64,7 +65,7 @@ function ProfileCard() {
               message="Your profile is not completed, please complete your profile"
               title="Complete your Profile"
             />
-            <div className="mt-3 mr-2" onClick={openModal}>
+            <div className="mt-3 mr-2" onClick={verificationContext?.openModal}>
               <ButtonLink text="Complete Now" />
             </div>
           </div>
@@ -76,7 +77,7 @@ function ProfileCard() {
               message={`Due to ${data?.rejectReason} your lawyer verification was rejected. Please resubmit your details.`}
               title="Verification Rejected"
             />
-            <div className="mt-3 mr-3" onClick={openModal}>
+            <div className="mt-3 mr-3" onClick={verificationContext?.openModal}>
               <ButtonLink text="Resubmit" />
             </div>
           </div>

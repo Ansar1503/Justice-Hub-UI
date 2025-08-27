@@ -61,7 +61,6 @@ export function useStartSession() {
     onError: (error: any) => {
       const message =
         error.response.data || "Something went wrong please try again later!";
-      error.message = message;
       toast.error(message);
     },
   });
@@ -81,10 +80,13 @@ export function useJoinSession() {
     },
 
     onError: (error: any) => {
+      console.log("error:", error);
       const message =
-        error.response.data || "Something went wrong please try again later!";
-      error.message = message;
-      toast.error(message);
+        error.response.data?.error ||
+        "Something went wrong please try again later!";
+      if (typeof message === "string") {
+        toast.error(message);
+      }
     },
   });
 }

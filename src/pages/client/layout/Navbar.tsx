@@ -9,6 +9,7 @@ import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 // import { LogOut } from "@/store/redux/client/ClientSlice";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
+import NotificationComponent from "@/components/NotificationPopover";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -52,7 +53,9 @@ function Navbar() {
               Home
             </li>
             <li className="hover:underline cursor-pointer">Services</li>
-            <NavLink to="/client/lawyers"><li className="hover:underline cursor-pointer" >Lawyers</li></NavLink>
+            <NavLink to="/client/lawyers">
+              <li className="hover:underline cursor-pointer">Lawyers</li>
+            </NavLink>
             <li className="hover:underline cursor-pointer">Blogs</li>
             <li className="hover:underline cursor-pointer">About Us</li>
           </ul>
@@ -63,58 +66,61 @@ function Navbar() {
           {/* Desktop Buttons */}
           <div className="hidden md:flex gap-4 items-center">
             {user?.name ? (
-              <div className="relative">
-                <button
-                  onClick={toggleDropdown}
-                  className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-opacity-20 hover:bg-white transition-all duration-200"
-                >
-                  <span className="text-white text-lg font-semibold">
-                    Hello, {user?.name}!
-                  </span>
-                  <FiChevronDown
-                    className={`transition-transform duration-200 ${
-                      isDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {/* User Dropdown */}
-                {isDropdownOpen && (
-                  <div
-                    className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-10 ${
-                      theme === "dark"
-                        ? "bg-[#2D3142] text-white"
-                        : "bg-[#15355E] text-white"
-                    }`}
+              <div className="flex items-center gap-3">
+                <NotificationComponent />
+                <div className="relative">
+                  <button
+                    onClick={toggleDropdown}
+                    className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-opacity-20 hover:bg-white transition-all duration-200"
                   >
-                    <div className="px-4 py-3 border-b border-gray-700">
-                      <p className="text-sm">Signed in as</p>
-                      <p className="text-sm font-medium truncate">
-                        {user?.email || user?.name}
-                      </p>
+                    <span className="text-white text-lg font-semibold">
+                      Hello, {user?.name}!
+                    </span>
+                    <FiChevronDown
+                      className={`transition-transform duration-200 ${
+                        isDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* User Dropdown */}
+                  {isDropdownOpen && (
+                    <div
+                      className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-10 ${
+                        theme === "dark"
+                          ? "bg-[#2D3142] text-white"
+                          : "bg-[#15355E] text-white"
+                      }`}
+                    >
+                      <div className="px-4 py-3 border-b border-gray-700">
+                        <p className="text-sm">Signed in as</p>
+                        <p className="text-sm font-medium truncate">
+                          {user?.email || user?.name}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          navigate("/client");
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-white"
+                      >
+                        <FiUser className="mr-2" />
+                        Go to Profile
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          handleLogout();
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-white"
+                      >
+                        <FiLogOut className="mr-2" />
+                        Logout
+                      </button>
                     </div>
-                    <button
-                      onClick={() => {
-                        setIsDropdownOpen(false);
-                        navigate("/client");
-                      }}
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-white"
-                    >
-                      <FiUser className="mr-2" />
-                      Go to Profile
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsDropdownOpen(false);
-                        handleLogout();
-                      }}
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-white"
-                    >
-                      <FiLogOut className="mr-2" />
-                      Logout
-                    </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             ) : (
               <button

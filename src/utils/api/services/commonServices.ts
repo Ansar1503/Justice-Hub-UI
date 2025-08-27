@@ -84,3 +84,47 @@ export async function fetchSessions(payload: FetchSessionsPayloadType) {
   );
   return response.data;
 }
+
+export async function updateNotificationStatus(payload: {
+  id: string;
+  status: boolean;
+}) {
+  const { token, user } = store.getState().Auth;
+  const { id, status } = payload;
+  const response = await axiosinstance.patch(
+    `/api/${user?.role}/notification/${id}/status`,
+    { status },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function MarkAllNotificationsAsRead() {
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.put(
+    `/api/${user?.role}/notification/status`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function fetchReviews(pageParam: any, lawyer_id: string) {
+  // console.log("lawyerId", lawyer_id, "cursort", pageParam);
+  const { token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/client/lawyers/reviews/${lawyer_id}?cursor=${pageParam}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function fetchAllNotifications(pageParam: any) {
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `/api/${user?.role}/notifications?cursor=${pageParam}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
