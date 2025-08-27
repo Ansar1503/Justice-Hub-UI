@@ -180,7 +180,7 @@ export default function SessionsListing() {
         console.warn("Socket is null");
         return;
       }
-      const data = await startSessionMutation({ sessionId: session?._id });
+      const data = await startSessionMutation({ sessionId: session?.id });
       // console.log("data", data);
       dispatch(
         setZcState({
@@ -193,13 +193,14 @@ export default function SessionsListing() {
       const notificationData: Omit<NotificationType, "id"> = {
         isRead: false,
         message: `Your Session has been started by the lawyer ${currentUser?.name} on ${date} at ${time} `,
-        sessionId: session?._id,
+        sessionId: session?.id,
         roomId: data?.room_id,
         recipientId: session?.client_id,
         senderId: session?.lawyer_id,
         title: "Session Started",
         type: "session",
       };
+      console.log("new ntofiication", notificationData);
       if (!socket.connected) {
         console.warn("Socket not yet connected. Waiting...");
         socket.connect();
@@ -213,7 +214,7 @@ export default function SessionsListing() {
 
       if (data?.room_id) {
         // console.log("data.roomid is available", data?.room_id);
-        navigate(`/lawyer/session/join/${session?._id}`);
+        navigate(`/lawyer/session/join/${session?.  id}`);
         setSelectedSession(session);
       }
     } catch (err) {
