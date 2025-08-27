@@ -60,8 +60,8 @@ export function useStartSession() {
 
     onError: (error: any) => {
       const message =
-        error.response.data || "Something went wrong please try again later!";
-      error.message = message;
+        error.response.data?.error ||
+        "Something went wrong please try again later!";
       toast.error(message);
     },
   });
