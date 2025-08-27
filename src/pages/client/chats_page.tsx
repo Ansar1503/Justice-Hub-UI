@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import ChatList from "@/components/users/chat/ChatList";
 import Footer from "./layout/Footer";
@@ -32,7 +32,6 @@ function ChatsPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const { id } = useParams();
-  console.log("id: session", id);
   const { token, user } = store.getState().Auth;
   const currentUserId = user?.user_id || "";
   const queryClient = useQueryClient();
@@ -87,15 +86,17 @@ function ChatsPage() {
   // console.log("chatMessagesData", chatMessageData);
   const chatMessages =
     chatMessageData?.pages.flatMap((page) => page?.data) || [];
-  const chatSessions =
-    chatSessionData?.pages.flatMap((page) => page?.data) ?? [];
+  const chatSessions = useMemo(() => {
+    return chatSessionData?.pages.flatMap((page) => page?.data) || [];
+  }, [chatSessionData]);
+
   useEffect(() => {
-    if (id) {
-      const sessionToSelect = chatMessages.filter((cm) => cm._id === id);
-      if (!sessionToSelect) return;
-      setSelectedSession(sessionToSelect[0]);
+    if (!id || !chatSessions.length) return;
+    const sessionToSelect = chatSessions.find((cs) => cs._id === id);
+    if (sessionToSelect) {
+      setSelectedSession(sessionToSelect);
     }
-  }, [id]);
+  }, [id, chatSessions]);
   // console.log("chatsessions", chatSessions);
   const handleInputMessage = useCallback(() => {
     if (!socket.current || !selectedSession) return;
@@ -371,7 +372,6 @@ function ChatsPage() {
       console.log("Socket disconnected & cleaned up");
     };
   }, [token]);
-
   const handleSelectSession = (session: AggregateChatSession) => {
     // console.log("sessionselected", session);
     setSelectedSession(session);
