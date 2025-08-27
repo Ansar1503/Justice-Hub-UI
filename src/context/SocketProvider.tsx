@@ -6,6 +6,7 @@ import { SocketEvents } from "@/types/enums/socket";
 import { NotificationType } from "@/types/types/Notification";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
 import { getSocket } from "@/utils/socket/socket";
+import { useQueryClient } from "@tanstack/react-query";
 import { createContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -17,9 +18,10 @@ export const SocketContext = createContext<Socket | null>(null);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { token } = useSelector((state: RootState) => state.Auth);
+  const { token, user } = useSelector((state: RootState) => state.Auth);
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
   useEffect(() => {
     if (!token) return;
@@ -45,6 +47,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       });
     });
     s.on(SocketEvents.NOTIFICATION_RECEIVED, (data: NotificationType) => {
+      queryClient.invalidateQueries({
+        queryKey: ["notifications", user?.user_id],
+      });
       if (data.type === "session") {
         if (Notification.permission === "granted") {
           showNotification();
