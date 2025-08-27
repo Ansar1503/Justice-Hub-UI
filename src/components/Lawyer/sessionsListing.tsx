@@ -189,7 +189,7 @@ export default function SessionsListing() {
           AppId: data?.zc?.appId,
         })
       );
-      const { date, time } = formatDateTime(session?.start_date);
+      const { date, time } = formatDateTime(new Date().toString());
       const notificationData: Omit<NotificationType, "id"> = {
         isRead: false,
         message: `Your Session has been started by the lawyer ${currentUser?.name} on ${date} at ${time} `,
