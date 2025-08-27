@@ -76,7 +76,7 @@ export default function NotificationModal({
           <DialogDescription>
             {unreadCount > 0
               ? `${unreadCount} unread notifications`
-              : "All caught up!"}
+              : ""}
           </DialogDescription>
         </DialogHeader>
 
