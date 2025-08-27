@@ -14,7 +14,11 @@ import { useJoinSession } from "@/store/tanstack/mutations/sessionMutation";
 import { setZcState } from "@/store/redux/zc/zcSlice";
 import { useNavigate } from "react-router-dom";
 import NotificationModal from "./NotificationModal";
-import { useUpdateReadNotification } from "@/store/tanstack/mutations/NotificationMutations";
+
+import {
+  useUpdateMarkAllAsRead,
+  useUpdateReadNotification,
+} from "@/store/tanstack/mutations/NotificationMutations";
 import { NotificationType } from "@/types/types/Notification";
 
 export default function NotificationComponent() {
@@ -25,6 +29,7 @@ export default function NotificationComponent() {
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { data: notificationsData } = useInfiniteFetchAllNotifications(isOpen);
   const { mutateAsync: MarkAsRead } = useUpdateReadNotification();
+  const { mutateAsync: MarkAllAsRead } = useUpdateMarkAllAsRead();
   const notifications = notificationsData?.pages?.flatMap(
     (page) => page?.data ?? []
   );
@@ -47,6 +52,7 @@ export default function NotificationComponent() {
   const getNotificationIcon = (type: "message" | "session") => {
     return type === "message" ? "💬" : "🎯";
   };
+
   async function handleNotificationClick(notification: NotificationType) {
     await MarkAsRead({
       id: notification.id,
@@ -67,6 +73,9 @@ export default function NotificationComponent() {
     }
   }
 
+  async function handleMarkAllAsRead() {
+    await MarkAllAsRead();
+  }
   return (
     <>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -98,7 +107,7 @@ export default function NotificationComponent() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  // onClick={}
+                  onClick={handleMarkAllAsRead}
                   className="text-xs"
                 >
                   Mark all read
@@ -179,7 +188,6 @@ export default function NotificationComponent() {
         isOpen={isNotificationModalOpen}
         onOpenChange={setIsNotificationModalOpen}
         onMarkAsRead={handleNotificationClick}
-        
       />
     </>
   );
