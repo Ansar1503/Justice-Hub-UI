@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from "./ui/scroll-area";
 import { Badge } from "./ui/badge";
 import { useInfiniteFetchAllNotifications } from "@/store/tanstack/infiniteQuery";
-import { useAppDispatch } from "@/store/redux/Hook";
+import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 import { useJoinSession } from "@/store/tanstack/mutations/sessionMutation";
 import { setZcState } from "@/store/redux/zc/zcSlice";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +26,7 @@ export default function NotificationComponent() {
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.Auth);
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
   const { data: notificationsData } = useInfiniteFetchAllNotifications(true);
   const { mutateAsync: MarkAsRead } = useUpdateReadNotification();
@@ -69,7 +70,10 @@ export default function NotificationComponent() {
           token: data?.zc?.token,
         })
       );
-      navigate(`/client/session/join/${notification?.sessionId}`);
+      navigate(`/${user?.role}/session/join/${notification?.sessionId}`);
+    }
+    if (notification.type === "message") {
+      navigate(`/${user?.role}/chats/${notification.sessionId}`);
     }
   }
 
