@@ -27,7 +27,7 @@ export default function NotificationComponent() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { mutateAsync: JoinSessionMutation } = useJoinSession();
-  const { data: notificationsData } = useInfiniteFetchAllNotifications(isOpen);
+  const { data: notificationsData } = useInfiniteFetchAllNotifications(true);
   const { mutateAsync: MarkAsRead } = useUpdateReadNotification();
   const { mutateAsync: MarkAllAsRead } = useUpdateMarkAllAsRead();
   const notifications = notificationsData?.pages?.flatMap(
@@ -86,12 +86,9 @@ export default function NotificationComponent() {
             className="relative p-2 hover:bg-white hover:bg-opacity-20 transition-all duration-200"
           >
             <Bell className="h-5 w-5" />
-            {unreadCount && unreadCount > 0 && (
-              <Badge
-                variant="destructive"
-                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-              >
-                {unreadCount > 99 ? "99+" : unreadCount}
+            {Number(unreadCount) > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                {Number(unreadCount) > 99 ? "99+" : unreadCount}
               </Badge>
             )}
           </Button>
