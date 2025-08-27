@@ -18,6 +18,8 @@ import { disconnectSocket, getSocket } from "@/utils/socket/socket";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
 import { toast } from "react-toastify";
 import { SocketEvents } from "@/types/enums/socket";
+import { NotificationType } from "@/types/types/Notification";
+import { useParams } from "react-router-dom";
 
 function ChatsPage() {
   const [search, setSearch] = useState("");
@@ -29,7 +31,8 @@ function ChatsPage() {
   // const [sessionMessages, setSessionMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
-
+  const { id } = useParams();
+  console.log("id: session", id);
   const { token, user } = store.getState().Auth;
   const currentUserId = user?.user_id || "";
   const queryClient = useQueryClient();
@@ -39,6 +42,19 @@ function ChatsPage() {
 
   useEffect(() => {
     selectedSessionRef.current = selectedSession;
+    if (selectedSession) {
+      const s = socket.current;
+      if (!s) return;
+      if (!s.connected) {
+        s.connect();
+      }
+      s.emit(SocketEvents.JOIN_CHAT_EVENT, { sessionId: selectedSession._id });
+      console.log("joint emitted");
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [selectedSession._id!]: 0,
+      }));
+    }
   }, [selectedSession]);
 
   // console.log("soccetcurtent", socket.current);
@@ -73,6 +89,13 @@ function ChatsPage() {
     chatMessageData?.pages.flatMap((page) => page?.data) || [];
   const chatSessions =
     chatSessionData?.pages.flatMap((page) => page?.data) ?? [];
+  useEffect(() => {
+    if (id) {
+      const sessionToSelect = chatMessages.filter((cm) => cm._id === id);
+      if (!sessionToSelect) return;
+      setSelectedSession(sessionToSelect[0]);
+    }
+  }, [id]);
   // console.log("chatsessions", chatSessions);
   const handleInputMessage = useCallback(() => {
     if (!socket.current || !selectedSession) return;
@@ -453,6 +476,16 @@ function ChatsPage() {
         }
       }
     );
+    const notificationData: Omit<NotificationType, "id"> = {
+      isRead: false,
+      message: newMessage.content,
+      sessionId: newMessage?.session_id,
+      recipientId: newMessage?.receiverId,
+      senderId: newMessage.senderId,
+      title: "New Message Received",
+      type: "message",
+    };
+    s.emit(SocketEvents.NOTIFICATION_SEND, notificationData);
   };
 
   const handleDeleteMessage = async (messageId: string, sessionId: string) => {

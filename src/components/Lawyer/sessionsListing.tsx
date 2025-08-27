@@ -214,7 +214,7 @@ export default function SessionsListing() {
 
       if (data?.room_id) {
         // console.log("data.roomid is available", data?.room_id);
-        navigate(`/lawyer/session/join/${session?.  id}`);
+        navigate(`/lawyer/session/join/${session?.id}`);
         setSelectedSession(session);
       }
     } catch (err) {

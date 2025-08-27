@@ -19,7 +19,7 @@ export default function LawyerRoutes() {
         <Route path="/schedule" element={<LawyerSchedulePage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/sessions" element={<SessionPage />} />
-        <Route path="/chats" element={<Chats_page />} />
+        <Route path="/chats/:id?" element={<Chats_page />} />
         <Route path="/reviews" element={<ReviewPage />} />
         <Route path="/session/join/:id" element={<VideoCall />} />
       </Route>

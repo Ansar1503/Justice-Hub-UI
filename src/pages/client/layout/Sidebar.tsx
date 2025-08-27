@@ -12,8 +12,6 @@ export default function Sidebar() {
   const user = useAppSelector((state) => state.Auth.user);
   const location = useLocation();
   const path = location.pathname;
-  const pathname = path.split("/")[path.split("/").length - 1];
-
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
     {
@@ -37,7 +35,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Toggle button*/}
-      {(pathname === "chats" || window.innerWidth < 768) && (
+      {(path.includes("chats") || window.innerWidth < 768) && (
         <button
           className="fixed z-30 bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg"
           onClick={() => setIsOpen(!isOpen)}
@@ -81,7 +79,7 @@ export default function Sidebar() {
           bg-brandForm2 dark:bg-black
           md:w-1/12 w-1/2 md:min-w-64 flex-shrink-0 min-h-screen
           ${
-            isOpen || (pathname !== "chats" && window.innerWidth >= 768)
+            isOpen || (!path.includes("chats") && window.innerWidth >= 768)
               ? "fixed left-0 h-screen w-72 z-20 p-4 pt-16 overflow-y-auto top-0 md:static md:h-auto md:pt-4"
               : "fixed -left-full p-4"
           } 
