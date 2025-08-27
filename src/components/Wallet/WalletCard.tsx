@@ -14,7 +14,7 @@ export function WalletCard({ balance, onAddFunds }: WalletCardProps) {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
