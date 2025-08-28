@@ -34,10 +34,10 @@ export function WalletCard({ balance, onAddFunds }: WalletCardProps) {
           </p>
           <p className="text-sm text-muted-foreground">Available balance</p>
         </div>
-        <Button onClick={onAddFunds} className="w-full sm:w-auto" size="lg">
+        {/* <Button onClick={onAddFunds} className="w-full sm:w-auto" size="lg">
           <Plus className="mr-2 h-4 w-4" />
           Add Funds
-        </Button>
+        </Button> */}
       </CardContent>
     </Card>
   );

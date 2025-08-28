@@ -5,47 +5,18 @@ import { WalletCard } from "./WalletCard";
 import { TransactionTable } from "./WalletTransactions";
 import { AddFundsDialog } from "./AddFundsDialog";
 import { useFetchWalletByUser } from "@/store/tanstack/Queries/walletQueries";
-
-export interface Transaction {
-  id: string;
-  date: string;
-  type: "credit" | "debit";
-  amount: number;
-  description: string;
-}
+import { WalletTransactions } from "@/types/types/WalletTransactions";
 
 interface WalletProps {
-  transactions?: Transaction[];
+  transactions?: WalletTransactions[];
 }
 
-const mockTransactions: Transaction[] = [
-  {
-    id: "1",
-    date: "2024-01-15T10:30:00Z",
-    type: "debit",
-    amount: 500,
-    description: "Booking Session with Lawyer John Doe",
-  },
-  {
-    id: "2",
-    date: "2024-01-14T15:45:00Z",
-    type: "credit",
-    amount: 1000,
-    description: "Wallet Top-up via UPI",
-  },
-  {
-    id: "3",
-    date: "2024-01-13T09:20:00Z",
-    type: "debit",
-    amount: 750,
-    description: "Consultation with Advocate Smith",
-  },
-];
+const mockTransactions: WalletTransactions[] = [];
 
 export function Wallet({ transactions = mockTransactions }: WalletProps) {
   const [isAddFundsOpen, setIsAddFundsOpen] = useState(false);
   const { data: WalletData } = useFetchWalletByUser();
-  const handleAddFunds = (amount: number) => {};
+  // const handleAddFunds = (amount: number) => {};
 
   return (
     <div className="space-y-8">
@@ -63,11 +34,11 @@ export function Wallet({ transactions = mockTransactions }: WalletProps) {
 
       <TransactionTable transactions={transactions} />
 
-      <AddFundsDialog
+      {/* <AddFundsDialog
         open={isAddFundsOpen}
         onOpenChange={setIsAddFundsOpen}
         onAddFunds={handleAddFunds}
-      />
+      /> */}
     </div>
   );
 }
