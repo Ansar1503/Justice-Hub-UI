@@ -200,22 +200,23 @@ export default function ClientAppointmentDetailModal({
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-            {canConfirmOrReject && (
-              <div className="flex gap-2">
-                <Button
-                  variant="destructive"
-                  onClick={() => setShowRejectDialog(true)}
-                >
-                  Reject
-                </Button>
+
+            <div className="flex gap-2">
+              <Button
+                variant="destructive"
+                onClick={() => setShowRejectDialog(true)}
+              >
+                Reject
+              </Button>
+              {canConfirmOrReject && (
                 <Button
                   onClick={() => setShowConfirmDialog(true)}
                   className="bg-green-600 hover:bg-green-700"
                 >
                   Confirm
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

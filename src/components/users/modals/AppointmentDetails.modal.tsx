@@ -68,19 +68,8 @@ export default function AppointmentDetailModal({
   };
 
   if (!appointment) return null;
-  function checkifTimeOut() {
-    const currentDate = new Date();
-    const appointmentDate = new Date(appointment?.date);
-    const time = appointment?.time;
-    const [h, m] = time.split(":").map(Number);
-    appointmentDate.setHours(h, m, 0, 0);
-    if (currentDate > appointmentDate) {
-      return true;
-    }
-    return false;
-  }
   let canCancelAppointment = false;
-  if (appointment?.status === "pending" && !checkifTimeOut()) {
+  if (appointment?.status === "pending") {
     canCancelAppointment = true;
   }
   return (
