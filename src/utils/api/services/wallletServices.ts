@@ -14,3 +14,21 @@ export async function fetchWalletByUser() {
   );
   return response.data;
 }
+
+export async function fetchWalletTransactions(payload: { page: number }) {
+  const { user, token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    WalletRoutes.api +
+      user?.role +
+      WalletRoutes.base +
+      WalletRoutes.transactions +
+      WalletRoutes.pageQuery +
+      payload.page,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+}
