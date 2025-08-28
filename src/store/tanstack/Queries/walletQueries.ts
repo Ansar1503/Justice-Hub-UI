@@ -13,7 +13,6 @@ export function useFetchWalletByUser() {
     queryKey: ["wallet", user?.user_id],
     queryFn: () => fetchWalletByUser(),
     enabled: !!user?.user_id,
-    staleTime: 300000,
     retry: 1,
   });
 }
@@ -27,7 +26,6 @@ export function useFetchWalletTransactions(payload: { page: number }) {
     queryKey: ["wallet", "transactions", user?.user_id],
     queryFn: () => fetchWalletTransactions(payload),
     enabled: !!user?.user_id,
-    staleTime: 300000,
     retry: 1,
   });
 }
