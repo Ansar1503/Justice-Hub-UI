@@ -1,13 +1,31 @@
 import { store } from "@/store/redux/store";
+import { WalletTransactions } from "@/types/types/WalletTransactions";
 import { WalletType } from "@/types/types/WalletType";
-import { fetchWalletByUser } from "@/utils/api/services/wallletServices";
+import {
+  fetchWalletByUser,
+  fetchWalletTransactions,
+} from "@/utils/api/services/wallletServices";
 import { useQuery } from "@tanstack/react-query";
 
 export function useFetchWalletByUser() {
   const { user } = store.getState().Auth;
   return useQuery<WalletType, Error>({
-    queryKey: ["wallet", user?.role],
+    queryKey: ["wallet", user?.user_id],
     queryFn: () => fetchWalletByUser(),
+    enabled: !!user?.user_id,
+    staleTime: 300000,
+    retry: 1,
+  });
+}
+
+export function useFetchWalletTransactions(payload: { page: number }) {
+  const { user } = store.getState().Auth;
+  return useQuery<
+    { data: WalletTransactions[] | []; page: number; totalPages: number },
+    Error
+  >({
+    queryKey: ["wallet", "transactions", user?.user_id],
+    queryFn: () => fetchWalletTransactions(payload),
     enabled: !!user?.user_id,
     staleTime: 300000,
     retry: 1,
