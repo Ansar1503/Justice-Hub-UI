@@ -11,13 +11,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import PaginationComponent from "../pagination";
-import { WalletTransactions } from "@/types/types/WalletTransactions";
+import { useFetchWalletTransactions } from "@/store/tanstack/Queries/walletQueries";
+import { useState } from "react";
 
-interface TransactionTableProps {
-  transactions: WalletTransactions[];
-}
+export function TransactionTable() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data: transactionData } = useFetchWalletTransactions({
+    page: currentPage,
+  });
+  const transactions = transactionData?.data;
+  const totalPages = transactionData?.totalPages;
 
-export function TransactionTable({ transactions }: TransactionTableProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -59,7 +63,6 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                 <TableRow>
                   <TableHead>Date & Time</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Description</TableHead>
                 </TableRow>
@@ -123,11 +126,11 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
         </ScrollArea>
         <div className="p-6 pt-4 border-t">
           <PaginationComponent
-            currentPage={1}
-            handlePageChange={() => {}}
-            itemsPerPage={1}
-            totalItems={10}
-            totalPages={10}
+            currentPage={currentPage}
+            handlePageChange={setCurrentPage}
+            itemsPerPage={10}
+            totalItems={transactions?.length || 0}
+            totalPages={totalPages || 1}
           />
         </div>
       </CardContent>

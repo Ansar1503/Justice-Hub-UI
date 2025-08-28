@@ -1,20 +1,11 @@
-"use client";
-
-import { useState } from "react";
+// import { useState } from "react";
 import { WalletCard } from "./WalletCard";
 import { TransactionTable } from "./WalletTransactions";
-import { AddFundsDialog } from "./AddFundsDialog";
+// import { AddFundsDialog } from "./AddFundsDialog";
 import { useFetchWalletByUser } from "@/store/tanstack/Queries/walletQueries";
-import { WalletTransactions } from "@/types/types/WalletTransactions";
 
-interface WalletProps {
-  transactions?: WalletTransactions[];
-}
-
-const mockTransactions: WalletTransactions[] = [];
-
-export function Wallet({ transactions = mockTransactions }: WalletProps) {
-  const [isAddFundsOpen, setIsAddFundsOpen] = useState(false);
+export function Wallet() {
+  // const [isAddFundsOpen, setIsAddFundsOpen] = useState(false);
   const { data: WalletData } = useFetchWalletByUser();
   // const handleAddFunds = (amount: number) => {};
 
@@ -27,12 +18,9 @@ export function Wallet({ transactions = mockTransactions }: WalletProps) {
         </p>
       </div>
 
-      <WalletCard
-        balance={WalletData?.balance ?? 0}
-        onAddFunds={() => setIsAddFundsOpen(true)}
-      />
+      <WalletCard balance={WalletData?.balance ?? 0} />
 
-      <TransactionTable transactions={transactions} />
+      <TransactionTable />
 
       {/* <AddFundsDialog
         open={isAddFundsOpen}

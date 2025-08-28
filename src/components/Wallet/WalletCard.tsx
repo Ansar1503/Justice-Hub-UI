@@ -1,15 +1,11 @@
-"use client";
-
-import { WalletIcon, Plus } from "lucide-react";
+import { WalletIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 interface WalletCardProps {
   balance: number;
-  onAddFunds: () => void;
 }
 
-export function WalletCard({ balance, onAddFunds }: WalletCardProps) {
+export function WalletCard({ balance }: WalletCardProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
