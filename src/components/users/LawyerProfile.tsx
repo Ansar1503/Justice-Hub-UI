@@ -42,7 +42,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { loadStripe } from "@stripe/stripe-js";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 import { store } from "@/store/redux/store";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { Riple } from "react-loading-indicators";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { DialogDescription } from "@radix-ui/react-dialog";
@@ -204,9 +204,8 @@ export default function LawyerProfile() {
         sessionId,
       });
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || "Booking failed! Try again.";
-      error.message = message;
+      const message: string =
+        error.response?.data?.error || "Booking failed! Try again.";
       toast.error(message);
     } finally {
       setIsSubmitting(false);
