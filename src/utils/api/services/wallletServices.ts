@@ -1,6 +1,7 @@
 import { store } from "@/store/redux/store";
 import axiosinstance from "../axios/axios.instance";
 import { WalletRoutes } from "@/utils/constants/RouteConstants";
+import { transactionType } from "@/components/Wallet/WalletTransactions";
 
 export async function fetchWalletByUser() {
   const { token, user } = store.getState().Auth;
@@ -15,7 +16,14 @@ export async function fetchWalletByUser() {
   return response.data;
 }
 
-export async function fetchWalletTransactions(payload: { page: number }) {
+export async function fetchWalletTransactions(payload: {
+  page: number;
+  search: string;
+  limit: number;
+  type: transactionType;
+  startDate?: Date;
+  endDate?: Date;
+}) {
   const { user, token } = store.getState().Auth;
   const response = await axiosinstance.get(
     WalletRoutes.api +
@@ -23,7 +31,17 @@ export async function fetchWalletTransactions(payload: { page: number }) {
       WalletRoutes.base +
       WalletRoutes.transactions +
       WalletRoutes.pageQuery +
-      payload.page,
+      payload.page +
+      WalletRoutes.limitQuery +
+      payload.limit +
+      WalletRoutes.searchQuery +
+      payload.search +
+      WalletRoutes.typeQuery +
+      payload.type +
+      WalletRoutes.startDateQuery +
+      payload.startDate ||
+      "" + WalletRoutes.endDateQuery + payload.endDate ||
+      "",
     {
       headers: {
         Authorization: `Bearer ${token}`,

@@ -1,3 +1,4 @@
+import { transactionType } from "@/components/Wallet/WalletTransactions";
 import { store } from "@/store/redux/store";
 import { WalletTransactions } from "@/types/types/WalletTransactions";
 import { WalletType } from "@/types/types/WalletType";
@@ -17,7 +18,14 @@ export function useFetchWalletByUser() {
   });
 }
 
-export function useFetchWalletTransactions(payload: { page: number }) {
+export function useFetchWalletTransactions(payload: {
+  page: number;
+  search: string;
+  limit: number;
+  type: transactionType;
+  startDate?: Date;
+  endDate?: Date;
+}) {
   const { user } = store.getState().Auth;
   return useQuery<
     { data: WalletTransactions[] | []; page: number; totalPages: number },

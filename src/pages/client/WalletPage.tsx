@@ -10,7 +10,7 @@ export default function WalletPage() {
       <div className="flex flex-1">
         <Sidebar />
         <main className="flex-1 p-4 md:p-6 lg:p-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="px-32 py-10">
             <Wallet />
           </div>
         </main>

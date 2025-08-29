@@ -1,8 +1,8 @@
 // import { useState } from "react";
 import { WalletCard } from "./WalletCard";
-import { TransactionTable } from "./WalletTransactions";
 // import { AddFundsDialog } from "./AddFundsDialog";
 import { useFetchWalletByUser } from "@/store/tanstack/Queries/walletQueries";
+import { TransactionTable } from "./WalletTransactions";
 
 export function Wallet() {
   // const [isAddFundsOpen, setIsAddFundsOpen] = useState(false);

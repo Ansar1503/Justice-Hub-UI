@@ -1,11 +1,11 @@
-type transactionCategory =
+export type transactionCategory =
   | "deposit"
   | "withdrawal"
   | "payment"
   | "refund"
   | "transfer";
 type transactionStatus = "pending" | "completed" | "failed" | "cancelled";
-type transactionType = "debit" | "credit";
+export type transactionType = "debit" | "credit";
 
 export interface WalletTransactions {
   id: string;
