@@ -39,9 +39,9 @@ export async function fetchWalletTransactions(payload: {
       WalletRoutes.typeQuery +
       payload.type +
       WalletRoutes.startDateQuery +
-      payload.startDate ||
-      "" + WalletRoutes.endDateQuery + payload.endDate ||
-      "",
+      (payload.startDate || "") +
+      WalletRoutes.endDateQuery +
+      (payload.endDate || ""),
     {
       headers: {
         Authorization: `Bearer ${token}`,

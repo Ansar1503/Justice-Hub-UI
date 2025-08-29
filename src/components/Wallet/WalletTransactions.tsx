@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 export type transactionType = "credit" | "debit" | "All";
 
 export function TransactionTable() {
-  const [itemsPerPage, setItemsPerPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [type, setType] = useState<transactionType>("All");
   const [currentPage, setCurrentPage] = useState(1);

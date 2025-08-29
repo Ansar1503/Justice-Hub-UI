@@ -31,7 +31,7 @@ export function useFetchWalletTransactions(payload: {
     { data: WalletTransactions[] | []; page: number; totalPages: number },
     Error
   >({
-    queryKey: ["wallet", "transactions", user?.user_id],
+    queryKey: ["wallet", "transactions", user?.user_id, payload],
     queryFn: () => fetchWalletTransactions(payload),
     enabled: !!user?.user_id,
     retry: 1,
