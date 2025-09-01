@@ -313,7 +313,9 @@ export default function LawyerProfile() {
                         ) : (
                           <span>
                             {lawyerDetails?.Address
-                              ? `${lawyerDetails.Address.city}, ${lawyerDetails.Address.state}, ${lawyerDetails.Address.pincode}`
+                              ? `${lawyerDetails?.Address.city || "n/a"}, ${
+                                  lawyerDetails.Address.state || "n/a"
+                                }, ${lawyerDetails.Address.pincode || "n/a"}`
                               : "N/A"}
                           </span>
                         )}
