@@ -14,7 +14,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Link, useLocation } from "react-router-dom";
-import { useContext, ReactNode } from "react";
+import React, { useContext, ReactNode } from "react";
 import { ThemeContext } from "@/context/ThemeProvider";
 import { ThemeEnum } from "@/types/enums/theme_enum";
 import { Moon, Sun } from "lucide-react";
@@ -37,18 +37,19 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const breadcrumbs = pathSegments.map((segment, index) => {
     const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
     const isLast = index === pathSegments.length - 1;
-
     return (
-      <BreadcrumbItem key={path}>
-        {isLast ? (
-          <BreadcrumbPage>{segment}</BreadcrumbPage>
-        ) : (
-          <BreadcrumbLink asChild>
-            <Link to={path}>{segment}</Link>
-          </BreadcrumbLink>
-        )}
+      <React.Fragment key={path}>
+        <BreadcrumbItem>
+          {isLast ? (
+            <BreadcrumbPage>{segment}</BreadcrumbPage>
+          ) : (
+            <BreadcrumbLink asChild>
+              <Link to={path}>{segment}</Link>
+            </BreadcrumbLink>
+          )}
+        </BreadcrumbItem>
         {!isLast && <BreadcrumbSeparator />}
-      </BreadcrumbItem>
+      </React.Fragment>
     );
   });
 
