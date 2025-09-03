@@ -9,3 +9,15 @@ export const WalletRoutes = {
   startDateQuery: "&startDate=",
   endDateQuery: "&endDate=",
 };
+
+export const CommonQueies = {
+  api: "/api/",
+  pageQuery: "?page=",
+  limitQuery: "&limit=",
+  searchQuery: "&search=",
+  params: "/",
+};
+
+export const SpecializationRoutes = {
+  base: "/specialization",
+};

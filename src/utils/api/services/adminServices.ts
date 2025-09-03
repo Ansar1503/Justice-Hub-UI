@@ -1,6 +1,10 @@
 import { store } from "@/store/redux/store";
 import { Disputes } from "@/types/types/Disputes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
+import {
+  CommonQueies,
+  SpecializationRoutes,
+} from "@/utils/constants/RouteConstants";
 
 export async function fetchUserByRole(query: {
   role: "lawyer" | "client";
@@ -174,6 +178,37 @@ export async function updateDisputesStatus(payload: {
     `/api/admin/disputes/status/${payload.disputesId}`,
     payload,
     { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function AddorUpdateSpecialization(
+  name: string,
+  id: string | null
+) {
+  const payload = { id, name };
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    CommonQueies.api + user?.role + SpecializationRoutes.base,
+    payload,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+}
+
+export async function DeleteSpecialization(id: string) {
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.delete(
+    CommonQueies.api +
+      user?.role +
+      SpecializationRoutes.base +
+      CommonQueies.params +
+      id,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
   );
   return response.data;
 }

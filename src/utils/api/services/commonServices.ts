@@ -7,6 +7,11 @@ import {
 } from "@/components/Lawyer/appointmentsListing";
 import { SortOrder } from "@/components/users/AppointmentsComponent";
 import { FetchSessionsPayloadType } from "@/types/types/sessionType";
+import {
+  CommonQueies,
+  SpecializationRoutes,
+} from "@/utils/constants/RouteConstants";
+import { FetchSpecializationRequestPayloadType } from "@/types/types/SpecializationType";
 
 export async function joinVideoSession(payload: { sessionId: string }) {
   const { user, token } = store.getState().Auth;
@@ -124,6 +129,26 @@ export async function fetchAllNotifications(pageParam: any) {
   const { token, user } = store.getState().Auth;
   const response = await axiosinstance.get(
     `/api/${user?.role}/notifications?cursor=${pageParam}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function fetchAllSpecializations(
+  payload: FetchSpecializationRequestPayloadType
+) {
+  const { token, user } = store.getState().Auth;
+  const { limit, page, search } = payload;
+  const response = await axiosinstance.get(
+    CommonQueies.api +
+      user?.role +
+      SpecializationRoutes.base +
+      CommonQueies.pageQuery +
+      page +
+      CommonQueies.limitQuery +
+      limit +
+      CommonQueies.searchQuery +
+      search,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

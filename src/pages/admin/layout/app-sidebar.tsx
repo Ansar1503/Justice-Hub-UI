@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CalendarDaysIcon, Headset, Shield, User, Wallet } from "lucide-react";
+import { CalendarDaysIcon, Gavel, Headset, Shield, User, Wallet } from "lucide-react";
 
 import { NavMain } from "./nav-main";
 // import { NavProjects } from "@/layout/admin/nav-projects";
@@ -39,6 +39,17 @@ const navdata = {
           url: "/admin/lawyer-verification",
         },
       ],
+    },
+    {
+      title:"Lawyer Cases",
+      url:"/admin/specializations",
+      icon:Gavel,
+      items:[
+        {
+          title:"Specializations",
+          url:"/admin/specializations"
+        }
+      ]
     },
     {
       title: "Sessions Details",
