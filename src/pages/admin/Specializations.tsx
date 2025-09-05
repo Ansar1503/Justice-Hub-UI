@@ -65,9 +65,9 @@ export default function Specializations() {
     }
   }, [isDialogOpen]);
   const { mutate: DeleteSpec, isPending: deletingSpec } =
-    useDeleteSpecialization(setCurrentPage, payload);
+    useDeleteSpecialization(payload);
   const { mutate: saveSpecialization, isPending: savingSpec } =
-    useSpecializationMutation(setCurrentPage, payload, editIndex ?? "");
+    useSpecializationMutation(payload, editIndex ?? "");
   const specializations = specializationsData?.data;
   const handleSave = async () => {
     if (specError || !newSpec.trim()) {

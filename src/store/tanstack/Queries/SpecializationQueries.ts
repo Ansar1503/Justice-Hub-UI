@@ -3,7 +3,7 @@ import {
   SpecializationsResponseTypeWithPagination,
 } from "@/types/types/SpecializationType";
 import { fetchAllSpecializations } from "@/utils/api/services/commonServices";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export function useFetchAllSpecializations(
   payload: FetchSpecializationRequestPayloadType
@@ -12,7 +12,8 @@ export function useFetchAllSpecializations(
     queryKey: ["specialization", payload],
     queryFn: () => fetchAllSpecializations(payload),
     staleTime: 1000 * 60,
-    refetchInterval: false,
     enabled: Boolean(payload?.page && payload?.limit),
+    refetchInterval: false,
+    placeholderData: keepPreviousData,
   });
 }

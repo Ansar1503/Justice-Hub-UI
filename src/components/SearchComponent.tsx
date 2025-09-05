@@ -35,7 +35,8 @@ export default function SearchComponent({
         placeholder={placeholder}
         className="pl-10 bg-white/10"
         value={localValue}
-        onChange={(e) => setLocalValue(e.target.value)}
+        onChange={(e) => {
+          setLocalValue(e.target.value)}}
       />
     </div>
   );
