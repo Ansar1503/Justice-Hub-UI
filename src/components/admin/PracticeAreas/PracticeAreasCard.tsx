@@ -8,17 +8,36 @@ import {
 import { PracticeAreaForm } from "./PracticeAreasForm";
 import SearchComponent from "@/components/SearchComponent";
 import { PracticeAreasTable } from "./PracticeAreasTable";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PracticeAreaType } from "@/types/types/PracticeAreaType";
-import { SpecializationsType } from "@/types/types/SpecializationType";
+import { useFetchAllSpecializations } from "@/store/tanstack/Queries/SpecializationQueries";
 
 export default function PracticeAreasCard() {
   const [isPracticeAreaModalOpen, setIsPracticeAreaModalOpen] = useState(false);
   const [practiceAreaSearch, setPracticeAreaSearch] = useState("");
   const [editingPracticeArea, setEditingPracticeArea] =
     useState<PracticeAreaType | null>(null);
-  const specialisations: SpecializationsType[] | [] = [];
-const practiceAreas
+  const { data: SpecializationData } = useFetchAllSpecializations({
+    limit: 100,
+    page: 1,
+    search: "",
+  });
+  const specialisations = useMemo(
+    () => SpecializationData?.data || [],
+    [SpecializationData?.data]
+  );
+
+  const handleSubmit = async (
+    name: string,
+    specializationId: string,
+    editingId?: string
+  ) => {
+    if (!editingId) {
+      console.log("first");
+    } else {
+      console.log("second");
+    }
+  };
   return (
     <Card className="rounded-xl shadow-sm">
       <CardHeader>
@@ -34,7 +53,7 @@ const practiceAreas
             onOpenChange={setIsPracticeAreaModalOpen}
             editingPracticeArea={editingPracticeArea}
             specializations={specialisations}
-            onSubmit={() => {}}
+            onSubmit={handleSubmit}
             onReset={() => {}}
           />
         </div>
@@ -46,10 +65,12 @@ const practiceAreas
           setSearchTerm={setPracticeAreaSearch}
         />
         <PracticeAreasTable
-          practiceAreas={}
-          specializations={specializations}
-          onEdit={handlePracticeAreaEdit}
-          onDelete={handlePracticeAreaDelete}
+          practiceAreas={[]}
+          specializations={specialisations}
+          onEdit={(spec) => {
+            setEditingPracticeArea(spec);
+          }}
+          onDelete={() => {}}
         />
       </CardContent>
     </Card>

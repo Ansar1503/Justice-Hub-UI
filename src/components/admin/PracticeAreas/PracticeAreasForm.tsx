@@ -1,7 +1,7 @@
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -10,19 +10,29 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus } from "lucide-react"
-import { SpecializationsType } from "@/types/types/SpecializationType"
-import { PracticeAreaType } from "@/types/types/PracticeAreaType"
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus } from "lucide-react";
+import { SpecializationsType } from "@/types/types/SpecializationType";
+import { PracticeAreaType } from "@/types/types/PracticeAreaType";
 
 interface PracticeAreaFormProps {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  editingPracticeArea: PracticeAreaType | null
-  specializations: SpecializationsType[]
-  onSubmit: (name: string, specializationId: string) => void
-  onReset: () => void
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  editingPracticeArea: PracticeAreaType | null;
+  specializations: SpecializationsType[];
+  onSubmit: (
+    name: string,
+    specializationId: string,
+    editingId?: string
+  ) => void;
+  onReset: () => void;
 }
 
 export function PracticeAreaForm({
@@ -33,24 +43,26 @@ export function PracticeAreaForm({
   onSubmit,
   onReset,
 }: PracticeAreaFormProps) {
-  const [name, setName] = useState(editingPracticeArea?.name || "")
-  const [specializationId, setSpecializationId] = useState(editingPracticeArea?.specializationId || "")
+  const [name, setName] = useState(editingPracticeArea?.name || "");
+  const [specializationId, setSpecializationId] = useState(
+    editingPracticeArea?.specializationId || ""
+  );
 
   const handleSubmit = () => {
-    if (!name.trim() || !specializationId) return
-    onSubmit(name, specializationId)
-    setName("")
-    setSpecializationId("")
-  }
+    if (!name.trim() || !specializationId) return;
+    onSubmit(name, specializationId, editingPracticeArea?.id);
+    setName("");
+    setSpecializationId("");
+  };
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      setName("")
-      setSpecializationId("")
-      onReset()
+      setName("");
+      setSpecializationId("");
+      onReset();
     }
-    onOpenChange(open)
-  }
+    onOpenChange(open);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -62,9 +74,15 @@ export function PracticeAreaForm({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{editingPracticeArea ? "Edit Practice Area" : "Add New Practice Area"}</DialogTitle>
+          <DialogTitle>
+            {editingPracticeArea
+              ? "Edit Practice Area"
+              : "Add New Practice Area"}
+          </DialogTitle>
           <DialogDescription>
-            {editingPracticeArea ? "Update the practice area details." : "Create a new practice area."}
+            {editingPracticeArea
+              ? "Update the practice area details."
+              : "Create a new practice area."}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -79,7 +97,10 @@ export function PracticeAreaForm({
           </div>
           <div>
             <Label htmlFor="pa-specialization">Specialization</Label>
-            <Select value={specializationId} onValueChange={setSpecializationId}>
+            <Select
+              value={specializationId}
+              onValueChange={setSpecializationId}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select a specialization" />
               </SelectTrigger>
@@ -97,9 +118,11 @@ export function PracticeAreaForm({
           <Button variant="outline" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>{editingPracticeArea ? "Update" : "Create"}</Button>
+          <Button onClick={handleSubmit}>
+            {editingPracticeArea ? "Update" : "Create"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

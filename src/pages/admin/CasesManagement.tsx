@@ -1,6 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminLayout } from "./layout/admin.layout";
 import SpecializationsCard from "@/components/admin/specializations/SpecializationsCard";
+import PracticeAreasCard from "@/components/admin/PracticeAreas/PracticeAreasCard";
+import CaseTypeCard from "@/components/admin/CaseTypes/CaseTypeCard";
 
 export default function CaseManagement() {
   return (
@@ -28,9 +30,13 @@ export default function CaseManagement() {
               <SpecializationsCard />
             </TabsContent>
 
-            <TabsContent value="practice-areas"></TabsContent>
+            <TabsContent value="practice-areas">
+              <PracticeAreasCard />
+            </TabsContent>
 
-            <TabsContent value="case-types"></TabsContent>
+            <TabsContent value="case-types">
+              <CaseTypeCard />
+            </TabsContent>
           </Tabs>
         </div>
       </div>
