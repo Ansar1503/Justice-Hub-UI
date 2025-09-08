@@ -21,3 +21,8 @@ export const CommonQueies = {
 export const SpecializationRoutes = {
   base: "/specialization",
 };
+
+export const PracticeAreaRoutes = {
+  base: "/practicearea",
+  specIdQuery: "&specId=",
+};

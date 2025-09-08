@@ -1,6 +1,6 @@
 import { lazy } from "react";
 
-const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
+const UserManagement = lazy(() => import("@/pages/admin/UserManagement"));
 const Sessions = lazy(() => import("@/pages/admin/Sessions"));
 import { Route, Routes } from "react-router-dom";
 import { Protected } from "./wrapper/admin.protect.route";
@@ -18,7 +18,7 @@ function AdminRoutes() {
   return (
     <Routes>
       <Route element={<Protected />}>
-        <Route index element={<AdminDashboard />} />
+        <Route index element={<UserManagement />} />
         <Route path="/lawyer-verification" element={<LawyerVerfication />} />
         <Route path="/sessions" element={<Sessions />} />
         <Route path="/appointments" element={<Appointments />} />

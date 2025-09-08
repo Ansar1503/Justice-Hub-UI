@@ -5,3 +5,17 @@ export interface PracticeAreaType {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface PracticeAreaResponse {
+  totalCount: number;
+  currentPage: number;
+  totalPage: number;
+  data: PracticeAreaType[] | [];
+}
+
+export interface PracticeAreaQuery {
+  limit: number;
+  page: number;
+  search: string;
+  specId: string;
+}

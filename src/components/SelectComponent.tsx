@@ -15,6 +15,7 @@ type Props = {
   className?: string;
   onSelect: (val: string) => void;
   selectedValue?: string;
+  clearable?: boolean;
 };
 
 export function SelectComponent({
@@ -24,20 +25,33 @@ export function SelectComponent({
   placeholder = "Select an option",
   values,
   selectedValue,
+  clearable = false,
 }: Props) {
   return (
-    <Select onValueChange={onSelect} value={selectedValue}>
+    <Select
+      onValueChange={(val) => onSelect(val === "clear" ? "" : val)}
+      value={selectedValue && selectedValue !== "" ? selectedValue : "clear"}
+    >
       <SelectTrigger className={`w-[180px] ${className}`}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           {label && <SelectLabel>{label}</SelectLabel>}
-          {values.map((value) => (
-            <SelectItem key={value} value={value}>
-              {value.charAt(0).toUpperCase() + value.slice(1)}
+
+          {clearable && <SelectItem value="clear">All / Clear</SelectItem>}
+
+          {values && values.length > 0 ? (
+            values.map((value) => (
+              <SelectItem key={value} value={value}>
+                {value.charAt(0).toUpperCase() + value.slice(1)}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem value="empty" disabled>
+              Empty
             </SelectItem>
-          ))}
+          )}
         </SelectGroup>
       </SelectContent>
     </Select>

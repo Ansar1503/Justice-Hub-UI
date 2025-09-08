@@ -19,6 +19,7 @@ interface PracticeAreasTableProps {
   specializations: SpecializationsType[];
   onEdit: (practiceArea: PracticeAreaType) => void;
   onDelete: (id: string) => void;
+  isDeleting: boolean;
 }
 
 export function PracticeAreasTable({
@@ -26,6 +27,7 @@ export function PracticeAreasTable({
   specializations,
   onEdit,
   onDelete,
+  isDeleting,
 }: PracticeAreasTableProps) {
   const getSpecializationName = (id: string) => {
     return specializations.find((s) => s.id === id)?.name || "Unknown";
@@ -64,13 +66,7 @@ export function PracticeAreasTable({
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
-                      {formatDate(practiceArea.createdAt)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      {formatDate(practiceArea.updatedAt)}
+                      {formatDate(new Date(practiceArea.createdAt))}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
@@ -85,6 +81,7 @@ export function PracticeAreasTable({
                       <Button
                         variant="ghost"
                         size="sm"
+                        disabled={isDeleting}
                         onClick={() => onDelete(practiceArea.id)}
                       >
                         <Trash2 className="h-4 w-4" />

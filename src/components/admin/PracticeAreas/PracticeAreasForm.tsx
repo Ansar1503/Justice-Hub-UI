@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +33,9 @@ interface PracticeAreaFormProps {
     editingId?: string
   ) => void;
   onReset: () => void;
+  specId: string;
+  isPracticeAreaAdding: boolean;
+  isPracticeAreaEditing: boolean;
 }
 
 export function PracticeAreaForm({
@@ -42,14 +45,25 @@ export function PracticeAreaForm({
   specializations,
   onSubmit,
   onReset,
+  specId,
+  isPracticeAreaAdding,
+  isPracticeAreaEditing,
 }: PracticeAreaFormProps) {
-  const [name, setName] = useState(editingPracticeArea?.name || "");
+  const [name, setName] = useState(editingPracticeArea?.name);
   const [specializationId, setSpecializationId] = useState(
     editingPracticeArea?.specializationId || ""
   );
+  useEffect(() => {
+    if (editingPracticeArea?.name) {
+      setName(editingPracticeArea.name);
+    }
+    if (specId) {
+      setSpecializationId(specId);
+    }
+  }, [editingPracticeArea]);
 
   const handleSubmit = () => {
-    if (!name.trim() || !specializationId) return;
+    if (!name || !name.trim() || !specializationId) return;
     onSubmit(name, specializationId, editingPracticeArea?.id);
     setName("");
     setSpecializationId("");
@@ -105,11 +119,15 @@ export function PracticeAreaForm({
                 <SelectValue placeholder="Select a specialization" />
               </SelectTrigger>
               <SelectContent>
-                {specializations.map((spec) => (
-                  <SelectItem key={spec.id} value={spec.id}>
-                    {spec.name}
-                  </SelectItem>
-                ))}
+                {specializations && specializations.length > 0 ? (
+                  specializations.map((spec) => (
+                    <SelectItem key={spec.id} value={spec.id}>
+                      {spec.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="">No Specifications found</SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -118,7 +136,10 @@ export function PracticeAreaForm({
           <Button variant="outline" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>
+          <Button
+            disabled={isPracticeAreaAdding || isPracticeAreaEditing}
+            onClick={handleSubmit}
+          >
             {editingPracticeArea ? "Update" : "Create"}
           </Button>
         </DialogFooter>

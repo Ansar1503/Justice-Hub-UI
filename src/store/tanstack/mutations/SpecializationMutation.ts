@@ -58,6 +58,7 @@ export function useDeleteSpecialization(
 
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ["specialization"] });
+      await queryClient.invalidateQueries({ queryKey: ["practiceareas"] });
 
       const cached = queryClient.getQueryData<{
         data: SpecializationsType[];
