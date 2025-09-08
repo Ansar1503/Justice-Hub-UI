@@ -23,6 +23,7 @@ interface CaseTypesTableProps {
   specializations: SpecializationsType[];
   onEdit: (caseType: CaseTypestype) => void;
   onDelete: (id: string) => void;
+  isDeleting: boolean;
 }
 
 export function CaseTypesTable({
@@ -31,6 +32,7 @@ export function CaseTypesTable({
   specializations,
   onEdit,
   onDelete,
+  isDeleting,
 }: CaseTypesTableProps) {
   const getPracticeAreaName = (id: string) => {
     return practiceAreas.find((p) => p.id === id)?.name || "Unknown";
@@ -85,13 +87,7 @@ export function CaseTypesTable({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                        {formatDate(caseType.createdAt)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        {formatDate(caseType.updatedAt)}
+                        {formatDate(new Date(caseType.createdAt))}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -100,12 +96,14 @@ export function CaseTypesTable({
                           variant="ghost"
                           size="sm"
                           onClick={() => onEdit(caseType)}
+                          disabled={isDeleting}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
+                          disabled={isDeleting}
                           onClick={() => onDelete(caseType.id)}
                         >
                           <Trash2 className="h-4 w-4" />

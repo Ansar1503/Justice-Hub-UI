@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,8 +29,10 @@ interface CaseTypeFormProps {
   editingCaseType: CaseTypestype | null;
   practiceAreas: PracticeAreaType[] | [];
   specializations: SpecializationsType[] | [];
-  onSubmit: (name: string, practiceAreaId: string) => void;
+  onSubmit: (name: string, practiceAreaId: string, editingId?: string) => void;
   onReset: () => void;
+  isEditing: boolean;
+  isAdding: boolean;
 }
 
 export function CaseTypeForm({
@@ -41,19 +43,28 @@ export function CaseTypeForm({
   specializations,
   onSubmit,
   onReset,
+  isAdding,
+  isEditing,
 }: CaseTypeFormProps) {
   const [name, setName] = useState(editingCaseType?.name || "");
   const [practiceAreaId, setPracticeAreaId] = useState(
     editingCaseType?.practiceareaId || ""
   );
-
+  useEffect(() => {
+    if (editingCaseType?.name) {
+      setName(editingCaseType.name);
+    }
+    if (editingCaseType?.practiceareaId) {
+      setPracticeAreaId(editingCaseType.practiceareaId);
+    }
+  }, [editingCaseType]);
   const getSpecializationName = (id: string) => {
-    return specializations.find((s) => s.id === id)?.name || "Unknown";
+    return specializations?.find((s) => s.id === id)?.name || "Unknown";
   };
 
   const handleSubmit = () => {
     if (!name.trim() || !practiceAreaId) return;
-    onSubmit(name, practiceAreaId);
+    onSubmit(name, practiceAreaId, editingCaseType?.id);
     setName("");
     setPracticeAreaId("");
   };
@@ -116,7 +127,7 @@ export function CaseTypeForm({
           <Button variant="outline" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>
+          <Button disabled={isAdding || isEditing} onClick={handleSubmit}>
             {editingCaseType ? "Update" : "Create"}
           </Button>
         </DialogFooter>

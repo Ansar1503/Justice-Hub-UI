@@ -24,6 +24,12 @@ import {
 } from "@/components/ui/select";
 import { SelectComponent } from "@/components/SelectComponent";
 import PaginationComponent from "@/components/pagination";
+import toast from "react-hot-toast";
+import {
+  useAddCaseTypeMutation,
+  useDeleteCasetypeMutation,
+  useUpdateCasetypeMutation,
+} from "@/store/tanstack/mutations/CasetypeMutation";
 
 export default function CaseTypeCard() {
   const [isCaseTypeModalOpen, setIsCaseTypeModalOpen] = useState(false);
@@ -63,7 +69,45 @@ export default function CaseTypeCard() {
     () => CasetypeData?.data || [],
     [CasetypeData?.data]
   );
-
+  const { mutateAsync: addCasetype, isPending: isAddingCasetype } =
+    useAddCaseTypeMutation();
+  const { mutateAsync: updateCasetype, isPending: isEditingCasetype } =
+    useUpdateCasetypeMutation({
+      limit: itemsPerPage,
+      page: currentPage,
+      search: caseTypeSearch,
+      pid: practiceId,
+    });
+  const { mutateAsync: deleteCasetype, isPending: isDeleting } =
+    useDeleteCasetypeMutation();
+  const handleSubmit = async (
+    name: string,
+    practiceId: string,
+    editingId?: string
+  ) => {
+    if (!name) {
+      toast.error("name is required");
+      return;
+    }
+    if (!practiceId) {
+      return toast.error("specialization id");
+    }
+    try {
+      if (!editingId) {
+        await addCasetype({ name, pid: practiceId });
+      } else {
+        await updateCasetype({
+          id: editingId,
+          name: name,
+          pid: practiceId,
+        });
+      }
+    } catch (error) {
+      console.log("error in adidng or updating", error);
+    } finally {
+      setIsCaseTypeModalOpen(false);
+    }
+  };
   return (
     <Card className="rounded-xl shadow-sm">
       <CardHeader>
@@ -75,13 +119,18 @@ export default function CaseTypeCard() {
             </CardDescription>
           </div>
           <CaseTypeForm
+            isAdding={isAddingCasetype}
+            isEditing={isEditingCasetype}
             isOpen={isCaseTypeModalOpen}
             onOpenChange={setIsCaseTypeModalOpen}
             editingCaseType={editingCaseType}
             practiceAreas={practiceAreas}
             specializations={specialisations}
-            onSubmit={() => {}}
-            onReset={() => {}}
+            onSubmit={handleSubmit}
+            onReset={() => {
+              setEditingCaseType(null);
+              setCaseTypeSearch("");
+            }}
           />
         </div>
       </CardHeader>
@@ -137,7 +186,10 @@ export default function CaseTypeCard() {
             setEditingCaseType(data);
             setIsCaseTypeModalOpen(true);
           }}
-          onDelete={() => {}}
+          onDelete={async (id) => {
+            await deleteCasetype(id);
+          }}
+          isDeleting={isDeleting}
         />
         <PaginationComponent
           currentPage={currentPage}
