@@ -18,7 +18,7 @@ export function useAddPracticeAreasMutation() {
       mutationFn: AddPracticeArea,
       onError: (error: any) => {
         const message = error?.response?.data?.error;
-        toast.error(message || "Error adding mutation");
+        toast.error(message || "Error adding practice area  ");
       },
       onSettled: () => {
         queryClient.invalidateQueries({

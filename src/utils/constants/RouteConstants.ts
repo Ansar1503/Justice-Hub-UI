@@ -26,3 +26,8 @@ export const PracticeAreaRoutes = {
   base: "/practicearea",
   specIdQuery: "&specId=",
 };
+
+export const CasetypeRoutes = {
+  base : "/casetypes",
+  pidQuery:"&pid="
+}
