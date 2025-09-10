@@ -36,14 +36,14 @@ import {
 } from "@/components/ui/table";
 
 import { LawyerVerificationModal } from "./Modals/LawyerVerification.Modal";
-import { LawerDataType } from "@/types/types/Client.data.type";
 import { useFetchAllLawyers } from "@/store/tanstack/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PaginationComponent from "../pagination";
 import SearchComponent from "../SearchComponent";
+import { AggregatedLawyerProfile } from "@/types/types/LawyerTypes";
 
 export function LawyersList() {
-  const [lawyers, setLawyers] = useState<any[]>([]);
+  const [lawyers, setLawyers] = useState<AggregatedLawyerProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "verified" | "rejected" | "pending" | "requested"
@@ -52,13 +52,12 @@ export function LawyersList() {
     "name" | "experience" | "consultation_fee" | "createdAt"
   >("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [selectedLawyer, setSelectedLawyer] = useState<LawerDataType | null>(
-    null
-  );
+  const [selectedLawyer, setSelectedLawyer] =
+    useState<AggregatedLawyerProfile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const { data, refetch: lawyerrefetch } = useFetchAllLawyers({
+  const { data: lawyerResponse, refetch: lawyerrefetch } = useFetchAllLawyers({
     sort: sortBy,
     order: sortOrder,
     search: searchTerm,
@@ -68,11 +67,10 @@ export function LawyersList() {
   });
 
   useEffect(() => {
-    if (data?.data) {
-      setLawyers(data.data?.lawyers);
+    if (lawyerResponse?.lawyers) {
+      setLawyers(lawyerResponse.lawyers);
     }
-  }, [data?.data, data, data?.data?.lawyers]);
-
+  }, [lawyerResponse, lawyerResponse?.lawyers]);
   useEffect(() => {
     async function fetchLawyers() {
       await lawyerrefetch();
@@ -84,9 +82,9 @@ export function LawyersList() {
     setCurrentPage(1);
   }, [sortBy, sortOrder, searchTerm, statusFilter]);
 
-  const totalPages = data?.data?.totalPages;
-  const totalItems = data?.data?.totalCount;
-
+  const totalPages = lawyerResponse?.totalPages || 1;
+  const totalItems = lawyerResponse?.totalCount || 1;
+  console.log("lwayer", lawyers);
   const handleSort = (
     field: "name" | "experience" | "consultation_fee" | "createdAt"
   ) => {
@@ -99,7 +97,7 @@ export function LawyersList() {
     setCurrentPage(1);
   };
 
-  const viewLawyerDetails = (lawyer: LawerDataType) => {
+  const viewLawyerDetails = (lawyer: AggregatedLawyerProfile) => {
     setSelectedLawyer(lawyer);
     setIsModalOpen(true);
   };
@@ -172,7 +170,8 @@ export function LawyersList() {
             </div> */}
             <SearchComponent
               searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm} className="w-full"
+              setSearchTerm={setSearchTerm}
+              className="w-full"
             />
             <div className="flex gap-2">
               <Select
@@ -256,7 +255,7 @@ export function LawyersList() {
                     </Button>
                   </TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Practice Areas</TableHead>
+
                   <TableHead>
                     <Button
                       variant="ghost"
@@ -294,62 +293,46 @@ export function LawyersList() {
                   </TableRow>
                 ) : (
                   lawyers &&
+                  lawyers.length > 0 &&
                   lawyers.map((lawyer) => (
                     <TableRow
-                      key={lawyer?.user_id}
+                      key={lawyer?.userId}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8 border">
                             <AvatarImage
-                              src={lawyer?.clientData?.profile_image}
-                              alt={lawyer?.name}
+                              src={lawyer?.personalDetails?.profileImage}
+                              alt={lawyer?.personalDetails?.name}
                             />
                             <AvatarFallback>
-                              {lawyer?.name?.substring(0, 2).toUpperCase()}
+                              {lawyer?.personalDetails?.name
+                                ?.substring(0, 2)
+                                .toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{lawyer?.name}</p>
+                            <p className="font-medium">
+                              {lawyer?.personalDetails?.name}
+                            </p>
                             <p className="text-xs text-muted-foreground">
-                              {lawyer?.email}
+                              {lawyer?.personalDetails?.email}
                             </p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {renderStatusBadge(lawyer?.verification_status)}
+                        {renderStatusBadge(
+                          lawyer?.verificationDetails?.verificationStatus
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        {lawyer?.ProfessionalDetails?.experience} yrs
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {lawyer.lawyerData &&
-                            lawyer.lawyerData.practice_areas &&
-                            lawyer.lawyerData?.practice_areas?.length > 0 &&
-                            lawyer.lawyerData.practice_areas
-                              .slice(
-                                0,
-                                lawyer.lawyerData.practice_areas.length - 1
-                              )
-                              .map((area: any) => (
-                                <Badge
-                                  key={area}
-                                  variant="secondary"
-                                  className="text-xs"
-                                >
-                                  {area}
-                                </Badge>
-                              ))}
-                          {lawyer.lawyerData.practice_areas.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{lawyer.lawyerData.practice_areas.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>{lawyer.lawyerData.experience} yrs</TableCell>
-                      <TableCell>
-                        ₹{lawyer.lawyerData.consultation_fee}
+                        ₹{lawyer?.ProfessionalDetails?.consultationFee}
                       </TableCell>
 
                       <TableCell className="text-right">

@@ -17,11 +17,7 @@ export type AppointmentStatus =
   | "cancelled"
   | "rejected";
 export type AppointmentType = "all" | "consultation" | "follow-up";
-export type SortField =
-  | "client_name"
-  | "date"
-  | "fee"
-  | "created_at";
+export type SortField = "client_name" | "date" | "fee" | "created_at";
 export type SortOrder = "asc" | "desc";
 
 export default function LawyerClientAppointmentListing() {

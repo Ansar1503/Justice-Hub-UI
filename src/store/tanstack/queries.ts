@@ -52,7 +52,10 @@ import {
   fetchSessions,
 } from "@/utils/api/services/commonServices";
 import { store } from "../redux/store";
-import { FetchLawyerResponseType } from "@/types/types/LawyerTypes";
+import {
+  AggregatedLawyerResponseAdminSide,
+  FetchLawyerResponseType,
+} from "@/types/types/LawyerTypes";
 
 export function useFetchClientData() {
   const { user } = store.getState().Auth;
@@ -77,7 +80,11 @@ export function useFetchLawyerData() {
     refetchOnReconnect: false,
     staleTime: 1000 * 60 * 5,
     retry: 1,
-    enabled: user && user?.role === "lawyer" ? true : false,
+    enabled:
+      (user && user?.role === "lawyer") ||
+      user?.lawyer_verification_status === "verified"
+        ? true
+        : false,
   });
 }
 
@@ -105,7 +112,7 @@ export function useFetchAllLawyers(query: {
   status?: "all" | "verified" | "rejected" | "pending" | "requested";
   search: string;
 }) {
-  return useQuery({
+  return useQuery<AggregatedLawyerResponseAdminSide>({
     queryKey: ["lawyers"],
     queryFn: () => fetchAllLawyers(query),
     retry: 1,

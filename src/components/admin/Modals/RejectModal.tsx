@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { LawerDataType } from "@/types/types/Client.data.type";
+import { AggregatedLawyerProfile } from "@/types/types/LawyerTypes";
 import { Label } from "@radix-ui/react-label";
 import { Loader2 } from "lucide-react";
 
@@ -16,7 +16,7 @@ export function RejectLawyerModal(payload: {
   statusChangePending: boolean;
   isRejectionDialogOpen: boolean;
   setIsRejectionDialogOpen: (val: boolean) => void;
-  lawyer: LawerDataType;
+  lawyer: AggregatedLawyerProfile;
   rejectionReason: string;
   setRejectionReason: (val: string) => void;
   handleRejectionSubmit: (val: string) => void;
@@ -30,8 +30,8 @@ export function RejectLawyerModal(payload: {
         <DialogHeader>
           <DialogTitle>Reject Verification</DialogTitle>
           <DialogDescription>
-            Please provide a reason for rejecting {payload.lawyer.name}'s
-            verification.
+            Please provide a reason for rejecting{" "}
+            {payload.lawyer?.personalDetails?.name}'s verification.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -59,7 +59,7 @@ export function RejectLawyerModal(payload: {
               payload.statusChangePending || !payload.rejectionReason.trim()
             }
             onClick={() =>
-              payload.handleRejectionSubmit(payload.lawyer.user_id)
+              payload.handleRejectionSubmit(payload.lawyer?.userId)
             }
           >
             {payload.statusChangePending ? (

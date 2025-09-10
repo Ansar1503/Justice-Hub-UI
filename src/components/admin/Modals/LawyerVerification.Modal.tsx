@@ -27,9 +27,10 @@ import { LawerDataType } from "@/types/types/Client.data.type";
 import { useChangeLawyerVerificationStatus } from "@/store/tanstack/mutations";
 import { DocumentPreview } from "../DocumentPreview";
 import { RejectLawyerModal } from "./RejectModal";
+import { AggregatedLawyerProfile } from "@/types/types/LawyerTypes";
 
 interface LawyerVerificationModalProps {
-  lawyer: any;
+  lawyer: AggregatedLawyerProfile;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -56,18 +57,18 @@ export function LawyerVerificationModal({
   const documents = [
     {
       name: "Bar Council Certificate",
-      url: lawyer?.lawyerDocuments?.bar_council_certificate || "",
-      number: lawyer?.lawyerData?.barcouncil_number || "N/A",
+      url: lawyer?.verificationDocuments?.barCouncilCertificate || "",
+      number: lawyer?.verificationDetails?.barCouncilNumber || "N/A",
     },
     {
       name: "Enrollment Certificate",
-      url: lawyer.lawyerDocuments?.enrollment_certificate || "",
-      number: lawyer?.lawyerData?.enrollment_certificate_number || "N/A",
+      url: lawyer.verificationDocuments?.enrollmentCertificate || "",
+      number: lawyer?.verificationDetails?.enrollmentCertificateNumber || "N/A",
     },
     {
       name: "Certificate of Practice",
-      url: lawyer?.lawyerDocuments?.certificate_of_practice || "",
-      number: lawyer?.lawyerData?.certificate_of_practice_number || "N/A",
+      url: lawyer?.verificationDocuments?.certificateOfPractice || "",
+      number: lawyer?.verificationDetails?.certificateOfPracticeNumber || "N/A",
     },
   ];
 
@@ -81,7 +82,7 @@ export function LawyerVerificationModal({
 
     try {
       setStatusAction("approve");
-      await mutateAsync({ user_id: lawyer.user_id, status });
+      await mutateAsync({ user_id: lawyer.userId, status });
       onClose();
     } catch (error) {
       console.error("Failed to change verification status:", error);
@@ -175,10 +176,13 @@ export function LawyerVerificationModal({
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>Lawyer Details</span>
-              {renderStatusBadge(lawyer?.lawyerData?.verification_status)}
+              {renderStatusBadge(
+                lawyer?.verificationDetails?.verificationStatus
+              )}
             </DialogTitle>
             <DialogDescription>
-              Review {lawyer.name}'s profile and verification details
+              Review {lawyer?.personalDetails?.name}'s profile and verification
+              details
             </DialogDescription>
           </DialogHeader>
 
@@ -187,9 +191,12 @@ export function LawyerVerificationModal({
             value={activeTab}
             onValueChange={setActiveTab}
           >
-            <TabsList className="grid grid-cols-2 mb-4">
+            <TabsList className="grid grid-cols-3 mb-4">
               <TabsTrigger value="verification">
                 Verification Details
+              </TabsTrigger>
+              <TabsTrigger value="professional">
+                professional Information
               </TabsTrigger>
               <TabsTrigger value="profile">Profile Information</TabsTrigger>
             </TabsList>
@@ -200,12 +207,14 @@ export function LawyerVerificationModal({
                   <CardTitle>Basic Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {lawyer?.lawyerData?.description && (
+                  {lawyer?.ProfessionalDetails?.description && (
                     <div>
                       <Label className="text-muted-foreground">
                         Description
                       </Label>
-                      <p className="mt-1">{lawyer?.lawyerData?.description}</p>
+                      <p className="mt-1">
+                        {lawyer?.ProfessionalDetails?.description}
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -263,7 +272,8 @@ export function LawyerVerificationModal({
                   </CardContent>
                 </Card>
               ))}
-
+            </TabsContent>
+            <TabsContent value="professional" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Professional Details</CardTitle>
@@ -275,12 +285,13 @@ export function LawyerVerificationModal({
                         Practice Areas
                       </Label>
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {(lawyer?.lawyerData?.practice_areas &&
-                          lawyer?.lawyerData?.practice_areas?.length > 0 &&
-                          lawyer?.lawyerData?.practice_areas?.map(
+                        {(lawyer?.ProfessionalDetails?.practiceAreas &&
+                          lawyer?.ProfessionalDetails?.practiceAreas?.length >
+                            0 &&
+                          lawyer?.ProfessionalDetails?.practiceAreas?.map(
                             (area: any) => (
-                              <Badge key={area} variant="secondary">
-                                {area}
+                              <Badge key={area._id} variant="secondary">
+                                {area.name}
                               </Badge>
                             )
                           )) || <span>N/A</span>}
@@ -291,12 +302,13 @@ export function LawyerVerificationModal({
                         Specialisation
                       </Label>
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {(lawyer?.lawyerData?.specialisation &&
-                          lawyer?.lawyerData?.specialisation?.length > 0 &&
-                          lawyer?.lawyerData?.specialisation?.map(
+                        {(lawyer?.ProfessionalDetails?.specialisations &&
+                          lawyer?.ProfessionalDetails?.specialisations?.length >
+                            0 &&
+                          lawyer?.ProfessionalDetails?.specialisations?.map(
                             (spec: any) => (
-                              <Badge key={spec} variant="secondary">
-                                {spec}
+                              <Badge key={spec._id} variant="secondary">
+                                {spec.name}
                               </Badge>
                             )
                           )) || <span>N/A</span>}
@@ -307,7 +319,7 @@ export function LawyerVerificationModal({
                         Experience
                       </Label>
                       <p className="mt-1 font-medium">
-                        {lawyer?.lawyerData?.experience || "N/A"} years
+                        {lawyer?.ProfessionalDetails?.experience || "N/A"} years
                       </p>
                     </div>
                     <div>
@@ -315,14 +327,13 @@ export function LawyerVerificationModal({
                         Consultation Fee
                       </Label>
                       <p className="mt-1 font-medium">
-                        ₹{lawyer?.lawyerData?.consultation_fee || "N/A"}
+                        ₹{lawyer?.ProfessionalDetails?.consultationFee || "N/A"}
                       </p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
-
             <TabsContent value="profile" className="space-y-6">
               <Card>
                 <CardHeader>
@@ -332,14 +343,17 @@ export function LawyerVerificationModal({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label className="text-muted-foreground">Full Name</Label>
-                      <p className="mt-1 font-medium">{lawyer.name}</p>
+                      <p className="mt-1 font-medium">
+                        {lawyer?.personalDetails?.name}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-muted-foreground">
                         Email Address
                       </Label>
                       <p className="mt-1 font-medium">
-                        {lawyer.email} {lawyer.is_verified}
+                        {lawyer?.personalDetails?.email}{" "}
+                        {lawyer?.personalDetails?.isVerified}
                       </p>
                     </div>
                     <div>
@@ -347,7 +361,7 @@ export function LawyerVerificationModal({
                         Phone Number
                       </Label>
                       <p className="mt-1 font-medium">
-                        {lawyer?.clientData?.mobile || "N/A"}
+                        {lawyer?.personalDetails?.mobile || "N/A"}
                       </p>
                     </div>
                     <div>
@@ -374,7 +388,8 @@ export function LawyerVerificationModal({
           </Tabs>
 
           <DialogFooter className="flex justify-between items-center">
-            {lawyer?.lawyerData?.verification_status === "requested" && (
+            {lawyer?.verificationDetails?.verificationStatus ===
+              "requested" && (
               <div className="flex gap-2">
                 <Button
                   variant="destructive"

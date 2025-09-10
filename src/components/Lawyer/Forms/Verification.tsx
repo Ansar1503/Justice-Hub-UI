@@ -3,7 +3,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,8 @@ import VerificationInputs from "@/utils/validations/LawyerVerification.Input.Val
 import { useLawyerVerification } from "@/store/tanstack/mutations";
 import { useFetchLawyerData } from "@/store/tanstack/queries";
 import { VerificationStatus } from "@/types/types/LawyerTypes";
+import { useFetchAllSpecializations } from "@/store/tanstack/Queries/SpecializationQueries";
+import { useFetchPracticeAreaBySpecIds } from "@/store/tanstack/Queries/PracticeAreaQuery";
 
 interface LawyerVerificationFormProps {
   setLoading: (loading: boolean) => void;
@@ -53,31 +55,6 @@ function LawyerVerificationForm({
     consultation_fee: 0,
   });
 
-  const availablePracticeAreas = [
-    "Civil Law",
-    "Criminal Law",
-    "Corporate Law",
-    "Family Law",
-    "Intellectual Property",
-    "Tax Law",
-    "Constitutional Law",
-    "Environmental Law",
-    "Labor Law",
-    "Real Estate Law",
-  ];
-
-  const availableSpecializations = [
-    "Divorce",
-    "Child Custody",
-    "Wills & Trusts",
-    "Personal Injury",
-    "Medical Malpractice",
-    "Bankruptcy",
-    "Immigration",
-    "Mergers & Acquisitions",
-    "Patent Law",
-    "Criminal Defense",
-  ];
   const { mutateAsync, isPending } = useLawyerVerification();
 
   const handleInputChange = (
@@ -117,6 +94,20 @@ function LawyerVerificationForm({
     setLoading(isPending);
   }, [isPending, setLoading]);
 
+  const { data: practiceAreas } = useFetchPracticeAreaBySpecIds(
+    formData.specialisation
+  );
+
+  const { data: SpecialisationData } = useFetchAllSpecializations({
+    limit: 1000,
+    page: 1,
+    search: "",
+  });
+  const specialisations = useMemo(
+    () => SpecialisationData?.data || [],
+    [SpecialisationData?.data]
+  );
+
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     fieldName: string
@@ -140,7 +131,13 @@ function LawyerVerificationForm({
       const updatedValues = currentValues.includes(value)
         ? currentValues.filter((item) => item !== value)
         : [...currentValues, value];
-
+      if (fieldName === "specialisation" && updatedValues.length > 3) {
+        setErrors((pr) => ({
+          ...pr,
+          [fieldName]: "Max 3 Specializations allowed",
+        }));
+        return;
+      }
       setFormData({
         ...formData,
         [fieldName]: updatedValues,
@@ -420,65 +417,69 @@ function LawyerVerificationForm({
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>
-                    Practice Areas <span className="text-red-500">*</span>
+                    Specialisation <span className="text-red-500">*</span>
                   </Label>
                   <div className="flex flex-wrap gap-2">
-                    {availablePracticeAreas.map((area) => (
-                      <Badge
-                        key={area}
-                        variant={
-                          lawyerData && lawyerData.practice_areas?.length
-                            ? lawyerData.practice_areas.includes(area)
+                    {specialisations &&
+                      specialisations.length > 0 &&
+                      specialisations.map((spec) => (
+                        <Badge
+                          key={spec.id}
+                          variant={
+                            lawyerData && lawyerData.specialisation.length
+                              ? lawyerData.specialisation.includes(spec.id)
+                                ? "default"
+                                : "outline"
+                              : formData.specialisation.includes(spec.id)
                               ? "default"
                               : "outline"
-                            : formData.practice_areas.includes(area)
-                            ? "default"
-                            : "outline"
-                        }
-                        className="cursor-pointer"
-                        onClick={() =>
-                          handleMultiSelectChange(area, "practice_areas")
-                        }
-                      >
-                        {area}
-                      </Badge>
-                    ))}
+                          }
+                          className="cursor-pointer"
+                          onClick={() =>
+                            handleMultiSelectChange(spec.id, "specialisation")
+                          }
+                        >
+                          {spec.name}
+                        </Badge>
+                      ))}
                   </div>
-                  {errors.practice_areas && (
+                  {errors.specialisation && (
                     <p className="text-red-500 text-sm">
-                      {errors.practice_areas}
+                      {errors.specialisation}
                     </p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label>
-                    Specialisation <span className="text-red-500">*</span>
+                    Practice Areas <span className="text-red-500">*</span>
                   </Label>
                   <div className="flex flex-wrap gap-2">
-                    {availableSpecializations.map((spec) => (
-                      <Badge
-                        key={spec}
-                        variant={
-                          lawyerData && lawyerData.specialisation.length
-                            ? lawyerData.specialisation.includes(spec)
+                    {practiceAreas &&
+                      practiceAreas.length > 0 &&
+                      practiceAreas.map((area) => (
+                        <Badge
+                          key={area.id}
+                          variant={
+                            lawyerData && lawyerData.practice_areas?.length
+                              ? lawyerData.practice_areas.includes(area.id)
+                                ? "default"
+                                : "outline"
+                              : formData.practice_areas.includes(area.id)
                               ? "default"
                               : "outline"
-                            : formData.specialisation.includes(spec)
-                            ? "default"
-                            : "outline"
-                        }
-                        className="cursor-pointer"
-                        onClick={() =>
-                          handleMultiSelectChange(spec, "specialisation")
-                        }
-                      >
-                        {spec}
-                      </Badge>
-                    ))}
+                          }
+                          className="cursor-pointer"
+                          onClick={() =>
+                            handleMultiSelectChange(area.id, "practice_areas")
+                          }
+                        >
+                          {area.name}
+                        </Badge>
+                      ))}
                   </div>
-                  {errors.specialisation && (
+                  {errors.practice_areas && (
                     <p className="text-red-500 text-sm">
-                      {errors.specialisation}
+                      {errors.practice_areas}
                     </p>
                   )}
                 </div>

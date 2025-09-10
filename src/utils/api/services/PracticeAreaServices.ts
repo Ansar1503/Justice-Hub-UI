@@ -67,3 +67,15 @@ export async function deletePracticeArea(id: string) {
   );
   return response.data;
 }
+
+export async function fetchPracticeAreasbySpecIds(query: string[] | []) {
+  const { user, token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api + user?.role + PracticeAreaRoutes.base,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { specIds: query },
+    }
+  );
+  return response.data;
+}
