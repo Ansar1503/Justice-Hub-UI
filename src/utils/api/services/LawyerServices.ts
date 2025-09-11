@@ -1,3 +1,4 @@
+import { ProfessionalDetailsFormData } from "@/components/Lawyer/ProfessionalDetailsComponent";
 import {
   AppointmentStatus,
   AppointmentType,
@@ -10,6 +11,7 @@ import {
   slotSettings,
 } from "@/types/types/SlotTypes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
+import { CommonQueies, profileQueries } from "@/utils/constants/RouteConstants";
 
 export async function LawyerVerification(formData: any) {
   const { token } = store.getState().Auth;
@@ -179,6 +181,56 @@ export async function endSession(sessionId: string) {
     {
       sessionId: sessionId,
     },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function fetchLawyersProfessionalDetails(
+  userId: string | undefined
+) {
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api +
+      user?.role +
+      profileQueries.base +
+      profileQueries.lawyer.base +
+      profileQueries.lawyer.professional +
+      CommonQueies.params +
+      userId,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function FetchLawyersVerificationDetails(
+  userId: string | undefined
+) {
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api +
+      user?.role +
+      profileQueries.base +
+      profileQueries.lawyer.base +
+      profileQueries.lawyer.verification +
+      CommonQueies.params +
+      userId,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function addLawyerProfessionalDetails(
+  payload: ProfessionalDetailsFormData
+) {
+  const { token, user } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    CommonQueies.api +
+      user?.role +
+      profileQueries.base +
+      profileQueries.lawyer.base +
+      profileQueries.lawyer.professional,
+    payload,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

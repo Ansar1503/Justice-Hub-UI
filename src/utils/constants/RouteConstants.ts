@@ -18,6 +18,15 @@ export const CommonQueies = {
   params: "/",
 };
 
+export const profileQueries = {
+  base: "/profile",
+  lawyer: {
+    base: "/lawyers",
+    verification: "/verification",
+    professional: "/professional",
+  },
+};
+
 export const SpecializationRoutes = {
   base: "/specialization",
 };
@@ -28,6 +37,6 @@ export const PracticeAreaRoutes = {
 };
 
 export const CasetypeRoutes = {
-  base : "/casetypes",
-  pidQuery:"&pid="
-}
+  base: "/casetypes",
+  pidQuery: "&pid=",
+};

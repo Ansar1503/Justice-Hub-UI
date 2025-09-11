@@ -293,7 +293,7 @@ export default function SessionsListing() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {sessions?.length === 0 ? (
+              {!sessions || sessions?.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}

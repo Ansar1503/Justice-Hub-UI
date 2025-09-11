@@ -58,14 +58,13 @@ export default function LawyerDirectory() {
   });
   useEffect(() => {
     refetch();
-  }, [searchTerm, filters,currentPage,itemsPerPage, refetch]);
+  }, [searchTerm, filters, currentPage, itemsPerPage, refetch]);
 
   useEffect(() => {
     if (data && data?.data) {
       setLawyers(data?.data?.data || []);
     }
   }, [data]);
-  // console.log("lawyers", lawyers);
 
   const totalPages = data?.data?.totalPages;
   const totalItems = data?.data?.totalCount;
@@ -91,9 +90,9 @@ export default function LawyerDirectory() {
   };
 
   return (
-    <div className="dark:bg-slate-800 bg-brandCream">
+    <div className="dark:bg-slate-800 bg-brandCream ">
       <Navbar />
-      <div className="container mx-auto py-6 px-4 md:px-6">
+      <div className="container mx-auto py-6 px-4 md:px-6 min-h-screen">
         <div className="flex flex-col space-y-4">
           <h1 className="text-3xl font-bold">Find a Lawyer</h1>
           <p className="text-muted-foreground ">
@@ -132,6 +131,7 @@ export default function LawyerDirectory() {
             <div className="w-full md:w-3/4">
               <div className="flex justify-between items-center mb-4">
                 <SearchComponent
+                  className="w-full"
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                 />
@@ -174,7 +174,7 @@ export default function LawyerDirectory() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {lawyers &&
-                      lawyers.map((lawyer, index) => (
+                      lawyers?.map((lawyer, index) => (
                         <LawyersCard
                           key={index}
                           getVerificationBadge={getVerificationBadge}

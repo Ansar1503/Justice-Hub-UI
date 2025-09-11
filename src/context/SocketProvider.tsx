@@ -52,12 +52,12 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       });
     });
     s.on(SocketEvents.NOTIFICATION_RECEIVED, (data: NotificationType) => {
-      setNotificationData(data);
-      setIsNotificationAlertOpen(true);
       queryClient.invalidateQueries({
         queryKey: ["notifications", user?.user_id],
       });
       if (data.type === "session") {
+        setNotificationData(data);
+        setIsNotificationAlertOpen(true);
         if (Notification.permission === "granted") {
           showNotification();
         } else if (Notification.permission === "default") {

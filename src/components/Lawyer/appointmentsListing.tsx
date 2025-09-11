@@ -302,7 +302,7 @@ export default function LawyerClientAppointmentListing() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {appointments?.length === 0 ? (
+                {!appointments || appointments?.length === 0 ? (
                   <tr>
                     <td
                       colSpan={6}

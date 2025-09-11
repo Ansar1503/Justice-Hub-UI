@@ -10,8 +10,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 
-import { VerificationStatus } from "@/types/types/Client.data.type";
 import { RefreshCcw } from "lucide-react";
+import { VerificationStatus } from "@/types/types/LawyerTypes";
+import { useFetchPracticeAreaBySpecIds } from "@/store/tanstack/Queries/PracticeAreaQuery";
+import { useFetchAllSpecializations } from "@/store/tanstack/Queries/SpecializationQueries";
+import { useMemo } from "react";
 
 interface FiltersSidebarProps {
   filters: {
@@ -34,6 +37,18 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
   resetFilters,
   handleApplyFilters,
 }) => {
+  const { data: practiceAreas } = useFetchPracticeAreaBySpecIds(
+    filters.specialisation
+  );
+  const { data: SpecialisationData } = useFetchAllSpecializations({
+    limit: 1000,
+    page: 1,
+    search: "",
+  });
+  const specialisations = useMemo(
+    () => SpecialisationData?.data || [],
+    [SpecialisationData]
+  );
   const toggleCheckbox = (
     field: keyof FiltersSidebarProps["filters"],
     value: string | VerificationStatus
@@ -48,67 +63,49 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
       };
     });
   };
-  const availablePracticeAreas = [
-    "Civil Law",
-    "Criminal Law",
-    "Corporate Law",
-    "Family Law",
-    "Intellectual Property",
-    "Tax Law",
-    "Constitutional Law",
-    "Environmental Law",
-    "Labor Law",
-    "Real Estate Law",
-  ];
 
-  const availableSpecializations = [
-    "Divorce",
-    "Child Custody",
-    "Wills & Trusts",
-    "Personal Injury",
-    "Medical Malpractice",
-    "Bankruptcy",
-    "Immigration",
-    "Mergers & Acquisitions",
-    "Patent Law",
-    "Criminal Defense",
-  ];
   return (
     <div className="w-full lg:w-[250px] space-y-4">
       <Accordion type="multiple" className="w-full">
         <AccordionItem value="practice">
           <AccordionTrigger>Practice Area</AccordionTrigger>
           <AccordionContent>
-            {availablePracticeAreas.map((area) => (
-              <div key={area} className="flex items-center space-x-2">
-                <Checkbox
-                  id={area}
-                  checked={filters.practiceAreas.includes(area)}
-                  onCheckedChange={() => toggleCheckbox("practiceAreas", area)}
-                />
-                <label htmlFor={area} className="text-sm">
-                  {area}
-                </label>
-              </div>
-            ))}
+            {practiceAreas &&
+              practiceAreas?.map((p) => (
+                <div key={p.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={p.id}
+                    checked={filters.practiceAreas.includes(p.id)}
+                    onCheckedChange={() =>
+                      toggleCheckbox("practiceAreas", p.id)
+                    }
+                  />
+                  <label htmlFor={p.name} className="text-sm">
+                    {p.name}
+                  </label>
+                </div>
+              ))}
           </AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="specialisation">
           <AccordionTrigger>Specialisation</AccordionTrigger>
           <AccordionContent>
-            {availableSpecializations.map((spec) => (
-              <div key={spec} className="flex items-center space-x-2">
-                <Checkbox
-                  id={spec}
-                  checked={filters.specialisation.includes(spec)}
-                  onCheckedChange={() => toggleCheckbox("specialisation", spec)}
-                />
-                <label htmlFor={spec} className="text-sm">
-                  {spec}
-                </label>
-              </div>
-            ))}
+            {specialisations &&
+              specialisations?.map((spec) => (
+                <div key={spec.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={spec.id}
+                    checked={filters.specialisation.includes(spec.id)}
+                    onCheckedChange={() =>
+                      toggleCheckbox("specialisation", spec.id)
+                    }
+                  />
+                  <label htmlFor={spec.name} className="text-sm">
+                    {spec.name}
+                  </label>
+                </div>
+              ))}
           </AccordionContent>
         </AccordionItem>
 

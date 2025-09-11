@@ -7,7 +7,7 @@ function LawyerDashboard() {
   return (
     <div className="bg-[#FFF2F2] dark:bg-slate-950 min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-grow flex flex-col md:flex-row md:gap-10 container">
+      <div className="flex-grow flex flex-col md:flex-row md:gap-10 ">
         <Sidebar />
         <main className="flex-grow md:mt-0 mt-6 px-6 py-8">
           <ProfileCard />

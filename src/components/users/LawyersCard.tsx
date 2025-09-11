@@ -44,9 +44,9 @@ export default function LawyersCard({
           <p className="text-sm font-medium">Practice Areas</p>
           <div className="flex gap-1 mt-1 overflow-hidden whitespace-nowrap">
             {lawyer.practice_areas &&
-              lawyer.practice_areas.map((area) => (
+              lawyer.practice_areas?.map((area, idx) => (
                 <Badge
-                  key={area}
+                  key={`${area}-${idx}`}
                   variant="secondary"
                   className="text-xs whitespace-nowrap"
                 >
@@ -60,9 +60,9 @@ export default function LawyersCard({
           <p className="text-sm font-medium">Specialization</p>
           <div className="flex gap-1 mt-1 overflow-hidden whitespace-nowrap">
             {lawyer.specialisation &&
-              lawyer.specialisation.map((spec) => (
+              lawyer.specialisation.map((spec,idx) => (
                 <Badge
-                  key={spec}
+                  key={`${spec}-${idx}`}
                   variant="outline"
                   className="text-xs whitespace-nowrap"
                 >

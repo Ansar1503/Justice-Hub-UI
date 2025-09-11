@@ -47,6 +47,8 @@ import { Riple } from "react-loading-indicators";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import Reviews from "./Reviews";
+import { PracticeAreaType } from "@/types/types/PracticeAreaType";
+import { SpecializationsType } from "@/types/types/SpecializationType";
 // import { LawerDataType } from "@/types/types/Client.data.type";
 
 export default function LawyerProfile() {
@@ -65,7 +67,6 @@ export default function LawyerProfile() {
   // const {mutateAsync:bookingMutate} = useBookingMutation()
   const { data: slotSettingsData, refetch: refetchslotSettings } =
     useFetchLawyerSlotSettings(id || "");
-
   const slotSettings = slotSettingsData?.data;
   const {
     data,
@@ -285,15 +286,17 @@ export default function LawyerProfile() {
                             .map((_, idx) => <BadgeSkeleton key={idx} />)
                         : lawyerDetails &&
                           lawyerDetails?.practice_areas.length &&
-                          lawyerDetails.practice_areas.map((area: string) => (
-                            <Badge
-                              key={area}
-                              variant="outline"
-                              className="bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                            >
-                              {area}
-                            </Badge>
-                          ))}
+                          lawyerDetails.practice_areas.map(
+                            (area: PracticeAreaType) => (
+                              <Badge
+                                key={area.id}
+                                variant="outline"
+                                className="bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                              >
+                                {area.name}
+                              </Badge>
+                            )
+                          )}
                     </div>
                     <div className="mt-4">
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -559,8 +562,8 @@ export default function LawyerProfile() {
                           {lawyerDetails &&
                             lawyerDetails?.specialisation?.length > 0 &&
                             lawyerDetails.specialisation.map(
-                              (spec: string, index: number) => (
-                                <li key={index}>{spec}</li>
+                              (spec: SpecializationsType, index: number) => (
+                                <li key={index}>{spec.name}</li>
                               )
                             )}
                         </ul>
