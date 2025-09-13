@@ -1,5 +1,4 @@
 import { Gender } from "../enums/user.enums";
-import { clientDataType } from "./Client.data.type";
 
 export interface ResponseType {
   success: boolean;
@@ -31,6 +30,10 @@ export interface BasicUpdatePayload {
   gender?: Gender;
 }
 
-export interface BasicUpdateResponse {
-  data: clientDataType;
+export interface BasicInfoType {
+  image?: string;
+  name: string;
+  mobile?: string;
+  dob?: string;
+  gender?: Gender;
 }

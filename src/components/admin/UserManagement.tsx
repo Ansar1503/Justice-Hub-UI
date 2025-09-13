@@ -34,7 +34,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MoreHorizontal, Check, X } from "lucide-react";
-import { clientDataType } from "@/types/types/Client.data.type";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserDetailsModal } from "@/components/admin/Modals/UserDetails.Modal";
 import { toast } from "react-toastify";
@@ -105,7 +104,7 @@ export function UserManagement() {
   }, [isError, error]);
 
   // function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-    // setSearch(e.target.value);
+  // setSearch(e.target.value);
   // }0
 
   function handleTabChange(tab: "client" | "lawyer") {
@@ -246,7 +245,7 @@ export function UserManagement() {
                 </TableHeader>
                 <TableBody>
                   {users && users?.length > 0 ? (
-                    users.map((user: clientDataType) => (
+                    users.map((user: any) => (
                       <TableRow
                         key={user.user_id || user.email}
                         className="hover:bg-gray-50 dark:hover:bg-slate-700"

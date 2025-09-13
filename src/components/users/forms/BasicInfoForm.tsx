@@ -5,6 +5,8 @@ import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation
 
 import { fetchClientDataType } from "@/types/types/Client.data.type";
 import { useBasicInfoUpdateMutation } from "@/store/tanstack/mutations";
+import { useAppDispatch } from "@/store/redux/Hook";
+import { setUser } from "@/store/redux/auth/Auth.Slice";
 
 function BasicInfoForm({
   data,
@@ -14,6 +16,7 @@ function BasicInfoForm({
   isLoading: boolean;
 }) {
   const [isEditingBasic, setIsEditingBasic] = useState(false);
+  const dispatch = useAppDispatch();
   // const { client: clientData, loading } = useAppSelector(
   //   (state) => state.Client
   // );
@@ -112,7 +115,8 @@ function BasicInfoForm({
     formData.append("mobile", BasicInfo?.mobile || "");
     formData.append("dob", BasicInfo?.dob || "");
     formData.append("gender", BasicInfo?.gender || "");
-    await mutateAsync(formData);
+    const data = await mutateAsync(formData);
+    dispatch(setUser(data));
     // dispatch(updateBasicInfo(formData));
     setIsEditingBasic(false);
   }

@@ -2,7 +2,6 @@
 import { validateAddressFields } from "@/utils/validations/ProfileFormValidation";
 import React, { useEffect, useState } from "react";
 import { Skeleton } from "../../ui/skeleton";
-// import { useFetchClientData } from "@/hooks/tanstack/queries";
 import { fetchClientDataType } from "@/types/types/Client.data.type";
 import { useUpdateAddressMutation } from "@/store/tanstack/mutations";
 

@@ -27,6 +27,12 @@ export const profileQueries = {
   },
 };
 
+export const ClientRoutes = {
+  base: "client",
+  profile: "/profile",
+  Basic: "/basic",
+};
+
 export const SpecializationRoutes = {
   base: "/specialization",
 };

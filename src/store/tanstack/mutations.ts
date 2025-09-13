@@ -25,12 +25,12 @@ import {
 } from "@/utils/api/services/clientServices";
 import {
   AddressType,
+  clientDataType,
   fetchClientDataType,
 } from "@/types/types/Client.data.type";
 import {
   LoginPayload,
   LoginResponse,
-  BasicUpdateResponse,
   ResponseType,
 } from "@/types/types/LoginResponseTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -64,7 +64,7 @@ export function useLoginMutation() {
 
 export function useBasicInfoUpdateMutation() {
   const queryClient = useQueryClient();
-  return useMutation<BasicUpdateResponse, Error, FormData>({
+  return useMutation<clientDataType, Error, FormData>({
     mutationFn: updateBasicInfo,
     onSuccess: () => {
       toast.success("Succeeded");
@@ -167,6 +167,14 @@ export function useBlockUser() {
       ChangeBlockStatusUser(payload.user_id, payload.status),
     onSuccess: (data) => {
       toast.success(data.message);
+      // const queries = queryClient.getQueriesData({ queryKey: ["user"] });
+      // const userDataEntry = queries.find(([_, data]: any[]) =>
+      //   data?.data?.some((user) => user._id === userId)
+      // );
+
+      // console.log(userDataEntry);
+      // -> [queryKey, fullQueryData]
+
       queryClient.invalidateQueries({ queryKey: ["user"], exact: false });
     },
     onError: (error: any) => {

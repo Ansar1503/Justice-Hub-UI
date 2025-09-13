@@ -4,7 +4,6 @@ import {
   AddressType,
   LawyerFilterParams,
 } from "@/types/types/Client.data.type";
-import { BasicUpdateResponse } from "@/types/types/LoginResponseTypes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 import {
   AppointmentStatus,
@@ -24,9 +23,7 @@ export async function fetchClientData() {
   return response.data;
 }
 
-export async function updateBasicInfo(
-  basicInfo: FormData
-): Promise<BasicUpdateResponse> {
+export async function updateBasicInfo(basicInfo: FormData) {
   const { token } = store.getState().Auth;
   const response = await axiosinstance.put(
     "/api/client/profile/basic/",

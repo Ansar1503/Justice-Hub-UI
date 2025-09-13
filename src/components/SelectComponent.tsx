@@ -30,7 +30,7 @@ export function SelectComponent({
   return (
     <Select
       onValueChange={(val) => onSelect(val === "clear" ? "" : val)}
-      value={selectedValue && selectedValue !== "" ? selectedValue : "clear"}
+      value={selectedValue}
     >
       <SelectTrigger className={`w-[180px] ${className}`}>
         <SelectValue placeholder={placeholder} />
