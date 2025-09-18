@@ -1,7 +1,10 @@
 import BasicInfoForm from "./forms/BasicInfoForm";
 import PersonalInfoForm from "./forms/PersonalInfoForm";
 import AddressInfoForm from "./forms/AddressInfoForm";
-import { useFetchClientData } from "@/store/tanstack/queries";
+import {
+  useFetchClientData,
+  useFetchProfileImage,
+} from "@/store/tanstack/queries";
 import { AlertDestructive } from "../ui/custom/AlertDestructive";
 import { ButtonLink } from "../ui/custom/ButtonLink";
 import {
@@ -21,6 +24,8 @@ function ProfileCard() {
   const verificationContext = useContext(LawyerVerificationContext);
   const { user } = useAppSelector((state) => state.Auth);
   const { data, isLoading } = useFetchClientData();
+  const { data: profileImage } = useFetchProfileImage();
+  // console.log("profile image", profileImage);
   const dispatch = useAppDispatch();
   useEffect(() => {
     if (
@@ -141,7 +146,11 @@ function ProfileCard() {
 
           <TabsContent value="basic-info" className="space-y-6 mt-6">
             <div className="bg-card rounded-lg border p-6">
-              <BasicInfoForm data={data} isLoading={isLoading} />
+              <BasicInfoForm
+                data={data}
+                isLoading={isLoading}
+                profileImage={profileImage}
+              />
             </div>
             <div className="bg-card rounded-lg border p-6">
               <AddressInfoForm data={data} isLoading={isLoading} />

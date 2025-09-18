@@ -12,6 +12,7 @@ import {
   SortOrder,
 } from "@/components/users/AppointmentsComponent";
 import { Review } from "@/types/types/Review";
+import { CommonQueies, profileQueries } from "@/utils/constants/RouteConstants";
 
 export async function fetchClientData() {
   const { token } = store.getState().Auth;
@@ -21,6 +22,17 @@ export async function fetchClientData() {
     },
   });
   return response.data;
+}
+
+export async function fetchProfileImage() {
+  const { user, token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api + user?.role + profileQueries.base + profileQueries.image,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data
 }
 
 export async function updateBasicInfo(basicInfo: FormData) {

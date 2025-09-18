@@ -20,6 +20,7 @@ export const CommonQueies = {
 
 export const profileQueries = {
   base: "/profile",
+  image: "/image",
   lawyer: {
     base: "/lawyers",
     verification: "/verification",

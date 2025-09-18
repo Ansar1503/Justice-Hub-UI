@@ -8,7 +8,7 @@ export const ThemeContext = createContext<ThemeType>({
 
 function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<ThemeEnum>(
-    (localStorage.getItem("theme") as ThemeEnum) || ThemeEnum.Light
+    (localStorage.getItem("theme") as ThemeEnum) || ThemeEnum.Dark
   );
 
   useEffect(() => {

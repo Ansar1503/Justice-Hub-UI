@@ -67,13 +67,13 @@ export function useBasicInfoUpdateMutation() {
   return useMutation<clientDataType, Error, FormData>({
     mutationFn: updateBasicInfo,
     onSuccess: () => {
-      toast.success("Succeeded");
+      toast.success("succeeded");
       queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["profileImage"] });
     },
     onError: (error: any) => {
       const message =
         error.response?.data?.message || "update failed! Try again";
-      error.message = message;
       toast.error(message);
     },
   });
@@ -93,7 +93,6 @@ export function useUpdateEmailMutation() {
       console.log("error in update email", error);
       const message =
         error.response?.data?.error || "update failed! Try again.";
-      error.message = message;
       toast.error(message);
     },
   });
@@ -110,7 +109,6 @@ export function useSendVerificationMailMutation() {
     onError: (error: any) => {
       const message =
         error.response?.data?.message || "update failed! Try again.";
-      error.message = message;
       toast.error(message);
     },
   });
@@ -229,7 +227,6 @@ export function useChangeLawyerVerificationStatus() {
       const message =
         error.response.data?.message ||
         "Something went wrong please try again later!";
-      error.message = message;
       toast.error(message);
     },
   });

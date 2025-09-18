@@ -3,6 +3,7 @@ import {
   fetchLawyerDetails,
   fetchLawyersByQuery,
   fetchLawyerSlotSettings,
+  fetchProfileImage,
   fetchReviewsBySession,
   fetchSessionDocuments,
   fetchSlotsforClients,
@@ -68,6 +69,17 @@ export function useFetchClientData() {
     retry: 1,
     enabled:
       user && user?.role !== "admin" && user.user_id != null ? true : false,
+  });
+}
+
+export function useFetchProfileImage() {
+  return useQuery<string>({
+    queryKey: ["profileImage"],
+    queryFn: fetchProfileImage,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
   });
 }
 
