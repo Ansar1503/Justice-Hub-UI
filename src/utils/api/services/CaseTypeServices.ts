@@ -57,5 +57,14 @@ export async function DeleteCasetype(id: string) {
       id,
     { headers: { Authorization: `Bearer ${token}` } }
   );
-  return response.data; 
+  return response.data;
+}
+
+export async function FetchCasetypeByPractice(payload: string[] | undefined) {
+  const { user, token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api + user?.role + CasetypeRoutes.base,
+    { headers: { Authorization: `Bearer ${token}` }, params: { pids: payload } }
+  );
+  return response.data;
 }
