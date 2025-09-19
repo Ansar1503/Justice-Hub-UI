@@ -390,6 +390,10 @@ export default function LawyerProfile() {
                           <DialogDescription>
                             Please select a date and time for your consultation.
                           </DialogDescription>
+                          <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium mt-2">
+                            Note: Use this form only for first-time case
+                            bookings. For follow-ups, go to the specific case.
+                          </p>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                           <div className="grid gap-2">
