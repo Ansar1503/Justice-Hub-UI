@@ -49,11 +49,15 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import Reviews from "./Reviews";
 import { PracticeAreaType } from "@/types/types/PracticeAreaType";
 import { SpecializationsType } from "@/types/types/SpecializationType";
+import { useFechCaseTypeByPractice } from "@/store/tanstack/Queries/CasetypeQuery";
+import { CaseTypestype } from "@/types/types/CaseType";
 // import { LawerDataType } from "@/types/types/Client.data.type";
 
 export default function LawyerProfile() {
   const [lawyerDetails, setLawyerDetails] = useState<any>();
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [caseType, setCaseType] = useState<CaseTypestype | null>(null);
+  const [title, setTitle] = useState<string>("");
   const [timeSlot, setTimeSlot] = useState<string>();
   const [timeSlots, setTimeSlots] = useState<string[]>([]);
   const [lawyerAvailablity, setLawyerAvailability] = useState<boolean>(false);
@@ -121,7 +125,9 @@ export default function LawyerProfile() {
     deleteSession();
   }, [sessionId, fetchSlots, refetchslotSettings]);
   const slotDetailsData = slotDetails?.data;
-
+  const { data: caseTypes } = useFechCaseTypeByPractice(
+    lawyerDetails?.practice_areas
+  );
   useEffect(() => {
     if (slotDetailsData && Object.keys(slotDetailsData).length > 0) {
       if (slotDetailsData?.isAvailable && slotDetailsData?.slots.length > 0) {
@@ -176,7 +182,15 @@ export default function LawyerProfile() {
   // };
 
   const handleSubmit = async () => {
-    if (!lawyerAvailablity || !date || !timeSlot || !reason.trim() || !id) {
+    if (
+      !lawyerAvailablity ||
+      !date ||
+      !timeSlot ||
+      !reason.trim() ||
+      !id ||
+      !caseType ||
+      !title
+    ) {
       return;
     }
     const stripe_pk = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
@@ -197,6 +211,8 @@ export default function LawyerProfile() {
           timeSlot,
           reason,
           duration: slotSettings?.slotDuration,
+          caseTypeId: caseType.id,
+          title: title,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -442,6 +458,75 @@ export default function LawyerProfile() {
                           </div>
                           <div className="grid gap-2">
                             <Label
+                              htmlFor="time"
+                              className="dark:text-gray-200"
+                            ></Label>
+                          </div>
+                          {/* Case Title */}
+                          <div className="grid gap-2">
+                            <Label
+                              htmlFor="title"
+                              className="dark:text-gray-200"
+                            >
+                              Case Title
+                            </Label>
+                            <input
+                              id="title"
+                              type="text"
+                              value={title}
+                              onChange={(e) => setTitle(e.target.value)}
+                              disabled={!lawyerAvailablity || isSubmitting}
+                              placeholder="e.g. Property dispute with landlord"
+                              className="px-3 py-2 rounded-md border dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400"
+                            />
+                          </div>
+                          {/* Case Type */}
+                          <div className="grid gap-2">
+                            <Label
+                              htmlFor="caseType"
+                              className="dark:text-gray-200"
+                            >
+                              Select Case Type
+                            </Label>
+                            <Select
+                              value={caseType?.id || ""}
+                              onValueChange={(value) => {
+                                const selected = caseTypes?.find(
+                                  (ct: CaseTypestype) =>
+                                    ct.id.toString() === value
+                                );
+                                setCaseType(selected || null);
+                              }}
+                            >
+                              <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <SelectValue placeholder="Select a case type" />
+                              </SelectTrigger>
+                              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                                {!caseTypes || caseTypes.length === 0 ? (
+                                  <SelectItem
+                                    value="unavailable"
+                                    disabled
+                                    className="dark:text-gray-400 dark:focus:bg-gray-600"
+                                  >
+                                    No case type suitable for this lawyer
+                                  </SelectItem>
+                                ) : (
+                                  caseTypes.map((ct: CaseTypestype) => (
+                                    <SelectItem
+                                      key={ct.id}
+                                      value={ct.id.toString()}
+                                      className="dark:text-white dark:focus:bg-gray-600"
+                                    >
+                                      {ct.name}
+                                    </SelectItem>
+                                  ))
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="grid gap-2">
+                            <Label
                               htmlFor="reason"
                               className="dark:text-gray-200"
                             >
@@ -498,6 +583,8 @@ export default function LawyerProfile() {
                               !date ||
                               !timeSlot ||
                               !reason ||
+                              !caseType ||
+                              !title ||
                               isSubmitting
                             }
                           >

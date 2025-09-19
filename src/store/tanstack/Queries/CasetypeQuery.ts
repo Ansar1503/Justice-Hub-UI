@@ -3,7 +3,10 @@ import {
   CaseTypeResponseWithPagination,
   CaseTypestype,
 } from "@/types/types/CaseType";
-import { fetchAllCaseTypes, FetchCasetypeByPractice } from "@/utils/api/services/CaseTypeServices";
+import {
+  fetchAllCaseTypes,
+  FetchCasetypeByPractice,
+} from "@/utils/api/services/CaseTypeServices";
 import { useQuery } from "@tanstack/react-query";
 
 export function useFetchAllCaseTypes(payload: CaseTypeFetchQuery) {
@@ -17,7 +20,7 @@ export function useFetchAllCaseTypes(payload: CaseTypeFetchQuery) {
 }
 
 export function useFechCaseTypeByPractice(payload: string[] | undefined) {
-  return useQuery<CaseTypestype>({
+  return useQuery<CaseTypestype[] | []>({
     queryKey: ["casetype", payload],
     queryFn: () => FetchCasetypeByPractice(payload),
     enabled: payload && payload.length != 0,
