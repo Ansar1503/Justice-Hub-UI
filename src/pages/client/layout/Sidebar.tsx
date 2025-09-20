@@ -1,4 +1,11 @@
-import { Calendar, Calendar1, User, UserPen, Wallet } from "lucide-react";
+import {
+  Calendar,
+  Calendar1,
+  FileText,
+  User,
+  UserPen,
+  Wallet,
+} from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "@/store/redux/Hook";
 import { useLocation, Link } from "react-router-dom";
@@ -14,6 +21,7 @@ export default function Sidebar() {
   const path = location.pathname;
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
+    { path: `/${user?.role}/cases`, label: "Cases", icon: FileText },
     {
       path: `/${user?.role}/appointments`,
       label: "appointments",

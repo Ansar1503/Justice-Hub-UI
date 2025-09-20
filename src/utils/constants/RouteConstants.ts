@@ -47,3 +47,7 @@ export const CasetypeRoutes = {
   base: "/casetypes",
   pidQuery: "&pid=",
 };
+
+export const CasesRoutes = {
+  base: "/cases",
+};

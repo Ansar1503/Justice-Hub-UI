@@ -5,7 +5,7 @@ import {
 } from "@/types/types/CaseType";
 import {
   fetchAllCaseTypes,
-  FetchCasetypeByPractice,
+  FetchAllCasetype,
 } from "@/utils/api/services/CaseTypeServices";
 import { useQuery } from "@tanstack/react-query";
 
@@ -19,11 +19,10 @@ export function useFetchAllCaseTypes(payload: CaseTypeFetchQuery) {
   });
 }
 
-export function useFechCaseTypeByPractice(payload: string[] | undefined) {
+export function useFechAllCaseType() {
   return useQuery<CaseTypestype[] | []>({
-    queryKey: ["casetype", payload],
-    queryFn: () => FetchCasetypeByPractice(payload),
-    enabled: payload && payload.length != 0,
+    queryKey: ["casetypes"],
+    queryFn: () => FetchAllCasetype(),
     staleTime: 1000 * 60,
   });
 }
