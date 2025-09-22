@@ -7,6 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { CaseStatusBadge } from "./CaseStatusBadge";
+import { formatDate } from "@/utils/utils";
 
 type Props = {
   Cases: CaseQueryResponseType["data"] | null;
@@ -32,16 +34,30 @@ export default function CaseList({ Cases }: Props) {
           </TableHeader>
           <TableBody>
             {Cases && Cases.length > 0 ? (
-              Cases.map((c: any) => (
-                <TableRow key={c}>
-                  <TableCell className="p-3 bg-white/5"></TableCell>
-                  <TableCell className="p-3 bg-white/5"></TableCell>
-                  <TableCell className="p-3 bg-white/5"></TableCell>
-                  <TableCell className="p-3 bg-white/5"></TableCell>
-                  <TableCell className="p-3 bg-white/5"></TableCell>
-                  <TableCell className="p-3 bg-white/5"></TableCell>
-                  <TableCell className="p-3 bg-white/5"></TableCell>
-                  <TableCell className="p-3 bg-white/5"></TableCell>
+              Cases.map((c, i) => (
+                <TableRow key={c.id || i}>
+                  <TableCell className="py-3 px-4 text-foreground">
+                    {c.id ? c.id.slice(5).toUpperCase() : "#Case-" + i}
+                  </TableCell>
+                  <TableCell className="p-3 bg-white/5 font-medium text-primary">
+                    {c.title}
+                  </TableCell>
+                  <TableCell className="py-3 px-4 text-foreground">
+                    {c.clientDetails.name}
+                  </TableCell>
+                  <TableCell className="py-3 px-4 text-foreground">
+                    {c.lawyerDetails.name}
+                  </TableCell>
+                  <TableCell className="py-3 px-4 text-muted-foreground">
+                    {c.caseTypeDetails.name}
+                  </TableCell>
+                  <TableCell className="py-3 px-4 text-foreground">
+                    <CaseStatusBadge status={c.status} />
+                  </TableCell>
+                  <TableCell className="py-3 px-4 text-foreground">
+                    {formatDate(new Date(c.createdAt))}
+                  </TableCell>
+                  <TableCell className="py-3 px-4 text-foreground"></TableCell>
                 </TableRow>
               ))
             ) : (

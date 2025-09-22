@@ -1,7 +1,11 @@
 import { store } from "@/store/redux/store";
 import { CaseTypeFetchQuery } from "@/types/types/CaseType";
 import axiosinstance from "../axios/axios.instance";
-import { CasetypeRoutes, CommonQueies } from "@/utils/constants/RouteConstants";
+import {
+  CasetypeRoutes,
+  CommonQueies,
+  PracticeAreaRoutes,
+} from "@/utils/constants/RouteConstants";
 
 export async function fetchAllCaseTypes(queries: CaseTypeFetchQuery) {
   const { limit, page, pid, search } = queries;
@@ -65,6 +69,18 @@ export async function FetchAllCasetype() {
   const response = await axiosinstance.get(
     CommonQueies.api + user?.role + CasetypeRoutes.base,
     { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+export async function FetchCasetypeByPractice(payload: string[] | undefined) {
+  const { user, token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api +
+      user?.role +
+      CasetypeRoutes.base +
+      PracticeAreaRoutes.base,
+    { headers: { Authorization: `Bearer ${token}` }, params: { pids: payload } }
   );
   return response.data;
 }

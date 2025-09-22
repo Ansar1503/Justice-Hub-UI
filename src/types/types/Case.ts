@@ -42,7 +42,7 @@ type AggregatedCasesData = {
   summary?: string;
   estimatedValue?: number;
   nextHearing?: Date;
-  status: statusType;
+  status: StatusType;
   createdAt: Date;
   updatedAt: Date;
 };
