@@ -126,7 +126,7 @@ export default function LawyerProfile() {
   }, [sessionId, fetchSlots, refetchslotSettings]);
   const slotDetailsData = slotDetails?.data;
   const { data: caseTypes } = useFechCaseTypeByPractice(
-    lawyerDetails?.practice_areas
+    lawyerDetails?.practice_areas?.map((p: PracticeAreaType) => p.id)
   );
   useEffect(() => {
     if (slotDetailsData && Object.keys(slotDetailsData).length > 0) {
