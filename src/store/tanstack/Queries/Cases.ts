@@ -1,3 +1,4 @@
+import { Appointment } from "@/types/types/AppointmentsType";
 import {
   AggregatedCasesData,
   CaseQueryResponseType,
@@ -5,6 +6,7 @@ import {
 } from "@/types/types/Case";
 import {
   FetchAllCasesByQuery,
+  FetchCaseAppointments,
   FetchCaseDetails,
 } from "@/utils/api/services/CaseServices";
 import { useQuery } from "@tanstack/react-query";
@@ -22,6 +24,15 @@ export function useFetchCaseDetails(id: string | undefined) {
   return useQuery<AggregatedCasesData>({
     queryKey: ["case", id],
     queryFn: () => FetchCaseDetails(id),
+    enabled: Boolean(id),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useFetchCaseAppointments(id: string | undefined) {
+  return useQuery<Appointment[] | []>({
+    queryKey: ["cases", "appointments", id],
+    queryFn: () => FetchCaseAppointments(id),
     enabled: Boolean(id),
     staleTime: 1000 * 60,
   });

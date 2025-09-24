@@ -1,6 +1,7 @@
 import {
   Calendar,
   Calendar1Icon,
+  FileText,
   Timer,
   User,
   UserPen,
@@ -24,6 +25,7 @@ export default function Sidebar() {
   const menuItems = [
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
     { path: `/${user?.role}/schedule`, label: "Slots", icon: Calendar },
+    { path: `/${user?.role}/cases`, label: "Cases", icon: FileText },
     {
       path: `/${user?.role}/appointments`,
       label: "Appointments",

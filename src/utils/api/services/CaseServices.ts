@@ -35,3 +35,17 @@ export async function FetchCaseDetails(id: string | undefined) {
   );
   return response.data;
 }
+
+export async function FetchCaseAppointments(id: string | undefined) {
+  const { user, token } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api +
+      user?.role +
+      CasesRoutes.base +
+      CasesRoutes.appointments +
+      CommonQueies.params +
+      id,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}

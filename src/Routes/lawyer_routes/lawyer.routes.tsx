@@ -12,6 +12,8 @@ import VideoCall from "@/pages/lawyer/VideoCall";
 import ReviewPage from "@/pages/lawyer/ReviewPage";
 import WalletPage from "@/pages/lawyer/WalletPage";
 import LawyerVerificationProtected from "./wrapper/LawyerVerificationProtected.route";
+import CasesPage from "@/pages/lawyer/CasesPage";
+import CaseDetailsPage from "@/pages/lawyer/CaseDetailsPage";
 
 export default function LawyerRoutes() {
   return (
@@ -26,6 +28,8 @@ export default function LawyerRoutes() {
           <Route path="/reviews" element={<ReviewPage />} />
           <Route path="/session/join/:id" element={<VideoCall />} />
           <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/cases" element={<CasesPage />} />
+          <Route path="/cases/:id" element={<CaseDetailsPage />} />
         </Route>
       </Route>
 

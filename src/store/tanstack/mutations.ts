@@ -285,11 +285,14 @@ export function useAddReview() {
 export function useCancellAppointment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { id: string; status: string }) =>
-      cancellAppointment(payload),
+    mutationFn: (payload: {
+      id: string;
+      status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+    }) => cancellAppointment(payload),
     onSuccess: () => {
       toast.success("Appointment cancelled!");
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "appointments"] });
     },
     onError: (error: any) => {
       const message =
@@ -304,11 +307,14 @@ export function useCancellAppointment() {
 export function useRejectAppointment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { id: string; status: string }) =>
-      rejectClientAppointment(payload),
+    mutationFn: (payload: {
+      id: string;
+      status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+    }) => rejectClientAppointment(payload),
     onSuccess: (updated) => {
       toast.success(updated.message);
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "appointments"] });
     },
     onError: (error: any) => {
       const message =
@@ -324,11 +330,14 @@ export function useRejectAppointment() {
 export function useConfirmAppointment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { id: string; status: string }) =>
-      confirmAppointment(payload),
+    mutationFn: (payload: {
+      id: string;
+      status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+    }) => confirmAppointment(payload),
     onSuccess: (updated) => {
       toast.success(updated.message);
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "appointments"] });
     },
     onError: (error: any) => {
       const message =

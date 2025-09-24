@@ -51,6 +51,7 @@ import { PracticeAreaType } from "@/types/types/PracticeAreaType";
 import { SpecializationsType } from "@/types/types/SpecializationType";
 import { useFechCaseTypeByPractice } from "@/store/tanstack/Queries/CasetypeQuery";
 import { CaseTypestype } from "@/types/types/CaseType";
+import { useFetchWalletByUser } from "@/store/tanstack/Queries/walletQueries";
 // import { LawerDataType } from "@/types/types/Client.data.type";
 
 export default function LawyerProfile() {
@@ -78,6 +79,13 @@ export default function LawyerProfile() {
     isLoading,
     isError,
   } = useFetchLawyerDetails(id || "");
+  const { data: walletData } = useFetchWalletByUser();
+  const walletBalance = walletData?.balance || 0;
+  const canPayFromWallet =
+    walletBalance >= (lawyerDetails?.consultation_fee || 0);
+  const [paymentMethod, setPaymentMethod] = useState<"wallet" | "stripe">(
+    canPayFromWallet ? "wallet" : "stripe"
+  );
   const lawyerDetailsData = data?.data;
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
@@ -222,6 +230,44 @@ export default function LawyerProfile() {
       });
     } catch (error: any) {
       const message: string =
+        error.response?.data?.error || "Booking failed! Try again.";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const handleWalletPayment = async () => {
+    if (
+      !lawyerAvailablity ||
+      !date ||
+      !timeSlot ||
+      !reason ||
+      !caseType ||
+      !title
+    ) {
+      return;
+    }
+    setIsSubmitting(true);
+    const { token } = store.getState().Auth;
+
+    try {
+      await axiosinstance.post(
+        "/api/client/lawyer/slots/book-with-wallet",
+        {
+          lawyer_id: id,
+          date: date?.toISOString(),
+          timeSlot,
+          reason,
+          duration: slotSettings?.slotDuration,
+          caseTypeId: caseType.id,
+          title: title,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success("Booking successful! Paid from wallet.");
+    } catch (error: any) {
+      const message =
         error.response?.data?.error || "Booking failed! Try again.";
       toast.error(message);
     } finally {
@@ -382,7 +428,7 @@ export default function LawyerProfile() {
                           )}
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[500px] dark:bg-gray-800 dark:border-gray-700">
+                      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
                         <DialogHeader>
                           <DialogTitle className="dark:text-white">
                             Book a Consultation
@@ -545,6 +591,7 @@ export default function LawyerProfile() {
                               className="resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400"
                             />
                           </div>
+
                           {/* <div className="grid gap-2">
                             <Label
                               htmlFor="document"
@@ -579,21 +626,79 @@ export default function LawyerProfile() {
                               )}
                             </div>
                           </div> */}
-                          <Button
-                            onClick={handleSubmit}
-                            className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white"
-                            disabled={
-                              !lawyerAvailablity ||
-                              !date ||
-                              !timeSlot ||
-                              !reason ||
-                              !caseType ||
-                              !title ||
-                              isSubmitting
-                            }
-                          >
-                            {isSubmitting ? "Submitting..." : "Submit Booking"}
-                          </Button>
+                          <div className="grid gap-2">
+                            <Label
+                              htmlFor="paymentMethod"
+                              className="dark:text-gray-200"
+                            >
+                              Select Payment Method
+                            </Label>
+                            <Select
+                              value={paymentMethod}
+                              onValueChange={(value) =>
+                                setPaymentMethod(value as "wallet" | "stripe")
+                              }
+                            >
+                              <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <SelectValue placeholder="Select a payment method" />
+                              </SelectTrigger>
+                              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                                {canPayFromWallet && (
+                                  <SelectItem
+                                    value="wallet"
+                                    className="dark:text-white dark:focus:bg-gray-600"
+                                  >
+                                    Wallet (₹{walletBalance})
+                                  </SelectItem>
+                                )}
+                                <SelectItem
+                                  value="stripe"
+                                  className="dark:text-white dark:focus:bg-gray-600"
+                                >
+                                  Pay with Stripe
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Show corresponding button */}
+                          {paymentMethod === "wallet" && canPayFromWallet ? (
+                            <Button
+                              onClick={handleWalletPayment}
+                              className="w-full mt-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                              disabled={
+                                !lawyerAvailablity ||
+                                !date ||
+                                !timeSlot ||
+                                !reason ||
+                                !caseType ||
+                                !title ||
+                                isSubmitting
+                              }
+                            >
+                              {isSubmitting
+                                ? "Processing..."
+                                : `Pay from Wallet (₹${walletBalance})`}
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={handleSubmit}
+                              className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white"
+                              disabled={
+                                !lawyerAvailablity ||
+                                !date ||
+                                !timeSlot ||
+                                !reason ||
+                                !caseType ||
+                                !title ||
+                                isSubmitting
+                              }
+                            >
+                              {isSubmitting
+                                ? "Submitting..."
+                                : "Submit Booking"}
+                            </Button>
+                          )}
                         </div>
                       </DialogContent>
                     </Dialog>

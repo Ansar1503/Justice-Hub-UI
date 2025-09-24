@@ -8,6 +8,7 @@ import {
   Briefcase,
   Tag,
   NotepadText,
+  HandCoins,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -114,6 +115,7 @@ export default function AppointmentDetailModal({
             </div>
 
             {/* Appointment Details */}
+            {/* Appointment Details */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <NotepadText className="h-4 w-4 text-gray-500" />
@@ -122,6 +124,7 @@ export default function AppointmentDetailModal({
                   {appointment?.reason}
                 </span>
               </div>
+
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-gray-500" />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -155,6 +158,26 @@ export default function AppointmentDetailModal({
                   <span className="font-medium">Status:</span>{" "}
                   {appointment?.status.charAt(0).toUpperCase() +
                     appointment?.status.slice(1)}
+                </span>
+              </div>
+
+              {/* Payment Status */}
+              <div className="flex items-center gap-2">
+                <HandCoins className="h-4 w-4 text-gray-500" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">Payment Status:</span>{" "}
+                  <span
+                    className={`font-semibold ${
+                      appointment?.payment_status === "success"
+                        ? "text-green-600 dark:text-green-400"
+                        : appointment?.payment_status === "pending"
+                        ? "text-yellow-600 dark:text-yellow-400"
+                        : "text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {appointment?.payment_status.charAt(0).toUpperCase() +
+                      appointment?.payment_status.slice(1)}
+                  </span>
                 </span>
               </div>
             </div>
