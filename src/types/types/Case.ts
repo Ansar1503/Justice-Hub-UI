@@ -30,7 +30,7 @@ export type FetchCaseQueryType = {
   caseTypeFilter: string;
 };
 
-type AggregatedCasesData = {
+export type AggregatedCasesData = {
   id: string;
   title: string;
   lawyerDetails: UserProfile;

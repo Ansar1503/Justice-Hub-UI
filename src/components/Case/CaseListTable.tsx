@@ -17,12 +17,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Link } from "react-router-dom";
+import { useAppSelector } from "@/store/redux/Hook";
 
 type Props = {
   Cases: CaseQueryResponseType["data"] | null;
 };
 
 export default function CaseList({ Cases }: Props) {
+  const { user } = useAppSelector((s) => s.Auth);
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-border/50">
@@ -31,8 +34,8 @@ export default function CaseList({ Cases }: Props) {
             <TableRow className="border-b hover:bg-muted/30">
               <TableHead className="font-semibold">Case ID</TableHead>
               <TableHead className="font-semibold">Case Title</TableHead>
-              {/* <TableHead className="font-semibold">Client</TableHead>
-              <TableHead className="font-semibold">Lawyer</TableHead> */}
+              <TableHead className="font-semibold">Client</TableHead>
+              <TableHead className="font-semibold">Primary Lawyer</TableHead>
               <TableHead className="font-semibold">Case Type</TableHead>
               <TableHead className="font-semibold">Status</TableHead>
               <TableHead className="font-semibold">Created</TableHead>
@@ -59,7 +62,7 @@ export default function CaseList({ Cases }: Props) {
                       {c.title}
                     </div>
                   </TableCell>
-                  {/* <TableCell>
+                  <TableCell>
                     <div className="flex items-center space-x-2">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                         <span className="text-xs font-medium text-primary">
@@ -82,7 +85,7 @@ export default function CaseList({ Cases }: Props) {
                         {c.lawyerDetails.name}
                       </span>
                     </div>
-                  </TableCell> */}
+                  </TableCell>
                   <TableCell>
                     <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/20">
                       {c.caseTypeDetails.name}
@@ -96,14 +99,16 @@ export default function CaseList({ Cases }: Props) {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View case details</span>
-                      </Button>
+                      <Link to={`/${user?.role}/cases/${c.id}`}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">View case details</span>
+                        </Button>
+                      </Link>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -116,12 +121,10 @@ export default function CaseList({ Cases }: Props) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View details</DropdownMenuItem>
+                          <Link to={`/${user?.role}/cases/${c.id}`}>
+                            <DropdownMenuItem>View details</DropdownMenuItem>
+                          </Link>
                           <DropdownMenuItem>Edit case</DropdownMenuItem>
-                          <DropdownMenuItem>Assign lawyer</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            Delete case
-                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -130,9 +133,9 @@ export default function CaseList({ Cases }: Props) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12">
+                <TableCell colSpan={8} className="text-center ">
                   <div className="flex flex-col items-center space-y-2">
-                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                    <div className="rounded-full bg-muted flex items-center justify-center">
                       <Eye className="h-6 w-6 text-muted-foreground" />
                     </div>
                     <h3 className="font-medium">No cases found</h3>
