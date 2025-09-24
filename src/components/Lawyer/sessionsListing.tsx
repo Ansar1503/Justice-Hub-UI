@@ -374,7 +374,7 @@ export default function SessionsListing() {
                 ) : (
                   sessions?.map((session) => {
                     const { date } = formatDateTime(
-                      session?.scheduled_date.toString()
+                      session?.appointmentDetails?.date.toString()
                     );
                     return (
                       <tr
@@ -417,8 +417,8 @@ export default function SessionsListing() {
                             <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                               <Clock className="h-3 w-3 flex-shrink-0" />
                               <span className="whitespace-nowrap">
-                                {session?.scheduled_time} ({session?.duration}{" "}
-                                min)
+                                {session?.appointmentDetails?.time} (
+                                {session?.appointmentDetails?.duration} min)
                               </span>
                             </div>
                           </div>
@@ -427,11 +427,11 @@ export default function SessionsListing() {
                           {renderStatusBadge(session?.status)}
                         </td>
                         <td className="py-4 px-4">
-                          {renderTypeBadge(session?.type)}
+                          {renderTypeBadge(session?.appointmentDetails?.type)}
                         </td>
                         <td className="py-4 px-4">
                           <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                            ₹{session.amount}
+                            ₹{session?.appointmentDetails?.amount || "N/A"}
                           </span>
                         </td>
                         <td className="py-4 px-4 text-right">
@@ -472,7 +472,7 @@ export default function SessionsListing() {
           ) : (
             sessions?.map((session) => {
               const { date, time } = formatDateTime(
-                session?.scheduled_date.toString()
+                session?.appointmentDetails?.date.toString()
               );
               return (
                 <div
@@ -535,7 +535,7 @@ export default function SessionsListing() {
                         Amount
                       </span>
                       <p className="font-medium text-gray-900 dark:text-white">
-                        ₹{session.amount}
+                        ₹{session?.appointmentDetails?.amount || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -544,10 +544,10 @@ export default function SessionsListing() {
                   <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-600">
                     <div className="flex items-center gap-2">
                       {renderStatusBadge(session?.status)}
-                      {renderTypeBadge(session?.type)}
+                      {renderTypeBadge(session?.appointmentDetails?.type)}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {session?.duration} min
+                      {session?.appointmentDetails?.duration} min
                     </div>
                   </div>
 

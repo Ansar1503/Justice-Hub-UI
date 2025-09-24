@@ -223,7 +223,7 @@ export function useFetchSessions(payload: FetchSessionsPayloadType) {
   return useQuery<FetchSessionsPayloadType, Error, FetchSessionsResponse>({
     queryKey: ["sessions", payload],
     queryFn: () => fetchSessions(payload),
-    // staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 10,
     retry: 1,
   });
 }

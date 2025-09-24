@@ -4,6 +4,8 @@ export type Appointment = {
   id: string;
   lawyer_id: string;
   client_id: string;
+  caseId: string;
+  bookingId: string;
   date: string;
   time: string;
   duration: number;

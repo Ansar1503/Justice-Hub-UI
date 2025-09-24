@@ -305,7 +305,7 @@ export default function SessionsListing() {
               ) : (
                 sessions?.map((session) => {
                   const { date, time } = formatDateTime(
-                    session?.scheduled_date?.toString()
+                    session?.appointmentDetails?.date?.toString()
                   );
                   return (
                     <tr
@@ -347,7 +347,7 @@ export default function SessionsListing() {
                           </div>
                           <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                             <Clock className="h-3 w-3" />
-                            {time} ({session?.duration} min)
+                            {time} ({session?.appointmentDetails?.duration} min)
                           </div>
                         </div>
                       </td>
@@ -355,14 +355,14 @@ export default function SessionsListing() {
                         {renderStatusBadge(session?.status)}
                       </td>
                       <td className="py-4 px-4">
-                        {renderTypeBadge(session?.type)}
+                        {renderTypeBadge(session?.appointmentDetails?.type)}
                       </td>
                       {/* <td className="py-4 px-4">
                         {renderPaymentBadge(session?.payment_status)}
                       </td> */}
                       <td className="py-4 px-4">
                         <span className="font-medium text-gray-900 dark:text-white">
-                          ₹{session.amount}
+                          ₹{session?.appointmentDetails?.amount || "N/A"}
                         </span>
                       </td>
                       <td className="py-4 px-4 text-right">

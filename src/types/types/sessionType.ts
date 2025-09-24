@@ -1,9 +1,11 @@
-import { UserProfile } from "./AppointmentsType";
+import { Appointment } from "./AppointmentsType";
+import { UserProfile } from "./Usertypes";
 
 export interface SessionDocument {
   _id: string;
   session_id: string;
   client_id: string;
+  caseId: string;
   document: { name: string; type: string; url: string; _id?: string }[];
   createdAt: Date;
   updatedAt: Date;
@@ -14,12 +16,8 @@ export interface Session {
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
-  scheduled_date: Date;
-  scheduled_time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: "consultation" | "follow-up";
+  caseId: string;
+  bookingId: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
 
   notes?: string;
@@ -44,12 +42,8 @@ export interface BaseSession {
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
-  scheduled_date: Date;
-  scheduled_time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: "consultation" | "follow-up";
+  caseId: string;
+  bookingId: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
 
   notes?: string;
@@ -72,6 +66,7 @@ export interface BaseSession {
 export interface SessionDataType extends BaseSession {
   clientData: UserProfile;
   lawyerData: UserProfile;
+  appointmentDetails: Appointment;
 }
 export interface FetchSessionsResponse {
   data: SessionDataType[] | [];

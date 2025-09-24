@@ -90,13 +90,13 @@ export default function SessionDetailModal({
   const sessionStartable = () => {
     return true;
     const currentDate = new Date();
-    const sessionDate = new Date(session?.scheduled_date);
-    const [h, m] = session?.scheduled_time
-      ? session.scheduled_time.split(":").map(Number)
+    const sessionDate = new Date(session?.appointmentDetails?.date);
+    const [h, m] = session?.appointmentDetails.time
+      ? session.appointmentDetails.time.split(":").map(Number)
       : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     const sessionEnd = new Date(
-      sessionDate.getTime() + session.duration * 60000
+      sessionDate.getTime() + session?.appointmentDetails?.duration * 60000
     );
     // console.log("currentdata", currentDate);
     // console.log("sessionDate", sessionDate);
@@ -113,13 +113,13 @@ export default function SessionDetailModal({
   const sessionJoinable = () => {
     return true;
     const currentDate = new Date();
-    const sessionDate = new Date(session?.scheduled_date);
-    const [h, m] = session?.scheduled_time
-      ? session.scheduled_time.split(":").map(Number)
+    const sessionDate = new Date(session?.appointmentDetails?.date);
+    const [h, m] = session?.appointmentDetails?.time
+      ? session.appointmentDetails.time.split(":").map(Number)
       : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     const sessionEnd = new Date(
-      sessionDate.getTime() + session.duration * 60000
+      sessionDate.getTime() + session.appointmentDetails.duration * 60000
     );
     return (
       session?.status === "ongoing" &&
@@ -131,9 +131,9 @@ export default function SessionDetailModal({
 
   const sessionCancelable = () => {
     const currentDate = new Date();
-    const sessionDate = new Date(session?.scheduled_date);
-    const [h, m] = session?.scheduled_time
-      ? session.scheduled_time.split(":").map(Number)
+    const sessionDate = new Date(session?.appointmentDetails?.date);
+    const [h, m] = session?.appointmentDetails?.time
+      ? session.appointmentDetails.time.split(":").map(Number)
       : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     return session?.status === "upcoming" && currentDate < sessionDate;
@@ -237,7 +237,7 @@ export default function SessionDetailModal({
                   Session Type
                 </h3>
                 <span className="inline-flex items-center px-2 py-1 rounded border border-gray-300 text-xs font-medium bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600">
-                  {session.type === "consultation"
+                  {session?.appointmentDetails?.type === "consultation"
                     ? "Consultation"
                     : "Follow-up"}
                 </span>
@@ -305,8 +305,10 @@ export default function SessionDetailModal({
                       Scheduled At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session?.scheduled_date.toString())},
-                      {formatTime(session?.scheduled_time)}
+                      {formatDate(
+                        session?.appointmentDetails?.date?.toString()
+                      )}
+                      ,{formatTime(session?.appointmentDetails?.time)}
                     </p>
                   </div>
                 </div>
@@ -318,7 +320,7 @@ export default function SessionDetailModal({
                       Duration
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDuration(session?.duration)}
+                      {formatDuration(session?.appointmentDetails?.duration)}
                     </p>
                   </div>
                 </div>
@@ -330,7 +332,7 @@ export default function SessionDetailModal({
                       Amount
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      ₹{session.amount}
+                      ₹{session?.appointmentDetails?.amount}
                     </p>
                   </div>
                 </div>
@@ -379,7 +381,7 @@ export default function SessionDetailModal({
                 Reason for Consultation
               </h3>
               <p className="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
-                {session?.reason}
+                {session?.appointmentDetails?.reason}
               </p>
             </div>
 

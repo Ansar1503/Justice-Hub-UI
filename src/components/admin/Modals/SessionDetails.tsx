@@ -125,13 +125,13 @@ export default function SessionDetails({
 
   const sessionJoinable = () => {
     const currentDate = new Date();
-    const sessionDate = new Date(session.scheduled_date);
-    const [h, m] = session.scheduled_time
-      ? session.scheduled_time.split(":").map(Number)
+    const sessionDate = new Date(session?.appointmentDetails?.date);
+    const [h, m] = session?.appointmentDetails?.time
+      ? session.appointmentDetails.time.split(":").map(Number)
       : [0, 0];
     sessionDate.setHours(h, m, 0, 0);
     const sessionEnd = new Date(
-      sessionDate.getTime() + session.duration * 60000
+      sessionDate.getTime() + session.appointmentDetails.duration * 60000
     );
 
     return (
@@ -186,7 +186,7 @@ export default function SessionDetails({
                   Session Type
                 </h3>
                 <span className="inline-flex items-center px-2 py-1 rounded border border-gray-300 text-xs font-medium bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600">
-                  {session.type === "consultation"
+                  {session?.appointmentDetails?.type === "consultation"
                     ? "Consultation"
                     : "Follow-up"}
                 </span>
@@ -300,8 +300,8 @@ export default function SessionDetails({
                       Scheduled At
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDate(session.scheduled_date)},{" "}
-                      {formatTime(session.scheduled_time)}
+                      {formatDate(session?.appointmentDetails?.date)},{" "}
+                      {formatTime(session?.appointmentDetails?.time)}
                     </p>
                   </div>
                 </div>
@@ -312,7 +312,7 @@ export default function SessionDetails({
                       Duration
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatDuration(session.duration)}
+                      {formatDuration(session?.appointmentDetails?.duration)}
                     </p>
                   </div>
                 </div>
@@ -323,7 +323,7 @@ export default function SessionDetails({
                       Amount
                     </p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      ₹{session.amount}
+                      ₹{session?.appointmentDetails?.amount || "N/A"}
                     </p>
                   </div>
                 </div>
@@ -336,7 +336,7 @@ export default function SessionDetails({
                 Reason for Consultation
               </h3>
               <p className="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
-                {session.reason || "No reason provided"}
+                {session?.appointmentDetails?.reason || "No reason provided"}
               </p>
             </div>
             {/* Session Notes */}

@@ -272,15 +272,17 @@ export default function Sessions() {
                           <Calendar className="h-3 w-3 flex-shrink-0" />
                           <span className="whitespace-nowrap">
                             {
-                              formatDateTime(String(session.scheduled_date))
-                                .date
+                              formatDateTime(
+                                String(session?.appointmentDetails?.date)
+                              ).date
                             }
                           </span>
                         </div>
                         <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                           <Clock className="h-3 w-3 flex-shrink-0" />
                           <span className="whitespace-nowrap">
-                            {session.scheduled_time} ({session.duration} min)
+                            {session?.appointmentDetails?.time} (
+                            {session?.appointmentDetails?.time} min)
                           </span>
                         </div>
                       </TableCell>
@@ -291,10 +293,12 @@ export default function Sessions() {
                         />
                       </TableCell>
                       <TableCell className="p-3  bg-white/5 ">
-                        <Badge variant="default">{session?.type}</Badge>
+                        <Badge variant="default">
+                          {session?.appointmentDetails?.type}
+                        </Badge>
                       </TableCell>
                       <TableCell className="p-3  bg-white/5 ">
-                        ₹ {session.amount}
+                        ₹ {session?.appointmentDetails?.amount || "N/A"}
                       </TableCell>
                       <TableCell className="p-3 bg-white/5">
                         <SessionDetails
