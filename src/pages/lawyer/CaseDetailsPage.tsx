@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CaseDetailsHeadCard from "@/components/Case/CaseDetailsHeadCard";
 import CaseAppointmentsTab from "@/components/Case/CaseAppointmentsTab";
 import { useAppSelector } from "@/store/redux/Hook";
+import CaseSessionsTab from "@/components/Case/CaseSessionsTab";
 
 export default function CaseDetailsPage() {
   const { id } = useParams();
@@ -60,6 +61,10 @@ export default function CaseDetailsPage() {
             </TabsList>
             <TabsContent value="appointments">
               <CaseAppointmentsTab id={CaseDetails?.id} />
+            </TabsContent>
+
+            <TabsContent value="sessions">
+              <CaseSessionsTab id={CaseDetails?.id} />
             </TabsContent>
             <TabsContent value="documents"></TabsContent>
           </Tabs>

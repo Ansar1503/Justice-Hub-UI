@@ -17,7 +17,7 @@ import {
   IndianRupee,
   CreditCard,
 } from "lucide-react";
-import { Appointment } from "@/types/types/AppointmentsType";
+import { appointmentOutputDto } from "@/types/types/AppointmentsType";
 import Confirmation from "../Confirmation";
 import { useAppSelector } from "@/store/redux/Hook";
 import {
@@ -27,7 +27,7 @@ import {
 } from "@/store/tanstack/mutations";
 
 type Props = {
-  appointment: Appointment | null;
+  appointment: appointmentOutputDto | null;
   isOpen: boolean;
   setOpen: (val: boolean) => void;
 };
@@ -112,8 +112,8 @@ export default function CaseAppointmentDetails({
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-gray-500" />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                <span className="font-medium">Lawyer ID:</span>{" "}
-                {appointment.lawyer_id}
+                <span className="font-medium">Lawyer :</span>{" "}
+                {appointment.lawyerData.name}
               </span>
             </div>
 
@@ -121,8 +121,8 @@ export default function CaseAppointmentDetails({
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-gray-500" />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                <span className="font-medium">Client ID:</span>{" "}
-                {appointment.client_id}
+                <span className="font-medium">Client :</span>{" "}
+                {appointment.clientData.name}
               </span>
             </div>
 

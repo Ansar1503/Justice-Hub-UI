@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Appointment } from "@/types/types/AppointmentsType";
+import { appointmentOutputDto } from "@/types/types/AppointmentsType";
 import { useFetchCaseAppointments } from "@/store/tanstack/Queries/Cases";
 import CaseAppointmentDetails from "./CaseAppointmentDetails";
 import { useState } from "react";
@@ -28,10 +28,9 @@ type Props = {
 
 export default function CaseAppointmentsTab({ id }: Props) {
   const [selectedAppointment, setSelectedAppointment] =
-    useState<Appointment | null>(null);
+    useState<appointmentOutputDto | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const { data: CaseAppointments } = useFetchCaseAppointments(id);
-
   return (
     <>
       <Card>
@@ -66,11 +65,11 @@ export default function CaseAppointmentsTab({ id }: Props) {
             </TableHeader>
             <TableBody>
               {CaseAppointments && CaseAppointments.length > 0 ? (
-                CaseAppointments.map((appointment: Appointment) => (
+                CaseAppointments.map((appointment: appointmentOutputDto) => (
                   <TableRow key={appointment.id} className="hover:bg-muted/20">
                     <TableCell>{appointment.bookingId}</TableCell>
-                    <TableCell>{appointment.lawyer_id}</TableCell>
-                    <TableCell>{appointment.client_id}</TableCell>
+                    <TableCell>{appointment.lawyerData?.name}</TableCell>
+                    <TableCell>{appointment.clientData?.name}</TableCell>
                     <TableCell>
                       {appointment.type === "consultation"
                         ? "Consultation"

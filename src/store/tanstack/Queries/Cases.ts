@@ -1,13 +1,15 @@
-import { Appointment } from "@/types/types/AppointmentsType";
+import { appointmentOutputDto } from "@/types/types/AppointmentsType";
 import {
   AggregatedCasesData,
   CaseQueryResponseType,
   FetchCaseQueryType,
 } from "@/types/types/Case";
+import { SessionDataType } from "@/types/types/sessionType";
 import {
   FetchAllCasesByQuery,
   FetchCaseAppointments,
   FetchCaseDetails,
+  FetchCaseSessions,
 } from "@/utils/api/services/CaseServices";
 import { useQuery } from "@tanstack/react-query";
 
@@ -30,9 +32,18 @@ export function useFetchCaseDetails(id: string | undefined) {
 }
 
 export function useFetchCaseAppointments(id: string | undefined) {
-  return useQuery<Appointment[] | []>({
+  return useQuery<appointmentOutputDto[] | []>({
     queryKey: ["cases", "appointments", id],
     queryFn: () => FetchCaseAppointments(id),
+    enabled: Boolean(id),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useFetchCaseSessions(id: string | undefined) {
+  return useQuery<SessionDataType[] | []>({
+    queryKey: ["cases", "sessions", id],
+    queryFn: () => FetchCaseSessions(id),
     enabled: Boolean(id),
     staleTime: 1000 * 60,
   });

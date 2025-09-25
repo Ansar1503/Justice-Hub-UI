@@ -17,6 +17,7 @@ export function useCancelSessionByLawyer() {
     onSuccess: (data) => {
       toast.success(data?.message || "Session cancelled successfully!");
       queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "sessions"] });
     },
     onError: (error: any) => {
       const message =
@@ -35,6 +36,7 @@ export function useCancelSessionByClient() {
       // console.log("data:", data);
       toast.success(data?.message || "Session cancelled successfully!");
       queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "sessions"] });
     },
     onError: (error: any) => {
       const message =
@@ -55,6 +57,7 @@ export function useStartSession() {
     mutationFn: (payload) => StartSession(payload.sessionId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "sessions"] });
       toast.success("Session started successfully!");
     },
 
@@ -76,6 +79,7 @@ export function useJoinSession() {
     mutationFn: (payload) => joinVideoSession(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "sessions"] });
       toast.success("Session started successfully!");
     },
 
@@ -97,6 +101,7 @@ export function useEndSession() {
     mutationFn: (sessionId: string) => endSession(sessionId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "sessions"] });
     },
     onError: (error: any) => {
       const message =
