@@ -252,7 +252,7 @@ export default function LawyerProfile() {
 
     try {
       await axiosinstance.post(
-        "/api/client/lawyer/slots/book-with-wallet",
+        "/api/client/lawyer/slots/book-wallet",
         {
           lawyer_id: id,
           date: date?.toISOString(),
