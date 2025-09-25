@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   User,
   Calendar,
@@ -62,31 +62,31 @@ ChatDetailsModalProps) {
     selectedSession?.name || "NO TTTLE"
   );
   const [chatNameError, setChatNameError] = useState("");
-
   const isCurrentUserClient =
     selectedSession?.participants?.client_id === currentUserId;
   const clientData = selectedSession?.clientData;
   const lawyerData = selectedSession?.lawyerData;
   const sessionDetails = selectedSession?.sessionDetails;
-  const sessionStartable = useMemo(() => {
-    if (!sessionDetails || sessionDetails?.status !== "ongoing") return false;
-    console.log("not false");
-    const currentDate = new Date();
-    const sessionDate = new Date(sessionDetails.scheduled_date);
-    const [h, m] = sessionDetails.scheduled_time
-      ? sessionDetails.scheduled_time.split(":").map(Number)
-      : [0, 0];
-    sessionDate.setHours(h, m, 0, 0);
-    const sessionEnd = new Date(
-      sessionDate.getTime() + sessionDetails?.duration * 60000
-    );
+  const appointmentDetails = selectedSession?.appointmentDetails;
+  // const sessionStartable = useMemo(() => {
+  //   if (!sessionDetails || sessionDetails?.status !== "ongoing") return false;
+  //   console.log("not false");
+  //   const currentDate = new Date();
+  //   const sessionDate = new Date(appointmentDetails.date);
+  //   const [h, m] = appointmentDetails.time
+  //     ? appointmentDetails.time.split(":").map(Number)
+  //     : [0, 0];
+  //   sessionDate.setHours(h, m, 0, 0);
+  //   const sessionEnd = new Date(
+  //     sessionDate.getTime() + appointmentDetails?.duration * 60000
+  //   );
 
-    return (
-      currentDate >= sessionDate &&
-      currentDate < sessionEnd &&
-      sessionDetails?.status === "ongoing"
-    );
-  }, [selectedSession]);
+  //   return (
+  //     currentDate >= sessionDate &&
+  //     currentDate < sessionEnd &&
+  //     sessionDetails?.status === "ongoing"
+  //   );
+  // }, [selectedSession]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -348,8 +348,8 @@ ChatDetailsModalProps) {
                     <div className="text-sm font-medium">Scheduled</div>
                     <div className="text-xs text-muted-foreground">
                       {formatDateTime(
-                        sessionDetails?.scheduled_date,
-                        sessionDetails?.scheduled_time
+                        new Date(appointmentDetails.date),
+                        appointmentDetails.time
                       )}
                     </div>
                   </div>
@@ -506,11 +506,11 @@ ChatDetailsModalProps) {
             {/* Actions */}
             <div className="space-y-3">
               <div className="space-y-2">
-                {sessionStartable && (
-                  <>
-                    <h3 className="font-semibold">Actions</h3>
+                {/* { && ( */}
+                <>
+                  <h3 className="font-semibold">Actions</h3>
 
-                    {/* <Button
+                  {/* <Button
                       variant="outline"
                       className="w-full justify-start bg-transparent"
                       onClick={onMuteSession}
@@ -527,15 +527,15 @@ ChatDetailsModalProps) {
                       Start Voice Call
                     </Button> */}
 
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start bg-transparent"
-                    >
-                      <Video className="h-4 w-4 mr-2" />
-                      Join Video Call
-                    </Button>
-                  </>
-                )}
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start bg-transparent"
+                  >
+                    <Video className="h-4 w-4 mr-2" />
+                    Join Video Call
+                  </Button>
+                </>
+                {/* )}/ */}
 
                 {/* <Button
                   variant="outline"

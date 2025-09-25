@@ -158,7 +158,6 @@ export default function SessionsListing() {
       const data = await JoinSessionMutation({
         sessionId: session?._id || "",
       });
-      console.log("Joining session:", data);
       dispatch(
         setZcState({
           AppId: data?.zc?.appId,
@@ -251,6 +250,10 @@ export default function SessionsListing() {
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
                 <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                  Booking ID
+                </th>
+
+                <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
                   <button
                     onClick={() => handleSort("lawyer_name")}
                     className="flex items-center gap-1 hover:text-blue-600"
@@ -312,6 +315,9 @@ export default function SessionsListing() {
                       key={session.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
+                      <td className="py-4 px-4 text-sm font-medium text-gray-900 dark:text-white">
+                        {session?.appointmentDetails?.bookingId}
+                      </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8 rounded-full overflow-hidden">

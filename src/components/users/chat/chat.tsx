@@ -205,9 +205,9 @@ function Chat({
     if (!session) return false;
 
     const currentDate = new Date();
-    const sessionDate = new Date(session.sessionDetails.scheduled_date);
+    const sessionDate = new Date(session?.appointmentDetails?.date);
 
-    const scheduledTime = session.sessionDetails.scheduled_time;
+    const scheduledTime = session?.appointmentDetails?.time;
     const [h, m] = scheduledTime
       ? scheduledTime.split(":").map(Number)
       : [0, 0];
@@ -215,7 +215,7 @@ function Chat({
     sessionDate.setHours(h, m, 0, 0);
 
     const sessionEnd = new Date(
-      sessionDate.getTime() + session.sessionDetails.duration * 60000
+      sessionDate.getTime() + session?.appointmentDetails?.duration * 60000
     );
 
     return currentDate > sessionEnd;
@@ -881,8 +881,8 @@ function Chat({
                     selectedSession?.sessionDetails?.status
                   ) &&
                     checkifTimeOut(
-                      selectedSession?.sessionDetails?.scheduled_date,
-                      selectedSession?.sessionDetails?.scheduled_time
+                      new Date(selectedSession?.appointmentDetails?.date),
+                      selectedSession?.appointmentDetails?.time
                     )) ||
                   isSessionOver
                 }

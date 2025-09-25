@@ -1,3 +1,4 @@
+import { Appointment } from "./AppointmentsType";
 import {
   clientDataType,
   LawerDataType,
@@ -43,6 +44,7 @@ export interface AggregateChatSession extends ChatSession {
   lawyerData: userDataType & clientDataType & LawerDataType;
   sessionDetails: Session;
   lastMessage: ChatMessage;
+  appointmentDetails: Appointment;
 }
 
 export interface ChatMessageOutputDto {

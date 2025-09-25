@@ -321,6 +321,9 @@ export default function SessionsListing() {
             <table className="w-full min-w-full">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                    Booking ID
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[200px]">
                     <button
                       onClick={() => handleSort("client_name")}
@@ -381,6 +384,9 @@ export default function SessionsListing() {
                         key={session.id}
                         className="hover:bg-gray-50 dark:hover:bg-gray-800"
                       >
+                        <td className="py-4 px-4 text-sm font-medium text-gray-900 dark:text-white">
+                          {session.appointmentDetails?.bookingId}
+                        </td>
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10 border flex-shrink-0 rounded-full overflow-hidden">

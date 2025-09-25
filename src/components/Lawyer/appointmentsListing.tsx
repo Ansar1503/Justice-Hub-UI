@@ -262,6 +262,9 @@ export default function LawyerClientAppointmentListing() {
             <table className="w-full min-w-full">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                    Booking ID
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white min-w-[200px]">
                     <button
                       onClick={() => handleSort("client_name")}
@@ -318,6 +321,10 @@ export default function LawyerClientAppointmentListing() {
                       key={appointment?.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
+                      {" "}
+                      <td className="py-4 px-4 text-sm font-medium text-gray-900 dark:text-white">
+                        {appointment?.bookingId}
+                      </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8 border flex-shrink-0">
@@ -399,6 +406,7 @@ export default function LawyerClientAppointmentListing() {
                 key={appointment?.id}
                 className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
               >
+                {" "}
                 {/* Client Info Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -430,7 +438,6 @@ export default function LawyerClientAppointmentListing() {
                     View
                   </button>
                 </div>
-
                 {/* Appointment Details Grid */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
@@ -458,7 +465,6 @@ export default function LawyerClientAppointmentListing() {
                     </p>
                   </div>
                 </div>
-
                 {/* Status and Type Row */}
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                   <div className="flex items-center gap-2">
@@ -469,7 +475,6 @@ export default function LawyerClientAppointmentListing() {
                     {appointment.duration} min
                   </div>
                 </div>
-
                 {/* Phone Number */}
                 {appointment?.clientData?.mobile && (
                   <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
