@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, Mail, Phone, Clock } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import {
   useFetchLawyerDetails,
@@ -66,6 +66,7 @@ export default function LawyerProfile() {
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   // const [fileError, setFileError] = useState<string>("");
+  const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
   const lawyerDetailsCache = queryClient.getQueryData(["lawyerDetails", id]);
@@ -266,6 +267,7 @@ export default function LawyerProfile() {
       );
 
       toast.success("Booking successful! Paid from wallet.");
+      navigate("/client/appointments");
     } catch (error: any) {
       const message =
         error.response?.data?.error || "Booking failed! Try again.";
