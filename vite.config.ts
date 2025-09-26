@@ -12,6 +12,6 @@ export default defineConfig({
   },
   server: {
     port: 4000,
-    allowedHosts: ["69cde1dc300c.ngrok-free.app", "https://myapp.loca.lt/"],
+    allowedHosts: ["c6cfac23a22c.ngrok-free.app"],
   },
 });

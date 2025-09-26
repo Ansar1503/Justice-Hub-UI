@@ -116,8 +116,10 @@ export default function SessionDetailModal({
   }, []);
 
   const sessionStartable = useMemo(() => {
+    console.log("session",session && !session.room_id)
     if (!session || !session.room_id) return false;
-
+    if (user?.role === "client") return false;
+    // return true;
     const currentDate = new Date();
     const sessionDate = new Date(session?.appointmentDetails?.date);
     const [h, m] = session?.appointmentDetails?.time
@@ -130,7 +132,25 @@ export default function SessionDetailModal({
     return (
       currentDate >= sessionDate &&
       currentDate < sessionEnd &&
-      session?.status == "ongoing"
+      session?.status == "upcoming"
+    );
+  }, [session]);
+  const sessionJoinable = useMemo(() => {
+    // return true;
+    if (!session || !session.room_id) return false;
+    const currentDate = new Date();
+    const sessionDate = new Date(session?.appointmentDetails?.date);
+    const [h, m] = session?.appointmentDetails?.time
+      ? session.appointmentDetails.time.split(":").map(Number)
+      : [0, 0];
+    sessionDate.setHours(h, m, 0, 0);
+    const sessionEnd = new Date(
+      sessionDate.getTime() + session?.appointmentDetails?.duration * 60000
+    );
+    return (
+      currentDate >= sessionDate &&
+      currentDate < sessionEnd &&
+      session.status === "ongoing"
     );
   }, [session]);
 
@@ -417,33 +437,31 @@ export default function SessionDetailModal({
                 </>
               )}
 
+              {sessionStartable && (
+                <Button
+                  onClick={() => setShowStartConfirm(true)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Start Session
+                </Button>
+              )}
+              {sessionJoinable && (
+                <Button
+                  onClick={() => setShowJoinConfirm(true)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Join Session
+                </Button>
+              )}
               {session.status === "ongoing" && (
-                <>
-                  {sessionStartable && (
-                    <Button
-                      onClick={() => setShowStartConfirm(true)}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <Video className="h-4 w-4 mr-2" />
-                      Start Session
-                    </Button>
-                  )}
-
-                  <Button
-                    onClick={() => setShowJoinConfirm(true)}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Video className="h-4 w-4 mr-2" />
-                    Join Session
-                  </Button>
-
-                  <Button
-                    variant="destructive"
-                    onClick={() => setShowEndConfirm(true)}
-                  >
-                    End Session
-                  </Button>
-                </>
+                <Button
+                  variant="destructive"
+                  onClick={() => setShowEndConfirm(true)}
+                >
+                  End Session
+                </Button>
               )}
             </div>
           </DialogFooter>

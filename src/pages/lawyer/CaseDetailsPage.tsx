@@ -16,6 +16,7 @@ import CaseDetailsHeadCard from "@/components/Case/CaseDetailsHeadCard";
 import CaseAppointmentsTab from "@/components/Case/CaseAppointmentsTab";
 import { useAppSelector } from "@/store/redux/Hook";
 import CaseSessionsTab from "@/components/Case/CaseSessionsTab";
+import CaseDocumentsTab from "@/components/Case/CaseDocumentsTab";
 
 export default function CaseDetailsPage() {
   const { id } = useParams();
@@ -66,7 +67,9 @@ export default function CaseDetailsPage() {
             <TabsContent value="sessions">
               <CaseSessionsTab id={CaseDetails?.id} />
             </TabsContent>
-            <TabsContent value="documents"></TabsContent>
+            <TabsContent value="documents">
+              <CaseDocumentsTab id={CaseDetails?.id} />
+            </TabsContent>
           </Tabs>
         </div>
       </div>

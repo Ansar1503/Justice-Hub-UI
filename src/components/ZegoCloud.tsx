@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
-import { useEndSession } from "@/store/tanstack/mutations/sessionMutation";
+// import { useEndSession } from "@/store/tanstack/mutations/sessionMutation";
 
 export default function ZegoVideoCall({
-  sessionId,
+  // sessionId,
   roomID,
   userID,
   userName,
@@ -18,7 +18,7 @@ export default function ZegoVideoCall({
   token: string;
 }) {
   // console.log("zegocloud");
-  const { mutateAsync: endSessionMutate } = useEndSession();
+  // const { mutateAsync: endSessionMutate } = useEndSession();
   const containerRef = useRef(null);
   const zegoInstanceRef = useRef<any>(null);
   // const navigate = useNavigate();
@@ -40,13 +40,15 @@ export default function ZegoVideoCall({
         mode: ZegoUIKitPrebuilt.VideoConference,
       },
       showScreenSharingButton: false,
+      branding: {
+        logoURL:
+          "https://github.com/Ansar1503/Justice-Hub-UI/blob/f01588155564983e6ebf86e95e70579ca5dee29b/src/assets/07-03.jpg",
+      },
       onLeaveRoom() {
         handleLeaveRoom();
       },
     });
-    async function handleLeaveRoom() {
-      await endSessionMutate(sessionId);
-    }
+    async function handleLeaveRoom() {}
     return () => {
       if (zegoInstanceRef.current) {
         zegoInstanceRef.current.destroy();

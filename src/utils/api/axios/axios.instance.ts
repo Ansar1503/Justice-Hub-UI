@@ -20,12 +20,9 @@ axiosinstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config;
-    // console.log("orignianlr request intercepter line 14", originalRequest);
     if (error.response?.status === 401) {
       try {
-        // console.log("refres posting....");
         const result = await axiosinstance.get("api/user/refresh");
-        // console.log("refresh result", result);
         const newToken = result.data;
         if (originalRequest && originalRequest.headers) {
           // console.log("new token :", newToken);
