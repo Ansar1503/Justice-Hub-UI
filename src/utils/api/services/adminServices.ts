@@ -15,18 +15,12 @@ export async function fetchUserByRole(query: {
   sortOrder?: string;
   status: "all" | "verified" | "blocked";
 }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
     `/api/admin/users?role=${query.role || ""}&search=${
       query.search || ""
     }&page=${query.page || 1}&limit=${query.limit || 10}&sort=${
       query.sortBy || ""
-    }&order=${query.sortOrder || "asc"}&status=${query.status || "all"}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    }&order=${query.sortOrder || "asc"}&status=${query.status || "all"}`
   );
   // console.log("response of users from admin : ", response);
   return response.data;
@@ -40,34 +34,22 @@ export async function fetchAllLawyers(query: {
   status?: "all" | "verified" | "rejected" | "pending" | "requested";
   search: string;
 }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
     `/api/admin/lawyers?sort=${query?.sort || "name"}&order=${
       query?.order || "asc"
     }&page=${query?.page || 1}&limit=${query?.limit || 10}&status=${
       query?.status || "all"
-    }&search=${query?.search || ""}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    }&search=${query?.search || ""}`
   );
 
   return response.data;
 }
 
 export async function ChangeBlockStatusUser(user_id: string, status: boolean) {
-  const { token } = store.getState().Auth;
-  const response = await axiosinstance.patch(
-    "/api/admin/user/",
-    { user_id, status },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const response = await axiosinstance.patch("/api/admin/user/", {
+    user_id,
+    status,
+  });
   return response.data;
 }
 
@@ -80,12 +62,11 @@ export async function changeLawyerVerificationStatus({
   user_id: string;
   status: "verified" | "rejected" | "pending" | "requested";
 }) {
-  const { token } = store.getState().Auth;
-  const response = await axiosinstance.patch(
-    "/api/admin/lawyer/",
-    { user_id, status, rejectReason },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  const response = await axiosinstance.patch("/api/admin/lawyer/", {
+    user_id,
+    status,
+    rejectReason,
+  });
   return response.data;
 }
 
@@ -106,10 +87,8 @@ export async function fetchAppointmentsForAdmin(payload: {
 }) {
   const { search, limit, page, sortBy, sortOrder, status, consultation_type } =
     payload;
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/admin/appointments?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}&consultation_type=${consultation_type}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    `/api/admin/appointments?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}&consultation_type=${consultation_type}`
   );
   return response.data;
 }
@@ -122,19 +101,15 @@ export async function fetchChatDisputes(payload: {
   page: number;
 }) {
   const { search, limit, page, sortBy, sortOrder } = payload;
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/admin/disputes/chat?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    `/api/admin/disputes/chat?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}`
   );
   return response.data;
 }
 
 export async function deleteMessage(messageId: string) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.delete(
-    `/api/admin/disputes/chat/${messageId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    `/api/admin/disputes/chat/${messageId}`
   );
   return response.data;
 }
@@ -147,10 +122,8 @@ export async function fetchReviewDisputes(payload: {
   sortOrder: "asc" | "desc";
 }) {
   const { search, limit, page, sortBy, sortOrder } = payload;
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/admin/disputes/reviews?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    `/api/admin/disputes/reviews?search=${search}&limit=${limit}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}`
   );
   return response.data;
 }
@@ -159,11 +132,10 @@ export async function fetchReviewDisputes(payload: {
 //   reviewId: string;
 //   diputeId: string;
 // }) {
-//   const { token } = store.getState().Auth;
+//
 //   const response = await axiosinstance.patch(
 //     `/api/admin/disputes/reviews/`,
 //     payload,
-//     { headers: { Authorization: `Bearer ${token}` } }
 //   );
 //   return response.data;
 // }
@@ -173,11 +145,9 @@ export async function updateDisputesStatus(payload: {
   status: Disputes["status"];
   disputesId: string;
 }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.put(
     `/api/admin/disputes/status/${payload.disputesId}`,
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }

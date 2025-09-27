@@ -1,12 +1,15 @@
 // import { store } from "@/Redux/store";
+import { store } from "@/store/redux/store";
 import axios, { AxiosInstance, AxiosError } from "axios";
 import persistStore from "redux-persist/es/persistStore";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
+const { token } = store.getState().Auth;
 
 const axiosinstance: AxiosInstance = axios.create({
   baseURL,
   withCredentials: true,
+  headers: { Authorization: `Bearer ${token}` },
 });
 
 // const axiosTokenInstance:AxiosInstance = axios.create({baseURL,
@@ -25,22 +28,16 @@ axiosinstance.interceptors.response.use(
         const result = await axiosinstance.get("api/user/refresh");
         const newToken = result.data;
         if (originalRequest && originalRequest.headers) {
-          // console.log("new token :", newToken);
           originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-          // console.log("og req:", originalRequest);
           const { store } = await import("@/store/redux/store");
           const { setToken } = await import("@/store/redux/auth/Auth.Slice");
           store.dispatch(setToken(newToken));
-          // store.dispatch(setToken(result.data.token));
           return axiosinstance(originalRequest);
         }
       } catch (refresherror) {
-        // console.log("refreshErrir", refresherror);
         const { store } = await import("@/store/redux/store");
         const { signOut } = await import("@/store/redux/auth/Auth.Slice");
-        // const { LogOut } = await import("@/store/redux/client/ClientSlice");
         store.dispatch(signOut());
-        // store.dispatch(LogOut());
         persistStore(store).purge();
         return Promise.reject(refresherror);
       }
