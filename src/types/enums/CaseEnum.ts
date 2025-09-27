@@ -1,4 +1,4 @@
-export enum CaseStatus {
+export enum CaseStatusEnum {
   OPEN = "open",
   CLOSED = "closed",
   ONHOLD = "onhold",
