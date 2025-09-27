@@ -3,7 +3,8 @@ import { store } from "@/store/redux/store";
 import { lawyerProfessionalDetailsResponse } from "@/types/types/LawyerProfessionalDetailsType";
 import { addLawyerProfessionalDetails } from "@/utils/api/services/LawyerServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export function useProfessionalDetailsUpdateMutation() {
   const queryClient = useQueryClient();
@@ -16,7 +17,10 @@ export function useProfessionalDetailsUpdateMutation() {
     mutationFn: addLawyerProfessionalDetails,
     onError: (error: any) => {
       const message = error?.response?.data?.error;
-      toast.error(message || "Error updating");
+      toast.error(message || "update failed");
+    },
+    onSuccess() {
+      toast.success("lawyer Details updated successfully");
     },
     async onMutate(variables) {
       await queryClient.cancelQueries({
