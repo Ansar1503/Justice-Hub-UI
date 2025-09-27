@@ -9,7 +9,7 @@ import {
 
 export async function fetchAllCaseTypes(queries: CaseTypeFetchQuery) {
   const { limit, page, pid, search } = queries;
-  const { token, user } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
     CommonQueies.api +
       user?.role +
@@ -21,18 +21,16 @@ export async function fetchAllCaseTypes(queries: CaseTypeFetchQuery) {
       CommonQueies.searchQuery +
       search +
       CasetypeRoutes.pidQuery +
-      pid,
-    { headers: { Authorization: `Bearer ${token}` } }
+      pid
   );
   return response.data;
 }
 
 export async function AddCaseType(payload: { name: string; pid: string }) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.post(
     CommonQueies.api + user?.role + CasetypeRoutes.base,
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }
@@ -42,45 +40,42 @@ export async function UpdateCasetype(payload: {
   pid: string;
   id: string;
 }) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.put(
     CommonQueies.api + user?.role + CasetypeRoutes.base,
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }
 
 export async function DeleteCasetype(id: string) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.delete(
     CommonQueies.api +
       user?.role +
       CasetypeRoutes.base +
       CommonQueies.params +
-      id,
-    { headers: { Authorization: `Bearer ${token}` } }
+      id
   );
   return response.data;
 }
 
 export async function FetchAllCasetype() {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    CommonQueies.api + user?.role + CasetypeRoutes.base,
-    { headers: { Authorization: `Bearer ${token}` } }
+    CommonQueies.api + user?.role + CasetypeRoutes.base
   );
   return response.data;
 }
 
 export async function FetchCasetypeByPractice(payload: string[] | undefined) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
     CommonQueies.api +
       user?.role +
       CasetypeRoutes.base +
       PracticeAreaRoutes.base,
-    { headers: { Authorization: `Bearer ${token}` }, params: { pids: payload } }
+    { params: { pids: payload } }
   );
   return response.data;
 }

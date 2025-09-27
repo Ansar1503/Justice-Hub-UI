@@ -4,14 +4,9 @@ import { WalletRoutes } from "@/utils/constants/RouteConstants";
 import { transactionType } from "@/components/Wallet/WalletTransactions";
 
 export async function fetchWalletByUser() {
-  const { token, user } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `${WalletRoutes.api}${user?.role}${WalletRoutes.base}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    `${WalletRoutes.api}${user?.role}${WalletRoutes.base}`
   );
   return response.data;
 }
@@ -24,7 +19,7 @@ export async function fetchWalletTransactions(payload: {
   startDate?: Date;
   endDate?: Date;
 }) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
     WalletRoutes.api +
       user?.role +
@@ -41,12 +36,7 @@ export async function fetchWalletTransactions(payload: {
       WalletRoutes.startDateQuery +
       (payload.startDate || "") +
       WalletRoutes.endDateQuery +
-      (payload.endDate || ""),
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+      (payload.endDate || "")
   );
   return response.data;
 }

@@ -10,18 +10,17 @@ export async function AddPracticeArea(payload: {
   name: string;
   specId: string;
 }) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.post(
     CommonQueies.api + user?.role + PracticeAreaRoutes.base,
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }
 
 export async function FetchAllPracticeAreas(query: PracticeAreaQuery) {
   const { limit, page, search, specId } = query;
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
     CommonQueies.api +
       user?.role +
@@ -33,8 +32,7 @@ export async function FetchAllPracticeAreas(query: PracticeAreaQuery) {
       CommonQueies.searchQuery +
       search +
       PracticeAreaRoutes.specIdQuery +
-      specId,
-    { headers: { Authorization: `Bearer ${token}` } }
+      specId
   );
   return response.data;
 }
@@ -44,36 +42,31 @@ export async function updatePracticeArea(payload: {
   name: string;
   specId: string;
 }) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.put(
     CommonQueies.api + user?.role + PracticeAreaRoutes.base,
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }
 
 export async function deletePracticeArea(id: string) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.delete(
     CommonQueies.api +
       user?.role +
       PracticeAreaRoutes.base +
       CommonQueies.params +
-      id,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+      id
   );
   return response.data;
 }
 
 export async function fetchPracticeAreasbySpecIds(query: string[] | []) {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
     CommonQueies.api + user?.role + PracticeAreaRoutes.base,
     {
-      headers: { Authorization: `Bearer ${token}` },
       params: { specIds: query },
     }
   );

@@ -15,36 +15,22 @@ import { Review } from "@/types/types/Review";
 import { CommonQueies, profileQueries } from "@/utils/constants/RouteConstants";
 
 export async function fetchClientData() {
-  const { token } = store.getState().Auth;
-  const response = await axiosinstance.get(`/api/client/profile`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await axiosinstance.get(`/api/client/profile`);
   return response.data;
 }
 
 export async function fetchProfileImage() {
-  const { user, token } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    CommonQueies.api + user?.role + profileQueries.base + profileQueries.image,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    CommonQueies.api + user?.role + profileQueries.base + profileQueries.image
   );
-  return response.data
+  return response.data;
 }
 
 export async function updateBasicInfo(basicInfo: FormData) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.put(
     "/api/client/profile/basic/",
-    basicInfo,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    basicInfo
   );
   return response.data;
 }
@@ -52,27 +38,17 @@ export async function updateBasicInfo(basicInfo: FormData) {
 export async function updateEmail(payload: {
   email: string;
 }): Promise<EmailUpdateResponse> {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.put(
     "/api/client/profile/personal",
-    payload,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    payload
   );
   return response.data;
 }
 
 export async function sendVerificationMail(payload: { email: string }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.post(
     "/api/client/profile/verifyMail",
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    payload
   );
   return response.data;
 }
@@ -81,41 +57,30 @@ export async function updatePassword(payload: {
   password: string;
   currentPassword: string;
 }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.put(
     "/api/client/profile/updatePassword",
-    payload,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    payload
   );
   return response.data;
 }
 
 export async function updateAddress(payload: AddressType) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.post(
     "api/client/profile/address",
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }
 
 export async function fetchLawyersByQuery(payload: LawyerFilterParams) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(`api/client/lawyers`, {
-    headers: { Authorization: `Bearer ${token}` },
     params: payload,
   });
   return response.data;
 }
 
 export async function fetchLawyerDetails(user_id: string) {
-  const { token } = store.getState().Auth;
-  const response = await axiosinstance.get(`api/client/lawyers/${user_id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await axiosinstance.get(`api/client/lawyers/${user_id}`, {});
   return response.data;
 }
 
@@ -126,11 +91,9 @@ export async function addReview(payload: {
   heading: string;
   sessionId: string;
 }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.post(
     `/api/client/lawyers/review`,
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }
@@ -141,35 +104,23 @@ export async function fetchSlotsforClients(
 ): Promise<
   ResponseType & { data: { isAvailable: boolean; slots: string[] | [] } }
 > {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/client/lawyers/slots/${lawyer_id}?date=${date}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/api/client/lawyers/slots/${lawyer_id}?date=${date}`
   );
   return response.data;
 }
 
 export async function bookAppointment(formData: FormData) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.post(
     `/api/client/lawyers/book`,
-    formData,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    formData
   );
   return response.data;
 }
 
 export async function fetchLawyerSlotSettings(lawyer_id: string) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/client/lawyers/settings/${lawyer_id}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/api/client/lawyers/settings/${lawyer_id}`
   );
   return response.data;
 }
@@ -185,10 +136,8 @@ export async function fetchAppointmentsForClient(payload: {
 }) {
   // console.log("payload", payload);
 
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/client/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&consultationType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    `/api/client/profile/appointments?search=${payload.search}&appointmentStatus=${payload.appointmentStatus}&consultationType=${payload.appointmentType}&sortField=${payload.sortField}&sortOrder=${payload.sortOrder}&page=${payload.page}&limit=${payload.limit}`
   );
   return response.data;
 }
@@ -197,43 +146,31 @@ export async function cancellAppointment(payload: {
   id: string;
   status: string;
 }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.patch(
     "/api/client/profile/appointments",
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }
 
 export async function cancelSessionByClient(payload: { id: string }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.patch(
     "/api/client/profile/sessions/cancel",
-    payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload
   );
   return response.data;
 }
 
 export async function fetchChatsForClientApi(cursor = 1, search: string) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/client/profile/chats?cursor=${cursor}&search=${search}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/api/client/profile/chats?cursor=${cursor}&search=${search}`
   );
   return response.data;
 }
 
 export async function fetchChatMessages(cursor = 1, sessionId: string) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/client/profile/chats/messages?cursor=${cursor}&sId=${sessionId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/api/client/profile/chats/messages?cursor=${cursor}&sId=${sessionId}`
   );
   // console.log("response-data-----:", response.data);
   return response.data;
@@ -243,13 +180,10 @@ export async function uploadDocuments(
   payload: FormData,
   setProgress?: (value: number) => void
 ) {
-  const { token } = store.getState().Auth;
-
   const response = await axiosinstance.post(
     `/api/client/profile/sessions/document`,
     payload,
     {
-      headers: { Authorization: `Bearer ${token}` },
       onUploadProgress: (progressEvent) => {
         // console.log("progressevent", progressEvent);
         if (setProgress) {
@@ -266,67 +200,49 @@ export async function uploadDocuments(
 }
 
 export async function fetchSessionDocuments(sessionId: string) {
-  const { token, user } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   if (!user?.role) return;
   const response = await axiosinstance.get(
-    `/api/${user?.role}/profile/sessions/document/${sessionId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/api/${user?.role}/profile/sessions/document/${sessionId}`
   );
   return response.data;
 }
 
 export async function removeDocumentFile(id: string, sessionId: string) {
   const response = await axiosinstance.delete(
-    `/api/client/profile/sessions/document/${id}?session=${sessionId}`,
-    {
-      headers: { Authorization: `Bearer ${store.getState().Auth.token}` },
-    }
+    `/api/client/profile/sessions/document/${id}?session=${sessionId}`
   );
   return response.data;
 }
 
 export async function fetchReviews(pageParam: any, lawyer_id: string) {
   // console.log("lawyerId", lawyer_id, "cursort", pageParam);
-  const { token } = store.getState().Auth;
+
   const response = await axiosinstance.get(
-    `/api/client/lawyers/reviews/${lawyer_id}?cursor=${pageParam}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/api/client/lawyers/reviews/${lawyer_id}?cursor=${pageParam}`
   );
   return response.data;
 }
 
 export async function fetchReviewsBySession(sessionId: string) {
-  const { token, user } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `/api/${user?.role}/profile/sessions/reviews/${sessionId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/api/${user?.role}/profile/sessions/reviews/${sessionId}`
   );
   return response.data;
 }
 
 export async function updateReview(payload: Partial<Review>) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.put(
     `/api/client/profile/reviews/${payload.id}`,
-    payload,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    payload
   );
   return response.data;
 }
 
 export async function deleteReview(payload: { review_id: string }) {
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.delete(
-    `/api/client/profile/reviews/${payload.review_id}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    `/api/client/profile/reviews/${payload.review_id}`
   );
   return response.data;
 }
@@ -337,16 +253,13 @@ export async function reportReview(payload: {
   reportedUser: string;
   reason: string;
 }) {
-  console.log("report payload", payload);
-  const { token } = store.getState().Auth;
   const response = await axiosinstance.post(
     `/api/client/profile/reviews/report/${payload.review_id}`,
     {
       reason: payload.reason,
       reportedBy: payload.reportedBy,
       reportedUser: payload.reportedUser,
-    },
-    { headers: { Authorization: `Bearer ${token}` } }
+    }
   );
   return response.data;
 }
