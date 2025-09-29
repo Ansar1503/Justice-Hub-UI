@@ -4,20 +4,18 @@ import axios, { AxiosInstance, AxiosError } from "axios";
 import persistStore from "redux-persist/es/persistStore";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
-const { token } = store.getState().Auth;
-
 const axiosinstance: AxiosInstance = axios.create({
   baseURL,
   withCredentials: true,
-  headers: { Authorization: `Bearer ${token}` },
 });
 
-// const axiosTokenInstance:AxiosInstance = axios.create({baseURL,
-//   withCredentials:true,
-//   headers:{
-//     Authorization:`Bearer ${token}`
-//   }
-// })
+axiosinstance.interceptors.request.use((config) => {
+  const { token } = store.getState().Auth;
+  if (token && config.headers) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 axiosinstance.interceptors.response.use(
   (response) => response,

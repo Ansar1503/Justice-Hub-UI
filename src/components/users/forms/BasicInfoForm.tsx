@@ -26,6 +26,7 @@ function BasicInfoForm({
   // console.log(";datatasd", data);
   const { isPending: basicLoading, mutateAsync } = useBasicInfoUpdateMutation();
 
+  console.log("profile image", profileImage);
   const { blobUrl } = useProfileBlobImage({ profileImage });
   // const dispatch = useAppDispatch();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
