@@ -1,4 +1,4 @@
-import axiosinstance from "@/utils/api/axios/axios.instance";
+import axios from "axios";
 import { useEffect, useState } from "react";
 
 export function useProfileBlobImage({
@@ -13,7 +13,7 @@ export function useProfileBlobImage({
 
     (async () => {
       try {
-        const result = await axiosinstance.get(profileImage, {
+        const result = await axios.get(profileImage, {
           responseType: "blob",
           withCredentials: false,
         });
