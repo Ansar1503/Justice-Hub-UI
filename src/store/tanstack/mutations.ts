@@ -54,7 +54,6 @@ export function useLoginMutation() {
       navigate(`/${data.user.role}/`);
     },
     onError: (error: any) => {
-      console.log("error", error);
       const message = error.response?.data?.error || "Login failed. Try again.";
       error.message = message;
       toast.error(message);
