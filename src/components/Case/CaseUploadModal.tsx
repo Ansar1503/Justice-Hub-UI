@@ -14,20 +14,16 @@ const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
-export interface DocumentItem {
-  name: string;
-  type: string;
-  url: string;
-}
-
 interface UploadDocumentModalProps {
   open: boolean;
   onClose: () => void;
+  onUpload: (file: File[]) => void;
 }
 
 export const UploadDocumentModal: React.FC<UploadDocumentModalProps> = ({
   open,
   onClose,
+  onUpload,
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +93,7 @@ export const UploadDocumentModal: React.FC<UploadDocumentModalProps> = ({
 
   const handleUpload = () => {
     if (files.length === 0) return;
-
+    onUpload(files);
     setFiles([]);
     setError(null);
     onClose();

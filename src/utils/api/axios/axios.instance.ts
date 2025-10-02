@@ -29,6 +29,7 @@ axiosinstance.interceptors.response.use(
           originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
           const { store } = await import("@/store/redux/store");
           const { setToken } = await import("@/store/redux/auth/Auth.Slice");
+          console.log("netoken", newToken);
           store.dispatch(setToken(newToken));
           return axiosinstance(originalRequest);
         }

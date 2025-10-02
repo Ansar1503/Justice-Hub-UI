@@ -9,32 +9,29 @@ import {
 } from "../ui/card";
 import { UploadDocumentModal } from "./CaseUploadModal";
 import { useState } from "react";
-
-export interface DocumentItem {
-  name: string;
-  type: string;
-  url: string;
-  _id?: string;
-}
-
-export interface CaseDocumentProps {
-  id: string;
-  caseId: string;
-  clientId?: string;
-  lawyerId?: string;
-  document: DocumentItem;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { useUploadCaseDocumentMutation } from "@/store/tanstack/mutations/CaseDocumentMutation";
 
 type Props = {
-  // caseDocuments: CaseDocumentProps[];
   id: string;
 };
 
 export default function CaseDocumentsTab({ id }: Props) {
   const caseDocuments = [];
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const { mutateAsync } = useUploadCaseDocumentMutation();
+  async function handleUpload(file: File[]) {
+    if (!file) return;
+    try {
+      file.forEach(async (f) => {
+        const formData = new FormData();
+        formData.append("file", f);
+        formData.append("caseId", id);
+        await mutateAsync(formData);
+      });
+    } catch (error) {
+      console.log("errors occured while upload", error);
+    }
+  }
 
   return (
     <>
@@ -153,6 +150,7 @@ export default function CaseDocumentsTab({ id }: Props) {
       </Card>
 
       <UploadDocumentModal
+        onUpload={handleUpload}
         onClose={() => setIsUploadModalOpen(false)}
         open={isUploadModalOpen}
       />
