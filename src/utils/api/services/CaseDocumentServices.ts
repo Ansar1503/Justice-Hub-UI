@@ -29,3 +29,16 @@ export async function FethcAllCaseDocumentsByCase(
   );
   return response.data;
 }
+
+export async function DeleteCaseDocument(id: string) {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.delete(
+    CommonQueies.api +
+      user?.role +
+      CasesRoutes.base +
+      CasesRoutes.documents +
+      CommonQueies.params +
+      id
+  );
+  return response.data; 
+}

@@ -1,4 +1,4 @@
-import { Download, Eye, FileText, Upload } from "lucide-react";
+import { Download, FileText, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -10,7 +10,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { UploadDocumentModal } from "./CaseUploadModal";
 import { useState } from "react";
-import { useUploadCaseDocumentMutation } from "@/store/tanstack/mutations/CaseDocumentMutation";
+import {
+  useDeleteCaseDocumentMutation,
+  useUploadCaseDocumentMutation,
+} from "@/store/tanstack/mutations/CaseDocumentMutation";
 import { useFetchCaseDocuments } from "@/store/tanstack/Queries/Cases";
 import { sortOrderType } from "@/types/types/CommonTypes";
 import SearchComponent from "../SearchComponent";
@@ -41,9 +44,12 @@ export default function CaseDocumentsTab({ id }: Props) {
     sortOrder: sortOrder,
     uploadedBy: currentTab,
   });
-  console.log("casedocuemtes", caseDocumentsData);
+
   const caseDocuments = caseDocumentsData?.data;
-  const { mutateAsync } = useUploadCaseDocumentMutation();
+  const { mutateAsync: uploadCaseDocument, isPending: uploadingDocument } =
+    useUploadCaseDocumentMutation();
+  const { mutateAsync: deleteCaseDocument, isPending: deletingDocument } =
+    useDeleteCaseDocumentMutation();
 
   async function handleUpload(file: File[]) {
     if (!file) return;
@@ -52,11 +58,16 @@ export default function CaseDocumentsTab({ id }: Props) {
         const formData = new FormData();
         formData.append("file", f);
         formData.append("caseId", id);
-        await mutateAsync(formData);
+        await uploadCaseDocument(formData);
       });
     } catch (error) {
       console.log("errors occured while upload", error);
     }
+  }
+
+  async function handleDeleteCaseDocument(id: string) {
+    if (!id) return;
+    await deleteCaseDocument(id);
   }
 
   const renderDocumentsList = () => {
@@ -97,26 +108,54 @@ export default function CaseDocumentsTab({ id }: Props) {
 
               {/* Right: Actions */}
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="sm"
                   className="hover:bg-primary/10"
                   onClick={() => window.open(d.document.url, "_blank")}
                 >
                   <Eye className="h-4 w-4" />
-                </Button>
+                </Button> */}
+
                 <Button
                   variant="ghost"
                   size="sm"
                   className="hover:bg-primary/10"
+                  disabled={deletingDocument || uploadingDocument}
                   onClick={() => {
                     const link = document.createElement("a");
-                    link.href = d.document.url;
-                    link.download = d.document.name;
+                    link.href = d.document.url.replace(
+                      "/upload/",
+                      "/upload/fl_attachment/"
+                    );
                     link.click();
                   }}
                 >
                   <Download className="h-4 w-4" />
+                </Button>
+
+                {/* 🗑️ Delete Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hover:bg-destructive/10 text-destructive"
+                  onClick={() => handleDeleteCaseDocument(d.id)}
+                  disabled={deletingDocument || uploadingDocument}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4"
+                    />
+                  </svg>
                 </Button>
               </div>
             </div>
@@ -139,6 +178,7 @@ export default function CaseDocumentsTab({ id }: Props) {
           onClick={() => setIsUploadModalOpen(true)}
           size="lg"
           className="shadow-sm"
+          disabled={deletingDocument || uploadingDocument}
         >
           <Upload className="h-4 w-4 mr-2" />
           Upload First Document
@@ -160,6 +200,7 @@ export default function CaseDocumentsTab({ id }: Props) {
             </div>
             <Button
               onClick={() => setIsUploadModalOpen(true)}
+              disabled={deletingDocument || uploadingDocument}
               className="shadow-sm hover:shadow-md transition-shadow"
             >
               <Upload className="h-4 w-4 mr-2" />
