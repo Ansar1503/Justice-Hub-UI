@@ -4,7 +4,12 @@ import {
   CaseQueryResponseType,
   FetchCaseQueryType,
 } from "@/types/types/Case";
+import {
+  CaseDocumentsResponseWithPagination,
+  FetchCasesDocumentsByCaseQueryType,
+} from "@/types/types/CaseDocument";
 import { SessionDataType } from "@/types/types/sessionType";
+import { FethcAllCaseDocumentsByCase } from "@/utils/api/services/CaseDocumentServices";
 import {
   FetchAllCasesByQuery,
   FetchCaseAppointments,
@@ -46,5 +51,17 @@ export function useFetchCaseSessions(id: string | undefined) {
     queryFn: () => FetchCaseSessions(id),
     enabled: Boolean(id),
     staleTime: 1000 * 60,
+  });
+}
+
+export function useFetchCaseDocuments(
+  query: FetchCasesDocumentsByCaseQueryType
+) {
+  return useQuery<CaseDocumentsResponseWithPagination>({
+    queryKey: ["cases", "documents", query],
+    queryFn: () => FethcAllCaseDocumentsByCase(query),
+    enabled: Boolean(query.caseId),
+    staleTime: 1000 * 60,
+    retry: 1,
   });
 }
