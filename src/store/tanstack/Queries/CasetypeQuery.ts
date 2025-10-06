@@ -15,8 +15,10 @@ export function useFetchAllCaseTypes(payload: CaseTypeFetchQuery) {
     queryKey: ["casetype", payload],
     queryFn: () => fetchAllCaseTypes(payload),
     staleTime: 1000 * 60,
-    enabled: Boolean(payload?.page && payload?.limit),
+    enabled: Boolean(payload?.page && payload?.limit && payload.pid),
+    refetchOnWindowFocus: false,
     refetchInterval: false,
+    retry: false,
   });
 }
 
@@ -25,6 +27,9 @@ export function useFechAllCaseType() {
     queryKey: ["casetypes"],
     queryFn: () => FetchAllCasetype(),
     staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    retry: 1,
   });
 }
 

@@ -32,7 +32,7 @@ export type FetchCasesDocumentsByCaseQueryType = {
   page: number;
   limit: number;
   sortOrder: "asc" | "desc";
-  caseId: string;
+  caseId: string | undefined;
   sort: "date" | "size" | "name";
   uploadedBy: "lawyer" | "client";
 };

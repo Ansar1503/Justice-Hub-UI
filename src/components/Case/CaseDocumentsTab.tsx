@@ -19,9 +19,10 @@ import { sortOrderType } from "@/types/types/CommonTypes";
 import SearchComponent from "../SearchComponent";
 import PaginationComponent from "../pagination";
 import { SelectComponent } from "../SelectComponent";
+import { useAppSelector } from "@/store/redux/Hook";
 
 type Props = {
-  id: string;
+  id: string | undefined;
 };
 
 type SortBy = "date" | "name" | "size";
@@ -34,7 +35,7 @@ export default function CaseDocumentsTab({ id }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagelimit, setPageLimit] = useState(10);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-
+  const { user } = useAppSelector((s) => s.Auth);
   const { data: caseDocumentsData } = useFetchCaseDocuments({
     caseId: id,
     limit: pagelimit,
@@ -50,8 +51,8 @@ export default function CaseDocumentsTab({ id }: Props) {
     useUploadCaseDocumentMutation();
   const { mutateAsync: deleteCaseDocument, isPending: deletingDocument } =
     useDeleteCaseDocumentMutation();
-
   async function handleUpload(file: File[]) {
+    if (!id) return;
     if (!file) return;
     try {
       file.forEach(async (f) => {
@@ -140,7 +141,11 @@ export default function CaseDocumentsTab({ id }: Props) {
                   size="sm"
                   className="hover:bg-destructive/10 text-destructive"
                   onClick={() => handleDeleteCaseDocument(d.id)}
-                  disabled={deletingDocument || uploadingDocument}
+                  disabled={
+                    deletingDocument ||
+                    uploadingDocument ||
+                    user?.user_id !== d.uploaderDetails.user_id
+                  }
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

@@ -21,12 +21,14 @@ import { appointmentOutputDto } from "@/types/types/AppointmentsType";
 import { useFetchCaseAppointments } from "@/store/tanstack/Queries/Cases";
 import CaseAppointmentDetails from "./CaseAppointmentDetails";
 import { useState } from "react";
+import { useAppSelector } from "@/store/redux/Hook";
 
 type Props = {
   id: string | undefined;
 };
 
 export default function CaseAppointmentsTab({ id }: Props) {
+  const { user } = useAppSelector((s) => s.Auth);
   const [selectedAppointment, setSelectedAppointment] =
     useState<appointmentOutputDto | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -42,10 +44,12 @@ export default function CaseAppointmentsTab({ id }: Props) {
                 All appointments and meetings related to this case
               </CardDescription>
             </div>
-            <Button>
-              <Calendar className="h-4 w-4 mr-2" />
-              Schedule Appointment
-            </Button>
+            {user?.role !== "lawyer" && (
+              <Button>
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule Appointment
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
