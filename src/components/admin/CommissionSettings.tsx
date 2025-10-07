@@ -11,24 +11,37 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Cog, Percent, Briefcase, AlertTriangle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SummaryTile } from "./CommissioinSummary";
+import { useAddCommissionSettingsMutation } from "@/store/tanstack/mutations/CommissionMutation";
+import { useFetchCommissionSettings } from "@/store/tanstack/Queries/CommissionQuery";
 
 function clampPercent(n: number) {
-  return Math.max(0, Math.min(40, Math.round(n))); // limit max to 40%
+  return Math.max(0, Math.min(40, Math.round(n)));
 }
 
 export default function CommissionSettings() {
   const [initialCommission, setInitialCommission] = useState<number>(20);
   const [followupCommission, setFollowupCommission] = useState<number>(10);
-  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const {
+    isPending: addingCommissionSettings,
+    mutateAsync: addCommissionSettings,
+  } = useAddCommissionSettingsMutation();
+  const { data: CommissionSettings } = useFetchCommissionSettings();
+  useEffect(() => {
+    if (
+      CommissionSettings?.initialCommission &&
+      CommissionSettings.followupCommission
+    ) {
+      setInitialCommission(CommissionSettings.initialCommission);
+      setFollowupCommission(CommissionSettings.followupCommission);
+    }
+  }, [CommissionSettings]);
   const handleSave = async () => {
     setError(null);
 
-    // Validation: follow-up must be at least 5% less
     if (followupCommission > initialCommission - 5) {
       setError(
         "Follow-up commission should be at least 5% less than the initial commission."
@@ -36,18 +49,23 @@ export default function CommissionSettings() {
       return;
     }
 
-    // Validation: max 40%
     if (initialCommission > 40 || followupCommission > 40) {
       setError("Commission cannot exceed 40%.");
       return;
     }
 
-    setSaving(true);
-    setSaved(false);
-    await new Promise((r) => setTimeout(r, 600));
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await addCommissionSettings({
+        followupCommission: followupCommission,
+        initialCommission: initialCommission,
+        id: "",
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (error) {
+      setSaved(false);
+      console.log("error adding commisssion settings ", error);
+    }
   };
 
   const initialAdminAmt = Math.round((1000 * initialCommission) / 100);
@@ -84,8 +102,12 @@ export default function CommissionSettings() {
       )}
 
       <div className="flex items-center gap-3">
-        <Button onClick={handleSave} disabled={saving} className="min-w-28">
-          {saving ? "Saving..." : "Save Changes"}
+        <Button
+          onClick={handleSave}
+          disabled={addingCommissionSettings}
+          className="min-w-28"
+        >
+          {addingCommissionSettings ? "Saving..." : "Save Changes"}
         </Button>
         {saved && (
           <Alert className="border border-border">

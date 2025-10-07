@@ -2,6 +2,7 @@ import { store } from "@/store/redux/store";
 import { Disputes } from "@/types/types/Disputes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 import {
+  CommissionRoutes,
   CommonQueies,
   SpecializationRoutes,
 } from "@/utils/constants/RouteConstants";
@@ -157,28 +158,38 @@ export async function AddorUpdateSpecialization(
   id: string | null
 ) {
   const payload = { id, name };
-  const { token, user } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.patch(
     CommonQueies.api + user?.role + SpecializationRoutes.base,
-    payload,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    payload
   );
   return response.data;
 }
 
 export async function DeleteSpecialization(id: string) {
-  const { token, user } = store.getState().Auth;
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.delete(
     CommonQueies.api +
       user?.role +
       SpecializationRoutes.base +
       CommonQueies.params +
-      id,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+      id
+  );
+  return response.data;
+}
+
+export async function AddCommissionSettings(payload: {
+  id?: string;
+  initialCommission: number;
+  followupCommission: number;
+}) {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    CommonQueies.api +
+      user?.role +
+      CommissionRoutes.base +
+      CommissionRoutes.settings,
+    payload
   );
   return response.data;
 }

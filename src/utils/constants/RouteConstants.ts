@@ -52,6 +52,11 @@ export const CasesRoutes = {
   base: "/cases",
   appointments: "/appointments",
   sessions: "/sessions",
-  documents:"/documents"
+  documents: "/documents",
 };
 
+export const CommissionRoutes = {
+  base: "/commission",
+  settings: "/settings",
+  transactions: "/transactions",
+};
