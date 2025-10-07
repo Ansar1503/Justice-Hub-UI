@@ -27,15 +27,11 @@ import axiosinstance from "@/utils/api/axios/axios.instance";
 import { store } from "@/store/redux/store";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-
-interface Case {
-  id: string;
-  title: string;
-  caseType: string;
-  status: string;
-}
+import { Casetype } from "@/types/types/Case";
+import { CaseTypestype } from "@/types/types/CaseType";
 
 interface FollowUpBookingModalProps {
+  caseTypes: CaseTypestype[];
   lawyerId: string;
   lawyerAvailablity: boolean;
   timeSlots: string[];
@@ -49,6 +45,7 @@ interface FollowUpBookingModalProps {
 }
 
 export function FollowUpBookingModal({
+  caseTypes,
   lawyerId,
   lawyerAvailablity,
   timeSlots,
@@ -60,9 +57,10 @@ export function FollowUpBookingModal({
   onDateChange,
   children,
 }: FollowUpBookingModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
-  const [cases, setCases] = useState<Case[]>([]);
+  const [selectedCase, setSelectedCase] = useState<Casetype | null>(null);
+  const [cases, setCases] = useState<Casetype[]>([]);
   const [timeSlot, setTimeSlot] = useState<string>();
   const [reason, setReason] = useState<string>("");
   const [isLoadingCases, setIsLoadingCases] = useState(false);
@@ -81,19 +79,21 @@ export function FollowUpBookingModal({
         ? Number(slotSettings.maxDaysInAdvance)
         : 30)
   );
-
   useEffect(() => {
     const fetchCases = async () => {
       setIsLoadingCases(true);
       const { token } = store.getState().Auth;
       try {
+        const caseTypeIds = caseTypes.map((c) => c.id);
+        if (!caseTypeIds) return;
         const response = await axiosinstance.get(
-          `/api/client/cases/lawyer/${lawyerId}/follow-up`,
+          `/api/client/cases/caseTypes/ids`,
           {
             headers: { Authorization: `Bearer ${token}` },
+            params: { caseTypeIds: caseTypes.map((c) => c.id) },
           }
         );
-        setCases(response.data.cases || []);
+        setCases(response.data || []);
       } catch (error: any) {
         console.error("Failed to fetch cases:", error);
         toast.error("Failed to load cases");
@@ -102,10 +102,10 @@ export function FollowUpBookingModal({
       }
     };
 
-    if (lawyerId) {
+    if (lawyerId && isOpen) {
       fetchCases();
     }
-  }, [lawyerId]);
+  }, [lawyerId, isOpen]);
 
   const handleSubmit = async () => {
     if (
@@ -186,14 +186,14 @@ export function FollowUpBookingModal({
 
   const handleDateSelect = (newDate: Date | undefined) => {
     setDate(newDate);
-    setTimeSlot(undefined); // Reset time slot when date changes
+    setTimeSlot(undefined);
     if (onDateChange) {
       onDateChange(newDate);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
@@ -216,34 +216,22 @@ export function FollowUpBookingModal({
                 setSelectedCase(selected || null);
               }}
             >
-              <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <SelectTrigger>
                 <SelectValue placeholder="Select a case for follow-up" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+              <SelectContent>
                 {isLoadingCases ? (
-                  <SelectItem
-                    value="loading"
-                    disabled
-                    className="dark:text-gray-400 dark:focus:bg-gray-600"
-                  >
+                  <SelectItem value="loading" disabled>
                     Loading cases...
                   </SelectItem>
-                ) : !cases || cases.length === 0 ? (
-                  <SelectItem
-                    value="unavailable"
-                    disabled
-                    className="dark:text-gray-400 dark:focus:bg-gray-600"
-                  >
+                ) : cases.length === 0 ? (
+                  <SelectItem value="unavailable" disabled>
                     No cases available for follow-up
                   </SelectItem>
                 ) : (
                   cases.map((c) => (
-                    <SelectItem
-                      key={c.id}
-                      value={c.id}
-                      className="dark:text-white dark:focus:bg-gray-600"
-                    >
-                      {c.title} - {c.caseType}
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.title} - {c.summary}
                     </SelectItem>
                   ))
                 )}

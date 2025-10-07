@@ -9,6 +9,7 @@ import ChatDisputes from "@/pages/admin/ChatDisputes";
 import ReviewDisputes from "@/pages/admin/ReviewDisputes";
 import WalletPage from "@/pages/admin/WalletPage";
 import CaseManagement from "@/pages/admin/CasesManagement";
+import CommissionPage from "@/pages/admin/CommissionPage";
 
 const LawyerVerfication = lazy(
   () => import("@/pages/admin/VerificationInputs")
@@ -26,6 +27,10 @@ function AdminRoutes() {
         <Route path="/disputes/review" element={<ReviewDisputes />} />
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/casesmanagement" element={<CaseManagement />} />
+        <Route
+          path="settings/commission"
+          element={<CommissionPage />}
+        ></Route>
       </Route>
     </Routes>
   );

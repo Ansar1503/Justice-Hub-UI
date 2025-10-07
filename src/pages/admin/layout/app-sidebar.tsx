@@ -3,6 +3,7 @@ import {
   CalendarDaysIcon,
   Gavel,
   Headset,
+  Settings,
   Shield,
   User,
   Wallet,
@@ -49,7 +50,7 @@ const navdata = {
     },
     {
       title: "Lawyer Cases",
-      url: "",
+      url: "/admin/casesmanagement",
       icon: Gavel,
       items: [
         {
@@ -87,6 +88,12 @@ const navdata = {
           url: "/admin/disputes/chat",
         },
       ],
+    },
+    {
+      title: "Settings",
+      url: "/admin/settings/commission",
+      icon: Settings,
+      items: [{ title: "Commission", url: "/admin/settings/commission" }],
     },
     { title: "Wallet", url: "/admin/wallet", icon: Wallet },
   ],

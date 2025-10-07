@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 
 import { useState } from "react";
@@ -56,6 +54,7 @@ export function BookingModal({
   onDateChange,
   children,
 }: BookingModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [caseType, setCaseType] = useState<CaseTypestype | null>(null);
   const [title, setTitle] = useState<string>("");
@@ -173,7 +172,7 @@ export function BookingModal({
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>

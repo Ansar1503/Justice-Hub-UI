@@ -97,7 +97,6 @@ export default function LawyerProfile() {
   }, [sessionId, fetchSlots, refetchslotSettings]);
 
   const slotDetailsData = slotDetails?.data;
-  console.log("slotDetails", slotDetailsData);
   const { data: caseTypes } = useFechCaseTypeByPractice(
     lawyerDetails?.practice_areas?.map((p: PracticeAreaType) => p.id)
   );
@@ -170,6 +169,7 @@ export default function LawyerProfile() {
                 </BookingModal>
 
                 <FollowUpBookingModal
+                  caseTypes={caseTypes || []}
                   lawyerId={id || ""}
                   lawyerAvailablity={lawyerAvailablity}
                   timeSlots={timeSlots}
