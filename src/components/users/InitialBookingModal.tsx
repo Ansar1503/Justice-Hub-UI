@@ -363,7 +363,15 @@ export function BookingModal({
                 paymentMethod != "stripe"
               }
             >
-              Submit Booking
+              {!lawyerAvailablity ||
+              !date ||
+              !timeSlot ||
+              !reason ||
+              !caseType ||
+              !title ||
+              paymentMethod != "stripe"
+                ? "Submit Booking"
+                : `Pay ₹${consultationFee}`}
             </Button>
           )}
         </div>
