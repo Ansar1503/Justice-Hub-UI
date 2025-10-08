@@ -58,7 +58,7 @@ export default function CommissionSettings() {
       await addCommissionSettings({
         followupCommission: followupCommission,
         initialCommission: initialCommission,
-        id: "",
+        id: CommissionSettings?.id,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
