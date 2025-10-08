@@ -1,7 +1,10 @@
 import { ResponseType } from "@/types/types/LoginResponseTypes";
-import { Session } from "@/types/types/sessionType";
+import { BaseSession, Session } from "@/types/types/sessionType";
 import { cancelSessionByClient } from "@/utils/api/services/clientServices";
-import { joinVideoSession } from "@/utils/api/services/commonServices";
+import {
+  addSessionSummary,
+  joinVideoSession,
+} from "@/utils/api/services/commonServices";
 import {
   cancelSessionByLawyer,
   endSession,
@@ -107,6 +110,30 @@ export function useEndSession() {
       const message =
         error.response.data || "Something went wrong please try again later!";
       error.message = message;
+      toast.error(message);
+    },
+  });
+}
+
+export function useAddSessionSummary() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    BaseSession,
+    any,
+    {
+      sessionId: string;
+      summary: string;
+    }
+  >({
+    mutationFn: addSessionSummary,
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["cases", "sessions"] });
+    },
+    onError: (err: any) => {
+      const message =
+        err.response.data || "Something went wrong please try again later!";
+      err.message = message;
       toast.error(message);
     },
   });

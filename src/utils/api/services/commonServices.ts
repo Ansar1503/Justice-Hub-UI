@@ -8,6 +8,7 @@ import {
 import { SortOrder } from "@/components/users/AppointmentsComponent";
 import { FetchSessionsPayloadType } from "@/types/types/sessionType";
 import {
+  CasesRoutes,
   CommonQueies,
   SpecializationRoutes,
 } from "@/utils/constants/RouteConstants";
@@ -137,6 +138,23 @@ export async function fetchAllSpecializations(
       limit +
       CommonQueies.searchQuery +
       search
+  );
+  return response.data;
+}
+
+export async function addSessionSummary(payload: {
+  sessionId: string;
+  summary: string;
+}) {
+  if (!payload.sessionId.trim() || !payload.summary.trim()) return;
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    CommonQueies.api +
+      user?.role +
+      CasesRoutes.base +
+      CasesRoutes.sessions +
+      CasesRoutes.sessionSummary,
+    payload
   );
   return response.data;
 }

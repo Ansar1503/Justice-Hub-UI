@@ -35,6 +35,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { SessionDataType } from "@/types/types/sessionType";
 import FeedbackModal from "../users/modals/Feedback";
 import { useAppSelector } from "@/store/redux/Hook";
+import { useAddSessionSummary } from "@/store/tanstack/mutations/sessionMutation";
 
 interface SessionDetailModalProps {
   session: SessionDataType | null;
@@ -90,7 +91,14 @@ export default function SessionDetailModal({
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isEditingSummary, setIsEditingSummary] = useState(false);
+  const [summaryText, setSummaryText] = useState<string>(
+    session?.summary ?? ""
+  );
+  const [summarySaving, setSummarySaving] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
   const { user } = useAppSelector((s) => s.Auth);
+  const { mutateAsync: addSessionSummary } = useAddSessionSummary();
   const formatDate = useCallback((dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
       weekday: "long",
@@ -116,8 +124,8 @@ export default function SessionDetailModal({
   }, []);
 
   const sessionStartable = useMemo(() => {
-    console.log("session",session && !session.room_id)
-    if (!session || !session.room_id) return false;
+    // console.log("session",session)
+    if (!session) return false;
     if (user?.role === "client") return false;
     // return true;
     const currentDate = new Date();
@@ -136,8 +144,9 @@ export default function SessionDetailModal({
     );
   }, [session]);
   const sessionJoinable = useMemo(() => {
-    // return true;
+    // console.log("session",session)
     if (!session || !session.room_id) return false;
+    // return true;
     const currentDate = new Date();
     const sessionDate = new Date(session?.appointmentDetails?.date);
     const [h, m] = session?.appointmentDetails?.time
@@ -211,6 +220,24 @@ export default function SessionDetailModal({
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
+
+  const handleSaveSummary = useCallback(async () => {
+    if (!session) return;
+    if (!session.id) return;
+    if (!summaryText) return;
+    try {
+      setSummarySaving(true);
+      setSummaryError(null);
+      setIsEditingSummary(false);
+      await addSessionSummary({ sessionId: session.id, summary: summaryText });
+      handleClose();
+    } catch (e) {
+      setSummaryError("Failed to save summary. Please try again.");
+      console.log("error", e);
+    } finally {
+      setSummarySaving(false);
+    }
+  }, [session, summaryText]);
 
   if (!isOpen || !session) return null;
   return (
@@ -391,6 +418,103 @@ export default function SessionDetailModal({
               </p>
             </div>
 
+            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Session Summary
+              </h3>
+
+              {/* Client view: read-only */}
+              {user?.role === "client" && (
+                <>
+                  {session?.summary?.trim() ? (
+                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      {session.summary}
+                    </p>
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-400 italic">
+                      No summary has been added yet.
+                    </p>
+                  )}
+                </>
+              )}
+
+              {/* Lawyer view: can add/edit */}
+              {user?.role === "lawyer" && (
+                <div className="space-y-3">
+                  {!isEditingSummary ? (
+                    <>
+                      {session?.summary?.trim() ? (
+                        <>
+                          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                            {session.summary}
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="default"
+                              onClick={() => {
+                                setSummaryText(session?.summary ?? "");
+                                setIsEditingSummary(true);
+                              }}
+                            >
+                              Edit Summary
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <p className="text-gray-500 dark:text-gray-400 italic">
+                            No summary yet.
+                          </p>
+                          <Button
+                            variant="default"
+                            onClick={() => {
+                              setSummaryText("");
+                              setIsEditingSummary(true);
+                            }}
+                          >
+                            Add Summary
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <textarea
+                        className="w-full min-h-28 p-3 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Write a brief summary of the session..."
+                        value={summaryText}
+                        onChange={(e) => setSummaryText(e.target.value)}
+                        disabled={summarySaving}
+                      />
+                      {summaryError && (
+                        <p className="text-sm text-red-600">{summaryError}</p>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={handleSaveSummary}
+                          disabled={summarySaving}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          {summarySaving ? "Saving..." : "Save Summary"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setIsEditingSummary(false);
+                            setSummaryText(session?.summary ?? "");
+                            setSummaryError(null);
+                          }}
+                          disabled={summarySaving}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
             {/* Follow-up Information */}
             {session?.follow_up_suggested && (
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
