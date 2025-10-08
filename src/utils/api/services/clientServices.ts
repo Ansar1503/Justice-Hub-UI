@@ -146,16 +146,18 @@ export async function cancellAppointment(payload: {
   id: string;
   status: string;
 }) {
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.patch(
-    "/api/client/profile/appointments",
+    `/api/${user?.role}/profile/appointments`,
     payload
   );
   return response.data;
 }
 
 export async function cancelSessionByClient(payload: { id: string }) {
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.patch(
-    "/api/client/profile/sessions/cancel",
+    `/api/${user?.role}/profile/sessions/cancel`,
     payload
   );
   return response.data;

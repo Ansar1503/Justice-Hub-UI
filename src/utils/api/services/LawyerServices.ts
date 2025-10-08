@@ -117,16 +117,18 @@ export async function confirmAppointment(payload: {
 }
 
 export async function cancelSessionByLawyer(payload: { id: string }) {
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.patch(
-    `/api/lawyer/profile/sessions/cancel`,
+    `/api/${user?.role}/profile/sessions/cancel`,
     payload
   );
   return response.data;
 }
 
 export async function StartSession(sessionId: string) {
+  const { user } = store.getState().Auth;
   const response = await axiosinstance.patch(
-    `/api/lawyer/profile/sessions/startSession`,
+    `/api/${user?.role}/profile/sessions/startSession`,
     {
       sessionId: sessionId,
     }
