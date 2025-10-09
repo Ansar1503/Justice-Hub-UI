@@ -12,6 +12,7 @@ import ReviewPage from "@/pages/client/ReviewPage";
 import WalletPage from "@/pages/client/WalletPage";
 import CasesPage from "@/pages/client/CasesPage";
 import CaseDetailsPage from "@/pages/client/CaseDetailsPage";
+import ClientDashboard from "@/pages/client/Dashboard";
 const Chats_page = lazy(() => import("@/pages/client/chats_page"));
 function ClientRoutes() {
   return (
@@ -32,6 +33,7 @@ function ClientRoutes() {
         <Route path="/cases" element={<CasesPage />} />
         <Route path="/cases/:id" element={<CaseDetailsPage />} />
         <Route path="/wallet" element={<WalletPage />} />
+        <Route path="/dashboard" element={<ClientDashboard />} />
       </Route>
     </Routes>
   );
