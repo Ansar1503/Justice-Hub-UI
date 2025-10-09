@@ -2,6 +2,7 @@ import {
   Calendar,
   Calendar1,
   FileText,
+  LayoutDashboard,
   User,
   UserPen,
   Wallet,
@@ -20,6 +21,11 @@ export default function Sidebar() {
   const location = useLocation();
   const path = location.pathname;
   const menuItems = [
+    {
+      path: `/${user?.role}/dashboard`,
+      label: "Dashboard",
+      icon: LayoutDashboard,
+    },
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
     { path: `/${user?.role}/cases`, label: "Cases", icon: FileText },
     {
@@ -34,6 +40,7 @@ export default function Sidebar() {
       icon: IoChatbubblesOutline,
     },
     { path: `/${user?.role}/wallet`, label: "wallets", icon: Wallet },
+
     // {
     //   path: `/${user?.role}/reviews`,
     //   label: "Reviews",

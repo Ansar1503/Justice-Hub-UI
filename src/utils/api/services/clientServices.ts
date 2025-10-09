@@ -12,7 +12,11 @@ import {
   SortOrder,
 } from "@/components/users/AppointmentsComponent";
 import { Review } from "@/types/types/Review";
-import { CommonQueies, profileQueries } from "@/utils/constants/RouteConstants";
+import {
+  ClientRoutes,
+  CommonQueies,
+  profileQueries,
+} from "@/utils/constants/RouteConstants";
 
 export async function fetchClientData() {
   const response = await axiosinstance.get(`/api/client/profile`);
@@ -262,6 +266,13 @@ export async function reportReview(payload: {
       reportedBy: payload.reportedBy,
       reportedUser: payload.reportedUser,
     }
+  );
+  return response.data;
+}
+
+export async function FetchClientDashboardData() {
+  const response = await axiosinstance.get(
+    CommonQueies.api + ClientRoutes.base + ClientRoutes.dashboard
   );
   return response.data;
 }

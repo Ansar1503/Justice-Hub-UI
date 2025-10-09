@@ -1,5 +1,4 @@
 import { lazy } from "react";
-import LawyerDashboard from "@/pages/lawyer/Dashboard";
 import { Route, Routes } from "react-router-dom";
 import LawyerProtected from "./wrapper/lawyer.protected.route";
 import LawyerSchedulePage from "@/pages/lawyer/Schedule";
@@ -14,12 +13,14 @@ import WalletPage from "@/pages/lawyer/WalletPage";
 import LawyerVerificationProtected from "./wrapper/LawyerVerificationProtected.route";
 import CasesPage from "@/pages/lawyer/CasesPage";
 import CaseDetailsPage from "@/pages/lawyer/CaseDetailsPage";
+import LawyerProfilePage from "@/pages/lawyer/Dashboard";
+import LawyerDashboard from "@/pages/lawyer/LawyerDashboard";
 
 export default function LawyerRoutes() {
   return (
     <Routes>
       <Route element={<LawyerProtected />}>
-        <Route index element={<LawyerDashboard />} />
+        <Route index element={<LawyerProfilePage />} />
         <Route element={<LawyerVerificationProtected />}>
           <Route path="/schedule" element={<LawyerSchedulePage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
@@ -30,6 +31,7 @@ export default function LawyerRoutes() {
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/cases" element={<CasesPage />} />
           <Route path="/cases/:id" element={<CaseDetailsPage />} />
+          <Route path="/dashboard" element={<LawyerDashboard />} />
         </Route>
       </Route>
 

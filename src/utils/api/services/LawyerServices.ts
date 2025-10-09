@@ -11,7 +11,11 @@ import {
   slotSettings,
 } from "@/types/types/SlotTypes";
 import axiosinstance from "@/utils/api/axios/axios.instance";
-import { CommonQueies, profileQueries } from "@/utils/constants/RouteConstants";
+import {
+  ClientRoutes,
+  CommonQueies,
+  profileQueries,
+} from "@/utils/constants/RouteConstants";
 
 export async function LawyerVerification(formData: any) {
   const response = await axiosinstance.post(
@@ -190,6 +194,14 @@ export async function addLawyerProfessionalDetails(
       profileQueries.lawyer.base +
       profileQueries.lawyer.professional,
     payload
+  );
+  return response.data;
+}
+
+export async function fetchLawyerDashboarData() {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api + user?.role + ClientRoutes.dashboard
   );
   return response.data;
 }

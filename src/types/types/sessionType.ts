@@ -25,8 +25,8 @@ export interface Session {
   follow_up_suggested?: boolean;
   follow_up_session_id?: string;
   room_id?: string;
-  start_time?: Date;
-  end_time?: Date;
+  start_time?: string;
+  end_time?: string;
   client_joined_at?: Date;
   client_left_at?: Date;
   lawyer_joined_at?: Date;

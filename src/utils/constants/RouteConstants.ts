@@ -32,6 +32,7 @@ export const ClientRoutes = {
   base: "client",
   profile: "/profile",
   Basic: "/basic",
+  dashboard: "/dashboard",
 };
 
 export const SpecializationRoutes = {
@@ -62,3 +63,4 @@ export const CommissionRoutes = {
   settings: "/settings",
   transactions: "/transactions",
 };
+

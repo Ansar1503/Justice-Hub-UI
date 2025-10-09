@@ -1,4 +1,5 @@
 import {
+  FetchClientDashboardData,
   fetchClientData,
   fetchLawyerDetails,
   fetchLawyersByQuery,
@@ -17,11 +18,13 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchAvailableSlots,
+  fetchLawyerDashboarData,
   fetchLawyerData,
   fetchOverrideslots,
   fetchSlotSettings,
 } from "@/utils/api/services/LawyerServices";
 import {
+  ClientDashboardDataType,
   clientDataType,
   fetchClientDataType,
   LawyerFilterParams,
@@ -56,6 +59,7 @@ import { store } from "../redux/store";
 import {
   AggregatedLawyerResponseAdminSide,
   FetchLawyerResponseType,
+  FrontendLawyerDashboard,
 } from "@/types/types/LawyerTypes";
 
 export function useFetchClientData() {
@@ -356,5 +360,27 @@ export function useFetchCallLogs(payload: {
     queryFn: () => fetchCallLogs(payload),
     retry: 1,
     enabled: payload.sessionId ? true : false,
+  });
+}
+
+export function useFetchClientDashboardData() {
+  const { user } = store.getState().Auth;
+  return useQuery<ClientDashboardDataType>({
+    queryKey: ["client", "dashboard", user?.user_id],
+    queryFn: () => FetchClientDashboardData(),
+    retry: 1,
+    staleTime: 1000 * 60 * 10,
+    enabled: Boolean(user?.user_id),
+  });
+}
+
+export function useFetchLawyerDashboardData() {
+  const { user } = store.getState().Auth;
+  return useQuery<FrontendLawyerDashboard>({
+    queryKey: ["client", "dashboard", user?.user_id],
+    queryFn: () => fetchLawyerDashboarData(),
+    retry: 1,
+    staleTime: 1000 * 60 * 10,
+    enabled: Boolean(user?.user_id),
   });
 }

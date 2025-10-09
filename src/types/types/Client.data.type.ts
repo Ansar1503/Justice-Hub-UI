@@ -1,4 +1,6 @@
 import { Gender, UserEnum } from "../enums/user.enums";
+import { Casetype } from "./Case";
+import { Session } from "./sessionType";
 
 type VerificationStatus = "verified" | "rejected" | "pending" | "requested";
 
@@ -89,3 +91,27 @@ export interface LawyerFilterParams {
   page?: number;
   limit?: number;
 }
+
+export interface ClientDashboardDataType {
+  totalCases: number;
+  activeCases: number;
+  completedCases: number;
+  totalAppointments: number;
+  upcomingAppointments: number;
+  pendingPayments: number;
+  walletBalance: number;
+
+  nextAppointment?: {
+    id: string;
+    date: Date;
+    time: string;
+    lawyerId: string;
+    lawyerName: string;
+    type: "consultation" | "follow-up";
+    status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+  };
+  cases: Casetype[];
+  sessions: Session[];
+}
+
+

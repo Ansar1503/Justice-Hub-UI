@@ -2,6 +2,7 @@ import {
   Calendar,
   Calendar1Icon,
   FileText,
+  LayoutDashboard,
   Timer,
   User,
   UserPen,
@@ -23,6 +24,11 @@ export default function Sidebar() {
   const pathname = path.split("/")[path.split("/").length - 1];
 
   const menuItems = [
+    {
+      path: `/${user?.role}/dashboard`,
+      label: "Dashboard",
+      icon: LayoutDashboard,
+    },
     { path: `/${user?.role}/`, label: "Profile", icon: UserPen },
     { path: `/${user?.role}/schedule`, label: "Slots", icon: Calendar },
     { path: `/${user?.role}/cases`, label: "Cases", icon: FileText },

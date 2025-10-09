@@ -91,3 +91,97 @@ export interface AggregatedLawyerResponseAdminSide {
   currentPage: number;
   totalPages: number;
 }
+
+export interface FrontendLawyerDashboard {
+  totalCases: number;
+  activeCases: number;
+  closedCases: number;
+  caseGrowthPercent?: number;
+
+  totalAppointments: number;
+  upcomingAppointments: number;
+  completedAppointments: number;
+  pendingAppointments: number;
+  cancelledAppointments: number;
+
+  nextAppointment?: {
+    id: string;
+    date: string;
+    time: string;
+    clientId: string;
+    clientName: string;
+    type: "consultation" | "follow-up";
+    status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+  };
+
+  recentAppointments?: Array<{
+    id: string;
+    bookingId: string;
+    clientId: string;
+    caseId: string;
+    amount: number;
+    date: string;
+    time: string;
+    status: string;
+    type: string;
+  }>;
+
+  totalSessions: number;
+  activeSessions: number;
+  recentSessions?: Array<{
+    id: string;
+    appointment_id: string;
+    bookingId: string;
+    client_id: string;
+    caseId: string;
+    lawyer_id: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    start_time?: string;
+    end_time?: string;
+    callDuration?: number;
+    end_reason?: string;
+    follow_up_suggested?: boolean;
+    lawyer_joined_at?: string;
+    lawyer_left_at?: string;
+    room_id?: string;
+    summary?: string;
+  }>;
+
+  walletBalance: number;
+  totalEarnings: number;
+  totalCommissionPaid: number;
+  earningsGrowthPercent?: number;
+  recentTransactions?: Array<{
+    id: string;
+    amount: number;
+    type: "debit" | "credit";
+    description: string;
+    category: string;
+    status: string;
+    createdAt: string;
+  }>;
+
+  totalReviews: number;
+  averageRating: number;
+  recentReviews?: Array<{
+    id: string;
+    heading: string;
+    review: string;
+    rating: number;
+    clientId: string;
+    sessionId: string;
+    createdAt: string;
+  }>;
+
+  recentCases?: Array<{
+    id: string;
+    title: string;
+    clientId: string;
+    status: string;
+    summary?: string;
+    caseType: string;
+    createdAt: string;
+  }>;
+}

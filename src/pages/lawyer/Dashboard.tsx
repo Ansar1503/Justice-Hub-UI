@@ -3,7 +3,7 @@ import Footer from "@/pages/lawyer/layout/Footer";
 import Navbar from "@/pages/lawyer/layout/Navbar";
 import Sidebar from "@/pages/lawyer/layout/Sidebar";
 
-function LawyerDashboard() {
+function LawyerProfilePage() {
   return (
     <div className="bg-[#FFF2F2] dark:bg-slate-950 min-h-screen flex flex-col">
       <Navbar />
@@ -18,4 +18,4 @@ function LawyerDashboard() {
   );
 }
 
-export default LawyerDashboard;
+export default LawyerProfilePage;
