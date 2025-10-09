@@ -44,12 +44,12 @@ export default function CaseAppointmentsTab({ id }: Props) {
                 All appointments and meetings related to this case
               </CardDescription>
             </div>
-            {user?.role !== "lawyer" && (
+            {/* {user?.role !== "lawyer" && (
               <Button>
                 <Calendar className="h-4 w-4 mr-2" />
                 Schedule Appointment
               </Button>
-            )}
+            )} */}
           </div>
         </CardHeader>
         <CardContent>

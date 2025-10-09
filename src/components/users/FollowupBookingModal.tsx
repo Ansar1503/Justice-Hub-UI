@@ -29,6 +29,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Casetype } from "@/types/types/Case";
 import { CaseTypestype } from "@/types/types/CaseType";
+import { useFetchCommissionSettings } from "@/store/tanstack/Queries/CommissionQuery";
 
 interface FollowUpBookingModalProps {
   caseTypes: CaseTypestype[];
@@ -60,11 +61,33 @@ export function FollowUpBookingModal({
   const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedCase, setSelectedCase] = useState<Casetype | null>(null);
+  const [amountPayable, setAmountPayable] = useState<number>(consultationFee);
   const [cases, setCases] = useState<Casetype[]>([]);
   const [timeSlot, setTimeSlot] = useState<string>();
   const [reason, setReason] = useState<string>("");
   const [isLoadingCases, setIsLoadingCases] = useState(false);
   const navigate = useNavigate();
+  const { data: CommissionSettings } = useFetchCommissionSettings();
+
+  useEffect(() => {
+    if (
+      CommissionSettings?.initialCommission != null &&
+      CommissionSettings.followupCommission != null &&
+      consultationFee != null &&
+      consultationFee > 0
+    ) {
+      const commissionPercent = CommissionSettings.followupCommission;
+      const discountAmount = Math.round(
+        (consultationFee *
+          (CommissionSettings.initialCommission - commissionPercent)) /
+          100
+      );
+      const amountPaid = consultationFee - discountAmount;
+      setAmountPayable(amountPaid > 0 ? amountPaid : 0);
+    } else {
+      setAmountPayable(consultationFee || 0);
+    }
+  }, [CommissionSettings, consultationFee, date, timeSlot, reason]);
 
   const canPayFromWallet = walletBalance >= consultationFee;
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "stripe">(
@@ -360,10 +383,19 @@ export function FollowUpBookingModal({
                 !date ||
                 !timeSlot ||
                 !reason ||
-                !selectedCase
+                !selectedCase ||
+                !amountPayable
               }
             >
-              Submit Follow-Up Booking
+              {" "}
+              {!lawyerAvailablity ||
+              !date ||
+              !timeSlot ||
+              !reason ||
+              !selectedCase ||
+              !amountPayable
+                ? "Submit Follow-Up Booking"
+                : `pay ₹${amountPayable}`}
             </Button>
           )}
         </div>
