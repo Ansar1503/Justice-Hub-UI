@@ -58,3 +58,10 @@ export async function FetchCaseSessions(id: string | undefined) {
   return response.data;
 }
 
+export async function FetchAllCasesByUser() {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    CommonQueies.api + user?.role + CasesRoutes.base + CasesRoutes.user
+  );
+  return response.data;
+}

@@ -50,9 +50,10 @@ export const CasetypeRoutes = {
 
 export const CasesRoutes = {
   base: "/cases",
+  user: "/user",
   appointments: "/appointments",
   sessions: "/sessions",
-  sessionSummary:"/summary",
+  sessionSummary: "/summary",
   documents: "/documents",
 };
 

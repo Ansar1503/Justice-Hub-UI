@@ -1,7 +1,9 @@
+import { store } from "@/store/redux/store";
 import { appointmentOutputDto } from "@/types/types/AppointmentsType";
 import {
   AggregatedCasesData,
   CaseQueryResponseType,
+  Casetype,
   FetchCaseQueryType,
 } from "@/types/types/Case";
 import {
@@ -12,6 +14,7 @@ import { SessionDataType } from "@/types/types/sessionType";
 import { FethcAllCaseDocumentsByCase } from "@/utils/api/services/CaseDocumentServices";
 import {
   FetchAllCasesByQuery,
+  FetchAllCasesByUser,
   FetchCaseAppointments,
   FetchCaseDetails,
   FetchCaseSessions,
@@ -61,6 +64,17 @@ export function useFetchCaseDocuments(
     queryKey: ["cases", "documents", query],
     queryFn: () => FethcAllCaseDocumentsByCase(query),
     enabled: Boolean(query.caseId),
+    staleTime: 1000 * 60,
+    retry: 1,
+  });
+}
+
+export function useFetchAllCasesByUser() {
+  const { user } = store.getState().Auth;
+  return useQuery<Casetype[]>({
+    queryKey: ["cases", user?.user_id],
+    queryFn: () => FetchAllCasesByUser(),
+    enabled: Boolean(user?.user_id),
     staleTime: 1000 * 60,
     retry: 1,
   });
