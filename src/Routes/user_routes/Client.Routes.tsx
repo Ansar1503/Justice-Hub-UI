@@ -1,10 +1,5 @@
-import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./wrapper/ClientProtected.Route";
-const ClientProfile = lazy(() => import("@/pages/client/ClientProfile"));
-const SessionsPage = lazy(() => import("@/pages/client/AppointmentsPage"));
-const LawyerDirectory = lazy(() => import("@/pages/client/LawyersListing"));
-const LawyersPage = lazy(() => import("@/pages/client/LawyerProfile"));
 import PaymentSuccessPage from "@/pages/client/payment_successpaeg";
 import SessionPage from "@/pages/client/sessions";
 import VideoCall from "@/pages/lawyer/VideoCall";
@@ -13,17 +8,21 @@ import WalletPage from "@/pages/client/WalletPage";
 import CasesPage from "@/pages/client/CasesPage";
 import CaseDetailsPage from "@/pages/client/CaseDetailsPage";
 import ClientDashboard from "@/pages/client/Dashboard";
-const Chats_page = lazy(() => import("@/pages/client/chats_page"));
+import AppointmentsPage from "@/pages/client/AppointmentsPage";
+import ClientProfile from "@/pages/client/ClientProfile";
+import LawyerDirectory from "@/pages/client/LawyersListing";
+import LawyersPage from "@/pages/client/LawyerProfile";
+import ChatsPage from "@/pages/client/chats_page";
 function ClientRoutes() {
   return (
     <Routes>
       <Route element={<ProtectedRoute />}>
         <Route index element={<ClientProfile />} />
-        <Route path="/appointments" element={<SessionsPage />} />
+        <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/sessions" element={<SessionPage />} />
         <Route path="/lawyers" element={<LawyerDirectory />} />
         <Route path="/lawyers/:id" element={<LawyersPage />} />
-        <Route path="/chats/:id?" element={<Chats_page />} />
+        <Route path="/chats/:id?" element={<ChatsPage />} />
         <Route path="/session/join/:id" element={<VideoCall />} />
         <Route path="/reviews" element={<ReviewPage />} />
         <Route

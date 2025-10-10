@@ -1,5 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "./StatusBadge";
+import { CalendarX } from "lucide-react";
+
 type Props = {
   appointment?: {
     id?: string;
@@ -35,8 +37,9 @@ export function NextAppointmentCard({ appointment }: Props) {
       </h2>
       <Card className="p-4">
         {!a ? (
-          <div className="text-sm text-muted-foreground">
-            No upcoming appointment.
+          <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+            <CalendarX className="w-6 h-6 mb-2 opacity-60" />
+            <p className="text-sm">No upcoming appointments</p>
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-4 sm:items-center">

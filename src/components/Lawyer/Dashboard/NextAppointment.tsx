@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "./utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CalendarX } from "lucide-react";
+import { formatDate } from "./utils";
 import { FrontendLawyerDashboard } from "@/types/types/LawyerTypes";
 import { useNavigate } from "react-router-dom";
 
@@ -23,6 +24,8 @@ export function NextAppointmentCard({
   loading?: boolean;
 }) {
   const navigate = useNavigate();
+
+  // 🕓 Loading State
   if (loading) {
     return (
       <Card className="border-border bg-card">
@@ -39,6 +42,35 @@ export function NextAppointmentCard({
   }
 
   const a = data?.nextAppointment;
+
+  // ❌ Empty State (No upcoming appointment)
+  if (!a) {
+    return (
+      <Card className="border-border bg-card text-center py-8">
+        <CardHeader>
+          <CardTitle className="text-base">Next Appointment</CardTitle>
+          <CardDescription>
+            Stay prepared for your upcoming session
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-4 text-muted-foreground">
+            <CalendarX className="w-8 h-8 mb-2 opacity-60" />
+            <p className="text-sm mb-2">No upcoming appointments</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/lawyer/appointments")}
+            >
+              View All Appointments
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // ✅ Data State (Appointment available)
   return (
     <Card className="border-border bg-card">
       <CardHeader>
@@ -48,18 +80,18 @@ export function NextAppointmentCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
-        <div className="text-lg font-medium">{a?.clientName ?? "—"}</div>
+        <div className="text-lg font-medium">{a.clientName ?? "—"}</div>
         <div className="text-sm text-muted-foreground">
-          {formatDate(a?.date, true)} · {a?.time ?? "—"}
+          {formatDate(a.date, true)} · {a.time ?? "—"}
         </div>
         <div className="text-sm">
-          Type: <span className="font-medium">{a?.type ?? "—"}</span>
+          Type: <span className="font-medium">{a.type ?? "—"}</span>
         </div>
         <Badge
           variant="secondary"
-          aria-label={`Status ${a?.status ?? "unknown"}`}
+          aria-label={`Status ${a.status ?? "unknown"}`}
         >
-          {a?.status ?? "—"}
+          {a.status ?? "—"}
         </Badge>
       </CardContent>
       <CardFooter>
@@ -67,9 +99,7 @@ export function NextAppointmentCard({
           variant="default"
           size="sm"
           aria-label="View appointment details"
-          onClick={() => {
-            navigate(`/lawyer/appointments`);
-          }}
+          onClick={() => navigate("/lawyer/appointments")}
         >
           View Details
         </Button>
