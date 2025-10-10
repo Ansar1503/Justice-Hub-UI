@@ -7,10 +7,10 @@ import {
   Shield,
   User,
   Wallet,
+  LayoutDashboard, // 🆕 Dashboard icon
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
-// import { NavProjects } from "@/layout/admin/nav-projects";
 import { NavUser } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
 import {
@@ -25,11 +25,22 @@ import { store } from "@/store/redux/store";
 
 const navdata = {
   navMain: [
+    // 🆕 Dashboard Section
+    {
+      title: "Dashboard",
+      url: "/admin/dashboard",
+      icon: LayoutDashboard,
+      items: [
+        {
+          title: "Overview",
+          url: "/admin/dashboard",
+        },
+      ],
+    },
     {
       title: "User Management",
       url: "/admin/",
       icon: User,
-      isActive: true,
       items: [
         {
           title: "Users",
@@ -38,7 +49,7 @@ const navdata = {
       ],
     },
     {
-      title: "Lawyer Verfication",
+      title: "Lawyer Verification",
       url: "/admin/lawyer-verification",
       icon: Shield,
       items: [
@@ -95,7 +106,11 @@ const navdata = {
       icon: Settings,
       items: [{ title: "Commission", url: "/admin/settings/commission" }],
     },
-    { title: "Wallet", url: "/admin/wallet", icon: Wallet },
+    {
+      title: "Wallet",
+      url: "/admin/wallet",
+      icon: Wallet,
+    },
   ],
 };
 
@@ -104,12 +119,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
 
   const dashItems = navdata.navMain.map((item) => {
-    if (item.url === "/admin/" && location.pathname === "/admin/") {
-      return { ...item, isActive: true };
-    }
-
     const isActive =
-      item.url !== "/admin/" && location.pathname.startsWith(item.url);
+      location.pathname === item.url || location.pathname.startsWith(item.url);
 
     return {
       ...item,
@@ -128,12 +139,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={dashItems} />
-        {/* <NavProjects projects={[]} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser
           user={{
-            avatar: user?.name.charAt(0) || "",
+            avatar: user?.name?.charAt(0) || "",
             email: user?.email || "",
             name: user?.name || "NA",
           }}

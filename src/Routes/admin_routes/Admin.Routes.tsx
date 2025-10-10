@@ -9,6 +9,7 @@ import CommissionPage from "@/pages/admin/CommissionPage";
 import UserManagementPage from "@/pages/admin/UserManagement";
 import { LawyerVerification } from "@/utils/api/services/LawyerServices";
 import Sessions from "@/pages/admin/Sessions";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
 
 function AdminRoutes() {
   return (
@@ -22,6 +23,7 @@ function AdminRoutes() {
         <Route path="/disputes/review" element={<ReviewDisputes />} />
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/casesmanagement" element={<CaseManagement />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="settings/commission" element={<CommissionPage />}></Route>
       </Route>
     </Routes>

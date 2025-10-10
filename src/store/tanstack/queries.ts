@@ -61,6 +61,8 @@ import {
   FetchLawyerResponseType,
   FrontendLawyerDashboard,
 } from "@/types/types/LawyerTypes";
+import { FrontendAdminDashboard } from "@/types/types/AdminDashboardType";
+import axiosinstance from "@/utils/api/axios/axios.instance";
 
 export function useFetchClientData() {
   const { user } = store.getState().Auth;
@@ -382,5 +384,21 @@ export function useFetchLawyerDashboardData() {
     retry: 1,
     staleTime: 1000 * 60 * 10,
     enabled: Boolean(user?.user_id),
+  });
+}
+
+export function useAdminDashboard(startDate?: string, endDate?: string) {
+  return useQuery<FrontendAdminDashboard>({
+    queryKey: ["admin", "dashboard", { startDate, endDate }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (startDate) params.append("startDate", startDate);
+      if (endDate) params.append("endDate", endDate);
+      const res = await axiosinstance(
+        `/api/admin/dashboard/overview?${params.toString()}`
+      );
+      return res.data;
+    },
+    staleTime: 1000 * 60 * 2,
   });
 }

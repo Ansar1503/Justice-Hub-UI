@@ -42,3 +42,4 @@ export interface FrontendAdminDashboard {
   recentTransactions?: FrontendTransaction[];
   recentDisputes?: FrontendDispute[];
 }
+export type RangeValue = "7d" | "30d" | "this-year" | "custom";
