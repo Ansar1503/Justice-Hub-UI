@@ -7,9 +7,9 @@ import WalletPage from "@/pages/admin/WalletPage";
 import CaseManagement from "@/pages/admin/CasesManagement";
 import CommissionPage from "@/pages/admin/CommissionPage";
 import UserManagementPage from "@/pages/admin/UserManagement";
-import { LawyerVerification } from "@/utils/api/services/LawyerServices";
 import Sessions from "@/pages/admin/Sessions";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
+import LawyerVerification from "@/pages/admin/VerificationInputs";
 
 function AdminRoutes() {
   return (
