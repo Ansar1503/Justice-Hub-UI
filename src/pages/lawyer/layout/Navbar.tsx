@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { Bell, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationComponent from "@/components/NotificationPopover";
+import { persistor } from "@/store/redux/store";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -23,9 +24,11 @@ function Navbar() {
   const user = useAppSelector((state) => state.Auth.user);
 
   const dispatch = useAppDispatch();
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // dispatch(LogOut());
     dispatch(signOut());
+    await persistor.flush();
+    await persistor.purge();
     navigate("/login");
   };
 
