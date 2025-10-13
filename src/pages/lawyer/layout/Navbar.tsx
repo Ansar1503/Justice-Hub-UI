@@ -29,7 +29,7 @@ function Navbar() {
     dispatch(signOut());
     await persistor.flush();
     await persistor.purge();
-    navigate("/login");
+    window.location.reload();
   };
 
   const toggleDropdown = () => {
