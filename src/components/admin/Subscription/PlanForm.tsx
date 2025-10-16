@@ -36,16 +36,9 @@ type PlanFormProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialPlan?: SubscriptionType | null;
-  onSubmit: (plan: SubscriptionType) => void;
+  onSubmit: (plan: Omit<SubscriptionType, "id">) => void;
 };
 
-function newId(prefix = "id") {
-  return `${prefix}_${Math.random()
-    .toString(36)
-    .slice(2, 8)}_${Date.now().toString(36)}`;
-}
-
-// Default benefit sets
 const basicBenefits: PlanBenefits = {
   bookingsPerMonth: 2,
   followupBookingsPerCase: 1,
@@ -175,8 +168,7 @@ export function PlanForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validateForm()) return;
-    const plan: SubscriptionType = {
-      id: initialPlan?.id ?? newId("plan"),
+    const plan: Omit<SubscriptionType, "id"> = {
       name: name.trim(),
       description: description.trim(),
       price: isFree ? 0 : Number(price),

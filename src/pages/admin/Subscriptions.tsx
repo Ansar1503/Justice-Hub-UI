@@ -15,7 +15,7 @@ export default function Subscriptions() {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionType | null>(
     null
   );
-
+  
   const handleAddPlan = () => {
     setSelectedPlan(null);
     setFormOpen(true);
@@ -35,7 +35,7 @@ export default function Subscriptions() {
     console.log("Deactivate plan id:", id);
   };
 
-  const handleFormSubmit = (plan: SubscriptionType) => {
+  const handleFormSubmit = (plan: Omit<SubscriptionType, "id">) => {
     console.log("Plan submitted:", plan);
     setFormOpen(false);
   };
