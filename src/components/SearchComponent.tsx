@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Input } from "./ui/input";
 
 type Props = {
@@ -21,23 +21,38 @@ export default function SearchComponent({
     const handler = setTimeout(() => {
       setSearchTerm(localValue);
     }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
+    return () => clearTimeout(handler);
   }, [localValue, setSearchTerm]);
 
+  const clearSearch = () => {
+    setLocalValue("");
+    setSearchTerm("");
+  };
+
   return (
-    <div className={`relative ${className}`}>
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+    <div className={`relative w-full ${className}`}>
+      {/* Search Icon */}
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+
+      {/* Input */}
       <Input
         type="text"
         placeholder={placeholder}
-        className="pl-10 bg-white/10"
+        className="pl-10 pr-8 bg-white/10 focus-visible:ring-1 focus-visible:ring-primary"
         value={localValue}
-        onChange={(e) => {
-          setLocalValue(e.target.value)}}
+        onChange={(e) => setLocalValue(e.target.value)}
       />
+
+      {/* Clear Button */}
+      {localValue && (
+        <button
+          onClick={clearSearch}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Clear search"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 }

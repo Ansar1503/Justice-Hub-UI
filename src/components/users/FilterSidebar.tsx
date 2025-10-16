@@ -67,48 +67,50 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
   return (
     <div className="w-full lg:w-[250px] space-y-4">
       <Accordion type="multiple" className="w-full">
-        <AccordionItem value="practice">
-          <AccordionTrigger>Practice Area</AccordionTrigger>
-          <AccordionContent>
-            {practiceAreas &&
-              practiceAreas?.map((p) => (
-                <div key={p.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={p.id}
-                    checked={filters.practiceAreas.includes(p.id)}
-                    onCheckedChange={() =>
-                      toggleCheckbox("practiceAreas", p.id)
-                    }
-                  />
-                  <label htmlFor={p.name} className="text-sm">
-                    {p.name}
-                  </label>
-                </div>
-              ))}
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="specialisation">
-          <AccordionTrigger>Specialisation</AccordionTrigger>
-          <AccordionContent>
-            {specialisations &&
-              specialisations?.map((spec) => (
-                <div key={spec.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={spec.id}
-                    checked={filters.specialisation.includes(spec.id)}
-                    onCheckedChange={() =>
-                      toggleCheckbox("specialisation", spec.id)
-                    }
-                  />
-                  <label htmlFor={spec.name} className="text-sm">
-                    {spec.name}
-                  </label>
-                </div>
-              ))}
-          </AccordionContent>
-        </AccordionItem>
-
+        {specialisations && specialisations.length > 0 && (
+          <AccordionItem value="specialisation">
+            <AccordionTrigger>Specialisation</AccordionTrigger>
+            <AccordionContent>
+              {specialisations &&
+                specialisations?.map((spec) => (
+                  <div key={spec.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={spec.id}
+                      checked={filters.specialisation.includes(spec.id)}
+                      onCheckedChange={() =>
+                        toggleCheckbox("specialisation", spec.id)
+                      }
+                    />
+                    <label htmlFor={spec.name} className="text-sm">
+                      {spec.name}
+                    </label>
+                  </div>
+                ))}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        {practiceAreas && practiceAreas.length > 0 && (
+          <AccordionItem value="practice">
+            <AccordionTrigger>Practice Area</AccordionTrigger>
+            <AccordionContent>
+              {practiceAreas &&
+                practiceAreas?.map((p) => (
+                  <div key={p.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={p.id}
+                      checked={filters.practiceAreas.includes(p.id)}
+                      onCheckedChange={() =>
+                        toggleCheckbox("practiceAreas", p.id)
+                      }
+                    />
+                    <label htmlFor={p.name} className="text-sm">
+                      {p.name}
+                    </label>
+                  </div>
+                ))}
+            </AccordionContent>
+          </AccordionItem>
+        )}
         <AccordionItem value="experience">
           <AccordionTrigger>Experience (Years)</AccordionTrigger>
           <AccordionContent className="mt-2">

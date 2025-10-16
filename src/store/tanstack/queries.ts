@@ -139,7 +139,7 @@ export function useFetchAllLawyers(query: {
 
 export function useFetchLawyersByQuery(query: LawyerFilterParams) {
   return useQuery({
-    queryKey: ["lawyers", "queries"],
+    queryKey: ["lawyers", "queries", query],
     queryFn: () => fetchLawyersByQuery(query),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

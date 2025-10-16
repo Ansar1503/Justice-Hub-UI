@@ -10,12 +10,13 @@ import UserManagementPage from "@/pages/admin/UserManagement";
 import Sessions from "@/pages/admin/Sessions";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import LawyerVerification from "@/pages/admin/VerificationInputs";
+import Subscriptions from "@/pages/admin/Subscriptions";
 
 function AdminRoutes() {
   return (
     <Routes>
       <Route element={<Protected />}>
-        <Route index element={<UserManagementPage />} />
+        <Route path="/users" element={<UserManagementPage />} />
         <Route path="/lawyer-verification" element={<LawyerVerification />} />
         <Route path="/sessions" element={<Sessions />} />
         <Route path="/appointments" element={<Appointments />} />
@@ -24,7 +25,8 @@ function AdminRoutes() {
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/casesmanagement" element={<CaseManagement />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
-        <Route path="settings/commission" element={<CommissionPage />}></Route>
+        <Route path="settings/commission" element={<CommissionPage />} />
+        <Route path="/subscriptions" element={<Subscriptions />} />
       </Route>
     </Routes>
   );

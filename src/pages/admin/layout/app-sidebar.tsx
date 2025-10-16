@@ -7,7 +7,8 @@ import {
   Shield,
   User,
   Wallet,
-  LayoutDashboard, // 🆕 Dashboard icon
+  LayoutDashboard,
+  CalendarSync, // 🆕 Dashboard icon
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
@@ -39,12 +40,12 @@ const navdata = {
     },
     {
       title: "User Management",
-      url: "/admin/",
+      url: "/admin/users",
       icon: User,
       items: [
         {
           title: "Users",
-          url: "/admin/",
+          url: "/admin/users",
         },
       ],
     },
@@ -99,6 +100,12 @@ const navdata = {
           url: "/admin/disputes/chat",
         },
       ],
+    },
+    {
+      title: "Subscriptions",
+      url: "/admin/subscriptions",
+      icon: CalendarSync,
+      items: [{ title: "Plans", url: "/admin/subscriptions" }],
     },
     {
       title: "Settings",

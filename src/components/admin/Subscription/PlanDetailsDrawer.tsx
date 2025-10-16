@@ -9,7 +9,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { SubscriptionType } from "@/types/types/SubscriptionType";
+import type { SubscriptionType } from "@/types/types/SubscriptionType";
 
 type PlanDetailsDrawerProps = {
   open: boolean;

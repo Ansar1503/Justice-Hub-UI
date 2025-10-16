@@ -8,14 +8,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { SubscriptionType } from "@/types/types/SubscriptionType";
-import { PlanDetailsDrawer } from "./PlanDetailsDrawer";
+import type { SubscriptionType } from "@/types/types/SubscriptionType";
 
 type PlanTableProps = {
   plans: SubscriptionType[] | [];
   onEdit: (plan: SubscriptionType) => void;
   onDeactivate: (id: string) => void;
+  onViewDetails: (plan: SubscriptionType) => void;
 };
 
 const inr = new Intl.NumberFormat("en-IN", {
@@ -24,17 +23,12 @@ const inr = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 0,
 });
 
-export function PlanTable({ plans, onEdit, onDeactivate }: PlanTableProps) {
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionType | null>(
-    null
-  );
-
-  function handleViewDetails(plan: SubscriptionType) {
-    setSelectedPlan(plan);
-    setDetailsOpen(true);
-  }
-
+export function PlanTable({
+  plans,
+  onEdit,
+  onDeactivate,
+  onViewDetails,
+}: PlanTableProps) {
   return (
     <>
       <div className="rounded-lg border bg-card overflow-x-auto">
@@ -90,7 +84,7 @@ export function PlanTable({ plans, onEdit, onDeactivate }: PlanTableProps) {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => handleViewDetails(plan)}
+                        onClick={() => onViewDetails(plan)}
                       >
                         View Details
                       </Button>
@@ -122,12 +116,6 @@ export function PlanTable({ plans, onEdit, onDeactivate }: PlanTableProps) {
           </TableBody>
         </Table>
       </div>
-
-      <PlanDetailsDrawer
-        open={detailsOpen}
-        onOpenChange={setDetailsOpen}
-        plan={selectedPlan}
-      />
     </>
   );
 }
