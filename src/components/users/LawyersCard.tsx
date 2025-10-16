@@ -1,113 +1,101 @@
+import { MapPin, Briefcase, DollarSign } from "lucide-react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Button } from "../ui/button";
-import { LawerDataType } from "@/types/types/Client.data.type";
-import { Badge } from "../ui/badge";
-import { useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+interface Lawyer {
+  id: string;
+  name: string;
+  profileImage?: string;
+  specialization: string[];
+  practiceAreas: string[];
+  experience: number;
+  rating: number;
+  reviewCount: number;
+  location: string;
+  consultationFee: number;
+  verified?: boolean;
+}
+
+interface LawyersCardProps {
+  lawyer: Lawyer;
+  getVerificationBadge: (verified: boolean) => React.ReactNode;
+}
 
 export default function LawyersCard({
   lawyer,
   getVerificationBadge,
-}: {
-  lawyer: Partial<LawerDataType>;
-  getVerificationBadge: any;
-}) {
-  const navigate = useNavigate();
+}: LawyersCardProps) {
+  const initials = lawyer.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
   return (
-    <Card key={lawyer.user_id}>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between">
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-8 w-8 border">
-              <AvatarImage src={lawyer?.profile_image} alt={lawyer?.name} />
-              <AvatarFallback>
-                {lawyer?.name?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <CardTitle className="text-lg">{lawyer.name}</CardTitle>
-              <CardDescription>{lawyer.address?.city}</CardDescription>
+    <Card className="group h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-border/50">
+      <CardHeader className="pb-4">
+        <div className="flex items-start gap-4">
+          <Avatar className="h-16 w-16 ring-2 ring-primary/10 transition-all group-hover:ring-primary/30">
+            <AvatarImage src={lawyer.profileImage} alt={lawyer.name} />
+            <AvatarFallback className="bg-primary/10 text-primary text-lg font-semibold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-bold text-lg truncate">{lawyer.name}</h3>
+              {lawyer.verified && getVerificationBadge(true)}
+            </div>
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <MapPin className="h-3 w-3" />
+              <span className="truncate">{lawyer.location}</span>
             </div>
           </div>
-          {getVerificationBadge(lawyer.verification_status)}
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div>
-          <p className="text-sm font-medium">Practice Areas</p>
-          <div className="flex gap-1 mt-1 overflow-hidden whitespace-nowrap">
-            {lawyer.practice_areas &&
-              lawyer.practice_areas?.map((area, idx) => (
-                <Badge
-                  key={`${area}-${idx}`}
-                  variant="secondary"
-                  className="text-xs whitespace-nowrap"
-                >
-                  {area}
-                </Badge>
-              ))}
+
+      <CardContent className="flex-1 space-y-4 pb-4">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            Practice Areas
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {lawyer.specialization.slice(0, 3).map((spec, idx) => (
+              <Badge key={idx} variant="secondary" className="text-xs">
+                {spec}
+              </Badge>
+            ))}
+            {lawyer.specialization.length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{lawyer.specialization.length - 3}
+              </Badge>
+            )}
           </div>
         </div>
 
-        <div>
-          <p className="text-sm font-medium">Specialization</p>
-          <div className="flex gap-1 mt-1 overflow-hidden whitespace-nowrap">
-            {lawyer.specialisation &&
-              lawyer.specialisation.map((spec,idx) => (
-                <Badge
-                  key={`${spec}-${idx}`}
-                  variant="outline"
-                  className="text-xs whitespace-nowrap"
-                >
-                  {spec}
-                </Badge>
-              ))}
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Briefcase className="h-4 w-4 text-primary" />
+            <span className="font-medium">{lawyer.experience} years</span>
           </div>
-        </div>
-
-        <div className="flex justify-between">
-          <div>
-            <p className="text-sm font-medium">Experience</p>
-            <p>{lawyer.experience} years</p>
+          <div className="flex items-center gap-1 text-sm font-semibold text-foreground">
+            <DollarSign className="h-4 w-4 text-primary" />
+            <span>₹{lawyer.consultationFee.toLocaleString()}</span>
           </div>
-          <div>
-            <p className="text-sm font-medium">Consultation Fee</p>
-            <p className="font-semibold">${lawyer.consultation_fee}</p>
-          </div>
-        </div>
-        <div>
-          {/* <div className="flex items-center"> */}
-          {/* <div className="flex"> */}
-          {/* {Array.from({ length: 5 }).map((_, i) => (
-              <svg
-                key={i}
-                className={`w-4 h-4 ${
-                  i < Math.floor(lawyer.rating) ? "text-yellow-400" : "text-gray-300"
-                }`}
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))} */}
-          {/* </div> */}
-          {/* <span className="ml-1 text-sm text-gray-500">({lawyer.reviews} reviews)</span> */}
-          {/* </div> */}
         </div>
       </CardContent>
-      <CardFooter>
+
+      <CardFooter className="pt-4 border-t border-border/50">
         <Button
-          className="w-full"
-          onClick={() => {
-            navigate(`/client/lawyers/${lawyer.user_id}`);
-          }}
+          className="w-full group-hover:shadow-md transition-all"
+          variant="default"
         >
           View Profile
         </Button>

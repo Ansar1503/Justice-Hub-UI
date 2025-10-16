@@ -15,8 +15,8 @@ import FiltersSidebar from "@/components/users/FilterSidebar";
 import SearchComponent from "@/components/SearchComponent";
 import { useFetchLawyersByQuery } from "@/store/tanstack/queries";
 import PaginationComponent from "@/components/pagination";
-import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
+import Navbar from "./layout/Navbar";
 
 export type sortType = "fee-high" | "rating" | "experience" | "fee-low";
 
@@ -54,7 +54,6 @@ export default function LawyerDirectory() {
     limit: itemsPerPage,
     page: currentPage,
   });
-
 
   useEffect(() => {
     if (data?.data?.data) {
