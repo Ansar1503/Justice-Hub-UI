@@ -1,193 +1,164 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Separator } from "@/components/ui/separator";
-import { X } from "lucide-react";
-import { filterType } from "@/pages/client/LawyersListing";
+import { Button } from "@/components/ui/button";
+
+import { RefreshCcw } from "lucide-react";
+import { VerificationStatus } from "@/types/types/LawyerTypes";
+import { useFetchPracticeAreaBySpecIds } from "@/store/tanstack/Queries/PracticeAreaQuery";
+import { useFetchAllSpecializations } from "@/store/tanstack/Queries/SpecializationQueries";
+import { useMemo } from "react";
 
 interface FiltersSidebarProps {
-  filters: filterType;
-  setFilters: (filters: filterType) => void;
-  resetFilters: () => void;
+  filters: {
+    practiceAreas: string[];
+    specialisation: string[];
+    experienceRange: number[];
+    feeRange: number[];
+    sortBy: "rating" | "experience" | "fee-low" | "fee-high";
+  };
+  setFilters: React.Dispatch<
+    React.SetStateAction<FiltersSidebarProps["filters"]>
+  >;
   handleApplyFilters: () => void;
+  resetFilters: () => void;
 }
 
-const practiceAreaOptions = [
-  "Corporate Law",
-  "Criminal Law",
-  "Family Law",
-  "Civil Litigation",
-  "Intellectual Property",
-  "Tax Law",
-  "Real Estate",
-  "Employment Law",
-];
-
-const specializationOptions = [
-  "Contract Disputes",
-  "Business Formation",
-  "Divorce & Custody",
-  "Personal Injury",
-  "Estate Planning",
-  "Immigration",
-  "Bankruptcy",
-  "Environmental Law",
-];
-
-export default function FiltersSidebar({
+const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
   filters,
   setFilters,
   resetFilters,
   handleApplyFilters,
-}: FiltersSidebarProps) {
-  const handlePracticeAreaChange = (area: string, checked: boolean) => {
-    setFilters({
-      ...filters,
-      practiceAreas: checked
-        ? [...filters.practiceAreas, area]
-        : filters.practiceAreas.filter((a) => a !== area),
-    });
-  };
-
-  const handleSpecializationChange = (spec: string, checked: boolean) => {
-    setFilters({
-      ...filters,
-      specialisation: checked
-        ? [...filters.specialisation, spec]
-        : filters.specialisation.filter((s) => s !== spec),
+}) => {
+  const { data: practiceAreas } = useFetchPracticeAreaBySpecIds(
+    filters.specialisation
+  );
+  const { data: SpecialisationData } = useFetchAllSpecializations({
+    limit: 1000,
+    page: 1,
+    search: "",
+  });
+  const specialisations = useMemo(
+    () => SpecialisationData?.data || [],
+    [SpecialisationData]
+  );
+  const toggleCheckbox = (
+    field: keyof FiltersSidebarProps["filters"],
+    value: string | VerificationStatus
+  ) => {
+    setFilters((prev) => {
+      const current = prev[field] as string[];
+      return {
+        ...prev,
+        [field]: current.includes(value)
+          ? current.filter((v) => v !== value)
+          : [...current, value],
+      };
     });
   };
 
   return (
-    <Card className="sticky top-6 border-border/50 shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-border/50">
-        <CardTitle className="text-xl font-bold">Filters</CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={resetFilters}
-          className="h-8 px-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
-        >
-          <X className="h-4 w-4 mr-1" />
-          Clear
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-6 pt-6">
-        {/* Practice Areas */}
-        <div className="space-y-3">
-          <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Practice Areas
-          </Label>
-          <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
-            {practiceAreaOptions.map((area) => (
-              <div key={area} className="flex items-center space-x-2 group">
-                <Checkbox
-                  id={`practice-${area}`}
-                  checked={filters.practiceAreas.includes(area)}
-                  onCheckedChange={(checked) =>
-                    handlePracticeAreaChange(area, checked as boolean)
-                  }
-                  className="transition-all"
-                />
-                <label
-                  htmlFor={`practice-${area}`}
-                  className="text-sm leading-none cursor-pointer group-hover:text-primary transition-colors"
-                >
-                  {area}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
+    <div className="w-full lg:w-[250px] space-y-4">
+      <Accordion type="multiple" className="w-full">
+        {specialisations && specialisations.length > 0 && (
+          <AccordionItem value="specialisation">
+            <AccordionTrigger>Specialisation</AccordionTrigger>
+            <AccordionContent>
+              {specialisations &&
+                specialisations?.map((spec) => (
+                  <div key={spec.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={spec.id}
+                      checked={filters.specialisation.includes(spec.id)}
+                      onCheckedChange={() =>
+                        toggleCheckbox("specialisation", spec.id)
+                      }
+                    />
+                    <label htmlFor={spec.name} className="text-sm">
+                      {spec.name}
+                    </label>
+                  </div>
+                ))}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        {practiceAreas && practiceAreas.length > 0 && (
+          <AccordionItem value="practice">
+            <AccordionTrigger>Practice Area</AccordionTrigger>
+            <AccordionContent>
+              {practiceAreas &&
+                practiceAreas?.map((p) => (
+                  <div key={p.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={p.id}
+                      checked={filters.practiceAreas.includes(p.id)}
+                      onCheckedChange={() =>
+                        toggleCheckbox("practiceAreas", p.id)
+                      }
+                    />
+                    <label htmlFor={p.name} className="text-sm">
+                      {p.name}
+                    </label>
+                  </div>
+                ))}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        <AccordionItem value="experience">
+          <AccordionTrigger>Experience (Years)</AccordionTrigger>
+          <AccordionContent className="mt-2">
+            <Slider
+              min={0}
+              max={25}
+              step={1}
+              value={filters.experienceRange}
+              onValueChange={(value) =>
+                setFilters((prev) => ({ ...prev, experienceRange: value }))
+              }
+            />
+            <div className="text-sm mt-1">
+              {filters.experienceRange[0]} - {filters.experienceRange[1]} years
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
-        <Separator className="bg-border/50" />
+        <AccordionItem value="fee">
+          <AccordionTrigger>Consultation Fee</AccordionTrigger>
+          <AccordionContent>
+            <Slider
+              className="mt-2"
+              min={0}
+              max={10000}
+              step={10}
+              value={filters.feeRange}
+              onValueChange={(value) =>
+                setFilters((prev) => ({ ...prev, feeRange: value }))
+              }
+            />
+            <div className="text-sm mt-1">
+              ₹{filters.feeRange[0]} - ₹{filters.feeRange[1]}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
-        {/* Specializations */}
-        <div className="space-y-3">
-          <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Specializations
-          </Label>
-          <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
-            {specializationOptions.map((spec) => (
-              <div key={spec} className="flex items-center space-x-2 group">
-                <Checkbox
-                  id={`spec-${spec}`}
-                  checked={filters.specialisation.includes(spec)}
-                  onCheckedChange={(checked) =>
-                    handleSpecializationChange(spec, checked as boolean)
-                  }
-                  className="transition-all"
-                />
-                <label
-                  htmlFor={`spec-${spec}`}
-                  className="text-sm leading-none cursor-pointer group-hover:text-primary transition-colors"
-                >
-                  {spec}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
+      <Button variant="outline" className="w-full" onClick={handleApplyFilters}>
+        Apply Filter
+      </Button>
 
-        <Separator className="bg-border/50" />
-
-        {/* Experience Range */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Experience
-            </Label>
-            <span className="text-sm font-semibold text-primary">
-              {filters.experienceRange[0]} - {filters.experienceRange[1]} yrs
-            </span>
-          </div>
-          <Slider
-            min={0}
-            max={25}
-            step={1}
-            value={filters.experienceRange}
-            onValueChange={(value) =>
-              setFilters({ ...filters, experienceRange: value })
-            }
-            className="w-full"
-          />
-        </div>
-
-        <Separator className="bg-border/50" />
-
-        {/* Fee Range */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Fee Range
-            </Label>
-            <span className="text-sm font-semibold text-primary">
-              ₹{filters.feeRange[0].toLocaleString()} - ₹
-              {filters.feeRange[1].toLocaleString()}
-            </span>
-          </div>
-          <Slider
-            min={0}
-            max={10000}
-            step={500}
-            value={filters.feeRange}
-            onValueChange={(value) =>
-              setFilters({ ...filters, feeRange: value })
-            }
-            className="w-full"
-          />
-        </div>
-
-        <Button
-          onClick={handleApplyFilters}
-          className="w-full shadow-md hover:shadow-lg transition-all"
-          size="lg"
-        >
-          Apply Filters
-        </Button>
-      </CardContent>
-    </Card>
+      <Button variant="ghost" className="w-full" onClick={resetFilters}>
+        <RefreshCcw />
+        Reset Filters
+      </Button>
+    </div>
   );
-}
+};
+
+export default FiltersSidebar;

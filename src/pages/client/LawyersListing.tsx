@@ -31,7 +31,7 @@ export type filterType = {
 export default function LawyerDirectory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [lawyers, setLawyers] = useState([]);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(6);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<filterType>({
     practiceAreas: [],
@@ -200,26 +200,47 @@ export default function LawyerDirectory() {
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-                      {lawyers.map((lawyer: any, index: number) => (
-                        <LawyersCard
-                          key={lawyer.id || index}
-                          getVerificationBadge={getVerificationBadge}
-                          lawyer={lawyer}
-                        />
-                      ))}
+                      {lawyers.map((rawLawyer: any, index: number) => {
+                        const lawyer = {
+                          id: rawLawyer.user_id || `lawyer-${index}`,
+                          name: rawLawyer.name || "Unknown Lawyer",
+                          profileImage: rawLawyer.profile_image || "",
+                          specialization: rawLawyer.specialisation || [],
+                          practiceAreas: rawLawyer.practice_areas || [],
+                          experience: rawLawyer.experience || 0,
+                          rating: rawLawyer.rating || 0,
+                          reviewCount: rawLawyer.reviewCount || 0,
+                          location: rawLawyer.Address?.city
+                            ? `${rawLawyer.Address.city}${
+                                rawLawyer.Address.state
+                                  ? ", " + rawLawyer.Address.state
+                                  : ""
+                              }`
+                            : "Not specified",
+                          consultationFee: rawLawyer.consultation_fee || 0,
+                          verified:
+                            rawLawyer.verification_status === "verified",
+                        };
+
+                        return (
+                          <LawyersCard
+                            key={lawyer.id}
+                            lawyer={lawyer}
+                            getVerificationBadge={getVerificationBadge}
+                          />
+                        );
+                      })}
                     </div>
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                      <div className="mt-8 bg-card p-6 rounded-lg border shadow-card">
-                        <PaginationComponent
-                          currentPage={currentPage}
-                          handlePageChange={handlePageChange}
-                          itemsPerPage={itemsPerPage}
-                          totalItems={totalItems}
-                          totalPages={totalPages}
-                        />
-                      </div>
+                      <PaginationComponent
+                        currentPage={currentPage}
+                        handlePageChange={handlePageChange}
+                        itemsPerPage={itemsPerPage}
+                        totalItems={totalItems}
+                        totalPages={totalPages}
+                      />
                     )}
                   </>
                 )}
