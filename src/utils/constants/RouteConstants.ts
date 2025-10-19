@@ -12,6 +12,7 @@ export const WalletRoutes = {
 
 export const CommonQueies = {
   api: "/api/",
+  admin: "admin",
   pageQuery: "?page=",
   limitQuery: "&limit=",
   searchQuery: "&search=",
@@ -64,3 +65,6 @@ export const CommissionRoutes = {
   transactions: "/transactions",
 };
 
+export const SubscriptionRoute = {
+  base: "/subscriptions",
+};

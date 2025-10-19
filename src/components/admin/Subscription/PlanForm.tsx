@@ -1,174 +1,149 @@
-"use client";
+import type React from "react"
 
-import type React from "react";
-import { useEffect, useState } from "react";
-
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import type {
-  PlanBenefits,
-  SubscriptionIntervalType,
-  SubscriptionType,
-} from "@/types/types/SubscriptionType";
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
+import type { PlanBenefits, SubscriptionIntervalType, SubscriptionType } from "@/types/types/SubscriptionType"
 
 type PlanFormProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  initialPlan?: SubscriptionType | null;
-  onSubmit: (plan: Omit<SubscriptionType, "id">) => void;
-};
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  initialPlan?: SubscriptionType | null
+  onAdd: (plan: Omit<SubscriptionType, "id" | "createdAt" | "updatedAt">) => void
+  onEdit: (plan: Omit<SubscriptionType, "createdAt" | "updatedAt">) => void
+}
 
 const basicBenefits: PlanBenefits = {
-  bookingsPerMonth: 2,
-  followupBookingsPerCase: 1,
+  bookingsPerMonth: 3,
+  followupBookingsPerCase: 3,
   chatAccess: false,
   discountPercent: 0,
-  documentUploadLimit: 3,
+  documentUploadLimit: 10,
   expiryAlert: false,
   autoRenew: false,
-};
+}
 
 const monthlyBenefits: PlanBenefits = {
-  bookingsPerMonth: 10,
-  followupBookingsPerCase: 3,
+  bookingsPerMonth: "unlimited",
+  followupBookingsPerCase: "unlimited",
   chatAccess: true,
   discountPercent: 10,
-  documentUploadLimit: 20,
+  documentUploadLimit: 30,
   expiryAlert: true,
   autoRenew: true,
-};
+}
 
 const yearlyBenefits: PlanBenefits = {
   bookingsPerMonth: "unlimited",
   followupBookingsPerCase: "unlimited",
   chatAccess: true,
-  discountPercent: 25,
-  documentUploadLimit: 100,
+  discountPercent: 10,
+  documentUploadLimit: 30,
   expiryAlert: true,
   autoRenew: true,
-};
+}
 
-export function PlanForm({
-  open,
-  onOpenChange,
-  initialPlan,
-  onSubmit,
-}: PlanFormProps) {
-  const isEdit = !!initialPlan;
-  const [name, setName] = useState(initialPlan?.name ?? "");
-  const [description, setDescription] = useState(
-    initialPlan?.description ?? ""
-  );
-  const [price, setPrice] = useState<number>(initialPlan?.price ?? 0);
-  const [interval, setInterval] = useState<SubscriptionIntervalType>(
-    initialPlan?.interval ?? "monthly"
-  );
-  const [isFree, setIsFree] = useState<boolean>(initialPlan?.isFree ?? false);
-  const [stripeProductId, setStripeProductId] = useState(
-    initialPlan?.stripeProductId ?? ""
-  );
-  const [stripePriceId, setStripePriceId] = useState(
-    initialPlan?.stripePriceId ?? ""
-  );
-  const [isActive, setIsActive] = useState<boolean>(
-    initialPlan?.isActive ?? true
-  );
-  const [benefits, setBenefits] = useState<PlanBenefits>(
-    initialPlan?.benefits ?? monthlyBenefits
-  );
-  const [errors, setErrors] = useState<Record<string, string>>({});
+export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: PlanFormProps) {
+  const isEdit = !!initialPlan
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [price, setPrice] = useState<number>(0)
+  const [interval, setInterval] = useState<SubscriptionIntervalType>("monthly")
+  const [isFree, setIsFree] = useState<boolean>(false)
+  const [stripeProductId, setStripeProductId] = useState("")
+  const [stripePriceId, setStripePriceId] = useState("")
+  const [isActive, setIsActive] = useState<boolean>(true)
+  const [benefits, setBenefits] = useState<PlanBenefits>(monthlyBenefits)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
 
   useEffect(() => {
-    if (open) {
-      setName(initialPlan?.name ?? "");
-      setDescription(initialPlan?.description ?? "");
-      setPrice(initialPlan?.price ?? 0);
-      setInterval(initialPlan?.interval ?? "monthly");
-      setIsFree(initialPlan?.isFree ?? false);
-      setStripeProductId(initialPlan?.stripeProductId ?? "");
-      setStripePriceId(initialPlan?.stripePriceId ?? "");
-      setIsActive(initialPlan?.isActive ?? true);
-      setBenefits(initialPlan?.benefits ?? monthlyBenefits);
-      setErrors({});
-    }
-  }, [open, initialPlan?.id]);
+    if (!open) return
 
-  // Handle Free Plan
-  const handleFreeToggle = (checked: boolean) => {
-    setIsFree(checked);
-    if (checked) {
-      setPrice(0);
-      setInterval("none");
-      setName("Basic");
-      setDescription("Free basic plan for limited access.");
-      setBenefits(basicBenefits);
+    if (initialPlan) {
+      setName(initialPlan.name ?? "")
+      setDescription(initialPlan.description ?? "")
+      setPrice(initialPlan.price ?? 0)
+      setInterval(initialPlan.interval ?? "monthly")
+      setIsFree(initialPlan.isFree ?? false)
+      setStripeProductId(initialPlan.stripeProductId ?? "")
+      setStripePriceId(initialPlan.stripePriceId ?? "")
+      setIsActive(initialPlan.isActive ?? true)
+      setBenefits(
+        initialPlan.benefits && Object.keys(initialPlan.benefits).length > 0 ? initialPlan.benefits : monthlyBenefits,
+      )
     } else {
-      setInterval("monthly");
-      setPrice(499);
-      setName("Monthly Plan");
-      setDescription("Access premium features with a monthly plan.");
-      setBenefits(monthlyBenefits);
+      setName("")
+      setDescription("")
+      setPrice(0)
+      setInterval("monthly")
+      setIsFree(false)
+      setStripeProductId("")
+      setStripePriceId("")
+      setIsActive(true)
+      setBenefits(monthlyBenefits)
     }
-  };
+  }, [open, initialPlan])
 
-  // Handle Interval Change
+  const handleFreeToggle = (checked: boolean) => {
+    setIsFree(checked)
+    if (checked) {
+      setPrice(0)
+      setInterval("none")
+      setName("Basic")
+      setDescription("Free basic plan for limited access.")
+      setBenefits(basicBenefits)
+    } else {
+      setInterval("monthly")
+      setPrice(499)
+      setName("Monthly Plan")
+      setDescription("Access premium features with a monthly plan.")
+      setBenefits(monthlyBenefits)
+    }
+  }
+
   const handleIntervalChange = (v: SubscriptionIntervalType) => {
-    setInterval(v);
+    setInterval(v)
     if (v === "monthly") {
-      setPrice(499);
-      setBenefits(monthlyBenefits);
-      setName("Monthly Plan");
+      setPrice(499)
+      setBenefits(monthlyBenefits)
+      setName("Monthly Plan")
     } else if (v === "yearly") {
-      setPrice(4999);
-      setBenefits(yearlyBenefits);
-      setName("Yearly Plan");
+      setPrice(4999)
+      setBenefits(yearlyBenefits)
+      setName("Yearly Plan")
     } else if (v === "none" && isFree) {
-      setPrice(0);
-      setBenefits(basicBenefits);
-      setName("Basic");
+      setPrice(0)
+      setBenefits(basicBenefits)
+      setName("Basic")
     }
-  };
+  }
 
-  // Validation
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    if (!name.trim()) newErrors.name = "Plan name is required.";
-    if (!description.trim())
-      newErrors.description = "Please add a description.";
-    if (!isFree && (isNaN(price) || price <= 0))
-      newErrors.price = "Price must be greater than 0.";
-    if (!interval) newErrors.interval = "Select a billing interval.";
+    const newErrors: Record<string, string> = {}
+    if (!name.trim()) newErrors.name = "Plan name is required."
+    if (!description.trim()) newErrors.description = "Please add a description."
+    if (!isFree && (isNaN(price) || price <= 0)) newErrors.price = "Price must be greater than 0."
+    if (!interval) newErrors.interval = "Select a billing interval."
     if (benefits.discountPercent < 0 || benefits.discountPercent > 100)
-      newErrors.discountPercent = "Discount must be between 0 and 100.";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+      newErrors.discountPercent = "Discount must be between 0 and 100."
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!validateForm()) return;
-    const plan: Omit<SubscriptionType, "id"> = {
+  const handleAddSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!validateForm()) return
+    onAdd({
       name: name.trim(),
       description: description.trim(),
       price: isFree ? 0 : Number(price),
@@ -178,11 +153,26 @@ export function PlanForm({
       stripePriceId: stripePriceId.trim() || undefined,
       isActive,
       benefits,
-      createdAt: initialPlan?.createdAt ?? new Date(),
-      updatedAt: new Date(),
-    };
-    onSubmit(plan);
-    onOpenChange(false);
+    })
+    onOpenChange(false)
+  }
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!validateForm() || !initialPlan?.id) return
+    onEdit({
+      id: initialPlan.id,
+      name: name.trim(),
+      description: description.trim(),
+      price: isFree ? 0 : Number(price),
+      interval,
+      isFree,
+      stripeProductId: stripeProductId.trim() || undefined,
+      stripePriceId: stripePriceId.trim() || undefined,
+      isActive,
+      benefits,
+    })
+    onOpenChange(false)
   }
 
   return (
@@ -197,14 +187,14 @@ export function PlanForm({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="overflow-y-auto flex-1 px-6">
-          <form onSubmit={handleSubmit} className="grid gap-6 pb-6">
-            {/* === GENERAL === */}
+        <div className="overflow-y-auto flex-1">
+          <form onSubmit={isEdit ? handleEditSubmit : handleAddSubmit} className="grid gap-6 px-6 pb-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">General</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4">
+                {/* Plan Name */}
                 <div className="grid gap-2">
                   <Label>Plan Name</Label>
                   <Input
@@ -212,26 +202,21 @@ export function PlanForm({
                     onChange={(e) => setName(e.target.value)}
                     className={errors.name ? "border-red-500" : ""}
                   />
-                  {errors.name && (
-                    <p className="text-red-500 text-xs">{errors.name}</p>
-                  )}
+                  {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
                 </div>
 
+                {/* Description */}
                 <div className="grid gap-2">
                   <Label>Description</Label>
                   <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className={cn(
-                      "min-h-24",
-                      errors.description && "border-red-500"
-                    )}
+                    className={cn("min-h-24", errors.description && "border-red-500")}
                   />
-                  {errors.description && (
-                    <p className="text-red-500 text-xs">{errors.description}</p>
-                  )}
+                  {errors.description && <p className="text-red-500 text-xs">{errors.description}</p>}
                 </div>
 
+                {/* Price, Interval, Free Plan */}
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="grid gap-2">
                     <Label>Price (₹)</Label>
@@ -241,33 +226,18 @@ export function PlanForm({
                       value={price}
                       onChange={(e) => setPrice(Number(e.target.value))}
                       disabled={isFree}
-                      className={cn(
-                        errors.price && "border-red-500",
-                        isFree && "opacity-60"
-                      )}
                     />
-                    {errors.price && (
-                      <p className="text-red-500 text-xs">{errors.price}</p>
-                    )}
-                    {isFree && (
-                      <p className="text-xs text-gray-500 italic">
-                        Free Plan (₹0)
-                      </p>
-                    )}
+                    {errors.price && <p className="text-red-500 text-xs">{errors.price}</p>}
                   </div>
 
                   <div className="grid gap-2">
                     <Label>Billing Interval</Label>
                     <Select
                       value={interval}
-                      onValueChange={(v) =>
-                        handleIntervalChange(v as SubscriptionIntervalType)
-                      }
+                      onValueChange={(v) => handleIntervalChange(v as SubscriptionIntervalType)}
                       disabled={isFree}
                     >
-                      <SelectTrigger
-                        className={cn(errors.interval && "border-red-500")}
-                      >
+                      <SelectTrigger>
                         <SelectValue placeholder="Select interval" />
                       </SelectTrigger>
                       <SelectContent>
@@ -276,23 +246,16 @@ export function PlanForm({
                         <SelectItem value="yearly">Yearly</SelectItem>
                       </SelectContent>
                     </Select>
-                    {errors.interval && (
-                      <p className="text-red-500 text-xs">{errors.interval}</p>
-                    )}
                   </div>
 
                   <div className="grid gap-2">
                     <Label>Free Plan</Label>
-                    <Switch
-                      checked={isFree}
-                      onCheckedChange={handleFreeToggle}
-                    />
+                    <Switch checked={isFree} onCheckedChange={handleFreeToggle} />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* === BENEFITS === */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Plan Benefits</CardTitle>
@@ -311,31 +274,24 @@ export function PlanForm({
                       label: "Document Upload Limit",
                     },
                   ].map((field) => {
-                    const value = benefits[field.key as keyof PlanBenefits];
-                    const numericValue =
-                      value === "unlimited" || typeof value === "boolean"
-                        ? ""
-                        : (value as number | string);
+                    const value = benefits[field.key as keyof PlanBenefits]
 
                     return (
                       <div key={field.key} className="grid gap-2">
                         <Label>{field.label}</Label>
                         <Input
-                          type="number"
-                          min={0}
-                          value={numericValue}
-                          onChange={(e) =>
+                          value={value === "unlimited" ? "unlimited" : (value?.toString() ?? "")}
+                          onChange={(e) => {
+                            const val = e.target.value.trim()
                             setBenefits({
                               ...benefits,
-                              [field.key]:
-                                e.target.value === ""
-                                  ? "unlimited"
-                                  : Number(e.target.value),
+                              [field.key]: val.toLowerCase() === "unlimited" ? "unlimited" : Number(val),
                             })
-                          }
+                          }}
                         />
+                        <p className="text-xs text-muted-foreground">Enter a number or type "unlimited"</p>
                       </div>
-                    );
+                    )
                   })}
 
                   {/* Switch-based benefits */}
@@ -347,27 +303,18 @@ export function PlanForm({
                     <div key={field.key} className="grid gap-2">
                       <Label className="flex items-center gap-2">
                         {field.label}
-                        <Badge
-                          variant={
-                            benefits[field.key as keyof PlanBenefits]
-                              ? "default"
-                              : "secondary"
-                          }
-                        >
-                          {benefits[field.key as keyof PlanBenefits]
-                            ? "Yes"
-                            : "No"}
+                        <Badge variant={benefits[field.key as keyof PlanBenefits] ? "default" : "secondary"}>
+                          {benefits[field.key as keyof PlanBenefits] ? "Yes" : "No"}
                         </Badge>
                       </Label>
                       <Switch
                         checked={!!benefits[field.key as keyof PlanBenefits]}
-                        onCheckedChange={(checked) =>
-                          setBenefits({ ...benefits, [field.key]: checked })
-                        }
+                        onCheckedChange={(checked) => setBenefits({ ...benefits, [field.key]: checked })}
                       />
                     </div>
                   ))}
 
+                  {/* Discount */}
                   <div className="grid gap-2">
                     <Label>Discount (%)</Label>
                     <Input
@@ -381,50 +328,22 @@ export function PlanForm({
                           discountPercent: Number(e.target.value),
                         })
                       }
-                      className={errors.discountPercent ? "border-red-500" : ""}
                     />
-                    {errors.discountPercent && (
-                      <p className="text-red-500 text-xs">
-                        {errors.discountPercent}
-                      </p>
-                    )}
                   </div>
                 </div>
 
                 <Separator />
 
-                {/* ✅ Summary */}
+                {/* Summary */}
                 <div className="grid gap-3">
                   <div className="text-sm font-semibold">Summary</div>
                   <div className="space-y-2 rounded-lg bg-muted/30 p-3 text-sm">
-                    <div className="flex justify-between">
-                      <span>Bookings / month</span>
-                      <span>{benefits.bookingsPerMonth}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Followups / case</span>
-                      <span>{benefits.followupBookingsPerCase}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Chat access</span>
-                      <span>{benefits.chatAccess ? "Yes" : "No"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Discount</span>
-                      <span>{benefits.discountPercent}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Document limit</span>
-                      <span>{benefits.documentUploadLimit}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Expiry alert</span>
-                      <span>{benefits.expiryAlert ? "Yes" : "No"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Auto renew</span>
-                      <span>{benefits.autoRenew ? "Yes" : "No"}</span>
-                    </div>
+                    {Object.entries(benefits).map(([key, val]) => (
+                      <div key={key} className="flex justify-between capitalize">
+                        <span>{key.replace(/([A-Z])/g, " $1")}</span>
+                        <span>{String(val)}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </CardContent>
@@ -432,15 +351,16 @@ export function PlanForm({
           </form>
         </div>
 
+        {/* === Footer === */}
         <div className="flex justify-end gap-2 border-t pt-4 px-6">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>
+          <Button onClick={isEdit ? handleEditSubmit : handleAddSubmit}>
             {isEdit ? "Save Changes" : "Create Plan"}
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

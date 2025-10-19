@@ -1,40 +1,32 @@
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import type { SubscriptionType } from "@/types/types/SubscriptionType";
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
+import type { SubscriptionType } from "@/types/types/SubscriptionType"
 
 type PlanDetailsDrawerProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  plan: SubscriptionType | null;
-};
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  plan: SubscriptionType | null
+}
 
 const inr = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
   maximumFractionDigits: 0,
-});
+})
 
-export function PlanDetailsDrawer({
-  open,
-  onOpenChange,
-  plan,
-}: PlanDetailsDrawerProps) {
-  if (!plan) return null;
+export function PlanDetailsDrawer({ open, onOpenChange, plan }: PlanDetailsDrawerProps) {
+  if (!plan) return null
 
   const createdDate = new Date(plan.createdAt).toLocaleDateString("en-IN", {
     year: "numeric",
     month: "short",
     day: "numeric",
-  });
+  })
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -67,29 +59,21 @@ export function PlanDetailsDrawer({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm text-muted-foreground">Price</div>
-                  <div className="text-lg font-semibold">
-                    {inr.format(plan.price)}
-                  </div>
+                  <div className="text-lg font-semibold">{inr.format(plan.price)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Interval</div>
-                  <div className="text-lg font-semibold capitalize">
-                    {plan.interval}
-                  </div>
+                  <div className="text-lg font-semibold capitalize">{plan.interval}</div>
                 </div>
               </div>
               <Separator />
               <div>
                 <div className="text-sm text-muted-foreground">Free Plan</div>
-                <Badge variant={plan.isFree ? "default" : "secondary"}>
-                  {plan.isFree ? "Yes" : "No"}
-                </Badge>
+                <Badge variant={plan.isFree ? "default" : "secondary"}>{plan.isFree ? "Yes" : "No"}</Badge>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Description</div>
-                <div className="text-sm">
-                  {plan.description || "No description"}
-                </div>
+                <div className="text-sm">{plan.description || "No description"}</div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Created</div>
@@ -106,15 +90,11 @@ export function PlanDetailsDrawer({
             <CardContent className="grid gap-4">
               <div>
                 <div className="text-sm text-muted-foreground">Product ID</div>
-                <div className="font-mono text-sm">
-                  {plan.stripeProductId || "Not configured"}
-                </div>
+                <div className="font-mono text-sm">{plan.stripeProductId || "Not configured"}</div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Price ID</div>
-                <div className="font-mono text-sm">
-                  {plan.stripePriceId || "Not configured"}
-                </div>
+                <div className="font-mono text-sm">{plan.stripePriceId || "Not configured"}</div>
               </div>
             </CardContent>
           </Card>
@@ -127,49 +107,31 @@ export function PlanDetailsDrawer({
               <div className="grid gap-3">
                 <div className="flex items-center justify-between border-b pb-3">
                   <div className="text-sm font-medium">Bookings per Month</div>
-                  <div className="font-mono text-sm">
-                    {plan.benefits.bookingsPerMonth}
-                  </div>
+                  <div className="font-mono text-sm">{plan.benefits.bookingsPerMonth}</div>
                 </div>
                 <div className="flex items-center justify-between border-b pb-3">
-                  <div className="text-sm font-medium">
-                    Followup Bookings per Case
-                  </div>
-                  <div className="font-mono text-sm">
-                    {plan.benefits.followupBookingsPerCase}
-                  </div>
+                  <div className="text-sm font-medium">Followup Bookings per Case</div>
+                  <div className="font-mono text-sm">{plan.benefits.followupBookingsPerCase}</div>
                 </div>
                 <div className="flex items-center justify-between border-b pb-3">
                   <div className="text-sm font-medium">Chat Access</div>
-                  <Badge variant="outline">
-                    {plan.benefits.chatAccess ? "Yes" : "No"}
-                  </Badge>
+                  <Badge variant="outline">{plan.benefits.chatAccess ? "Yes" : "No"}</Badge>
                 </div>
                 <div className="flex items-center justify-between border-b pb-3">
                   <div className="text-sm font-medium">Discount (%)</div>
-                  <div className="font-mono text-sm">
-                    {plan.benefits.discountPercent}
-                  </div>
+                  <div className="font-mono text-sm">{plan.benefits.discountPercent}</div>
                 </div>
                 <div className="flex items-center justify-between border-b pb-3">
-                  <div className="text-sm font-medium">
-                    Document Upload Limit
-                  </div>
-                  <div className="font-mono text-sm">
-                    {plan.benefits.documentUploadLimit}
-                  </div>
+                  <div className="text-sm font-medium">Document Upload Limit</div>
+                  <div className="font-mono text-sm">{plan.benefits.documentUploadLimit}</div>
                 </div>
                 <div className="flex items-center justify-between border-b pb-3">
                   <div className="text-sm font-medium">Expiry Alert</div>
-                  <Badge variant="outline">
-                    {plan.benefits.expiryAlert ? "Yes" : "No"}
-                  </Badge>
+                  <Badge variant="outline">{plan.benefits.expiryAlert ? "Yes" : "No"}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium">Auto Renew</div>
-                  <Badge variant="outline">
-                    {plan.benefits.autoRenew ? "Yes" : "No"}
-                  </Badge>
+                  <Badge variant="outline">{plan.benefits.autoRenew ? "Yes" : "No"}</Badge>
                 </div>
               </div>
             </CardContent>
@@ -181,5 +143,5 @@ export function PlanDetailsDrawer({
         </div>
       </SheetContent>
     </Sheet>
-  );
+  )
 }
