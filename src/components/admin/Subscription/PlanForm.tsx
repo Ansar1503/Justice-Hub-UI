@@ -1,26 +1,44 @@
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
-import type { PlanBenefits, SubscriptionIntervalType, SubscriptionType } from "@/types/types/SubscriptionType"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import type {
+  PlanBenefits,
+  SubscriptionIntervalType,
+  SubscriptionType,
+} from "@/types/types/SubscriptionType";
 
 type PlanFormProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  initialPlan?: SubscriptionType | null
-  onAdd: (plan: Omit<SubscriptionType, "id" | "createdAt" | "updatedAt">) => void
-  onEdit: (plan: Omit<SubscriptionType, "createdAt" | "updatedAt">) => void
-}
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  initialPlan?: SubscriptionType | null;
+  onAdd: (
+    plan: Omit<SubscriptionType, "id" | "createdAt" | "updatedAt">
+  ) => void;
+  onEdit: (plan: Omit<SubscriptionType, "createdAt" | "updatedAt">) => void;
+};
 
 const basicBenefits: PlanBenefits = {
   bookingsPerMonth: 3,
@@ -30,7 +48,7 @@ const basicBenefits: PlanBenefits = {
   documentUploadLimit: 10,
   expiryAlert: false,
   autoRenew: false,
-}
+};
 
 const monthlyBenefits: PlanBenefits = {
   bookingsPerMonth: "unlimited",
@@ -40,7 +58,7 @@ const monthlyBenefits: PlanBenefits = {
   documentUploadLimit: 30,
   expiryAlert: true,
   autoRenew: true,
-}
+};
 
 const yearlyBenefits: PlanBenefits = {
   bookingsPerMonth: "unlimited",
@@ -50,99 +68,108 @@ const yearlyBenefits: PlanBenefits = {
   documentUploadLimit: 30,
   expiryAlert: true,
   autoRenew: true,
-}
+};
 
-export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: PlanFormProps) {
-  const isEdit = !!initialPlan
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [price, setPrice] = useState<number>(0)
-  const [interval, setInterval] = useState<SubscriptionIntervalType>("monthly")
-  const [isFree, setIsFree] = useState<boolean>(false)
-  const [stripeProductId, setStripeProductId] = useState("")
-  const [stripePriceId, setStripePriceId] = useState("")
-  const [isActive, setIsActive] = useState<boolean>(true)
-  const [benefits, setBenefits] = useState<PlanBenefits>(monthlyBenefits)
-  const [errors, setErrors] = useState<Record<string, string>>({})
-
+export function PlanForm({
+  open,
+  onOpenChange,
+  initialPlan,
+  onAdd,
+  onEdit,
+}: PlanFormProps) {
+  const isEdit = !!initialPlan;
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState<number>(0);
+  const [interval, setInterval] = useState<SubscriptionIntervalType>("monthly");
+  const [isFree, setIsFree] = useState<boolean>(false);
+  const [stripeProductId, setStripeProductId] = useState("");
+  const [stripePriceId, setStripePriceId] = useState("");
+  const [isActive, setIsActive] = useState<boolean>(true);
+  const [benefits, setBenefits] = useState<PlanBenefits>(monthlyBenefits);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
 
     if (initialPlan) {
-      setName(initialPlan.name ?? "")
-      setDescription(initialPlan.description ?? "")
-      setPrice(initialPlan.price ?? 0)
-      setInterval(initialPlan.interval ?? "monthly")
-      setIsFree(initialPlan.isFree ?? false)
-      setStripeProductId(initialPlan.stripeProductId ?? "")
-      setStripePriceId(initialPlan.stripePriceId ?? "")
-      setIsActive(initialPlan.isActive ?? true)
+      setName(initialPlan.name ?? "");
+      setDescription(initialPlan.description ?? "");
+      setPrice(initialPlan.price ?? 0);
+      setInterval(initialPlan.interval ?? "monthly");
+      setIsFree(initialPlan.isFree ?? false);
+      setStripeProductId(initialPlan.stripeProductId ?? "");
+      setStripePriceId(initialPlan.stripePriceId ?? "");
+      setIsActive(initialPlan.isActive ?? true);
       setBenefits(
-        initialPlan.benefits && Object.keys(initialPlan.benefits).length > 0 ? initialPlan.benefits : monthlyBenefits,
-      )
+        initialPlan.benefits && Object.keys(initialPlan.benefits).length > 0
+          ? initialPlan.benefits
+          : monthlyBenefits
+      );
     } else {
-      setName("")
-      setDescription("")
-      setPrice(0)
-      setInterval("monthly")
-      setIsFree(false)
-      setStripeProductId("")
-      setStripePriceId("")
-      setIsActive(true)
-      setBenefits(monthlyBenefits)
+      setName("");
+      setDescription("");
+      setPrice(0);
+      setInterval("monthly");
+      setIsFree(false);
+      setStripeProductId("");
+      setStripePriceId("");
+      setIsActive(true);
+      setBenefits(monthlyBenefits);
     }
-  }, [open, initialPlan])
+  }, [open, initialPlan]);
 
   const handleFreeToggle = (checked: boolean) => {
-    setIsFree(checked)
+    setIsFree(checked);
     if (checked) {
-      setPrice(0)
-      setInterval("none")
-      setName("Basic")
-      setDescription("Free basic plan for limited access.")
-      setBenefits(basicBenefits)
+      setPrice(0);
+      setInterval("none");
+      setName("Basic");
+      setDescription("Free basic plan for limited access.");
+      setBenefits(basicBenefits);
     } else {
-      setInterval("monthly")
-      setPrice(499)
-      setName("Monthly Plan")
-      setDescription("Access premium features with a monthly plan.")
-      setBenefits(monthlyBenefits)
+      setInterval("monthly");
+      setPrice(499);
+      setName("Monthly Plan");
+      setDescription("Access premium features with a monthly plan.");
+      setBenefits(monthlyBenefits);
     }
-  }
+  };
 
   const handleIntervalChange = (v: SubscriptionIntervalType) => {
-    setInterval(v)
+    setInterval(v);
     if (v === "monthly") {
-      setPrice(499)
-      setBenefits(monthlyBenefits)
-      setName("Monthly Plan")
+      setPrice(499);
+      setBenefits(monthlyBenefits);
+      setName("Monthly Plan");
     } else if (v === "yearly") {
-      setPrice(4999)
-      setBenefits(yearlyBenefits)
-      setName("Yearly Plan")
+      setPrice(4999);
+      setBenefits(yearlyBenefits);
+      setName("Yearly Plan");
     } else if (v === "none" && isFree) {
-      setPrice(0)
-      setBenefits(basicBenefits)
-      setName("Basic")
+      setPrice(0);
+      setBenefits(basicBenefits);
+      setName("Basic");
     }
-  }
+  };
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
-    if (!name.trim()) newErrors.name = "Plan name is required."
-    if (!description.trim()) newErrors.description = "Please add a description."
-    if (!isFree && (isNaN(price) || price <= 0)) newErrors.price = "Price must be greater than 0."
-    if (!interval) newErrors.interval = "Select a billing interval."
+    const newErrors: Record<string, string> = {};
+    if (!name.trim()) newErrors.name = "Plan name is required.";
+    if (!description.trim())
+      newErrors.description = "Please add a description.";
+    if (!isFree && (isNaN(price) || price <= 0))
+      newErrors.price = "Price must be greater than 0.";
+    if (!interval) newErrors.interval = "Select a billing interval.";
     if (benefits.discountPercent < 0 || benefits.discountPercent > 100)
-      newErrors.discountPercent = "Discount must be between 0 and 100."
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+      newErrors.discountPercent = "Discount must be between 0 and 100.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleAddSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateForm()) return
+    e.preventDefault();
+    if (!validateForm()) return;
     onAdd({
       name: name.trim(),
       description: description.trim(),
@@ -153,13 +180,13 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
       stripePriceId: stripePriceId.trim() || undefined,
       isActive,
       benefits,
-    })
-    onOpenChange(false)
-  }
+    });
+    onOpenChange(false);
+  };
 
   const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateForm() || !initialPlan?.id) return
+    e.preventDefault();
+    if (!validateForm() || !initialPlan?.id) return;
     onEdit({
       id: initialPlan.id,
       name: name.trim(),
@@ -171,9 +198,9 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
       stripePriceId: stripePriceId.trim() || undefined,
       isActive,
       benefits,
-    })
-    onOpenChange(false)
-  }
+    });
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -188,7 +215,10 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
         </DialogHeader>
 
         <div className="overflow-y-auto flex-1">
-          <form onSubmit={isEdit ? handleEditSubmit : handleAddSubmit} className="grid gap-6 px-6 pb-6">
+          <form
+            onSubmit={isEdit ? handleEditSubmit : handleAddSubmit}
+            className="grid gap-6 px-6 pb-6"
+          >
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">General</CardTitle>
@@ -202,7 +232,9 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
                     onChange={(e) => setName(e.target.value)}
                     className={errors.name ? "border-red-500" : ""}
                   />
-                  {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
+                  {errors.name && (
+                    <p className="text-red-500 text-xs">{errors.name}</p>
+                  )}
                 </div>
 
                 {/* Description */}
@@ -211,9 +243,14 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
                   <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className={cn("min-h-24", errors.description && "border-red-500")}
+                    className={cn(
+                      "min-h-24",
+                      errors.description && "border-red-500"
+                    )}
                   />
-                  {errors.description && <p className="text-red-500 text-xs">{errors.description}</p>}
+                  {errors.description && (
+                    <p className="text-red-500 text-xs">{errors.description}</p>
+                  )}
                 </div>
 
                 {/* Price, Interval, Free Plan */}
@@ -227,14 +264,18 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
                       onChange={(e) => setPrice(Number(e.target.value))}
                       disabled={isFree}
                     />
-                    {errors.price && <p className="text-red-500 text-xs">{errors.price}</p>}
+                    {errors.price && (
+                      <p className="text-red-500 text-xs">{errors.price}</p>
+                    )}
                   </div>
 
                   <div className="grid gap-2">
                     <Label>Billing Interval</Label>
                     <Select
                       value={interval}
-                      onValueChange={(v) => handleIntervalChange(v as SubscriptionIntervalType)}
+                      onValueChange={(v) =>
+                        handleIntervalChange(v as SubscriptionIntervalType)
+                      }
                       disabled={isFree}
                     >
                       <SelectTrigger>
@@ -250,7 +291,10 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
 
                   <div className="grid gap-2">
                     <Label>Free Plan</Label>
-                    <Switch checked={isFree} onCheckedChange={handleFreeToggle} />
+                    <Switch
+                      checked={isFree}
+                      onCheckedChange={handleFreeToggle}
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -274,24 +318,33 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
                       label: "Document Upload Limit",
                     },
                   ].map((field) => {
-                    const value = benefits[field.key as keyof PlanBenefits]
+                    const value = benefits[field.key as keyof PlanBenefits];
 
                     return (
                       <div key={field.key} className="grid gap-2">
                         <Label>{field.label}</Label>
                         <Input
-                          value={value === "unlimited" ? "unlimited" : (value?.toString() ?? "")}
+                          value={
+                            value === "unlimited"
+                              ? "unlimited"
+                              : value?.toString() ?? ""
+                          }
                           onChange={(e) => {
-                            const val = e.target.value.trim()
+                            const val = e.target.value.trim();
                             setBenefits({
                               ...benefits,
-                              [field.key]: val.toLowerCase() === "unlimited" ? "unlimited" : Number(val),
-                            })
+                              [field.key]:
+                                val.toLowerCase() === "unlimited"
+                                  ? "unlimited"
+                                  : Number(val),
+                            });
                           }}
                         />
-                        <p className="text-xs text-muted-foreground">Enter a number or type "unlimited"</p>
+                        <p className="text-xs text-muted-foreground">
+                          Enter a number or type "unlimited"
+                        </p>
                       </div>
-                    )
+                    );
                   })}
 
                   {/* Switch-based benefits */}
@@ -303,13 +356,23 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
                     <div key={field.key} className="grid gap-2">
                       <Label className="flex items-center gap-2">
                         {field.label}
-                        <Badge variant={benefits[field.key as keyof PlanBenefits] ? "default" : "secondary"}>
-                          {benefits[field.key as keyof PlanBenefits] ? "Yes" : "No"}
+                        <Badge
+                          variant={
+                            benefits[field.key as keyof PlanBenefits]
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {benefits[field.key as keyof PlanBenefits]
+                            ? "Yes"
+                            : "No"}
                         </Badge>
                       </Label>
                       <Switch
                         checked={!!benefits[field.key as keyof PlanBenefits]}
-                        onCheckedChange={(checked) => setBenefits({ ...benefits, [field.key]: checked })}
+                        onCheckedChange={(checked) =>
+                          setBenefits({ ...benefits, [field.key]: checked })
+                        }
                       />
                     </div>
                   ))}
@@ -339,7 +402,10 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
                   <div className="text-sm font-semibold">Summary</div>
                   <div className="space-y-2 rounded-lg bg-muted/30 p-3 text-sm">
                     {Object.entries(benefits).map(([key, val]) => (
-                      <div key={key} className="flex justify-between capitalize">
+                      <div
+                        key={key}
+                        className="flex justify-between capitalize"
+                      >
                         <span>{key.replace(/([A-Z])/g, " $1")}</span>
                         <span>{String(val)}</span>
                       </div>
@@ -362,5 +428,5 @@ export function PlanForm({ open, onOpenChange, initialPlan, onAdd, onEdit }: Pla
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

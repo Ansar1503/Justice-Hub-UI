@@ -21,3 +21,33 @@ export async function FetchAllSubscriptionPlans() {
   );
   return response.data;
 }
+
+export async function UpdateSubscriptionPlan(
+  payload: Omit<SubscriptionType, "createdAt" | "updatedAt">
+) {
+  const response = await axiosinstance.patch(
+    CommonQueies.api +
+      CommonQueies.admin +
+      SubscriptionRoute.base +
+      CommonQueies.params +
+      payload.id,
+    payload
+  );
+  return response.data;
+}
+
+export async function ChangeActiveSubscriptionStatus(params: {
+  id: string;
+  status: boolean;
+}) {
+  const response = await axiosinstance.patch(
+    CommonQueies.api +
+      CommonQueies.admin +
+      SubscriptionRoute.base +
+      SubscriptionRoute.status +
+      CommonQueies.params +
+      params.id,
+    params
+  );
+  return response.data;
+}
