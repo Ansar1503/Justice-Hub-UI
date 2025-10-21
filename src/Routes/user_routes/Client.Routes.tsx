@@ -13,6 +13,7 @@ import ClientProfile from "@/pages/client/ClientProfile";
 import LawyerDirectory from "@/pages/client/LawyersListing";
 import LawyersPage from "@/pages/client/LawyerProfile";
 import ChatsPage from "@/pages/client/chats_page";
+import SubscriptionPage from "@/pages/client/SubscriptionPage";
 function ClientRoutes() {
   return (
     <Routes>
@@ -33,6 +34,7 @@ function ClientRoutes() {
         <Route path="/cases/:id" element={<CaseDetailsPage />} />
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/dashboard" element={<ClientDashboard />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
       </Route>
     </Routes>
   );

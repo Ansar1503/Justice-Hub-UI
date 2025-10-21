@@ -1,6 +1,7 @@
 import {
   Calendar,
   Calendar1,
+  CalendarSync,
   FileText,
   LayoutDashboard,
   User,
@@ -39,13 +40,12 @@ export default function Sidebar() {
       label: "chats",
       icon: IoChatbubblesOutline,
     },
+    {
+      path: `/${user?.role}/subscription`,
+      label: "Subscription",
+      icon: CalendarSync,
+    },
     { path: `/${user?.role}/wallet`, label: "wallets", icon: Wallet },
-
-    // {
-    //   path: `/${user?.role}/reviews`,
-    //   label: "Reviews",
-    //   icon: MdOutlineRateReview,
-    // },
   ];
 
   return (

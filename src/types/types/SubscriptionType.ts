@@ -23,3 +23,15 @@ export type SubscriptionType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type PlanCardData = {
+  id: string
+  name: string
+  price: string
+  period: string
+  description: string
+  badge: string | null
+  features: string[]
+  buttonText: string
+  highlighted?: boolean
+}
