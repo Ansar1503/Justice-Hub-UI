@@ -159,16 +159,16 @@ function Navbar() {
       {isOpen && (
         <div className="md:hidden mt-4 text-lg flex flex-col items-center gap-4">
           <ul className="flex flex-col gap-4 text-center">
-            <li
+            {/* <li
               className="hover:underline cursor-pointer"
               onClick={() => navigate("/")}
             >
               Home
-            </li>
-            <li className="hover:underline cursor-pointer">Services</li>
-            <li className="hover:underline cursor-pointer">Lawyers</li>
-            <li className="hover:underline cursor-pointer">Blogs</li>
-            <li className="hover:underline cursor-pointer">About Us</li>
+            </li> */}
+            {/* <li className="hover:underline cursor-pointer">Services</li> */}
+            {/* <li className="hover:underline cursor-pointer">Lawyers</li> */}
+            {/* <li className="hover:underline cursor-pointer">Blogs</li> */}
+            {/* <li className="hover:underline cursor-pointer">About Us</li> */}
           </ul>
 
           {/* Mobile Buttons (Only Visible in Menu) */}

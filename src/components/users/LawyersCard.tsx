@@ -1,4 +1,4 @@
-import { MapPin, Briefcase, DollarSign } from "lucide-react";
+import { MapPin, Briefcase } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -88,7 +88,6 @@ export default function LawyersCard({
             <span className="font-medium">{lawyer.experience} years</span>
           </div>
           <div className="flex items-center gap-1 text-sm font-semibold text-foreground">
-            <DollarSign className="h-4 w-4 text-primary" />
             <span>₹{lawyer.consultationFee.toLocaleString()}</span>
           </div>
         </div>
