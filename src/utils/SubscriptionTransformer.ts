@@ -56,7 +56,8 @@ export function transformSubscriptionToPlanCard(
     badge: subscription.isFree ? "Free" : null,
     features,
     buttonText: isCurrentPlan ? "Current Plan" : "Subscribe Now",
-    highlighted: subscription.name.toLowerCase().includes("professional"),
+    highlighted: isCurrentPlan,
+    isFree: subscription.isFree,
   };
 }
 

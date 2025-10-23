@@ -1,8 +1,13 @@
-import { SubscriptionType } from "@/types/types/SubscriptionType";
+import {
+  SubscriptionType,
+  UserSubscriptionType,
+} from "@/types/types/SubscriptionType";
 import {
   AddSubscriptionPlan,
   ChangeActiveSubscriptionStatus,
   FetchAllSubscriptionPlans,
+  FetchCurrentUserSubscription,
+  SubscribePlan,
   UpdateSubscriptionPlan,
 } from "@/utils/api/services/SubscriptionServices";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -39,6 +44,16 @@ export function useFetchAllSubscriptionPlans() {
   return useQuery<SubscriptionType[]>({
     queryKey: ["subscription-plans"],
     queryFn: FetchAllSubscriptionPlans,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+}
+
+export function useFetchCurrentUserSubscription() {
+  return useQuery<UserSubscriptionType>({
+    queryKey: ["user-subscription"],
+    queryFn: FetchCurrentUserSubscription,
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     retry: 1,
@@ -101,5 +116,18 @@ export function useChangeActiveSubscriptionStatus() {
           : "Subscription Plan Deactivated"
       );
     },
+  });
+}
+
+export function useSubscibePlan() {
+  // const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: SubscribePlan,
+    onError: (error: any) => {
+      const message = error.response?.data?.error || "Something went wrong";
+      error.message = message;
+      toast.error(message);
+    },
+    onSettled() {},
   });
 }

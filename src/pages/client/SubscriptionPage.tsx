@@ -7,7 +7,11 @@ import PlanGrid from "@/components/users/Subscriptioin/PlanGrid";
 import { PlanComparison } from "@/components/users/Subscriptioin/PlanComparison";
 import ConfirmSubscriptionModal from "@/components/users/Subscriptioin/ConfirmSubscriptionModal";
 import CancelSubscriptionModal from "@/components/users/Subscriptioin/CancelSubscriptionModal";
-import { useFetchAllSubscriptionPlans } from "@/store/tanstack/mutations/SubscriptionMutation";
+import {
+  useFetchAllSubscriptionPlans,
+  useFetchCurrentUserSubscription,
+  useSubscibePlan,
+} from "@/store/tanstack/mutations/SubscriptionMutation";
 import type { SubscriptionType } from "@/types/types/SubscriptionType";
 
 export default function SubscriptionPage() {
@@ -17,12 +21,22 @@ export default function SubscriptionPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const { data: plans = [] } = useFetchAllSubscriptionPlans();
-  const currentPlanId = "professional";
-  const currentPlan = plans.find((p) => p.id === currentPlanId) || null;
-  const renewalDate = "2025-01-15";
+  const { data: userSubscription } = useFetchCurrentUserSubscription();
+
+  const { mutateAsync: Subscibe } = useSubscibePlan();
+
+  const currentPlanId = userSubscription?.planId;
+  const currentPlan = plans.find((p) => p.id === currentPlanId);
+  const renewalDate = userSubscription?.endDate
+    ? new Date(userSubscription.endDate).toISOString()
+    : new Date().toISOString();
 
   const handleSubscribe = (planId: string) => {
     const plan = plans.find((p) => p.id === planId);
+    if (plan?.isFree) {
+      console.warn("Cannot subscribe to free plan");
+      return;
+    }
     setSelectedPlan(plan || null);
     setShowConfirmModal(true);
   };
@@ -31,13 +45,25 @@ export default function SubscriptionPage() {
     setShowCancelModal(true);
   };
 
-  const handleConfirmSubscription = () => {
+  const handleConfirmSubscription = async () => {
+    try {
+      if (!selectedPlan?.id) return;
+      const SubscribeData = await Subscibe({ planId: selectedPlan.id });
+      if (SubscribeData?.checkoutUrl) {
+        window.location.href = SubscribeData.checkoutUrl;
+      } else {
+        console.log("no checkout url");
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
     setShowConfirmModal(false);
   };
 
   const handleConfirmCancel = () => {
     setShowCancelModal(false);
   };
+
   return (
     <div className="flex flex-col min-h-screen  bg-[#FFF2F2] dark:bg-black">
       <Navbar />
@@ -46,12 +72,13 @@ export default function SubscriptionPage() {
         <div className="w-full">
           <div className="mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <SubscriptionHeader
-              currentPlan={currentPlan}
+              currentPlan={currentPlan || null}
+              userSubscription={userSubscription || null}
               renewalDate={renewalDate}
               onCancel={handleCancel}
             />
             <PlanGrid
-              currentPlan={currentPlanId}
+              currentPlan={currentPlanId || ""}
               plans={plans}
               onSubscribe={handleSubscribe}
             />

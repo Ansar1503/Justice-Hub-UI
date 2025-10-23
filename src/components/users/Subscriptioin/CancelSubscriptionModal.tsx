@@ -24,21 +24,23 @@ export default function CancelSubscriptionModal({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
-          <AlertDialogDescription className="space-y-4 pt-4">
-            <p>
-              Are you sure you want to cancel your subscription? You will lose
-              access to premium features immediately.
-            </p>
-            <div className="rounded-lg bg-destructive/10 p-4 border border-destructive/20">
-              <p className="text-sm font-medium text-destructive">
-                This action cannot be undone. Your data will be retained for 30
-                days.
+          <AlertDialogDescription asChild>
+            <div className="space-y-4 pt-4">
+              <p>
+                Are you sure you want to cancel your subscription? You will lose
+                access to premium features immediately.
+              </p>
+              <div className="rounded-lg bg-destructive/10 p-4 border border-destructive/20">
+                <p className="text-sm font-medium text-destructive">
+                  This action cannot be undone. Your data will be retained for
+                  30 days.
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                If you have any feedback about your experience, we'd love to
+                hear it.
               </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              If you have any feedback about your experience, we'd love to hear
-              it.
-            </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex gap-3 justify-end">

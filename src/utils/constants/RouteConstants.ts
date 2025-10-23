@@ -17,6 +17,7 @@ export const CommonQueies = {
   limitQuery: "&limit=",
   searchQuery: "&search=",
   params: "/",
+  client: "client",
 };
 
 export const profileQueries = {
@@ -68,4 +69,6 @@ export const CommissionRoutes = {
 export const SubscriptionRoute = {
   base: "/subscriptions",
   status: "/status",
+  subscribe: "/subscibe",
+  user: "/user",
 };

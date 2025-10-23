@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Card,
   CardContent,
@@ -10,16 +8,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, CheckCircle2, AlertCircle, Clock } from "lucide-react";
-import type { SubscriptionType } from "@/types/types/SubscriptionType";
+import type {
+  SubscriptionType,
+  UserSubscriptionType,
+} from "@/types/types/SubscriptionType";
 
 interface SubscriptionHeaderProps {
   currentPlan: SubscriptionType | null;
+  userSubscription: UserSubscriptionType | null;
   renewalDate: string;
   onCancel: () => void;
 }
 
 export default function SubscriptionHeader({
   currentPlan,
+  userSubscription,
   renewalDate,
   onCancel,
 }: SubscriptionHeaderProps) {
@@ -60,28 +63,34 @@ export default function SubscriptionHeader({
   const expirationStatus = calculateExpirationStatus();
 
   const getStatusBadge = () => {
-    switch (expirationStatus.status) {
-      case "expired":
-        return <Badge className="bg-red-500/20 text-red-400">Expired</Badge>;
-      case "expiring-soon":
-        return (
-          <Badge className="bg-yellow-500/20 text-yellow-400">
-            Expiring Soon
-          </Badge>
-        );
-      default:
-        return <Badge className="bg-teal-500/20 text-teal-400">Active</Badge>;
+    const status = userSubscription?.status || "active";
+
+    if (status === "expired" || expirationStatus.status === "expired") {
+      return <Badge className="bg-red-500/20 text-red-400">Expired</Badge>;
+    } else if (expirationStatus.status === "expiring-soon") {
+      return (
+        <Badge className="bg-yellow-500/20 text-yellow-400">
+          Expiring Soon
+        </Badge>
+      );
+    } else if (status === "canceled") {
+      return <Badge className="bg-red-500/20 text-red-400">Canceled</Badge>;
+    } else {
+      return <Badge className="bg-teal-500/20 text-teal-400">Active</Badge>;
     }
   };
 
   const getStatusIcon = () => {
-    switch (expirationStatus.status) {
-      case "expired":
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
-      case "expiring-soon":
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      default:
-        return <CheckCircle2 className="h-5 w-5 text-teal-500" />;
+    const status = userSubscription?.status || "active";
+
+    if (status === "expired" || expirationStatus.status === "expired") {
+      return <AlertCircle className="h-5 w-5 text-red-500" />;
+    } else if (expirationStatus.status === "expiring-soon") {
+      return <Clock className="h-5 w-5 text-yellow-500" />;
+    } else if (status === "canceled") {
+      return <AlertCircle className="h-5 w-5 text-red-500" />;
+    } else {
+      return <CheckCircle2 className="h-5 w-5 text-teal-500" />;
     }
   };
 
@@ -159,7 +168,8 @@ export default function SubscriptionHeader({
                 </p>
               </div>
             </div>
-            {expirationStatus.status === "expired" && (
+            {(expirationStatus.status === "expired" ||
+              userSubscription?.status === "expired") && (
               <Button
                 size="sm"
                 className="bg-teal-500 hover:bg-teal-600 text-white"
@@ -172,13 +182,15 @@ export default function SubscriptionHeader({
 
         <div className="mt-6 flex gap-3">
           {getStatusBadge()}
-          <Button
-            variant="outline"
-            onClick={onCancel}
-            className="ml-auto bg-transparent"
-          >
-            Cancel Subscription
-          </Button>
+          {userSubscription?.status !== "canceled" && (
+            <Button
+              variant="outline"
+              onClick={onCancel}
+              className="ml-auto bg-transparent"
+            >
+              Cancel Subscription
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

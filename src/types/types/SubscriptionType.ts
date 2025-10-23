@@ -25,13 +25,31 @@ export type SubscriptionType = {
 };
 
 export type PlanCardData = {
-  id: string
-  name: string
-  price: string
-  period: string
-  description: string
-  badge: string | null
-  features: string[]
-  buttonText: string
-  highlighted?: boolean
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  badge: string | null;
+  features: string[];
+  buttonText: string;
+  highlighted?: boolean;
+  isFree: boolean;
+};
+
+type SubscriptionStatus = "active" | "expired" | "canceled" | "trialing";
+
+export interface UserSubscriptionType {
+  id: string;
+  userId: string;
+  planId: string;
+  stripeSubscriptionId?: string;
+  stripeCustomerId?: string;
+  status: SubscriptionStatus;
+  startDate: Date;
+  endDate?: Date;
+  autoRenew: boolean;
+  benefitsSnapshot: PlanBenefits;
+  createdAt: Date;
+  updatedAt: Date;
 }

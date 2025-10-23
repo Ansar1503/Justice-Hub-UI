@@ -20,6 +20,7 @@ interface PlanCardProps {
     features: string[];
     buttonText: string;
     highlighted?: boolean;
+    isFree?: boolean;
   };
   isCurrentPlan: boolean;
   onSubscribe: () => void;
@@ -30,6 +31,7 @@ export default function PlanCard({
   isCurrentPlan,
   onSubscribe,
 }: PlanCardProps) {
+  const isFreePlan = plan.isFree === true;
   return (
     <Card
       className={`relative flex flex-col transition-all duration-300 ${
@@ -90,14 +92,20 @@ export default function PlanCard({
             <Button disabled className="w-full">
               Current Plan
             </Button>
+          ) : isFreePlan ? (
+            <div className="space-y-2">
+              <Button disabled className="w-full cursor-not-allowed opacity-70">
+                Free Plan
+              </Button>
+            </div>
           ) : (
             <Button
               onClick={onSubscribe}
-              className={
+              className={`w-full ${
                 plan.highlighted
-                  ? "w-full bg-teal-500 hover:bg-teal-600 text-white"
-                  : "w-full"
-              }
+                  ? "bg-teal-500 hover:bg-teal-600 text-white"
+                  : ""
+              }`}
             >
               {plan.buttonText}
             </Button>
