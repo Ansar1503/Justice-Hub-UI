@@ -202,7 +202,7 @@ function Chat({
     return currentDate > appointmentDate;
   }
   const checkSessionOver = (session: AggregateChatSession | null) => {
-    return true
+    // return true
     if (!session) return false;
 
     const currentDate = new Date();
@@ -322,7 +322,6 @@ function Chat({
     setFiles(updatedFiles);
     setIsPreviewOpen(true);
   };
-  // file select handler end
 
   // format message time start
   const formatMessageTime = (date: Date) => {
@@ -868,25 +867,25 @@ function Chat({
                     : "This session is not active"
                 }
                 className="flex-1"
-                // disabled={
-                //   !["upcoming", "ongoing"].includes(
-                //     selectedSession?.sessionDetails?.status
-                //   ) || isSessionOver
-                // }
+                disabled={
+                  !["upcoming", "ongoing"].includes(
+                    selectedSession?.sessionDetails?.status
+                  ) || isSessionOver
+                }
               />
               <Button
                 type="submit"
-                // disabled={
-                //   (!newMessage.trim() && files.length === 0) ||
-                //   (!["upcoming", "ongoing"].includes(
-                //     selectedSession?.sessionDetails?.status
-                //   ) &&
-                //     checkifTimeOut(
-                //       new Date(selectedSession?.appointmentDetails?.date),
-                //       selectedSession?.appointmentDetails?.time
-                //     )) ||
-                //   isSessionOver
-                // }
+                disabled={
+                  (!newMessage.trim() && files.length === 0) ||
+                  (!["upcoming", "ongoing"].includes(
+                    selectedSession?.sessionDetails?.status
+                  ) &&
+                    checkifTimeOut(
+                      new Date(selectedSession?.appointmentDetails?.date),
+                      selectedSession?.appointmentDetails?.time
+                    )) ||
+                  isSessionOver
+                }
               >
                 <Send className="h-4 w-4" />
               </Button>

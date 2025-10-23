@@ -78,3 +78,12 @@ export const getCustomStyles = <T>(
   indicatorSeparator: () => ({ display: "none" }),
   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
 });
+
+export function formatTo12Hour(time: string): string {
+  if (!time) return time;
+  const [hoursStr, minutes] = time.split(":");
+  const hours = parseInt(hoursStr, 10);
+  const suffix = hours >= 12 ? "PM" : "AM";
+  const formattedHours = ((hours + 11) % 12) + 1;
+  return `${formattedHours}:${minutes} ${suffix}`;
+}

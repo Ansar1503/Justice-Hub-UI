@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 interface Lawyer {
   id: string;
@@ -32,6 +33,7 @@ export default function LawyersCard({
   lawyer,
   getVerificationBadge,
 }: LawyersCardProps) {
+  const navigate = useNavigate();
   const initials = lawyer.name
     .split(" ")
     .map((n) => n[0])
@@ -96,6 +98,9 @@ export default function LawyersCard({
         <Button
           className="w-full group-hover:shadow-md transition-all"
           variant="default"
+          onClick={() => {
+            navigate(`/client/lawyers/${lawyer.id}`);
+          }}
         >
           View Profile
         </Button>

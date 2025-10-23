@@ -16,10 +16,10 @@ import { useFechCaseTypeByPractice } from "@/store/tanstack/Queries/CasetypeQuer
 import { useFetchWalletByUser } from "@/store/tanstack/Queries/walletQueries";
 import LawyerNotAccessible from "./LawyerNotAccessible";
 import Reviews from "./Reviews";
-import { BookingModal } from "./InitialBookingModal";
-import { FollowUpBookingModal } from "./FollowupBookingModal";
 import { LawyerProfileHeader } from "./LawyerProfileHeaderComponent";
 import { LawyerTabs } from "./LawyerTabsComponent";
+import { BookingModalEnhanced } from "./InitialBookingModal";
+import { FollowUpBookingModalEnhanced } from "./FollowupBookingModal";
 
 export default function LawyerProfile() {
   const [lawyerDetails, setLawyerDetails] = useState<any>();
@@ -151,7 +151,7 @@ export default function LawyerProfile() {
               isLoading={isLoading}
             >
               <div className="flex flex-col gap-2 mt-4 w-full md:w-auto">
-                <BookingModal
+                <BookingModalEnhanced
                   lawyerId={id || ""}
                   lawyerAvailablity={lawyerAvailablity}
                   timeSlots={timeSlots}
@@ -166,9 +166,9 @@ export default function LawyerProfile() {
                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white">
                     Book New Case
                   </Button>
-                </BookingModal>
+                </BookingModalEnhanced>
 
-                <FollowUpBookingModal
+                <FollowUpBookingModalEnhanced
                   caseTypes={caseTypes || []}
                   lawyerId={id || ""}
                   lawyerAvailablity={lawyerAvailablity}
@@ -183,7 +183,7 @@ export default function LawyerProfile() {
                   <Button className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white">
                     Book Follow-Up
                   </Button>
-                </FollowUpBookingModal>
+                </FollowUpBookingModalEnhanced>
               </div>
             </LawyerProfileHeader>
 

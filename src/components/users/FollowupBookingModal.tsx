@@ -1,9 +1,7 @@
 "use client";
 
 import type React from "react";
-
 import { useState, useEffect } from "react";
-import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,16 +25,20 @@ import axiosinstance from "@/utils/api/axios/axios.instance";
 import { store } from "@/store/redux/store";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Casetype } from "@/types/types/Case";
-import { CaseTypestype } from "@/types/types/CaseType";
+import type { Casetype } from "@/types/types/Case";
+import type { CaseTypestype } from "@/types/types/CaseType";
 import { useFetchCommissionSettings } from "@/store/tanstack/Queries/CommissionQuery";
+import { useAvailabilityData } from "../../hooks/useavailabilt";
+import { EnhancedAvailabilityCalendar } from "./Calendar";
+import { formatTo12Hour } from "@/utils/utils";
+import { slotSettings } from "@/types/types/SlotTypes";
 
-interface FollowUpBookingModalProps {
+interface FollowUpBookingModalEnhancedProps {
   caseTypes: CaseTypestype[];
   lawyerId: string;
   lawyerAvailablity: boolean;
   timeSlots: string[];
-  slotSettings: any;
+  slotSettings?: slotSettings;
   walletBalance: number;
   consultationFee: number;
   onSubmitStart: () => void;
@@ -45,7 +47,7 @@ interface FollowUpBookingModalProps {
   children: React.ReactNode;
 }
 
-export function FollowUpBookingModal({
+export function FollowUpBookingModalEnhanced({
   caseTypes,
   lawyerId,
   lawyerAvailablity,
@@ -57,7 +59,7 @@ export function FollowUpBookingModal({
   onSubmitEnd,
   onDateChange,
   children,
-}: FollowUpBookingModalProps) {
+}: FollowUpBookingModalEnhancedProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedCase, setSelectedCase] = useState<Casetype | null>(null);
@@ -66,8 +68,12 @@ export function FollowUpBookingModal({
   const [timeSlot, setTimeSlot] = useState<string>();
   const [reason, setReason] = useState<string>("");
   const [isLoadingCases, setIsLoadingCases] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const navigate = useNavigate();
   const { data: CommissionSettings } = useFetchCommissionSettings();
+
+  const { data: availabilityData, isLoading: isLoadingAvailability } =
+    useAvailabilityData(lawyerId, currentMonth);
 
   useEffect(() => {
     if (
@@ -89,7 +95,7 @@ export function FollowUpBookingModal({
     }
   }, [CommissionSettings, consultationFee, date, timeSlot, reason]);
 
-  const canPayFromWallet = walletBalance >= consultationFee;
+  const canPayFromWallet = walletBalance >= amountPayable;
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "stripe">(
     canPayFromWallet ? "wallet" : "stripe"
   );
@@ -102,6 +108,7 @@ export function FollowUpBookingModal({
         ? Number(slotSettings.maxDaysInAdvance)
         : 30)
   );
+
   useEffect(() => {
     const fetchCases = async () => {
       setIsLoadingCases(true);
@@ -128,7 +135,7 @@ export function FollowUpBookingModal({
     if (lawyerId && isOpen) {
       fetchCases();
     }
-  }, [lawyerId, isOpen]);
+  }, [lawyerId, isOpen, caseTypes]);
 
   const handleSubmit = async () => {
     if (
@@ -218,13 +225,13 @@ export function FollowUpBookingModal({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="dark:text-white">
             Book Follow-Up Consultation
           </DialogTitle>
           <DialogDescription>
-            Select an existing case for follow-up consultation.
+            Select an existing case and choose your preferred date and time.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -266,15 +273,23 @@ export function FollowUpBookingModal({
             <Label htmlFor="date" className="dark:text-gray-200">
               Select Date
             </Label>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleDateSelect}
-              disabled={(date) => date < today || date > thirtyDaysFromNow}
-              fromMonth={today}
-              toMonth={thirtyDaysFromNow}
-              className="rounded-md border mx-auto dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
+            {isLoadingAvailability ? (
+              <div className="p-8 text-center text-muted-foreground">
+                Loading availability...
+              </div>
+            ) : (
+              <EnhancedAvailabilityCalendar
+                scheduleSettings={slotSettings}
+                onMonthChange={setCurrentMonth}
+                selected={date}
+                onSelect={handleDateSelect}
+                availabilityData={availabilityData}
+                disabled={(date) => date < today || date > thirtyDaysFromNow}
+                fromMonth={currentMonth}
+                toMonth={thirtyDaysFromNow}
+                className="dark:bg-gray-700 dark:border-gray-600"
+              />
+            )}
           </div>
 
           <div className="grid gap-2">
@@ -289,6 +304,7 @@ export function FollowUpBookingModal({
                 {!lawyerAvailablity || !date ? (
                   <SelectItem
                     value="unavailable"
+                    disabled
                     className="dark:text-gray-400 dark:focus:bg-gray-600"
                   >
                     No available slots for this date
@@ -300,7 +316,7 @@ export function FollowUpBookingModal({
                       value={slot}
                       className="dark:text-white dark:focus:bg-gray-600"
                     >
-                      {slot}
+                      {formatTo12Hour(slot)}
                     </SelectItem>
                   ))
                 )}
@@ -387,7 +403,6 @@ export function FollowUpBookingModal({
                 !amountPayable
               }
             >
-              {" "}
               {!lawyerAvailablity ||
               !date ||
               !timeSlot ||

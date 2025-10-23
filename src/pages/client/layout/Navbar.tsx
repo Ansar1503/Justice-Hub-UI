@@ -52,12 +52,12 @@ function Navbar() {
             >
               Home
             </li>
-            <li className="hover:underline cursor-pointer">Services</li>
+            {/* <li className="hover:underline cursor-pointer">Services</li> */}
             <NavLink to="/client/lawyers">
               <li className="hover:underline cursor-pointer">Lawyers</li>
             </NavLink>
-            <li className="hover:underline cursor-pointer">Blogs</li>
-            <li className="hover:underline cursor-pointer">About Us</li>
+            {/* <li className="hover:underline cursor-pointer">Blogs</li> */}
+            {/* <li className="hover:underline cursor-pointer">About Us</li> */}
           </ul>
         </div>
 

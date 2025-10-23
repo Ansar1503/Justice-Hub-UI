@@ -1,7 +1,7 @@
-import type React from "react";
+"use client";
 
-import { useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
+import type React from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,12 +26,16 @@ import axiosinstance from "@/utils/api/axios/axios.instance";
 import { store } from "@/store/redux/store";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { EnhancedAvailabilityCalendar } from "./Calendar";
+import { useAvailabilityData } from "../../hooks/useavailabilt";
+import { formatTo12Hour } from "@/utils/utils";
+import { slotSettings } from "@/types/types/SlotTypes";
 
-interface BookingModalProps {
+interface BookingModalEnhancedProps {
   lawyerId: string;
   lawyerAvailablity: boolean;
   timeSlots: string[];
-  slotSettings: any;
+  slotSettings?: slotSettings;
   caseTypes: CaseTypestype[];
   walletBalance: number;
   consultationFee: number;
@@ -41,7 +45,7 @@ interface BookingModalProps {
   children: React.ReactNode;
 }
 
-export function BookingModal({
+export function BookingModalEnhanced({
   lawyerId,
   lawyerAvailablity,
   timeSlots,
@@ -53,19 +57,26 @@ export function BookingModal({
   onSubmitEnd,
   onDateChange,
   children,
-}: BookingModalProps) {
+}: BookingModalEnhancedProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [caseType, setCaseType] = useState<CaseTypestype | null>(null);
   const [title, setTitle] = useState<string>("");
   const [timeSlot, setTimeSlot] = useState<string>();
   const [reason, setReason] = useState<string>("");
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const navigate = useNavigate();
 
+  const { data: availabilityData, isLoading: isLoadingAvailability } =
+    useAvailabilityData(lawyerId, currentMonth);
   const canPayFromWallet = walletBalance >= consultationFee;
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "stripe">(
     canPayFromWallet ? "wallet" : "stripe"
   );
+
+  useEffect(() => {
+    if (date && onDateChange) onDateChange(date);
+  }, [isOpen]);
 
   const today = new Date(new Date().setHours(0, 0, 0, 0));
   const thirtyDaysFromNow = new Date();
@@ -174,13 +185,13 @@ export function BookingModal({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="dark:text-white">
             Book a Consultation
           </DialogTitle>
           <DialogDescription>
-            Please select a date and time for your consultation.
+            Select a date with available slots and choose your preferred time.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -188,16 +199,25 @@ export function BookingModal({
             <Label htmlFor="date" className="dark:text-gray-200">
               Select Date
             </Label>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleDateSelect}
-              disabled={(date) => date < today || date > thirtyDaysFromNow}
-              fromMonth={today}
-              toMonth={thirtyDaysFromNow}
-              className="rounded-md border mx-auto dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
+            {isLoadingAvailability ? (
+              <div className="p-8 text-center text-muted-foreground">
+                Loading availability...
+              </div>
+            ) : (
+              <EnhancedAvailabilityCalendar
+                scheduleSettings={slotSettings}
+                onMonthChange={setCurrentMonth}
+                selected={date}
+                onSelect={handleDateSelect}
+                availabilityData={availabilityData}
+                disabled={(date) => date < today || date > thirtyDaysFromNow}
+                fromMonth={currentMonth}
+                toMonth={thirtyDaysFromNow}
+                className="dark:bg-gray-700 dark:border-gray-600"
+              />
+            )}
           </div>
+
           <div className="grid gap-2">
             <Label htmlFor="time" className="dark:text-gray-200">
               Select Time Slot
@@ -206,33 +226,32 @@ export function BookingModal({
               <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 <SelectValue placeholder="Select a time slot" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+              <SelectContent>
                 {!lawyerAvailablity || !date ? (
-                  <SelectItem
-                    value="unavailable"
-                    className="dark:text-gray-400 dark:focus:bg-gray-600"
-                  >
-                    No available slots for this date
+                  <SelectItem value="no-slots" disabled>
+                    No available slots
+                  </SelectItem>
+                ) : timeSlots.length === 0 ? (
+                  <SelectItem value="loading-slots" disabled>
+                    Loading slots...
                   </SelectItem>
                 ) : (
                   timeSlots.map((slot) => (
-                    <SelectItem
-                      key={slot}
-                      value={slot}
-                      className="dark:text-white dark:focus:bg-gray-600"
-                    >
-                      {slot}
+                    <SelectItem key={slot} value={slot}>
+                      {formatTo12Hour(slot)}
                     </SelectItem>
                   ))
                 )}
               </SelectContent>
             </Select>
           </div>
+
           <div className="grid gap-2">
             <Label htmlFor="time" className="dark:text-gray-200">
               Slot Duration - {slotSettings?.slotDuration} minutes
             </Label>
           </div>
+
           <div className="grid gap-2">
             <Label htmlFor="title" className="dark:text-gray-200">
               Case Title
@@ -247,6 +266,7 @@ export function BookingModal({
               className="px-3 py-2 rounded-md border dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400"
             />
           </div>
+
           <div className="grid gap-2">
             <Label htmlFor="caseType" className="dark:text-gray-200">
               Select Case Type
@@ -341,10 +361,9 @@ export function BookingModal({
                 !lawyerAvailablity ||
                 !date ||
                 !timeSlot ||
-                !reason ||
+                !reason.trim() ||
                 !caseType ||
-                !title ||
-                paymentMethod != "wallet"
+                !title.trim()
               }
             >
               Pay from Wallet (₹{walletBalance})
@@ -357,7 +376,7 @@ export function BookingModal({
                 !lawyerAvailablity ||
                 !date ||
                 !timeSlot ||
-                !reason ||
+                !reason.trim() ||
                 !caseType ||
                 !title ||
                 paymentMethod != "stripe"

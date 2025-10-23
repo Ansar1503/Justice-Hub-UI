@@ -14,10 +14,12 @@ import { useLocation, Link } from "react-router-dom";
 // import { useFetchClientData } from "@/store/tanstack/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { IoChatbubblesOutline } from "react-icons/io5";
+import { useFetchCurrentUserSubscription } from "@/store/tanstack/mutations/SubscriptionMutation";
 // import { MdOutlineRateReview } from "react-icons/md";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: userSubscription } = useFetchCurrentUserSubscription();
   const user = useAppSelector((state) => state.Auth.user);
   const location = useLocation();
   const path = location.pathname;
@@ -31,13 +33,13 @@ export default function Sidebar() {
     { path: `/${user?.role}/cases`, label: "Cases", icon: FileText },
     {
       path: `/${user?.role}/appointments`,
-      label: "appointments",
+      label: "Appointments",
       icon: Calendar,
     },
     { path: `/${user?.role}/sessions`, label: "Session", icon: Calendar1 },
     {
       path: `/${user?.role}/chats`,
-      label: "chats",
+      label: "Chats",
       icon: IoChatbubblesOutline,
     },
     {
@@ -45,8 +47,14 @@ export default function Sidebar() {
       label: "Subscription",
       icon: CalendarSync,
     },
-    { path: `/${user?.role}/wallet`, label: "wallets", icon: Wallet },
+    { path: `/${user?.role}/wallet`, label: "Wallet", icon: Wallet },
   ];
+
+  const hasChatAccess = userSubscription?.benefitsSnapshot?.chatAccess;
+
+  const filteredMenuItems = hasChatAccess
+    ? menuItems
+    : menuItems.filter((item) => item.label !== "Chats");
 
   return (
     <>
@@ -126,7 +134,7 @@ export default function Sidebar() {
         {/* Navigation Menu */}
         <nav className="mt-4">
           <ul className="space-y-2">
-            {menuItems.map((item) => (
+            {filteredMenuItems.map((item) => (
               <li key={item.path}>
                 <Link
                   to={item.path}
