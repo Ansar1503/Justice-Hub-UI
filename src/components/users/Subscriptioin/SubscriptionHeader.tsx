@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import { Calendar, CheckCircle2, AlertCircle, Clock, Zap } from "lucide-react";
 import type {
   SubscriptionType,
   UserSubscriptionType,
@@ -26,6 +26,38 @@ export default function SubscriptionHeader({
   renewalDate,
   onCancel,
 }: SubscriptionHeaderProps) {
+  if (!currentPlan) {
+    return (
+      <Card className="mb-12 border-border bg-card">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="text-3xl">Your Subscription</CardTitle>
+              <CardDescription className="mt-2">
+                Manage your current plan and billing
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 p-8 text-center">
+            <Zap className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              No Active Plan
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              You don't have an active subscription. Choose a plan below to get
+              started and unlock premium features.
+            </p>
+            <Badge variant="outline" className="bg-muted">
+              No Plan
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const planPrice = currentPlan
     ? currentPlan.isFree
       ? "₹0"

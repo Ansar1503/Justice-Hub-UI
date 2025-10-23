@@ -23,12 +23,14 @@ interface PlanCardProps {
     isFree?: boolean;
   };
   isCurrentPlan: boolean;
+  isDowngradeBlocked?: boolean;
   onSubscribe: () => void;
 }
 
 export default function PlanCard({
   plan,
   isCurrentPlan,
+  isDowngradeBlocked,
   onSubscribe,
 }: PlanCardProps) {
   const isFreePlan = plan.isFree === true;
@@ -42,12 +44,6 @@ export default function PlanCard({
           : "border-border bg-card"
       }`}
     >
-      {plan.highlighted && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <Badge className="bg-teal-500 text-white">Recommended</Badge>
-        </div>
-      )}
-
       <CardHeader className={plan.highlighted ? "pt-8" : ""}>
         <div className="flex items-start justify-between">
           <div>
@@ -99,16 +95,24 @@ export default function PlanCard({
               </Button>
             </div>
           ) : (
-            <Button
-              onClick={onSubscribe}
-              className={`w-full ${
-                plan.highlighted
-                  ? "bg-teal-500 hover:bg-teal-600 text-white"
-                  : ""
-              }`}
-            >
-              {plan.buttonText}
-            </Button>
+            <div className="space-y-1">
+              <Button
+                onClick={onSubscribe}
+                disabled={isDowngradeBlocked}
+                className={`w-full ${
+                  plan.highlighted
+                    ? "bg-teal-500 hover:bg-teal-600 text-white"
+                    : ""
+                } ${isDowngradeBlocked ? "opacity-70 cursor-not-allowed" : ""}`}
+              >
+                {isDowngradeBlocked ? "Downgrade unavailable" : plan.buttonText}
+              </Button>
+              {isDowngradeBlocked && (
+                <p className="text-xs text-muted-foreground text-center">
+                  You can downgrade after your current plan ends.
+                </p>
+              )}
+            </div>
           )}
         </div>
       </CardContent>

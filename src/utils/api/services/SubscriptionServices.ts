@@ -33,6 +33,16 @@ export async function FetchCurrentUserSubscription() {
   return response.data;
 }
 
+export async function CancelSubscription() {
+  const response = await axiosinstance.delete(
+    CommonQueies.api +
+      CommonQueies.client +
+      SubscriptionRoute.base +
+      SubscriptionRoute.user
+  );
+  return response.data;
+}
+
 export async function UpdateSubscriptionPlan(
   payload: Omit<SubscriptionType, "createdAt" | "updatedAt">
 ) {

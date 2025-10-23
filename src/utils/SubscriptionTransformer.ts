@@ -55,8 +55,8 @@ export function transformSubscriptionToPlanCard(
     description: subscription.description || "Perfect plan for your needs",
     badge: subscription.isFree ? "Free" : null,
     features,
-    buttonText: isCurrentPlan ? "Current Plan" : "Subscribe Now",
-    highlighted: isCurrentPlan,
+    buttonText: isCurrentPlan ? "Current Plan" : "Subscribe",
+    highlighted:isCurrentPlan,
     isFree: subscription.isFree,
   };
 }

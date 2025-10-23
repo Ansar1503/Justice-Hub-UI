@@ -4,6 +4,7 @@ import {
 } from "@/types/types/SubscriptionType";
 import {
   AddSubscriptionPlan,
+  CancelSubscription,
   ChangeActiveSubscriptionStatus,
   FetchAllSubscriptionPlans,
   FetchCurrentUserSubscription,
@@ -128,6 +129,20 @@ export function useSubscibePlan() {
       error.message = message;
       toast.error(message);
     },
-    onSettled() {},
+  });
+}
+
+export function useCancelSubscription() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: CancelSubscription,
+    onError: (error: any) => {
+      const message = error.response?.data?.error || "Something went wrong";
+      error.message = message;
+      toast.error(message);
+    },
+    onSettled() {
+      queryClient.invalidateQueries({ queryKey: ["user-subscription"] });
+    },
   });
 }

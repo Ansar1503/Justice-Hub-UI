@@ -8,6 +8,7 @@ import { PlanComparison } from "@/components/users/Subscriptioin/PlanComparison"
 import ConfirmSubscriptionModal from "@/components/users/Subscriptioin/ConfirmSubscriptionModal";
 import CancelSubscriptionModal from "@/components/users/Subscriptioin/CancelSubscriptionModal";
 import {
+  useCancelSubscription,
   useFetchAllSubscriptionPlans,
   useFetchCurrentUserSubscription,
   useSubscibePlan,
@@ -22,7 +23,7 @@ export default function SubscriptionPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const { data: plans = [] } = useFetchAllSubscriptionPlans();
   const { data: userSubscription } = useFetchCurrentUserSubscription();
-
+  const { mutateAsync: CancelSubscription } = useCancelSubscription();
   const { mutateAsync: Subscibe } = useSubscibePlan();
 
   const currentPlanId = userSubscription?.planId;
@@ -60,7 +61,12 @@ export default function SubscriptionPage() {
     setShowConfirmModal(false);
   };
 
-  const handleConfirmCancel = () => {
+  const handleConfirmCancel = async () => {
+    try {
+      await CancelSubscription();
+    } catch (error) {
+      console.log("error", error);
+    }
     setShowCancelModal(false);
   };
 
@@ -81,7 +87,9 @@ export default function SubscriptionPage() {
               currentPlan={currentPlanId || ""}
               plans={plans}
               onSubscribe={handleSubscribe}
+              userSubscription={userSubscription || null}
             />
+
             <div className="mt-12">
               <h2 className="text-2xl font-bold mb-6">Plan Comparison</h2>
               <PlanComparison plans={plans} />

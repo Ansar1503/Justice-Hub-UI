@@ -1,18 +1,25 @@
 import { transformSubscriptionToPlanCard } from "@/utils/SubscriptionTransformer";
 import PlanCard from "./PlanCard";
-import type { SubscriptionType } from "@/types/types/SubscriptionType";
+import type {
+  SubscriptionType,
+  UserSubscriptionType,
+} from "@/types/types/SubscriptionType";
 
 interface PlanGridProps {
   currentPlan: string;
   plans: SubscriptionType[];
   onSubscribe: (planId: string) => void;
+  userSubscription: UserSubscriptionType | null;
 }
 
 export default function PlanGrid({
   currentPlan,
   plans,
+  userSubscription,
   onSubscribe,
 }: PlanGridProps) {
+  const today = new Date();
+  const currentPlanData = plans.find((p) => p.id === currentPlan);
   return (
     <div className="space-y-8">
       <div>
@@ -27,12 +34,22 @@ export default function PlanGrid({
             subscription,
             currentPlan === subscription.id
           );
+          let isDowngradeBlocked = false;
+          if (userSubscription && currentPlanData) {
+            const isDowngrade =
+              subscription.price < currentPlanData.price || subscription.isFree;
+            if (isDowngrade && userSubscription.endDate) {
+              const endDate = new Date(userSubscription.endDate);
+              isDowngradeBlocked = today < endDate;
+            }
+          }
           return (
             <PlanCard
               key={subscription.id}
               plan={planCard}
               isCurrentPlan={currentPlan === subscription.id}
               onSubscribe={() => onSubscribe(subscription.id)}
+              isDowngradeBlocked={isDowngradeBlocked}
             />
           );
         })}
