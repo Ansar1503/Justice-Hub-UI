@@ -1,7 +1,7 @@
 import { Disputes } from "@/types/types/Disputes";
 import { updateDisputesStatus } from "@/utils/api/services/adminServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export function useUpdateDisputeStatus() {
   const queryClient = useQueryClient();

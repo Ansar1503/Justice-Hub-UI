@@ -7,7 +7,7 @@ import {
   DeleteSpecialization,
 } from "@/utils/api/services/adminServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export function useSpecializationMutation(
   setCurrentPage: (vl: number) => void,

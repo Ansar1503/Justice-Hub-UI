@@ -1,7 +1,7 @@
 import { ResponseType } from "@/types/types/LoginResponseTypes";
 import { bookAppointment } from "@/utils/api/services/clientServices";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 export function useBookingMutation() {
   return useMutation<ResponseType, Error, FormData>({
