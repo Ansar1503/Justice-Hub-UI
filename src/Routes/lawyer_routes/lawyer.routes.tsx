@@ -14,6 +14,7 @@ import CaseDetailsPage from "@/pages/lawyer/CaseDetailsPage";
 import LawyerProfilePage from "@/pages/lawyer/Dashboard";
 import LawyerDashboard from "@/pages/lawyer/LawyerDashboard";
 import ChatsPage from "@/pages/client/chats_page";
+import BlogDashboadPage from "@/pages/lawyer/BlogDashboadPage";
 
 export default function LawyerRoutes() {
   return (
@@ -31,6 +32,7 @@ export default function LawyerRoutes() {
           <Route path="/cases" element={<CasesPage />} />
           <Route path="/cases/:id" element={<CaseDetailsPage />} />
           <Route path="/dashboard" element={<LawyerDashboard />} />
+          <Route path="/blogs" element={<BlogDashboadPage />} />
         </Route>
       </Route>
 

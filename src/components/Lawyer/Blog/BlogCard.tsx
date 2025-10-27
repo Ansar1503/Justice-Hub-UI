@@ -77,14 +77,14 @@ export function BlogCard({
 
         {/* Preview */}
         <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-          {blog.content.substring(0, 100)}...
+          {blog.content?.substring(0, 100)}...
         </p>
 
         {/* Dates */}
         <div className="mb-4 flex flex-col gap-1 text-xs text-muted-foreground">
-          <div>Created {formatDate(blog.createdAt)}</div>
+          <div>Created {formatDate(new Date(blog.createdAt))}</div>
           {blog.updatedAt !== blog.createdAt && (
-            <div>Updated {formatDate(blog.updatedAt)}</div>
+            <div>Updated {formatDate(new Date(blog.updatedAt))}</div>
           )}
         </div>
 

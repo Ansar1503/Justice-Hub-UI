@@ -13,13 +13,28 @@ export type BlogType = {
   isPublished: boolean;
   likes: string[];
   comments: BlogComment[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 };
 
 export type CreateblogType = {
   title: string;
   content: string;
-  coverImage?: string;
+  coverImage?: File;
   isPublished?: boolean;
+};
+
+export type FetchBlogsByLawyerQueryType = {
+  page: number;
+  limit: number;
+  search: string;
+  filter: "all" | "published" | "draft";
+  sort: "newest" | "oldest" | "title-asc" | "title-desc" | "likes" | "comments";
+};
+
+export type FetchBlogsByLawyerResponse = {
+  totalCount: number;
+  currentPage: number;
+  totalPage: number;
+  data: BlogType[];
 };

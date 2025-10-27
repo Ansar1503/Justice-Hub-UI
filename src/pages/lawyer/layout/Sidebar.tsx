@@ -1,6 +1,7 @@
 import {
   Calendar,
   Calendar1Icon,
+  FilePenLine,
   FileText,
   LayoutDashboard,
   Timer,
@@ -47,6 +48,11 @@ export default function Sidebar() {
       path: `/${user?.role}/reviews`,
       label: "Reviews",
       icon: GoCodeReview,
+    },
+    {
+      path: `/${user?.role}/blogs`,
+      label: "Blogs",
+      icon: FilePenLine,
     },
     { path: `/${user?.role}/wallet`, label: "wallets", icon: Wallet },
   ];

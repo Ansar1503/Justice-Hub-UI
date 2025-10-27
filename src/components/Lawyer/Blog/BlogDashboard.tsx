@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { Search, Plus, ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { BlogType } from "@/types/types/BlogType";
 import { BlogCard } from "./BlogCard";
+import SearchComponent from "@/components/SearchComponent";
+import PaginationComponent from "@/components/pagination";
+import { useFetchBlogsByLawyer } from "@/store/tanstack/Queries/BlogQuery";
 
 interface BlogDashboardProps {
-  blogs: BlogType[];
   onCreateNew: () => void;
   onEdit: (blog: BlogType) => void;
   onDelete: (id: string) => void;
@@ -23,17 +24,28 @@ type SortOption =
 type FilterOption = "all" | "published" | "draft";
 
 export function BlogDashboard({
-  blogs,
   onCreateNew,
   onEdit,
   onDelete,
   onTogglePublish,
 }: BlogDashboardProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [blogs, setBlogs] = useState<BlogType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
-
+  const { data } = useFetchBlogsByLawyer({
+    filter: filterBy,
+    limit: 10,
+    page: currentPage,
+    search: searchQuery,
+    sort: sortBy,
+  });
+  useEffect(() => {
+    if (data && data.data) {
+      setBlogs(data.data);
+    }
+  }, [data]);
   const handleFilterChange = (newFilter: FilterOption) => {
     setFilterBy(newFilter);
     setCurrentPage(1);
@@ -46,7 +58,7 @@ export function BlogDashboard({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 p-6 md:p-8">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
@@ -69,15 +81,10 @@ export function BlogDashboard({
 
         {/* Search */}
         <div className="mb-8 relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search articles..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="pl-10"
+          <SearchComponent
+            searchTerm={searchQuery}
+            setSearchTerm={setSearchQuery}
+            placeholder="Search Blog Titles"
           />
         </div>
 
@@ -161,6 +168,13 @@ export function BlogDashboard({
             )}
           </div>
         )}
+        <PaginationComponent
+          currentPage={currentPage}
+          handlePageChange={setCurrentPage}
+          itemsPerPage={10}
+          totalItems={10}
+          totalPages={1}
+        />
       </div>
     </div>
   );

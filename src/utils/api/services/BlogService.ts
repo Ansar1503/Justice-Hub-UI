@@ -1,8 +1,43 @@
-import { CreateblogType } from "@/types/types/BlogType";
+import { store } from "@/store/redux/store";
 import axiosinstance from "../axios/axios.instance";
-import { BlogRoute } from "@/utils/constants/RouteConstants";
+import { BlogRoute, CommonQueies } from "@/utils/constants/RouteConstants";
+import { FetchBlogsByLawyerQueryType } from "@/types/types/BlogType";
 
-export async function AddBlog(params: CreateblogType) {
-  const response = await axiosinstance.post(BlogRoute.base, params);
+export async function AddBlog(params: FormData) {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.post(
+    CommonQueies.api + user?.role + BlogRoute.base,
+    params,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+  return response.data;
+}
+
+export async function FetchBlogsByLawyer(query: FetchBlogsByLawyerQueryType) {
+  const { user } = store.getState().Auth;
+  const { filter, limit, page, search, sort } = query;
+  const response = await axiosinstance.get(
+    `${CommonQueies.api}${user?.role}${BlogRoute.base}`,
+    {
+      params: {
+        page,
+        limit,
+        search,
+        filter,
+        sort,
+      },
+    }
+  );
+  return response.data;
+}
+
+export async function UpdateBlog(payload: { id: string; params: FormData }) {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    `${CommonQueies.api}${user?.role}${BlogRoute.base}${CommonQueies.params}${payload.id}`,
+    payload.params
+  );
   return response.data;
 }
