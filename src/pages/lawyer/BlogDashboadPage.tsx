@@ -7,7 +7,9 @@ import { useState } from "react";
 import { EditorModal } from "@/components/Lawyer/Blog/EditorModal";
 import {
   useAddBlogMutation,
+  useDeleteBlogMutation,
   useEditBlogMutation,
+  useToggleBlogStatusMutation,
 } from "@/store/tanstack/mutations/BlogMutations";
 
 export default function BlogDashboadPage() {
@@ -15,6 +17,8 @@ export default function BlogDashboadPage() {
   const [editingBlog, setEditingBlog] = useState<BlogType | null>(null);
   const { mutateAsync: AddBlog } = useAddBlogMutation();
   const { mutateAsync: editBlog } = useEditBlogMutation();
+  const { mutateAsync: deleteBlog } = useDeleteBlogMutation();
+  const { mutateAsync: ToggleBlogStatus } = useToggleBlogStatusMutation();
 
   const handleCreateNew = () => {
     setEditingBlog(null);
@@ -61,7 +65,6 @@ export default function BlogDashboadPage() {
       }
     } catch (error) {
       console.log("Blog saving error:", error);
-      throw error; // Re-throw to prevent modal from closing on error
     }
   };
 
@@ -70,12 +73,22 @@ export default function BlogDashboadPage() {
     setEditingBlog(null);
   };
 
-  const handleDelete = (id: string) => {
-    console.log("id", id);
+  const handleDelete = async (id: string) => {
+    if (!id.trim()) return;
+    try {
+      await deleteBlog(id);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleTogglePublish = (id: string) => {
-    console.log("id", id);
+  const handleTogglePublish = async (id: string) => {
+    if (!id) return;
+    try {
+      await ToggleBlogStatus(id);
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div className="flex flex-col min-h-screen bg-[#FFF2F2] dark:bg-black">

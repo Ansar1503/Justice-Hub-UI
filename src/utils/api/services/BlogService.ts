@@ -41,3 +41,19 @@ export async function UpdateBlog(payload: { id: string; params: FormData }) {
   );
   return response.data;
 }
+
+export async function DeleteBlog(id: string) {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.delete(
+    `${CommonQueies.api}${user?.role}${BlogRoute.base}${CommonQueies.params}${id}`
+  );
+  return response.data;
+}
+
+export async function ToggleBlogStatus(id: string) {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    `${CommonQueies.api}${user?.role}${BlogRoute.base}${BlogRoute.publish}${CommonQueies.params}${id}`
+  );
+  return response.data;
+}
