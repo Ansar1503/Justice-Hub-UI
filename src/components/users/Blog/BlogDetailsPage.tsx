@@ -1,20 +1,32 @@
-import { useState } from "react";
-import { ArrowLeft, Heart, Share2 } from "lucide-react";
+import { ArrowLeft, Heart } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { NavLink, useParams } from "react-router-dom";
 import { useFetchBlogDetailsById } from "@/store/tanstack/Queries/BlogQuery";
 import { BlogCard } from "./BlogCard";
+import { useToggleBlogLikeMutation } from "@/store/tanstack/mutations/BlogMutations";
+import { useAppSelector } from "@/store/redux/Hook";
 
 export function BlogDetailPage() {
   const { id } = useParams();
-  const [isLiked, setIsLiked] = useState(false);
+  const { user } = useAppSelector((s) => s.Auth);
   const { data: blog } = useFetchBlogDetailsById(id);
+  const isLiked = blog?.likes.some((like) => like.userId === user?.user_id);
+  const { mutateAsync: toggleLike } = useToggleBlogLikeMutation();
+  const handleToggleLike = async () => {
+    if (!user?.user_id) return;
+    try {
+      await toggleLike(id!);
+    } catch (error) {
+      console.log("tooggle like error", error);
+    }
+  };
+
   if (!blog) {
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto px-4 py-12 sm:px-6 lg:px-8">
           <NavLink
-            to="/"
+            to="/client/blogs"
             className="mb-8 inline-flex items-center gap-2 text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -92,7 +104,7 @@ export function BlogDetailPage() {
               {/* Action Buttons */}
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setIsLiked(!isLiked)}
+                  onClick={() => handleToggleLike()}
                   className={`flex items-center gap-2 rounded-lg px-4 py-2 transition-colors ${
                     isLiked
                       ? "bg-primary text-primary-foreground"
@@ -102,15 +114,15 @@ export function BlogDetailPage() {
                   <Heart
                     className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`}
                   />
-                  <span>{blog.likes.length + (isLiked ? 1 : 0)}</span>
+                  <span>{blog.likes.length}</span>
                 </button>
                 {/* <button className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 hover:bg-muted">
                   <MessageCircle className="h-4 w-4" />
                   <span>{blog.comments.length}</span>
                 </button> */}
-                <button className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 hover:bg-muted">
+                {/* <button className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 hover:bg-muted">
                   <Share2 className="h-4 w-4" />
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

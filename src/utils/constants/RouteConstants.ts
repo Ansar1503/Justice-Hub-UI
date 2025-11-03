@@ -79,4 +79,6 @@ export const BlogRoute = {
   publish: "/publish",
   users: "/users",
   sortBy: "&sortBy=",
+  like: "/like",
+  comment: "/comment",
 };

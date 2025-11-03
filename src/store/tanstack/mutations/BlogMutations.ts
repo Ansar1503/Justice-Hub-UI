@@ -1,7 +1,8 @@
-import { BlogType } from "@/types/types/BlogType";
+import { BlogType, FetchedBlogByClient } from "@/types/types/BlogType";
 import {
   AddBlog,
   DeleteBlog,
+  ToggleBlogLike,
   ToggleBlogStatus,
   UpdateBlog,
 } from "@/utils/api/services/BlogService";
@@ -99,6 +100,47 @@ export function useToggleBlogStatusMutation() {
           ),
         };
       });
+    },
+  });
+}
+
+export function useToggleBlogLikeMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ToggleBlogLike,
+
+    onError: (error: any) => {
+      const message = error?.response?.data?.error;
+      toast.error(message || "update failed");
+    },
+
+    onSuccess: (data: { liked: boolean; userId: string; blogId: string }) => {
+      toast.success("Blog updated successfully");
+
+      queryClient.setQueryData(
+        ["client", "blogs", data.blogId],
+        (
+          oldBlog:
+            | (FetchedBlogByClient & { relatedBlogs: FetchedBlogByClient[] })
+            | undefined
+        ) => {
+          if (!oldBlog) return oldBlog;
+
+          const isLiked = data.liked;
+
+          return {
+            ...oldBlog,
+            likes: isLiked
+              ? [
+                  ...oldBlog.likes,
+                  { userId: data.userId, name: "", profile_image: "" },
+                ]
+              : oldBlog.likes.filter((user) => user.userId !== data.userId),
+          };
+        }
+      );
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
     },
   });
 }

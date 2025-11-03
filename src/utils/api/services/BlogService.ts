@@ -65,3 +65,11 @@ export async function fetchBlogDetailsById(blogId: string | undefined) {
   );
   return response.data;
 }
+
+export async function ToggleBlogLike(blogId: string) {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.patch(
+    `${CommonQueies.api}${user?.role}${BlogRoute.base}${BlogRoute.like}${CommonQueies.params}${blogId}`
+  );
+  return response.data;
+}
