@@ -2,16 +2,31 @@ import { store } from "@/store/redux/store";
 import {
   FetchBlogsByLawyerQueryType,
   FetchBlogsByLawyerResponse,
+  FetchedBlogByClient,
 } from "@/types/types/BlogType";
-import { FetchBlogsByLawyer } from "@/utils/api/services/BlogService";
+import {
+  FetchBlogsByLawyer,
+  fetchBlogDetailsById,
+} from "@/utils/api/services/BlogService";
 import { useQuery } from "@tanstack/react-query";
 
 export function useFetchBlogsByLawyer(query: FetchBlogsByLawyerQueryType) {
   const { user } = store.getState().Auth;
   return useQuery<FetchBlogsByLawyerResponse>({
     queryFn: () => FetchBlogsByLawyer(query),
-    queryKey: ["lawyer", "blogs",query],
+    queryKey: ["lawyer", "blogs", query],
     enabled: Boolean(user?.role === "lawyer" && user.user_id),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useFetchBlogDetailsById(blogId: string | undefined) {
+  return useQuery<
+    FetchedBlogByClient & { relatedBlogs: FetchedBlogByClient[] }
+  >({
+    queryKey: ["client", "blogs", blogId],
+    queryFn: () => fetchBlogDetailsById(blogId),
+    enabled: Boolean(blogId?.trim()),
     staleTime: 1000 * 60,
   });
 }

@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, ArrowRight, Clock } from "lucide-react";
+import { Heart,  ArrowRight } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { NavLink } from "react-router-dom";
 import { FetchedBlogByClient } from "@/types/types/BlogType";
@@ -39,9 +39,6 @@ export function BlogCard({ blog }: BlogCardProps) {
               <Badge variant="secondary" className="text-xs font-medium">
                 Article
               </Badge>
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />4 min read
-              </span>
             </div>
 
             {/* Title */}
@@ -79,18 +76,18 @@ export function BlogCard({ blog }: BlogCardProps) {
             {/* Stats and CTA */}
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors group/like">
-                  <Heart className="h-4 w-4 group-hover/like:fill-current" />
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <Heart className="h-4 w-4" />
                   <span className="font-medium">{blog.likes.length}</span>
-                </button>
-                <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
+                </div>
+                {/* <div className="flex items-center gap-1.5 text-sm text-muted-foreground ">
                   <MessageCircle className="h-4 w-4" />
                   <span className="font-medium">{blog.comments.length}</span>
-                </button>
+                </div> */}
               </div>
 
               <NavLink
-                to={`/blog/${blog.id}`}
+                to={`/client/blogs/${blog.id}`}
                 className="group/link inline-flex items-center gap-2 text-primary hover:text-primary-light font-semibold text-sm transition-all hover:gap-3"
                 aria-label="Read article"
               >

@@ -27,7 +27,6 @@ export function BlogListingPage() {
   const blogs = useMemo(() => {
     return data?.pages.flatMap((page) => page.data) ?? [];
   }, [data]);
-
   const featuredBlog = blogs[0];
   const remainingBlogs = blogs.slice(1);
   return (
