@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { BlogType } from "@/types/types/BlogType";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface EditorModalProps {
   blog: BlogType | null;
@@ -62,7 +63,7 @@ export function EditorModal({ blog, onSave, onClose }: EditorModalProps) {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file");
+      toast.error("Please select a valid image file");
       return;
     }
 
@@ -72,7 +73,7 @@ export function EditorModal({ blog, onSave, onClose }: EditorModalProps) {
 
   const handleSave = async () => {
     if (!title.trim() || !content.trim()) {
-      alert("Please fill in title and content");
+      toast.error("Please fill in title and content");
       return;
     }
 
