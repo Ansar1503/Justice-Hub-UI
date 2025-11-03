@@ -14,6 +14,7 @@ export const CommonQueies = {
   api: "/api/",
   admin: "admin",
   pageQuery: "?page=",
+  cursorQuery: "?cursor=",
   limitQuery: "&limit=",
   searchQuery: "&search=",
   params: "/",
@@ -76,4 +77,6 @@ export const SubscriptionRoute = {
 export const BlogRoute = {
   base: "/blogs",
   publish: "/publish",
+  users: "/users",
+  sortBy: "&sortBy=",
 };

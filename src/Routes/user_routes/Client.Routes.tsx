@@ -14,6 +14,7 @@ import LawyerDirectory from "@/pages/client/LawyersListing";
 import LawyersPage from "@/pages/client/LawyerProfile";
 import ChatsPage from "@/pages/client/chats_page";
 import SubscriptionPage from "@/pages/client/SubscriptionPage";
+import BlogsPage from "@/pages/client/BlogsPage";
 function ClientRoutes() {
   return (
     <Routes>
@@ -30,6 +31,7 @@ function ClientRoutes() {
           path="/lawyers/payment_success"
           element={<PaymentSuccessPage />}
         />
+        <Route path="/blogs" element={<BlogsPage />} />
         <Route path="/cases" element={<CasesPage />} />
         <Route path="/cases/:id" element={<CaseDetailsPage />} />
         <Route path="/wallet" element={<WalletPage />} />

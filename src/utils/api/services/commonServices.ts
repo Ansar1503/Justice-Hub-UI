@@ -8,11 +8,13 @@ import {
 import { SortOrder } from "@/components/users/AppointmentsComponent";
 import { FetchSessionsPayloadType } from "@/types/types/sessionType";
 import {
+  BlogRoute,
   CasesRoutes,
   CommonQueies,
   SpecializationRoutes,
 } from "@/utils/constants/RouteConstants";
 import { FetchSpecializationRequestPayloadType } from "@/types/types/SpecializationType";
+import { FetchBlogsByClientType } from "@/types/types/BlogType";
 
 export async function joinVideoSession(payload: { sessionId: string }) {
   const { user } = store.getState().Auth;
@@ -119,6 +121,17 @@ export async function fetchAllNotifications(pageParam: any) {
   const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
     `/api/${user?.role}/notifications?cursor=${pageParam}`
+  );
+  return response.data;
+}
+
+export async function FetchBlogsByClient(
+  params: unknown,
+  payload: FetchBlogsByClientType
+) {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.get(
+    `${CommonQueies.api}${user?.role}${BlogRoute.base}${BlogRoute.users}${CommonQueies.cursorQuery}${params}${CommonQueies.searchQuery}${payload.search}${BlogRoute.sortBy}${payload.sortBy}`
   );
   return response.data;
 }

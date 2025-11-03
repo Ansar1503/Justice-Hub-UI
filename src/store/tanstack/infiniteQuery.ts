@@ -4,9 +4,16 @@ import {
   fetchChatsForClientApi,
   fetchReviews,
 } from "@/utils/api/services/clientServices";
-import { fetchAllNotifications } from "@/utils/api/services/commonServices";
+import {
+  FetchBlogsByClient,
+  fetchAllNotifications,
+} from "@/utils/api/services/commonServices";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { store } from "../redux/store";
+import {
+  FetchBlogsByClientType,
+  infiniteFetchBlogsByClient,
+} from "@/types/types/BlogType";
 
 export function useInfiniteFetchChatforClient(search: string) {
   return useInfiniteQuery({
@@ -52,6 +59,22 @@ export function useInfiniteFetchAllNotifications(enabled: boolean) {
     queryFn: ({ pageParam }) => fetchAllNotifications(pageParam),
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
     enabled: user?.user_id && enabled ? true : false,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retryDelay: 30000,
+  });
+}
+
+export function useInfiniteFetchBlogsForClients(
+  payload: FetchBlogsByClientType
+) {
+  const { user } = store.getState().Auth;
+  return useInfiniteQuery<infiniteFetchBlogsByClient, any>({
+    queryKey: ["blogs", payload],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => FetchBlogsByClient(pageParam, payload),
+    getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
+    enabled: Boolean(user?.user_id),
     staleTime: 60_000,
     refetchOnWindowFocus: false,
     retryDelay: 30000,
