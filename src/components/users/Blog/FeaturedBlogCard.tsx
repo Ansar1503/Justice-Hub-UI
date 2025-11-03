@@ -27,13 +27,6 @@ export function FeaturedBlogCard({ blog }: FeaturedBlogCardProps) {
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent lg:bg-gradient-to-r"></div>
-
-            {/* Featured Badge */}
-            <div className="absolute top-6 left-6">
-              <Badge className="bg-accent-gold text-white font-semibold px-4 py-1.5 shadow-lg">
-                ⭐ Featured
-              </Badge>
-            </div>
           </div>
         )}
 

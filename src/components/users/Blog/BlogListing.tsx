@@ -57,7 +57,7 @@ export function BlogListingPage() {
       <main className="mx-auto px-6 py-12 sm:px-8 lg:px-12">
         {/* Filters Section */}
         <div className="mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 p-6 bg-card rounded-2xl shadow-md border border-border/50">
-          <div className="flex-1 max-w-md">
+          <div className="flex-1">
             <SearchComponent
               searchTerm={searchQuery}
               setSearchTerm={setSearchQuery}
