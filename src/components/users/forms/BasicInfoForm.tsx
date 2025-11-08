@@ -6,8 +6,8 @@ import { ValidateProfileFields } from "@/utils/validations/ProfileFormValidation
 import { fetchClientDataType } from "@/types/types/Client.data.type";
 import { useBasicInfoUpdateMutation } from "@/store/tanstack/mutations";
 import { useAppDispatch } from "@/store/redux/Hook";
-import { setProfileImage, setUser } from "@/store/redux/auth/Auth.Slice";
-import { useProfileBlobImage } from "@/hooks/useProfileBlobImage";
+import { setUser } from "@/store/redux/auth/Auth.Slice";
+// import { useProfileBlobImage } from "@/hooks/useProfileBlobImage";
 
 function BasicInfoForm({
   data,
@@ -26,13 +26,13 @@ function BasicInfoForm({
   // console.log(";datatasd", data);
   const { isPending: basicLoading, mutateAsync } = useBasicInfoUpdateMutation();
 
-  const { blobUrl } = useProfileBlobImage({ profileImage });
+  // const { blobUrl } = useProfileBlobImage({ profileImage });
   // const dispatch = useAppDispatch();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [BasicInfo, setBasicInfo] = useState({
     name: data?.name || "",
     mobile: data?.mobile || "",
-    image: blobUrl || "",
+    image: profileImage || "",
     dob: data?.dob || "",
     gender: data?.gender || "",
   });
@@ -42,15 +42,12 @@ function BasicInfoForm({
       setBasicInfo({
         dob: data?.dob || "",
         gender: data?.gender || "",
-        image: blobUrl || "",
+        image: data.profile_image || "",
         mobile: data?.mobile || "",
         name: data?.name || "",
       });
     }
-    if (blobUrl) {
-      dispatch(setProfileImage(blobUrl));
-    }
-  }, [data, blobUrl]);
+  }, [data]);
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {

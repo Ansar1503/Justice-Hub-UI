@@ -38,7 +38,7 @@ export default function AdminDashboard() {
   }, [range]);
 
   const { data, isLoading, error } = useAdminDashboard(startDate, endDate);
-console.log("data",data)
+
   return (
     <AdminLayout>
       <main className="min-h-dvh bg-muted/30">
