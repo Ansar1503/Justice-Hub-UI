@@ -7,7 +7,7 @@ import {
   Scale,
   X,
   //   Phone,
-  Video,
+  // Video,
   //   Settings,
   //   FileText,
   Users,
@@ -526,14 +526,14 @@ ChatDetailsModalProps) {
                       <Phone className="h-4 w-4 mr-2" />
                       Start Voice Call
                     </Button> */}
-
+{/* 
                   <Button
                     variant="outline"
                     className="w-full justify-start bg-transparent"
                   >
                     <Video className="h-4 w-4 mr-2" />
                     Join Video Call
-                  </Button>
+                  </Button> */}
                 </>
                 {/* )}/ */}
 

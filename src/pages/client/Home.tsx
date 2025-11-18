@@ -1,12 +1,13 @@
+import { useAppSelector } from "@/store/redux/Hook";
 import Footer from "./layout/Footer";
 import Hero from "./layout/Hero";
 import Navbar from "./layout/Navbar";
-
 function Home() {
+  const { user } = useAppSelector((s) => s.Auth);
   return (
     <div className="bg-brandCream dark:bg-gray-800">
       <Navbar />
-      <Hero />
+      {!user?.user_id && <Hero />}
       <div className="m-10">
         <div className="m-10">
           <h1 className="text-stone-500 dark:text-white text-3xl">

@@ -23,7 +23,6 @@ function currency(n?: number) {
 
 export default function DashboardPage() {
   const { data, isPending } = useFetchClientDashboardData();
-  console.log("data", data);
   const kpis = [
     { label: "Total Cases", value: data?.totalCases ?? 0 },
     { label: "Active Cases", value: data?.activeCases ?? 0 },
