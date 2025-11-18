@@ -17,6 +17,7 @@ import {
   CommonQueies,
   profileQueries,
 } from "@/utils/constants/RouteConstants";
+import { Appointment } from "@/types/types/AppointmentsType";
 
 export async function fetchClientData() {
   const response = await axiosinstance.get(`/api/client/profile`);
@@ -111,6 +112,17 @@ export async function fetchSlotsforClients(
   const response = await axiosinstance.get(
     `/api/client/lawyers/slots/${lawyer_id}?date=${date}`
   );
+  return response.data;
+}
+
+export async function FetchAmountPayable(payload: {
+  type: Appointment["type"];
+  lawyerId: string;
+}) {
+  const response = await axiosinstance.get(
+    `/api/client/lawyer/slots/pricedetails/${payload.lawyerId}?type=${payload.type}`
+  );
+
   return response.data;
 }
 

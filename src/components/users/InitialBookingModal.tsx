@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -30,6 +28,7 @@ import { EnhancedAvailabilityCalendar } from "./Calendar";
 import { useAvailabilityData } from "../../hooks/useavailabilt";
 import { formatTo12Hour } from "@/utils/utils";
 import { slotSettings } from "@/types/types/SlotTypes";
+import { FetchAmountPayable } from "@/utils/api/services/clientServices";
 
 interface BookingModalEnhancedProps {
   lawyerId: string;
@@ -67,11 +66,19 @@ export function BookingModalEnhanced({
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const navigate = useNavigate();
 
+  const [priceDetails, setPriceDetails] = useState<null | {
+    amountPayable: number;
+    subscriptionDiscountAmount: number;
+    followUpDiscountAmount: number;
+  }>(null);
+
+  const [isPriceLoading, setIsPriceLoading] = useState(false);
+
   const { data: availabilityData, isLoading: isLoadingAvailability } =
     useAvailabilityData(lawyerId, currentMonth);
-  const canPayFromWallet = walletBalance >= consultationFee;
+
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "stripe">(
-    canPayFromWallet ? "wallet" : "stripe"
+    "stripe"
   );
 
   useEffect(() => {
@@ -95,26 +102,54 @@ export function BookingModalEnhanced({
     }
   };
 
+  const fetchAmountPayable = async () => {
+    if (!date || !timeSlot || !reason.trim() || !caseType || !title.trim()) {
+      toast.error("Please fill all fields before proceeding.");
+      return;
+    }
+
+    setIsPriceLoading(true);
+    setPriceDetails(null);
+
+    try {
+      const data = await FetchAmountPayable({
+        type: "consultation",
+        lawyerId,
+      });
+
+      setPriceDetails(data);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.error || "Failed to fetch price details."
+      );
+    } finally {
+      setIsPriceLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (
       !lawyerAvailablity ||
       !date ||
       !timeSlot ||
       !reason.trim() ||
-      !lawyerId ||
       !caseType ||
-      !title
+      !title ||
+      !priceDetails
     ) {
       return;
     }
+
     const stripe_pk = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
     if (!stripe_pk) {
       console.error("Stripe publishable key not found");
       return;
     }
+
     onSubmitStart();
     const stripe = await loadStripe(stripe_pk);
     const { token } = store.getState().Auth;
+
     try {
       const response = await axiosinstance.post(
         "/api/client/lawyer/slots/checkout-session/",
@@ -125,18 +160,16 @@ export function BookingModalEnhanced({
           reason,
           duration: slotSettings?.slotDuration,
           caseTypeId: caseType.id,
-          title: title,
+          title,
+          amount: priceDetails.amountPayable, // FIXED
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       const sessionId = response?.data?.id;
-      stripe?.redirectToCheckout({
-        sessionId,
-      });
+      stripe?.redirectToCheckout({ sessionId });
     } catch (error: any) {
-      const message: string =
-        error.response?.data?.error || "Booking failed! Try again.";
-      toast.error(message);
+      toast.error(error.response?.data?.error || "Booking failed! Try again.");
     } finally {
       onSubmitEnd();
     }
@@ -147,12 +180,19 @@ export function BookingModalEnhanced({
       !lawyerAvailablity ||
       !date ||
       !timeSlot ||
-      !reason ||
+      !reason.trim() ||
       !caseType ||
-      !title
+      !title ||
+      !priceDetails
     ) {
       return;
     }
+
+    if (walletBalance < priceDetails.amountPayable) {
+      toast.error("Insufficient wallet balance.");
+      return;
+    }
+
     onSubmitStart();
     const { token } = store.getState().Auth;
 
@@ -166,7 +206,8 @@ export function BookingModalEnhanced({
           reason,
           duration: slotSettings?.slotDuration,
           caseTypeId: caseType.id,
-          title: title,
+          title,
+          amount: priceDetails.amountPayable,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -174,9 +215,7 @@ export function BookingModalEnhanced({
       toast.success("Booking successful! Paid from wallet.");
       navigate("/client/appointments");
     } catch (error: any) {
-      const message =
-        error.response?.data?.error || "Booking failed! Try again.";
-      toast.error(message);
+      toast.error(error.response?.data?.error || "Booking failed! Try again.");
     } finally {
       onSubmitEnd();
     }
@@ -185,6 +224,7 @@ export function BookingModalEnhanced({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
+
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="dark:text-white">
@@ -194,11 +234,11 @@ export function BookingModalEnhanced({
             Select a date with available slots and choose your preferred time.
           </DialogDescription>
         </DialogHeader>
+
         <div className="grid gap-4 py-4">
+          {/* DATE */}
           <div className="grid gap-2">
-            <Label htmlFor="date" className="dark:text-gray-200">
-              Select Date
-            </Label>
+            <Label className="dark:text-gray-200">Select Date</Label>
             {isLoadingAvailability ? (
               <div className="p-8 text-center text-muted-foreground">
                 Loading availability...
@@ -210,7 +250,7 @@ export function BookingModalEnhanced({
                 selected={date}
                 onSelect={handleDateSelect}
                 availabilityData={availabilityData}
-                disabled={(date) => date < today || date > thirtyDaysFromNow}
+                disabled={(d) => d < today || d > thirtyDaysFromNow}
                 fromMonth={currentMonth}
                 toMonth={thirtyDaysFromNow}
                 className="dark:bg-gray-700 dark:border-gray-600"
@@ -219,21 +259,16 @@ export function BookingModalEnhanced({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="time" className="dark:text-gray-200">
-              Select Time Slot
-            </Label>
+            <Label className="dark:text-gray-200">Select Time Slot</Label>
             <Select value={timeSlot} onValueChange={setTimeSlot}>
               <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 <SelectValue placeholder="Select a time slot" />
               </SelectTrigger>
+
               <SelectContent>
                 {!lawyerAvailablity || !date ? (
                   <SelectItem value="no-slots" disabled>
                     No available slots
-                  </SelectItem>
-                ) : timeSlots.length === 0 ? (
-                  <SelectItem value="loading-slots" disabled>
-                    Loading slots...
                   </SelectItem>
                 ) : (
                   timeSlots.map((slot) => (
@@ -247,35 +282,23 @@ export function BookingModalEnhanced({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="time" className="dark:text-gray-200">
-              Slot Duration - {slotSettings?.slotDuration} minutes
-            </Label>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="title" className="dark:text-gray-200">
-              Case Title
-            </Label>
+            <Label className="dark:text-gray-200">Case Title</Label>
             <input
-              id="title"
-              type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              disabled={!lawyerAvailablity}
               placeholder="e.g. Property dispute with landlord"
-              className="px-3 py-2 rounded-md border dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400"
+              className="px-3 py-2 rounded-md border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="caseType" className="dark:text-gray-200">
-              Select Case Type
-            </Label>
+            <Label className="dark:text-gray-200">Select Case Type</Label>
+
             <Select
               value={caseType?.id || ""}
               onValueChange={(value) => {
-                const selected = caseTypes?.find(
-                  (ct: CaseTypestype) => ct.id.toString() === value
+                const selected = caseTypes.find(
+                  (ct) => ct.id.toString() === value
                 );
                 setCaseType(selected || null);
               }}
@@ -283,80 +306,60 @@ export function BookingModalEnhanced({
               <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 <SelectValue placeholder="Select a case type" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
-                {!caseTypes || caseTypes.length === 0 ? (
+
+              <SelectContent>
+                {caseTypes.map((ct) => (
                   <SelectItem
-                    value="unavailable"
-                    disabled
-                    className="dark:text-gray-400 dark:focus:bg-gray-600"
+                    key={ct.id}
+                    value={ct.id.toString()}
+                    className="dark:text-white"
                   >
-                    No case type suitable for this lawyer
+                    {ct.name}
                   </SelectItem>
-                ) : (
-                  caseTypes.map((ct: CaseTypestype) => (
-                    <SelectItem
-                      key={ct.id}
-                      value={ct.id.toString()}
-                      className="dark:text-white dark:focus:bg-gray-600"
-                    >
-                      {ct.name}
-                    </SelectItem>
-                  ))
-                )}
+                ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="reason" className="dark:text-gray-200">
+            <Label className="dark:text-gray-200">
               Reason for Consultation
             </Label>
             <Textarea
-              id="reason"
               value={reason}
-              disabled={!lawyerAvailablity}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Briefly describe your legal issue"
-              className="resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400"
+              className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
 
+          {/* PAYMENT METHOD */}
           <div className="grid gap-2">
-            <Label htmlFor="paymentMethod" className="dark:text-gray-200">
-              Select Payment Method
-            </Label>
+            <Label className="dark:text-gray-200">Select Payment Method</Label>
             <Select
               value={paymentMethod}
-              onValueChange={(value) =>
-                setPaymentMethod(value as "wallet" | "stripe")
-              }
+              onValueChange={(v) => setPaymentMethod(v as "wallet" | "stripe")}
             >
               <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                <SelectValue placeholder="Select a payment method" />
+                <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
-                {canPayFromWallet && (
-                  <SelectItem
-                    value="wallet"
-                    className="dark:text-white dark:focus:bg-gray-600"
-                  >
+
+              <SelectContent>
+                <SelectItem value="stripe">Pay with Stripe</SelectItem>
+
+                {walletBalance > 0 && (
+                  <SelectItem value="wallet">
                     Wallet (₹{walletBalance})
                   </SelectItem>
                 )}
-                <SelectItem
-                  value="stripe"
-                  className="dark:text-white dark:focus:bg-gray-600"
-                >
-                  Pay with Stripe
-                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {paymentMethod === "wallet" && canPayFromWallet ? (
+          {!priceDetails && (
             <Button
-              onClick={handleWalletPayment}
-              className="w-full mt-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+              onClick={fetchAmountPayable}
+              className="w-full mt-4 bg-blue-600 dark:bg-blue-700"
               disabled={
                 !lawyerAvailablity ||
                 !date ||
@@ -366,33 +369,63 @@ export function BookingModalEnhanced({
                 !title.trim()
               }
             >
-              Pay from Wallet (₹{walletBalance})
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white"
-              disabled={
-                !lawyerAvailablity ||
-                !date ||
-                !timeSlot ||
-                !reason.trim() ||
-                !caseType ||
-                !title ||
-                paymentMethod != "stripe"
-              }
-            >
-              {!lawyerAvailablity ||
-              !date ||
-              !timeSlot ||
-              !reason ||
-              !caseType ||
-              !title ||
-              paymentMethod != "stripe"
-                ? "Submit Booking"
-                : `Pay ₹${consultationFee}`}
+              {isPriceLoading ? "Calculating..." : "Book Now"}
             </Button>
           )}
+
+          {priceDetails && (
+            <div className="p-4 rounded-md border dark:border-gray-600 dark:bg-gray-800 mt-4">
+              <p className="flex justify-between text-sm mb-2">
+                <span className="text-gray-300">Consultation Fee</span>
+                <span className="text-white">₹{consultationFee}</span>
+              </p>
+
+              {priceDetails.subscriptionDiscountAmount > 0 && (
+                <p className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-300">Subscription Discount</span>
+                  <span className="text-green-400">
+                    -₹{priceDetails.subscriptionDiscountAmount}
+                  </span>
+                </p>
+              )}
+
+              {priceDetails.followUpDiscountAmount > 0 && (
+                <p className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-300">Follow-up Discount</span>
+                  <span className="text-green-400">
+                    -₹{priceDetails.followUpDiscountAmount}
+                  </span>
+                </p>
+              )}
+
+              <hr className="my-2 border-gray-600" />
+
+              <p className="flex justify-between font-semibold text-lg text-white">
+                <span>Total Payable</span>
+                <span>₹{priceDetails.amountPayable}</span>
+              </p>
+            </div>
+          )}
+
+          {priceDetails && paymentMethod === "stripe" && (
+            <Button
+              onClick={handleSubmit}
+              className="w-full mt-3 bg-emerald-600"
+            >
+              Pay ₹{priceDetails.amountPayable}
+            </Button>
+          )}
+
+          {priceDetails &&
+            paymentMethod === "wallet" &&
+            walletBalance >= priceDetails.amountPayable && (
+              <Button
+                onClick={handleWalletPayment}
+                className="w-full mt-3 bg-blue-600"
+              >
+                Pay from Wallet (₹{priceDetails.amountPayable})
+              </Button>
+            )}
         </div>
       </DialogContent>
     </Dialog>

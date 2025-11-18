@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -25,12 +23,12 @@ import axiosinstance from "@/utils/api/axios/axios.instance";
 import { store } from "@/store/redux/store";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import type { Casetype } from "@/types/types/Case";
-import type { CaseTypestype } from "@/types/types/CaseType";
-import { useFetchCommissionSettings } from "@/store/tanstack/Queries/CommissionQuery";
 import { useAvailabilityData } from "../../hooks/useavailabilt";
 import { EnhancedAvailabilityCalendar } from "./Calendar";
 import { formatTo12Hour } from "@/utils/utils";
+import type { Casetype } from "@/types/types/Case";
+import type { CaseTypestype } from "@/types/types/CaseType";
+import { FetchAmountPayable } from "@/utils/api/services/clientServices";
 import { slotSettings } from "@/types/types/SlotTypes";
 
 interface FollowUpBookingModalEnhancedProps {
@@ -63,41 +61,23 @@ export function FollowUpBookingModalEnhanced({
   const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedCase, setSelectedCase] = useState<Casetype | null>(null);
-  const [amountPayable, setAmountPayable] = useState<number>(consultationFee);
   const [cases, setCases] = useState<Casetype[]>([]);
   const [timeSlot, setTimeSlot] = useState<string>();
   const [reason, setReason] = useState<string>("");
-  const [isLoadingCases, setIsLoadingCases] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const navigate = useNavigate();
-  const { data: CommissionSettings } = useFetchCommissionSettings();
+  const [priceDetails, setPriceDetails] = useState<null | {
+    amountPayable: number;
+    subscriptionDiscountAmount: number;
+    followUpDiscountAmount: number;
+  }>(null);
 
+  const [isPriceLoading, setIsPriceLoading] = useState(false);
   const { data: availabilityData, isLoading: isLoadingAvailability } =
     useAvailabilityData(lawyerId, currentMonth);
 
-  useEffect(() => {
-    if (
-      CommissionSettings?.initialCommission != null &&
-      CommissionSettings.followupCommission != null &&
-      consultationFee != null &&
-      consultationFee > 0
-    ) {
-      const commissionPercent = CommissionSettings.followupCommission;
-      const discountAmount = Math.round(
-        (consultationFee *
-          (CommissionSettings.initialCommission - commissionPercent)) /
-          100
-      );
-      const amountPaid = consultationFee - discountAmount;
-      setAmountPayable(amountPaid > 0 ? amountPaid : 0);
-    } else {
-      setAmountPayable(consultationFee || 0);
-    }
-  }, [CommissionSettings, consultationFee, date, timeSlot, reason]);
-
-  const canPayFromWallet = walletBalance >= amountPayable;
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "stripe">(
-    canPayFromWallet ? "wallet" : "stripe"
+    "stripe"
   );
 
   const today = new Date(new Date().setHours(0, 0, 0, 0));
@@ -111,11 +91,8 @@ export function FollowUpBookingModalEnhanced({
 
   useEffect(() => {
     const fetchCases = async () => {
-      setIsLoadingCases(true);
       const { token } = store.getState().Auth;
       try {
-        const caseTypeIds = caseTypes.map((c) => c.id);
-        if (!caseTypeIds) return;
         const response = await axiosinstance.get(
           `/api/client/cases/caseTypes/ids`,
           {
@@ -124,39 +101,49 @@ export function FollowUpBookingModalEnhanced({
           }
         );
         setCases(response.data || []);
-      } catch (error: any) {
-        console.error("Failed to fetch cases:", error);
-        toast.error("Failed to load cases");
-      } finally {
-        setIsLoadingCases(false);
+      } catch (error) {
+        console.log("fetch cases", error);
       }
     };
 
     if (lawyerId && isOpen) {
       fetchCases();
     }
-  }, [lawyerId, isOpen, caseTypes]);
+  }, [caseTypes, isOpen]);
 
-  const handleSubmit = async () => {
-    if (
-      !lawyerAvailablity ||
-      !date ||
-      !timeSlot ||
-      !reason.trim() ||
-      !lawyerId ||
-      !selectedCase
-    ) {
+  const fetchAmountPayable = async () => {
+    if (!selectedCase || !date || !timeSlot || !reason.trim()) {
+      toast.error("Fill all fields before continuing.");
       return;
     }
-    const stripe_pk = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-    if (!stripe_pk) {
-      console.error("Stripe publishable key not found");
-      return;
-    }
-    onSubmitStart();
-    const stripe = await loadStripe(stripe_pk);
-    const { token } = store.getState().Auth;
+
+    setIsPriceLoading(true);
+    setPriceDetails(null);
+
     try {
+      const data = await FetchAmountPayable({
+        type: "follow-up",
+        lawyerId,
+      });
+
+      setPriceDetails(data);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to get amount.");
+    } finally {
+      setIsPriceLoading(false);
+    }
+  };
+
+  const handleStripePay = async () => {
+    if (!priceDetails) return;
+
+    onSubmitStart();
+    const { token } = store.getState().Auth;
+
+    try {
+      const stripe_pk = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+      const stripe = await loadStripe(stripe_pk);
+
       const response = await axiosinstance.post(
         "/api/client/lawyer/slots/checkout-session/follow-up",
         {
@@ -165,27 +152,28 @@ export function FollowUpBookingModalEnhanced({
           timeSlot,
           reason,
           duration: slotSettings?.slotDuration,
-          caseId: selectedCase.id,
+          caseId: selectedCase?.id,
+          amount: priceDetails.amountPayable,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      const sessionId = response?.data?.id;
-      stripe?.redirectToCheckout({
-        sessionId,
-      });
-    } catch (error: any) {
-      const message: string =
-        error.response?.data?.error || "Booking failed! Try again.";
-      toast.error(message);
+
+      stripe?.redirectToCheckout({ sessionId: response.data.id });
+    } catch (e: any) {
+      toast.error(e.response?.data?.error || "Stripe payment failed.");
     } finally {
       onSubmitEnd();
     }
   };
 
-  const handleWalletPayment = async () => {
-    if (!lawyerAvailablity || !date || !timeSlot || !reason || !selectedCase) {
+  const handleWalletPay = async () => {
+    if (!priceDetails) return;
+
+    if (walletBalance < priceDetails.amountPayable) {
+      toast.error("Insufficient wallet balance.");
       return;
     }
+
     onSubmitStart();
     const { token } = store.getState().Auth;
 
@@ -198,17 +186,16 @@ export function FollowUpBookingModalEnhanced({
           timeSlot,
           reason,
           duration: slotSettings?.slotDuration,
-          caseId: selectedCase.id,
+          caseId: selectedCase?.id,
+          amount: priceDetails.amountPayable,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("Follow-up booking successful! Paid from wallet.");
+      toast.success("Follow-up booked successfully!");
       navigate("/client/appointments");
-    } catch (error: any) {
-      const message =
-        error.response?.data?.error || "Booking failed! Try again.";
-      toast.error(message);
+    } catch (e: any) {
+      toast.error(e.response?.data?.error || "Wallet payment failed.");
     } finally {
       onSubmitEnd();
     }
@@ -217,51 +204,46 @@ export function FollowUpBookingModalEnhanced({
   const handleDateSelect = (newDate: Date | undefined) => {
     setDate(newDate);
     setTimeSlot(undefined);
-    if (onDateChange) {
-      onDateChange(newDate);
-    }
+    onDateChange?.(newDate ?? undefined);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto scrollbar-hide dark:bg-gray-800 dark:border-gray-700">
+
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="dark:text-white">
-            Book Follow-Up Consultation
+            Follow-Up Consultation
           </DialogTitle>
           <DialogDescription>
-            Select an existing case and choose your preferred date and time.
+            Select a case, date, and time for your follow-up.
           </DialogDescription>
         </DialogHeader>
+
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="case" className="dark:text-gray-200">
-              Select Case
-            </Label>
+            <Label>Select Case</Label>
             <Select
               value={selectedCase?.id || ""}
               onValueChange={(value) => {
-                const selected = cases.find((c) => c.id === value);
-                setSelectedCase(selected || null);
+                const found = cases.find((c) => c.id === value);
+                setSelectedCase(found ?? null);
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a case for follow-up" />
+                <SelectValue placeholder="Choose your case" />
               </SelectTrigger>
+
               <SelectContent>
-                {isLoadingCases ? (
-                  <SelectItem value="loading" disabled>
-                    Loading cases...
-                  </SelectItem>
-                ) : cases.length === 0 ? (
-                  <SelectItem value="unavailable" disabled>
-                    No cases available for follow-up
+                {cases.length === 0 ? (
+                  <SelectItem value="no-follow-ups" disabled>
+                    No follow-up cases found
                   </SelectItem>
                 ) : (
                   cases.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
-                      {c.title} - {c.summary}
+                      {c.title}
                     </SelectItem>
                   ))
                 )}
@@ -270,13 +252,10 @@ export function FollowUpBookingModalEnhanced({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="date" className="dark:text-gray-200">
-              Select Date
-            </Label>
+            <Label>Select Date</Label>
+
             {isLoadingAvailability ? (
-              <div className="p-8 text-center text-muted-foreground">
-                Loading availability...
-              </div>
+              <div>Loading availability…</div>
             ) : (
               <EnhancedAvailabilityCalendar
                 scheduleSettings={slotSettings}
@@ -284,135 +263,129 @@ export function FollowUpBookingModalEnhanced({
                 selected={date}
                 onSelect={handleDateSelect}
                 availabilityData={availabilityData}
-                disabled={(date) => date < today || date > thirtyDaysFromNow}
+                disabled={(d) => d < today || d > thirtyDaysFromNow}
                 fromMonth={currentMonth}
                 toMonth={thirtyDaysFromNow}
-                className="dark:bg-gray-700 dark:border-gray-600"
+                className="dark:bg-gray-700"
               />
             )}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="time" className="dark:text-gray-200">
-              Select Time Slot
-            </Label>
+            <Label>Select Time Slot</Label>
+
             <Select value={timeSlot} onValueChange={setTimeSlot}>
-              <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                <SelectValue placeholder="Select a time slot" />
+              <SelectTrigger>
+                <SelectValue placeholder="Select time" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
-                {!lawyerAvailablity || !date ? (
-                  <SelectItem
-                    value="unavailable"
-                    disabled
-                    className="dark:text-gray-400 dark:focus:bg-gray-600"
-                  >
-                    No available slots for this date
+
+              <SelectContent>
+                {timeSlots.map((slot) => (
+                  <SelectItem key={slot} value={slot}>
+                    {formatTo12Hour(slot)}
                   </SelectItem>
-                ) : (
-                  timeSlots.map((slot) => (
-                    <SelectItem
-                      key={slot}
-                      value={slot}
-                      className="dark:text-white dark:focus:bg-gray-600"
-                    >
-                      {formatTo12Hour(slot)}
-                    </SelectItem>
-                  ))
-                )}
+                ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="time" className="dark:text-gray-200">
-              Slot Duration - {slotSettings?.slotDuration} minutes
-            </Label>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="reason" className="dark:text-gray-200">
-              Follow-Up Notes
-            </Label>
+            <Label>Notes</Label>
             <Textarea
-              id="reason"
               value={reason}
-              disabled={!lawyerAvailablity}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Describe what you'd like to discuss in this follow-up"
-              className="resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400"
+              placeholder="What would you like to discuss?"
+              className="dark:bg-gray-700"
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="paymentMethod" className="dark:text-gray-200">
-              Select Payment Method
-            </Label>
+            <Label>Payment Method</Label>
             <Select
               value={paymentMethod}
-              onValueChange={(value) =>
-                setPaymentMethod(value as "wallet" | "stripe")
-              }
+              onValueChange={(v) => setPaymentMethod(v as "wallet" | "stripe")}
             >
-              <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                <SelectValue placeholder="Select a payment method" />
+              <SelectTrigger>
+                <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
-                {canPayFromWallet && (
-                  <SelectItem
-                    value="wallet"
-                    className="dark:text-white dark:focus:bg-gray-600"
-                  >
+
+              <SelectContent>
+                <SelectItem value="stripe">Pay with Stripe</SelectItem>
+
+                {walletBalance > 0 && (
+                  <SelectItem value="wallet">
                     Wallet (₹{walletBalance})
                   </SelectItem>
                 )}
-                <SelectItem
-                  value="stripe"
-                  className="dark:text-white dark:focus:bg-gray-600"
-                >
-                  Pay with Stripe
-                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {paymentMethod === "wallet" && canPayFromWallet ? (
+          {!priceDetails && (
             <Button
-              onClick={handleWalletPayment}
-              className="w-full mt-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+              onClick={fetchAmountPayable}
+              className="w-full bg-blue-600 mt-3"
               disabled={
-                !lawyerAvailablity ||
-                !date ||
-                !timeSlot ||
-                !reason ||
-                !selectedCase
-              }
-            >
-              Pay from Wallet (₹{walletBalance})
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white"
-              disabled={
-                !lawyerAvailablity ||
-                !date ||
-                !timeSlot ||
-                !reason ||
                 !selectedCase ||
-                !amountPayable
+                !date ||
+                !timeSlot ||
+                !reason.trim() ||
+                !lawyerAvailablity
               }
             >
-              {!lawyerAvailablity ||
-              !date ||
-              !timeSlot ||
-              !reason ||
-              !selectedCase ||
-              !amountPayable
-                ? "Submit Follow-Up Booking"
-                : `pay ₹${amountPayable}`}
+              {isPriceLoading ? "Calculating..." : "Book Now"}
             </Button>
           )}
+
+          {priceDetails && (
+            <div className="p-4 mt-4 border rounded-md dark:bg-gray-700">
+              <p className="flex justify-between text-sm">
+                <span>Consultation Fee</span>
+                <span>₹{consultationFee}</span>
+              </p>
+
+              {priceDetails.subscriptionDiscountAmount > 0 && (
+                <p className="flex justify-between text-sm text-green-400">
+                  <span>Subscription Discount</span>
+                  <span>-₹{priceDetails.subscriptionDiscountAmount}</span>
+                </p>
+              )}
+
+              {priceDetails.followUpDiscountAmount > 0 && (
+                <p className="flex justify-between text-sm text-green-400">
+                  <span>Follow-up Discount</span>
+                  <span>-₹{priceDetails.followUpDiscountAmount}</span>
+                </p>
+              )}
+
+              <hr className="my-2" />
+
+              <p className="flex justify-between font-semibold text-lg">
+                <span>Total Payable</span>
+                <span>₹{priceDetails.amountPayable}</span>
+              </p>
+            </div>
+          )}
+
+          {priceDetails && paymentMethod === "stripe" && (
+            <Button
+              className="w-full bg-emerald-600 mt-3"
+              onClick={handleStripePay}
+            >
+              Pay ₹{priceDetails.amountPayable}
+            </Button>
+          )}
+
+          {priceDetails &&
+            paymentMethod === "wallet" &&
+            walletBalance >= priceDetails.amountPayable && (
+              <Button
+                className="w-full bg-blue-600 mt-3"
+                onClick={handleWalletPay}
+              >
+                Pay from Wallet (₹{priceDetails.amountPayable})
+              </Button>
+            )}
         </div>
       </DialogContent>
     </Dialog>
