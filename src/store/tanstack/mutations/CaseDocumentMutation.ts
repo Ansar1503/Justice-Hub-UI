@@ -1,4 +1,4 @@
-import { UpdateCaseDetailsType } from "@/types/types/Case";
+import { Casetype, UpdateCaseDetailsType } from "@/types/types/Case";
 import { CaseDocumentType } from "@/types/types/CaseDocument";
 import {
   DeleteCaseDocument,
@@ -40,14 +40,24 @@ export function useDeleteCaseDocumentMutation() {
 
 export function useUpdateCaseDetailsMutation() {
   const queryClient = useQueryClient();
-  return useMutation<unknown, any, UpdateCaseDetailsType>({
+  return useMutation<Casetype, any, UpdateCaseDetailsType>({
     mutationFn: UpdateCaseDetails,
     onError: (err) => {
       const message = err?.response?.data?.error;
       toast.error(message || "Error updating case details");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["cases"] });
+    onSettled: (data) => {
+      queryClient.setQueryData(["case", data?.id], (old: Casetype) => {
+        if (!old) return old
+        return {
+          ...old,
+          title: data?.title,
+          estimatedValue: data?.estimatedValue,
+          summary: data?.summary,
+          nextHearing: data?.nextHearing,
+          status: data?.status,
+        }
+      })
     },
   });
 }

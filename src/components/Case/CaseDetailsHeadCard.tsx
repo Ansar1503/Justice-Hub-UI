@@ -215,7 +215,7 @@ export default function CaseDetailsHeadCard({ CaseDetails }: Props) {
                 )}
               </>
             ) : (
-              <p className="font-medium text-accent">
+              <p className="font-medium ">
                 {!CaseDetails?.estimatedValue
                   ? "Amount Not Estimated"
                   : `₹${CaseDetails?.estimatedValue}`}
