@@ -6,11 +6,10 @@ export async function sendFiles(payload: {
   sessionId: string;
   onProgress?: (progress: number) => void;
 }) {
-  const formData = new FormData();
   const { user } = store.getState().Auth;
   const response = await axiosinstance.post(
     `/api/${user?.role}/chat/sendFile`,
-    formData,
+    payload,
     {
       headers: {
         "Content-Type": "multipart/form-data",
