@@ -36,7 +36,7 @@ export default function CaseDetailsHeadCard({ CaseDetails }: Props) {
       : "",
     summary: CaseDetails?.summary || "",
   });
-  const { mutate: updateCaseDetails, isPending: updateCaseDetailsLoading } = useUpdateCaseDetailsMutation()
+  const { isError, mutate: updateCaseDetails, isPending: updateCaseDetailsLoading } = useUpdateCaseDetailsMutation()
 
   const [errors, setErrors] = useState({
     title: "",
@@ -87,10 +87,10 @@ export default function CaseDetailsHeadCard({ CaseDetails }: Props) {
         estimatedValue: form.estimatedValue || 0,
         nextHearing: form.nextHearing ? form.nextHearing : undefined,
       })
+      if (!isError) setEditable(false);
     } catch (error) {
-
+      console.log(error)
     }
-    setEditable(false);
   };
 
   const handleCancel = () => {
