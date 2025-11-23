@@ -71,12 +71,12 @@ export function BookingModalEnhanced({
     subscriptionDiscountAmount: number;
     followUpDiscountAmount: number;
   }>(null);
-
+  
   const [isPriceLoading, setIsPriceLoading] = useState(false);
-
+  
   const { data: availabilityData, isLoading: isLoadingAvailability } =
-    useAvailabilityData(lawyerId, currentMonth);
-
+  useAvailabilityData(lawyerId, currentMonth);
+  
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "stripe">(
     "stripe"
   );
@@ -116,7 +116,6 @@ export function BookingModalEnhanced({
         type: "consultation",
         lawyerId,
       });
-
       setPriceDetails(data);
     } catch (error: any) {
       toast.error(
@@ -149,7 +148,6 @@ export function BookingModalEnhanced({
     onSubmitStart();
     const stripe = await loadStripe(stripe_pk);
     const { token } = store.getState().Auth;
-
     try {
       const response = await axiosinstance.post(
         "/api/client/lawyer/slots/checkout-session/",
@@ -161,7 +159,7 @@ export function BookingModalEnhanced({
           duration: slotSettings?.slotDuration,
           caseTypeId: caseType.id,
           title,
-          amount: priceDetails.amountPayable, // FIXED
+          amount: priceDetails.amountPayable,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -380,20 +378,20 @@ export function BookingModalEnhanced({
                 <span className="text-white">₹{consultationFee}</span>
               </p>
 
-              {priceDetails.subscriptionDiscountAmount > 0 && (
-                <p className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-300">Subscription Discount</span>
-                  <span className="text-green-400">
-                    -₹{priceDetails.subscriptionDiscountAmount}
-                  </span>
-                </p>
-              )}
-
               {priceDetails.followUpDiscountAmount > 0 && (
                 <p className="flex justify-between text-sm mb-2">
                   <span className="text-gray-300">Follow-up Discount</span>
                   <span className="text-green-400">
                     -₹{priceDetails.followUpDiscountAmount}
+                  </span>
+                </p>
+              )}
+
+              {priceDetails.subscriptionDiscountAmount > 0 && (
+                <p className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-300">Subscription Discount</span>
+                  <span className="text-green-400">
+                    -₹{priceDetails.subscriptionDiscountAmount}
                   </span>
                 </p>
               )}

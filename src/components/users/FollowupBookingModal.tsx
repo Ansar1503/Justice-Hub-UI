@@ -211,7 +211,7 @@ export function FollowUpBookingModalEnhanced({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto dark:bg-gray-800 dark:border-gray-700">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] scrollbar-hide overflow-y-auto dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="dark:text-white">
             Follow-Up Consultation
@@ -344,17 +344,17 @@ export function FollowUpBookingModalEnhanced({
                 <span>₹{consultationFee}</span>
               </p>
 
-              {priceDetails.subscriptionDiscountAmount > 0 && (
-                <p className="flex justify-between text-sm text-green-400">
-                  <span>Subscription Discount</span>
-                  <span>-₹{priceDetails.subscriptionDiscountAmount}</span>
-                </p>
-              )}
-
               {priceDetails.followUpDiscountAmount > 0 && (
                 <p className="flex justify-between text-sm text-green-400">
                   <span>Follow-up Discount</span>
                   <span>-₹{priceDetails.followUpDiscountAmount}</span>
+                </p>
+              )}
+
+              {priceDetails.subscriptionDiscountAmount > 0 && (
+                <p className="flex justify-between text-sm text-green-400">
+                  <span>Subscription Discount</span>
+                  <span>-₹{priceDetails.subscriptionDiscountAmount}</span>
                 </p>
               )}
 
