@@ -20,6 +20,15 @@ export type Casetype = {
   updatedAt: Date;
 };
 
+export type UpdateCaseDetailsType = {
+  title: string;
+  caseId: string
+  summary: string;
+  status: StatusType;
+  estimatedValue: number
+  nextHearing?: string
+}
+
 export type FetchCaseQueryType = {
   page: number;
   limit: number;

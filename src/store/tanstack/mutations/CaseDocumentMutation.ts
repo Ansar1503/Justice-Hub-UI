@@ -1,8 +1,10 @@
+import { UpdateCaseDetailsType } from "@/types/types/Case";
 import { CaseDocumentType } from "@/types/types/CaseDocument";
 import {
   DeleteCaseDocument,
   UploadCaseDocument,
 } from "@/utils/api/services/CaseDocumentServices";
+import { UpdateCaseDetails } from "@/utils/api/services/CaseServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -31,6 +33,21 @@ export function useDeleteCaseDocumentMutation() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cases", "documents"] });
+    },
+  });
+}
+
+
+export function useUpdateCaseDetailsMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<unknown, any, UpdateCaseDetailsType>({
+    mutationFn: UpdateCaseDetails,
+    onError: (err) => {
+      const message = err?.response?.data?.error;
+      toast.error(message || "Error updating case details");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cases"] });
     },
   });
 }
