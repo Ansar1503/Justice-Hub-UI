@@ -41,7 +41,7 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <AuthContextProvider>
           <ThemeProvider>
-            <GoogleOAuthProvider clientId={import.meta.env.VITE_AUTH_CLIENT_ID}>
+            <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
               <QueryClientProvider client={queryClient}>
                 <SocketProvider>
                   <LawyerVerificationProvider>

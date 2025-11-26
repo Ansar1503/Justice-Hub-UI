@@ -9,13 +9,13 @@ export async function loginUser(credentials: {
   return response.data;
 }
 
-export async function googlesignup(payload: {
-  code: string;
-  role: "lawyer" | "client";
-}) {
-  const response = await axiosinstance.post("/api/user/google/signup", payload);
-  return response.data;
-}
+// export async function googlesignup(payload: {
+//   code: string;
+//   role: "lawyer" | "client";
+// }) {
+//   const response = await axiosinstance.post("/api/user/google/signup", payload);
+//   return response.data;
+// }
 
 export async function refreshTokenRequest() {
   try {

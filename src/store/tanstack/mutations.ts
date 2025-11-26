@@ -5,7 +5,7 @@ import {
   LawyerVerification,
   rejectClientAppointment,
 } from "@/utils/api/services/LawyerServices";
-import { googlesignup, loginUser } from "@/utils/api/services/UserServices";
+import { loginUser } from "@/utils/api/services/UserServices";
 import {
   ChangeBlockStatusUser,
   changeLawyerVerificationStatus,
@@ -231,27 +231,27 @@ export function useChangeLawyerVerificationStatus() {
   });
 }
 
-export function useGoogleSignupMutation() {
-  const queryClient = useQueryClient();
-  return useMutation<
-    ResponseType,
-    Error,
-    { code: string; role: "lawyer" | "client" }
-  >({
-    mutationFn: (payload) => googlesignup(payload),
-    onSuccess: (data) => {
-      toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-    },
-    onError: (error: any) => {
-      const message =
-        error.response.data?.message ||
-        "Something went wrong please try again later!";
-      error.message = message;
-      toast.error(message);
-    },
-  });
-}
+// export function useGoogleSignupMutation() {
+//   const queryClient = useQueryClient();
+//   return useMutation<
+//     ResponseType,
+//     Error,
+//     { code: string; role: "lawyer" | "client" }
+//   >({
+//     mutationFn: (payload) => googlesignup(payload),
+//     onSuccess: (data) => {
+//       toast.success(data.message);
+//       queryClient.invalidateQueries({ queryKey: ["user"] });
+//     },
+//     onError: (error: any) => {
+//       const message =
+//         error.response.data?.message ||
+//         "Something went wrong please try again later!";
+//       error.message = message;
+//       toast.error(message);
+//     },
+//   });
+// }
 
 export function useAddReview() {
   const queryClient = useQueryClient();

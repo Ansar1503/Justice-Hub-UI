@@ -4,8 +4,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
+// import { jwtDecode } from "jwt-decode"
 import { motion } from "framer-motion";
 import { useLoginMutation } from "@/store/tanstack/mutations";
+import axiosinstance from "@/utils/api/axios/axios.instance";
+import { useDispatch } from "react-redux";
+import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { LoginResponse } from "@/types/types/LoginResponseTypes";
 // import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
 
 function LoginComponent() {
@@ -14,7 +21,7 @@ function LoginComponent() {
     email: "",
     password: "",
   });
-
+  const dispatch = useDispatch()
   const [validation, setValidation] = useState<Record<string, string>>({});
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -101,11 +108,10 @@ function LoginComponent() {
           <button
             type="submit"
             disabled={isPending}
-            className={`relative w-full py-2 mt-4 text-white rounded-lg transition overflow-hidden ${
-              isPending
-                ? "bg-blue-400 dark:bg-gray-600 cursor-not-allowed"
-                : "bg-blue-700 dark:bg-black hover:bg-blue-500 dark:hover:bg-gray-800"
-            }
+            className={`relative w-full py-2 mt-4 text-white rounded-lg transition overflow-hidden ${isPending
+              ? "bg-blue-400 dark:bg-gray-600 cursor-not-allowed"
+              : "bg-blue-700 dark:bg-black hover:bg-blue-500 dark:hover:bg-gray-800"
+              }
 `}
           >
             {isPending ? "Logging In..." : "Login"}
@@ -138,15 +144,29 @@ function LoginComponent() {
         <GoogleLogin
           theme="filled_blue"
           shape="pill"
-          onSuccess={(credentialResponse) => {
-            if (credentialResponse) {
-              console.log(credentialResponse);
+          onSuccess={async (res) => {
+            const credential = res.credential;
+            if (!credential) return;
+
+            try {
+              const response = await axiosinstance.post(
+                `/api/user/google`,
+                { credential }
+              );
+              const data = response.data as LoginResponse
+              dispatch(setUser(data.user));
+              dispatch(setToken(data.accesstoken));
+              toast.success(data.message);
+              const QueryClient = useQueryClient()
+              QueryClient.invalidateQueries({ queryKey: ["user"] });
+              navigate(`/${data.user.role}/`);
+            } catch (err) {
+              console.log("Google login failed", err);
             }
           }}
-          onError={() => {
-            console.log("error occured");
-          }}
+          onError={() => toast.error("Google auth error")}
         />
+
 
         {/* Bottom Links */}
         <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
