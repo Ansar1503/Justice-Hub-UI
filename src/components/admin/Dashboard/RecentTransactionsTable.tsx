@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { motion } from "framer-motion";
 import { StatusBadge } from "./StatusBadge";
+import { formatDate } from "@/components/Lawyer/Dashboard/utils";
 
 type Row = { id: string; amount: number; status: string; date: string };
 
@@ -44,14 +45,14 @@ export function RecentTransactionsTable({ rows }: { rows?: Row[] }) {
                       <TableCell className="text-right">
                         {new Intl.NumberFormat(undefined, {
                           style: "currency",
-                          currency: "USD",
+                          currency: "INR",
                           maximumFractionDigits: 2,
                         }).format(r.amount)}
                       </TableCell>
                       <TableCell className="text-right">
                         <StatusBadge status={r.status} />
                       </TableCell>
-                      <TableCell className="text-right">{r.date}</TableCell>
+                      <TableCell className="text-right">{formatDate(r.date)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
