@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -17,7 +15,6 @@ type Row = { id: string; amount: number; status: string; date: string };
 
 export function RecentTransactionsTable({ rows }: { rows?: Row[] }) {
   const data = rows ?? [];
-  console.log(data);
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="rounded-lg border bg-card text-card-foreground shadow-sm">
