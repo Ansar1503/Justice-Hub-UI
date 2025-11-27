@@ -2,8 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import {
   Users,
-  BriefcaseBusiness,
-  UserCheck,
   Percent,
   FolderOpenDot,
   TrendingUp,
@@ -16,10 +14,18 @@ type Summary = {
   totalLawyers?: number;
   totalClients?: number;
   totalRevenue?: number;
-  commissionPaid?: number;
+  totalCommission?: number;
+  totalLawyerPayouts?: number;
+  totalBookingAmountCollected?: number;
+  commissionGrowthPercent?: number;
+  subscriptionRevenue?: number;
+  subscriptionGrowthPercent?: number;
+  activeSubscriptions?: number;
+  expiredSubscriptions?: number;
+  newSubscriptions?: number;
   activeCases?: number;
-  growthPercent?: number;
 };
+
 
 export function SummaryCards({ summary }: { summary?: Summary }) {
   const items = [
@@ -30,27 +36,45 @@ export function SummaryCards({ summary }: { summary?: Summary }) {
       format: "currency" as const,
     },
     {
-      label: "Commission Paid",
-      value: summary?.commissionPaid,
+      label: "Commission Revenue",
+      value: summary?.totalCommission,
       icon: Percent,
       format: "currency" as const,
     },
     {
-      label: "Total Users",
-      value: summary?.totalUsers,
+      label: "Subscription Revenue",
+      value: summary?.subscriptionRevenue,
+      icon: CurrencyRupeeIcon,
+      format: "currency" as const,
+    },
+    {
+      label: "Total Booking Amount",
+      value: summary?.totalBookingAmountCollected,
+      icon: CurrencyRupeeIcon,
+      format: "currency" as const,
+    },
+    {
+      label: "Lawyer Payouts",
+      value: summary?.totalLawyerPayouts,
+      icon: CurrencyRupeeIcon,
+      format: "currency" as const,
+    },
+    {
+      label: "Active Subscriptions",
+      value: summary?.activeSubscriptions,
       icon: Users,
       format: "number" as const,
     },
     {
-      label: "Lawyers",
-      value: summary?.totalLawyers,
-      icon: BriefcaseBusiness,
+      label: "New Subscriptions",
+      value: summary?.newSubscriptions,
+      icon: Users,
       format: "number" as const,
     },
     {
-      label: "Clients",
-      value: summary?.totalClients,
-      icon: UserCheck,
+      label: "Expired Subscriptions",
+      value: summary?.expiredSubscriptions,
+      icon: Users,
       format: "number" as const,
     },
     {
@@ -60,6 +84,7 @@ export function SummaryCards({ summary }: { summary?: Summary }) {
       format: "number" as const,
     },
   ];
+
 
   const formatValue = (val?: number, type?: "currency" | "number") => {
     if (val == null) return "—";
@@ -72,7 +97,7 @@ export function SummaryCards({ summary }: { summary?: Summary }) {
     return new Intl.NumberFormat().format(val);
   };
 
-  const growth = summary?.growthPercent ?? 0;
+  const growth = (summary?.subscriptionGrowthPercent ?? 0) + (summary?.commissionGrowthPercent ?? 0);
   const growthClasses = growth >= 0 ? "text-green-600" : "text-destructive";
 
   return (
