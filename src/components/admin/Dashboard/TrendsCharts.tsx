@@ -28,7 +28,7 @@ export function TrendsChart({ trends }: { trends?: Trend[] }) {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="date" tick={{ fill: "hsl(var(--muted-foreground))" }} />
-                <YAxis yAxisId="left" tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `$${v}`} />
+                <YAxis yAxisId="left" tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `₹${v}`} />
                 <YAxis yAxisId="right" orientation="right" tick={{ fill: "hsl(var(--muted-foreground))" }} />
                 <Tooltip
                   contentStyle={{
@@ -38,7 +38,7 @@ export function TrendsChart({ trends }: { trends?: Trend[] }) {
                     borderRadius: 8,
                   }}
                   formatter={(value: any, name: string) => {
-                    if (name === "revenue") return [`$${value}`, "Revenue"]
+                    if (name === "revenue") return [`₹${value}`, "Revenue"]
                     if (name === "cases") return [value, "Cases"]
                     return [value, name]
                   }}
