@@ -28,7 +28,6 @@ export default function RangeSelector({ value, onChange }: Props) {
           <SelectItem value="7d">Last 7 Days</SelectItem>
           <SelectItem value="30d">Last 30 Days</SelectItem>
           <SelectItem value="this-year">This Year</SelectItem>
-          <SelectItem value="custom">Custom</SelectItem>
         </SelectContent>
       </Select>
     </div>
