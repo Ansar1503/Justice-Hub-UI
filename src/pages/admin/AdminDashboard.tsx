@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useMemo } from "react";
 import RangeSelector from "@/components/admin/Dashboard/RangeSelector";
 import dayjs from "dayjs";
@@ -13,41 +14,76 @@ import { RecentTransactionsTable } from "@/components/admin/Dashboard/RecentTran
 import { RecentDisputesList } from "@/components/admin/Dashboard/RecentDisputes";
 
 export default function AdminDashboard() {
-  const [range, setRange] = useState<"7d" | "30d" | "this-year" | "custom">(
-    "30d"
-  );
+  const [range, setRange] = useState<"7d" | "30d" | "this-year" | "custom">("30d");
+
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
+  const [error, setError] = useState("");
+
+  const handleCustomChange = (field: "start" | "end", value: string) => {
+    if (field === "start") setCustomStart(value);
+    else setCustomEnd(value);
+  };
 
   const { startDate, endDate } = useMemo(() => {
     const now = dayjs();
+
+    if (range === "custom") {
+      if (!customStart || !customEnd) return { startDate: "", endDate: "" };
+
+      if (customStart > customEnd) {
+        setError("Start date cannot be greater than end date");
+        return { startDate: "", endDate: "" };
+      }
+
+      setError("");
+      return {
+        startDate: customStart,
+        endDate: customEnd,
+      };
+    }
+
     if (range === "7d")
       return {
         startDate: now.subtract(7, "day").format("YYYY-MM-DD"),
         endDate: now.format("YYYY-MM-DD"),
       };
+
     if (range === "30d")
       return {
         startDate: now.subtract(30, "day").format("YYYY-MM-DD"),
         endDate: now.format("YYYY-MM-DD"),
       };
+
     if (range === "this-year")
       return {
         startDate: now.startOf("year").format("YYYY-MM-DD"),
         endDate: now.format("YYYY-MM-DD"),
       };
-    return { startDate: "", endDate: "" };
-  }, [range]);
 
-  const { data, isLoading, error } = useAdminDashboard(startDate, endDate);
+    return { startDate: "", endDate: "" };
+  }, [range, customStart, customEnd]);
+
+  const { data, isLoading, error: fetchError } = useAdminDashboard(startDate, endDate);
 
   return (
     <AdminLayout>
       <main className="min-h-dvh bg-muted/30">
         <section className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">
           <Header />
+
           <div className="flex justify-end mb-4">
-            <RangeSelector value={range} onChange={setRange} />
+            <RangeSelector
+              value={range}
+              onChange={setRange}
+              customStart={customStart}
+              customEnd={customEnd}
+              onCustomChange={handleCustomChange}
+              error={error}
+            />
           </div>
-          {error ? (
+
+          {fetchError ? (
             <div className="text-destructive">Failed to load dashboard.</div>
           ) : isLoading ? (
             <Skeleton />
