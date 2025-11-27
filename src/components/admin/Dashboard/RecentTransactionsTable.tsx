@@ -16,7 +16,7 @@ type Row = { id: string; amount: number; status: string; date: string };
 
 export function RecentTransactionsTable({ rows }: { rows?: Row[] }) {
   const data = rows ?? [];
-
+  console.log(data);
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="rounded-lg border bg-card text-card-foreground shadow-sm">
@@ -40,7 +40,7 @@ export function RecentTransactionsTable({ rows }: { rows?: Row[] }) {
                 <TableBody>
                   {data.map((r) => (
                     <TableRow key={r.id}>
-                      <TableCell className="font-medium">{r.id}</TableCell>
+                      <TableCell className="font-medium">{r.id?.slice(0, 8)}</TableCell>
                       <TableCell className="text-right">
                         {new Intl.NumberFormat(undefined, {
                           style: "currency",
