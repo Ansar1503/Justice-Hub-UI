@@ -6,7 +6,6 @@ import {
   UserCheck,
   Percent,
   FolderOpenDot,
-  CircleAlert,
   TrendingUp,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -19,7 +18,6 @@ type Summary = {
   totalRevenue?: number;
   commissionPaid?: number;
   activeCases?: number;
-  disputesOpen?: number;
   growthPercent?: number;
 };
 
@@ -59,12 +57,6 @@ export function SummaryCards({ summary }: { summary?: Summary }) {
       label: "Active Cases",
       value: summary?.activeCases,
       icon: FolderOpenDot,
-      format: "number" as const,
-    },
-    {
-      label: "Disputes Open",
-      value: summary?.disputesOpen,
-      icon: CircleAlert,
       format: "number" as const,
     },
   ];
