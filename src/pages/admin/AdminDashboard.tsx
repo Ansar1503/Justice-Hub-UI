@@ -12,6 +12,7 @@ import { TrendsChart } from "@/components/admin/Dashboard/TrendsCharts";
 import { TopLawyersTable } from "@/components/admin/Dashboard/TopLawyerTable";
 import { RecentTransactionsTable } from "@/components/admin/Dashboard/RecentTransactionsTable";
 import { RecentDisputesList } from "@/components/admin/Dashboard/RecentDisputes";
+import { AdminDownloadReportButton } from "@/components/admin/Dashboard/DownloadReport";
 
 export default function AdminDashboard() {
   const [range, setRange] = useState<"7d" | "30d" | "this-year" | "custom">("30d");
@@ -72,7 +73,9 @@ export default function AdminDashboard() {
         <section className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">
           <Header />
 
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-between mb-4 items-center">
+            <AdminDownloadReportButton startDate={startDate} endDate={endDate} />
+
             <RangeSelector
               value={range}
               onChange={setRange}

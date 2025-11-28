@@ -36,7 +36,7 @@ export function TopLawyersTable({ rows }: { rows?: Row[] }) {
                       <TableCell className="text-right">
                         {new Intl.NumberFormat(undefined, {
                           style: "currency",
-                          currency: "USD",
+                          currency: "INR",
                           maximumFractionDigits: 0,
                         }).format(r.earnings)}
                       </TableCell>
