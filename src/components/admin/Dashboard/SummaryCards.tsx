@@ -97,7 +97,11 @@ export function SummaryCards({ summary }: { summary?: Summary }) {
     return new Intl.NumberFormat().format(val);
   };
 
-  const growth = (summary?.subscriptionGrowthPercent ?? 0) + (summary?.commissionGrowthPercent ?? 0);
+  const rawGrowth =
+    (summary?.subscriptionGrowthPercent ?? 0) +
+    (summary?.commissionGrowthPercent ?? 0);
+
+  const growth = Math.min(rawGrowth, 100);
   const growthClasses = growth >= 0 ? "text-green-600" : "text-destructive";
 
   return (
