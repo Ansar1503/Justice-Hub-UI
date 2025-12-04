@@ -102,7 +102,6 @@ function LoggedInDashboard() {
   return (
     <div className="py-8 md:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Welcome Section */}
         <div className="mb-10 animate-fade-in-up">
           <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
             Welcome back, {user?.name}!
@@ -112,7 +111,6 @@ function LoggedInDashboard() {
           </p>
         </div>
 
-        {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {quickActions.map((action, index) => (
             <button
@@ -133,7 +131,6 @@ function LoggedInDashboard() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
-          {/* Upcoming Appointments */}
           <div className="lg:col-span-2 bg-card rounded-xl shadow-soft border border-border animate-fade-in-up animation-delay-200">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -184,7 +181,6 @@ function LoggedInDashboard() {
             </div>
           </div>
 
-          {/* Featured Lawyers */}
           <div className="bg-card rounded-xl shadow-soft border border-border animate-fade-in-up animation-delay-300">
             <div className="p-6 border-b border-border">
               <div className="flex items-center gap-3">
