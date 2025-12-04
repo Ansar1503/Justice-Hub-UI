@@ -1,31 +1,23 @@
-import { useAppSelector } from "@/store/redux/Hook";
 import Footer from "./layout/Footer";
 import Hero from "./layout/Hero";
 import Navbar from "./layout/Navbar";
+import IntroSection from "@/components/users/Home/IntroSection";
+import FeaturesSection from "@/components/users/Home/FeaturesSection";
+import WhyChooseUs from "@/components/users/Home/WhyChooseUs";
+import PracticeAreas from "@/components/users/Home/PracticalAreas";
+import CTASection from "@/components/users/Home/CTASection";
 function Home() {
-  const { user } = useAppSelector((s) => s.Auth);
   return (
-    <div className="bg-brandCream dark:bg-gray-800">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      {!user?.user_id && <Hero />}
-      <div className="m-10">
-        <div className="m-10">
-          <h1 className="text-stone-500 dark:text-white text-3xl">
-            One Stop Solution to All Legal Needs: Expert Advice, Effortless
-            Solutions.
-          </h1>
-        </div>
-        <div className="m-10 mr-40">
-          <p className="text-stone-400 dark:text-gray-300 mr-96">
-            Justice Hub provides the best online legal consultation and advisory
-            services in India and around the globe. Consult with experienced
-            lawyers, legal experts, and consultants via chat, phone, or video
-            call. Get the best online legal advice and guidance for all your
-            legal matters.
-          </p>
-        </div>
-      </div>
-
+      <>
+        <Hero />
+        <IntroSection />
+        <FeaturesSection />
+        <WhyChooseUs />
+        <PracticeAreas />
+        <CTASection />
+      </>
       <Footer />
     </div>
   );

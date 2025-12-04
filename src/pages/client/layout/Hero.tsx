@@ -8,16 +8,13 @@ function Hero() {
   const { setUserRole } = useContext(AuthContext);
   return (
     <div className="relative w-full h-[450px] md:h-[400px] lg:h-[450px] xl:h-[500px]">
-      {/* Background Image */}
       <img
         src="https://res.cloudinary.com/dcux2pmye/image/upload/v1740412142/Justice_Hub/kg3z2kurgz9ospnh6et8.jpg"
         alt="Legal Consultation"
         className="w-full h-full object-cover"
       />
 
-      {/* Overlay with Two Sections */}
       <div className="absolute inset-0 flex flex-col md:flex-row">
-        {/* Left - Client */}
         <div className="relative w-full md:w-1/2 flex justify-center items-center group px-6 py-8 md:p-12">
           <div className="absolute inset-0 bg-black/50 transition duration-500 group-hover:bg-black/30"></div>
           <div className="z-10 text-white text-center transition duration-500 group-hover:scale-105">
@@ -39,7 +36,6 @@ function Hero() {
           </div>
         </div>
 
-        {/* Right - Lawyer */}
         <div className="relative w-full md:w-1/2 flex justify-center items-center group px-6 py-8 md:p-12">
           <div className="absolute inset-0 bg-black/50 transition duration-500 group-hover:bg-black/30"></div>
           <div className="z-10 text-white text-center transition duration-500 group-hover:scale-105">
@@ -61,8 +57,6 @@ function Hero() {
           </div>
         </div>
       </div>
-
-      {/* Blur Effect on Hover */}
       <div className="absolute inset-0 flex flex-col md:flex-row">
         <div className="w-full md:w-1/2 hover:w-full hover:backdrop-blur-sm md:hover:backdrop-blur-none transition-all duration-500 backdrop-blur-xs cursor-pointer"></div>
         <div className="w-full md:w-1/2 hover:w-full hover:backdrop-blur-sm md:hover:backdrop-blur-none transition-all duration-500 backdrop-blur-xs cursor-pointer"></div>
