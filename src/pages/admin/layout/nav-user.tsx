@@ -1,5 +1,3 @@
-"use client";
-
 import {
   BadgeCheck,
   Bell,
@@ -109,19 +107,18 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-                <div
+              <div
                 className="flex cursor-pointer items-center gap-2 rounded-md p-2 text-xs text-red-500 "
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // dispatch(LogOutAction());
                   dispatch(signOut());
                   navigate("/login");
                 }}
-                >
+              >
                 <LogOut className="h-4 w-4" />
                 Log out
-                </div>
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
