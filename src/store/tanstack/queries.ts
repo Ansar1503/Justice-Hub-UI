@@ -196,7 +196,7 @@ export function useFetchSlotsforClients(id: string, date: Date) {
     queryKey: ["schedule", "slots", id, date],
     queryFn: () => fetchSlotsforClients(id, date),
     retry: 1,
-    enabled: id !== "" && !date,
+    enabled: Boolean(id && date),
   });
 }
 
