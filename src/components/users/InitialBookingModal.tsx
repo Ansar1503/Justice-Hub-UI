@@ -81,9 +81,9 @@ export function BookingModalEnhanced({
     "stripe"
   );
 
-  useEffect(() => {
-    if (date && onDateChange) onDateChange(date);
-  }, [isOpen]);
+  // useEffect(() => {
+  //   if (date && onDateChange) onDateChange(date);
+  // }, [isOpen]);
 
   const today = new Date(new Date().setHours(0, 0, 0, 0));
   const thirtyDaysFromNow = new Date();
