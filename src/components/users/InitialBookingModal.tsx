@@ -374,13 +374,13 @@ export function BookingModalEnhanced({
           {priceDetails && (
             <div className="p-4 rounded-md border dark:border-gray-600 dark:bg-gray-800 mt-4">
               <p className="flex justify-between text-sm mb-2">
-                <span className="text-gray-300">Consultation Fee</span>
-                <span className="text-white">₹{consultationFee}</span>
+                <span className="">Consultation Fee</span>
+                <span className="">₹{consultationFee}</span>
               </p>
 
               {priceDetails.followUpDiscountAmount > 0 && (
                 <p className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-300">Follow-up Discount</span>
+                  <span className="">Follow-up Discount</span>
                   <span className="text-green-400">
                     -₹{priceDetails.followUpDiscountAmount}
                   </span>
@@ -389,7 +389,7 @@ export function BookingModalEnhanced({
 
               {priceDetails.subscriptionDiscountAmount > 0 && (
                 <p className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-300">Subscription Discount</span>
+                  <span className="">Subscription Discount</span>
                   <span className="text-green-400">
                     -₹{priceDetails.subscriptionDiscountAmount}
                   </span>
@@ -398,7 +398,7 @@ export function BookingModalEnhanced({
 
               <hr className="my-2 border-gray-600" />
 
-              <p className="flex justify-between font-semibold text-lg text-white">
+              <p className="flex justify-between font-semibold text-lg">
                 <span>Total Payable</span>
                 <span>₹{priceDetails.amountPayable}</span>
               </p>
