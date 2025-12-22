@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
 import { AuthContext } from "../../../context/AuthContextPovider";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 // import { LogOut } from "@/store/redux/client/ClientSlice";
@@ -24,6 +24,7 @@ function Navbar() {
     dispatch(signOut());
     navigate("/login");
   };
+  const location = useLocation();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -55,12 +56,19 @@ function Navbar() {
               </li>
             )}
             {/* <li className="hover:underline cursor-pointer">Services</li> */}
-            <NavLink to="/client/lawyers">
-              <li className="hover:underline cursor-pointer">Lawyers</li>
-            </NavLink>
-            <NavLink to="/client/blogs">
-              <li className="hover:underline cursor-pointer">Blogs</li>
-            </NavLink>
+            {location.pathname !== "/login" &&
+              location.pathname !== "/signup" &&
+              location.pathname !== "/" && (
+                <>
+                  <NavLink to="/client/lawyers">
+                    <li className="hover:underline cursor-pointer">Lawyers</li>
+                  </NavLink>
+                  <NavLink to="/client/blogs">
+                    <li className="hover:underline cursor-pointer">Blogs</li>
+                  </NavLink>
+                </>
+              )}
+
             {/* <li className="hover:underline cursor-pointer">About Us</li> */}
           </ul>
         </div>
