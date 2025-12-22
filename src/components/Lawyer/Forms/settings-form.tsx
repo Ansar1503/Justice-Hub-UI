@@ -84,9 +84,9 @@ export function SlotSettingsForm() {
   return (
     <form onSubmit={handleSubmit}>
       <CardContent>
-        <div className="bg-gray-900 p-6 rounded-lg space-y-6">
+        <div className="rounded-lg space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="slotDuration" className="text-gray-200">
+            <Label htmlFor="slotDuration" className="">
               Slot Duration
             </Label>
             <Select
@@ -95,11 +95,11 @@ export function SlotSettingsForm() {
             >
               <SelectTrigger
                 id="slotDuration"
-                className="bg-gray-800 border-gray-700 text-white"
+                className=""
               >
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700 text-white">
+              <SelectContent className="">
                 {["15", "30", "45", "60", "90"].map((val) => (
                   <SelectItem key={`slotDuration-${val}`} value={val}>
                     {val} minutes
@@ -110,7 +110,7 @@ export function SlotSettingsForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="maxDaysInAdvance" className="text-gray-200">
+            <Label htmlFor="maxDaysInAdvance" className="">
               Max Days In Advance
             </Label>
             <Select
@@ -119,11 +119,11 @@ export function SlotSettingsForm() {
             >
               <SelectTrigger
                 id="maxDaysInAdvance"
-                className="bg-gray-800 border-gray-700 text-white"
+                className=""
               >
                 <SelectValue placeholder="Select advance notice" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700 text-white">
+              <SelectContent className="">
                 {["15", "30", "45", "60"].map((val) => (
                   <SelectItem key={`maxDaysInAdvance-${val}`} value={val}>
                     {val} days
@@ -140,9 +140,8 @@ export function SlotSettingsForm() {
               onCheckedChange={(checked) =>
                 handleChange("autoConfirm", checked)
               }
-              className="data-[state=checked]:bg-white data-[state=checked]:text-black"
             />
-            <Label htmlFor="autoConfirm" className="ml-2 text-gray-200">
+            <Label htmlFor="autoConfirm" className="ml-2">
               Auto confirm
             </Label>
           </div>
@@ -153,7 +152,7 @@ export function SlotSettingsForm() {
         <Button
           disabled={isPending}
           type="submit"
-          className="w-full bg-gray-200 text-black hover:bg-white"
+          className="w-full"
         >
           {isPending ? "Saving..." : id ? "Next Step" : "Save Settings"}
         </Button>
