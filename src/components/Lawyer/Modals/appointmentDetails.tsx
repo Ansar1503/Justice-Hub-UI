@@ -118,9 +118,9 @@ export default function ClientAppointmentDetailModal({
                   <span className="text-sm font-medium text-green-600 dark:text-green-300">
                     {appointment?.clientData?.name
                       ?.split(" ")
-                      .map((n: string) => n[0].toUpperCase())
-                      .join("")
-                      .slice(0, 2)}
+                      .map((n: string) => n[0]?.toUpperCase())
+                      ?.join("")
+                      ?.slice(0, 2)}
                   </span>
                 </div>
                 <div>
