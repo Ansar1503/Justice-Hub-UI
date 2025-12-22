@@ -51,7 +51,6 @@ export default function LawyerClientAppointmentListing() {
       page: currentPage,
       search: searchTerm,
     });
-  // console.log("appointmentData ----", appointmentData);
   const appointments = appointmentData?.data;
 
   const { mutateAsync: rejectMutation } = useRejectAppointment();
@@ -184,7 +183,6 @@ export default function LawyerClientAppointmentListing() {
           </h1>
         </div>
 
-        {/* Filters and Search */}
         <div className="flex flex-col gap-4 mb-6">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
@@ -256,7 +254,6 @@ export default function LawyerClientAppointmentListing() {
           </div>
         </div>
 
-        {/* Desktop Table View */}
         <div className="hidden lg:block border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full min-w-full">
@@ -407,7 +404,6 @@ export default function LawyerClientAppointmentListing() {
                 className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
               >
                 {" "}
-                {/* Client Info Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <Avatar className="h-10 w-10 border flex-shrink-0">
@@ -438,7 +434,6 @@ export default function LawyerClientAppointmentListing() {
                     View
                   </button>
                 </div>
-                {/* Appointment Details Grid */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <span className="text-gray-500 dark:text-gray-400 text-xs">
@@ -465,7 +460,6 @@ export default function LawyerClientAppointmentListing() {
                     </p>
                   </div>
                 </div>
-                {/* Status and Type Row */}
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                   <div className="flex items-center gap-2">
                     {renderStatusBadge(appointment.status)}
@@ -475,7 +469,6 @@ export default function LawyerClientAppointmentListing() {
                     {appointment.duration} min
                   </div>
                 </div>
-                {/* Phone Number */}
                 {appointment?.clientData?.mobile && (
                   <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
                     <span className="text-xs text-gray-500 dark:text-gray-400">

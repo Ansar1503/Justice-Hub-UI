@@ -338,7 +338,7 @@ export default function OverrideDates() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Calendar Section */}
-        <div className="bg-black text-white rounded-lg p-6">
+        <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold">Select the dates to override</h2>
           </div>
@@ -350,7 +350,7 @@ export default function OverrideDates() {
                 variant="outline"
                 size="icon"
                 onClick={prevMonth}
-                className="bg-transparent border-gray-700 hover:bg-gray-800"
+                className="bg-transparent border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
                 aria-label="Previous month"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -359,7 +359,7 @@ export default function OverrideDates() {
                 variant="outline"
                 size="icon"
                 onClick={nextMonth}
-                className="bg-transparent border-gray-700 hover:bg-gray-800"
+                className="bg-transparent border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
                 aria-label="Next month"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -396,9 +396,21 @@ export default function OverrideDates() {
                     isSelected ? " (selected)" : ""
                   }${isOverridden ? " (overridden)" : ""}`}
                   className={`h-9 w-9 rounded-md flex items-center justify-center relative transition-colors
-                    ${isSelected ? "bg-white text-black" : "hover:bg-gray-800"}
-                    ${isToday(day) ? "bg-gray-800" : ""}
-                    ${isOverridden ? "bg-red-600 hover:bg-red-700" : ""}
+                    ${
+                      isSelected
+                        ? "bg-black text-white dark:bg-white dark:text-black"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
+                    }
+                    ${
+                      isToday(day) && !isSelected
+                        ? "bg-gray-100 dark:bg-gray-800"
+                        : ""
+                    }
+                    ${
+                      isOverridden
+                        ? "bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700"
+                        : ""
+                    }
                     ${isDisabled ? "opacity-30 cursor-not-allowed" : ""}
                   `}
                 >
@@ -416,12 +428,12 @@ export default function OverrideDates() {
           </div>
 
           {selectedDates.length > 0 && (
-            <div className="border-t border-gray-700 pt-4">
-              <p className="text-sm mb-2">
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">
                 Selected: {selectedDates.length} date
                 {selectedDates.length > 1 ? "s" : ""}
               </p>
-              <div className="text-xs text-gray-400 mb-2">
+              <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                 {selectedDates
                   .sort((a, b) => a.getTime() - b.getTime())
                   .map((date) => format(date, "MMM d"))
@@ -429,7 +441,7 @@ export default function OverrideDates() {
               </div>
               <Button
                 onClick={openOverrideDialog}
-                className="w-full bg-white text-black hover:bg-gray-200"
+                className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
               >
                 Set Override for Selected Dates
               </Button>
@@ -449,7 +461,7 @@ export default function OverrideDates() {
           </div>
 
           {allOverrideDates.length === 0 ? (
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
+            <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
               <CardContent className="p-6 text-center">
                 <p className="text-gray-500 dark:text-gray-400">
                   No date overrides added yet
@@ -466,11 +478,11 @@ export default function OverrideDates() {
                 .map((override) => (
                   <Card
                     key={override._id}
-                    className="dark:bg-gray-800 dark:border-gray-700"
+                    className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700"
                   >
                     <CardContent className="p-4 flex justify-between items-start">
                       <div className="flex-1">
-                        <div className="font-medium dark:text-white">
+                        <div className="font-medium text-gray-900 dark:text-white">
                           {format(
                             new Date(override.date),
                             "EEEE, MMMM d, yyyy"
@@ -543,6 +555,7 @@ export default function OverrideDates() {
                 id="unavailable"
                 checked={isUnavailable}
                 onCheckedChange={setIsUnavailable}
+                className="data-[state=checked]:bg-black dark:data-[state=checked]:bg-white"
               />
               <Label htmlFor="unavailable">Mark unavailable (All day)</Label>
             </div>
@@ -559,10 +572,10 @@ export default function OverrideDates() {
                         updateTimeRange(index, "start", value)
                       }
                     >
-                      <SelectTrigger className="w-[120px]">
+                      <SelectTrigger className="w-[120px] bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
                         <SelectValue placeholder="Start time" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                         {timeOptions.map((time) => (
                           <SelectItem key={`start-${time}`} value={time}>
                             {formatTime(time)}
@@ -579,10 +592,10 @@ export default function OverrideDates() {
                         updateTimeRange(index, "end", value)
                       }
                     >
-                      <SelectTrigger className="w-[120px]">
+                      <SelectTrigger className="w-[120px] bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
                         <SelectValue>{formatTime(range.end)}</SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                         {timeOptions.map((time) => (
                           <SelectItem key={`end-${time}`} value={time}>
                             {formatTime(time)}
@@ -631,6 +644,7 @@ export default function OverrideDates() {
               type="button"
               onClick={handleFormSubmit}
               disabled={isSubmitting}
+              className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
             >
               {isSubmitting
                 ? "Adding..."

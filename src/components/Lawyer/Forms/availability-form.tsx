@@ -279,7 +279,7 @@ export function AvailabilityForm() {
                   id={`${day.key}-toggle`}
                   checked={availability[day.key].enabled}
                   onCheckedChange={() => toggleDay(day.key)}
-                  className="data-[state=checked]:bg-white data-[state=checked]:text-black"
+                  className="data-[state=checked]:bg-black dark:data-[state=checked]:bg-white"
                 />
                 <Label
                   htmlFor={`${day.key}-toggle`}
@@ -299,10 +299,16 @@ export function AvailabilityForm() {
                           updateTimeSlot(day.key, index, "start", value)
                         }
                       >
-                        <SelectTrigger className="w-[120px] bg-gray-800 border-gray-700">
+                        <SelectTrigger
+                          className="
+  w-[120px]
+  bg-white text-gray-900 border-gray-300
+  dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700
+"
+                        >
                           <SelectValue>{formatTime(slot.start)}</SelectValue>
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-gray-700">
+                        <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                           {timeOptions.map((time) => (
                             <SelectItem key={time} value={time}>
                               {formatTime(time)}
@@ -319,10 +325,16 @@ export function AvailabilityForm() {
                           updateTimeSlot(day.key, index, "end", value)
                         }
                       >
-                        <SelectTrigger className="w-[120px] bg-gray-800 border-gray-700">
+                        <SelectTrigger
+                          className="
+  w-[120px]
+  bg-white text-gray-900 border-gray-300
+  dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700
+"
+                        >
                           <SelectValue>{formatTime(slot.end)}</SelectValue>
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-gray-700">
+                        <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                           {timeOptions.map((time) => (
                             <SelectItem key={time} value={time}>
                               {formatTime(time)}
@@ -355,7 +367,7 @@ export function AvailabilityForm() {
                         size="icon"
                         onClick={() => removeTimeSlot(day.key, index)}
                         disabled={availability[day.key].timeSlots.length <= 1}
-                        className="text-red-500 hover:text-red-400 hover:bg-red-900/20"
+                        className="text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:text-red-400 dark:hover:bg-red-900/20"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -374,13 +386,13 @@ export function AvailabilityForm() {
               />
 
               <div
-                className="fixed bg-gray-900 p-6 rounded-lg w-80 shadow-xl border border-gray-700 z-50"
+                className="fixed bg-white dark:bg-gray-900 p-6 rounded-lg w-80 shadow-xl border border-gray-200 dark:border-gray-700 z-50"
                 style={{
                   top: `${modalPosition.top}px`,
                   left: `${modalPosition.left}px`,
                 }}
               >
-                <h3 className="text-lg font-medium mb-4 text-white">
+                <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">
                   COPY TIMES TO
                 </h3>
 
@@ -389,11 +401,14 @@ export function AvailabilityForm() {
                     <input
                       type="checkbox"
                       id="select-all"
-                      className="rounded bg-gray-800 border-gray-700"
+                      className="rounded bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-700"
                       onChange={handleSelectAllDays}
                       checked={selectedDays.length === days.length - 1}
                     />
-                    <label htmlFor="select-all" className="ml-2 text-gray-200">
+                    <label
+                      htmlFor="select-all"
+                      className="ml-2 text-gray-900 dark:text-gray-200"
+                    >
                       Select All
                     </label>
                   </div>
@@ -405,13 +420,13 @@ export function AvailabilityForm() {
                           <input
                             type="checkbox"
                             id={`copy-to-${day.key}`}
-                            className="rounded bg-gray-800 border-gray-700"
+                            className="rounded bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-700"
                             checked={selectedDays.includes(day.key)}
                             onChange={() => toggleDaySelection(day.key)}
                           />
                           <label
                             htmlFor={`copy-to-${day.key}`}
-                            className="ml-2 text-gray-200"
+                            className="ml-2 text-gray-900 dark:text-gray-200"
                           >
                             {day.label}
                           </label>
@@ -428,7 +443,11 @@ export function AvailabilityForm() {
                   >
                     Cancel
                   </Button>
-                  <Button type="button" onClick={copyTimesToSelectedDays}>
+                  <Button
+                    type="button"
+                    onClick={copyTimesToSelectedDays}
+                    className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                  >
                     Apply
                   </Button>
                 </div>
@@ -441,7 +460,7 @@ export function AvailabilityForm() {
         <Button
           disabled={isPending}
           type="submit"
-          className="w-full bg-gray-200 text-black hover:bg-white"
+          className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
         >
           {isPending ? "saving..." : id ? "Complete" : "Save"}
         </Button>
