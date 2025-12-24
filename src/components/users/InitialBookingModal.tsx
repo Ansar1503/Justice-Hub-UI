@@ -119,7 +119,9 @@ export function BookingModalEnhanced({
       setPriceDetails(data);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.error || "Failed to fetch price details."
+        typeof error.response?.data?.error === "string"
+          ? error.response?.data?.error
+          : "Failed to fetch price details."
       );
     } finally {
       setIsPriceLoading(false);
@@ -167,7 +169,11 @@ export function BookingModalEnhanced({
       const sessionId = response?.data?.id;
       stripe?.redirectToCheckout({ sessionId });
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Booking failed! Try again.");
+      toast.error(
+        typeof error.response?.data?.error === "string"
+          ? error.response?.data?.error
+          : "Booking failed! Try again."
+      );
     } finally {
       onSubmitEnd();
     }
@@ -214,7 +220,11 @@ export function BookingModalEnhanced({
       navigate("/client/appointments");
     } catch (error: any) {
       console.log(error);
-      toast.error(error.response?.data?.error || "Booking failed! Try again.");
+      toast.error(
+        typeof error.response?.data?.error === "string"
+          ? error.response?.data?.error
+          : "Booking failed! Try again."
+      );
     } finally {
       onSubmitEnd();
     }

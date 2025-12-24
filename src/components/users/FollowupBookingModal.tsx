@@ -128,7 +128,11 @@ export function FollowUpBookingModalEnhanced({
 
       setPriceDetails(data);
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to get amount.");
+      toast.error(
+        typeof error.response?.data?.error === "string"
+          ? error.response?.data?.error
+          : "Failed to get amount."
+      );
     } finally {
       setIsPriceLoading(false);
     }
@@ -161,7 +165,11 @@ export function FollowUpBookingModalEnhanced({
       stripe?.redirectToCheckout({ sessionId: response.data.id });
     } catch (e: any) {
       console.log(e);
-      toast.error(e.response?.data?.error || "Stripe payment failed.");
+      toast.error(
+        typeof e.response?.data?.error === "string"
+          ? e.response?.data?.error
+          : "Stripe payment failed."
+      );
     } finally {
       onSubmitEnd();
     }
@@ -197,7 +205,11 @@ export function FollowUpBookingModalEnhanced({
       navigate("/client/appointments");
     } catch (e: any) {
       console.log(e);
-      toast.error(e.response?.data?.error || "Wallet payment failed.");
+      toast.error(
+        typeof e.response?.data?.error === "string"
+          ? e.response?.data?.error
+          : "Wallet payment failed."
+      );
     } finally {
       onSubmitEnd();
     }
