@@ -140,7 +140,7 @@ export default function LawyerProfile() {
 
       <div className={isSubmitting ? "blur-sm pointer-events-none" : ""}>
         {(isError || !lawyerDetails) && !isLoading && (
-          <div className="absolute inset-0 z-50 bg-black bg-opacity-100 flex justify-center items-center">
+          <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
             <LawyerNotAccessible />
           </div>
         )}
