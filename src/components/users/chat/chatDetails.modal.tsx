@@ -119,6 +119,7 @@ ChatDetailsModalProps) {
   };
 
   const formatDateTime = (date: Date, time: string) => {
+    if (!date) return "";
     const sessionDate = new Date(date);
     const [hours, minutes] = time.split(":").map(Number);
     sessionDate.setHours(hours, minutes, 0, 0);
@@ -348,8 +349,8 @@ ChatDetailsModalProps) {
                     <div className="text-sm font-medium">Scheduled</div>
                     <div className="text-xs text-muted-foreground">
                       {formatDateTime(
-                        new Date(appointmentDetails.date),
-                        appointmentDetails.time
+                        new Date(appointmentDetails?.date),
+                        appointmentDetails?.time
                       )}
                     </div>
                   </div>
@@ -526,7 +527,7 @@ ChatDetailsModalProps) {
                       <Phone className="h-4 w-4 mr-2" />
                       Start Voice Call
                     </Button> */}
-{/* 
+                  {/* 
                   <Button
                     variant="outline"
                     className="w-full justify-start bg-transparent"
