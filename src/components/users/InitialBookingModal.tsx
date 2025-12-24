@@ -378,7 +378,20 @@ export function BookingModalEnhanced({
                 !title.trim()
               }
             >
-              {isPriceLoading ? "Calculating..." : "Book Now"}
+              {isPriceLoading ? "Calculating..." : "Book Now"}{" "}
+              {!lawyerAvailablity
+                ? "(lawyer not available)"
+                : !date
+                ? "(select a date)"
+                : !timeSlot
+                ? "(select a time)"
+                : !reason.trim()
+                ? "(add a reason)"
+                : !caseType
+                ? "(select a case type)"
+                : !title.trim()
+                ? "(add a title)"
+                : ""}
             </Button>
           )}
 

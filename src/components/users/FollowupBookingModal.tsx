@@ -347,7 +347,18 @@ export function FollowUpBookingModalEnhanced({
                 !lawyerAvailablity
               }
             >
-              {isPriceLoading ? "Calculating..." : "Book Now"}
+              {isPriceLoading ? "Calculating..." : "Book Now"}{" "}
+              {!selectedCase
+                ? "(select a case)"
+                : !date
+                ? "(select a date)"
+                : !timeSlot
+                ? "(select a time)"
+                : !reason.trim()
+                ? "(add a reason)"
+                : !lawyerAvailablity
+                ? "(lawyer not available)"
+                : ""}
             </Button>
           )}
 
