@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Star } from "lucide-react";
 import { useAddReview } from "@/store/tanstack/mutations";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 interface ReviewFormProps {
   lawyer_id: string;

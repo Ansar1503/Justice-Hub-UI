@@ -36,7 +36,7 @@
 //   useSpecializationMutation,
 // } from "@/store/tanstack/mutations/SpecializationMutation";
 // import Confirmation from "@/components/Confirmation";
-// import toast from "react-hot-toast";
+// import { toast } from "sonner";
 // import { SpecializationsType } from "@/types/types/SpecializationType";
 
 // export default function Specializations() {

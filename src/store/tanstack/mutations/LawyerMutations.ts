@@ -3,7 +3,7 @@ import { store } from "@/store/redux/store";
 import { lawyerProfessionalDetailsResponse } from "@/types/types/LawyerProfessionalDetailsType";
 import { addLawyerProfessionalDetails } from "@/utils/api/services/LawyerServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import toast from "react-hot-toast";
+
 import { toast } from "sonner";
 
 export function useProfessionalDetailsUpdateMutation() {

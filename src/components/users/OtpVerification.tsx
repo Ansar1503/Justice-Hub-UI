@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 import { motion } from "framer-motion";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 function OtpVerification() {
   const [otp, setOtp] = useState(Array(6).fill(""));

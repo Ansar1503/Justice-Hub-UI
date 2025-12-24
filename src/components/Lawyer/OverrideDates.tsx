@@ -34,7 +34,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import type {
   OverrideDate,
   OverrideDateResponse,

@@ -12,7 +12,7 @@ import { useMemo, useState } from "react";
 import { PracticeAreaType } from "@/types/types/PracticeAreaType";
 import { useFetchAllSpecializations } from "@/store/tanstack/Queries/SpecializationQueries";
 import { SelectComponent } from "@/components/SelectComponent";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {
   useAddPracticeAreasMutation,
   useDeletePracticeAreaMutation,

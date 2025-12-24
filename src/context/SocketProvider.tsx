@@ -11,7 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { Socket } from "socket.io-client";
 
 // context/SocketContext.tsx

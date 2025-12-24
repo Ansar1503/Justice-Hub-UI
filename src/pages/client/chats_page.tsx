@@ -16,7 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { disconnectSocket, getSocket } from "@/utils/socket/socket";
 import { refreshTokenRequest } from "@/utils/api/services/UserServices";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { SocketEvents } from "@/types/enums/socket";
 import { NotificationType } from "@/types/types/Notification";
 import { useParams } from "react-router-dom";

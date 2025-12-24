@@ -35,7 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@radix-ui/react-progress";
 import { useRef, useState, useCallback, useMemo } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import {
   useDocumentUpdateMutation,
   useRemoveFile,

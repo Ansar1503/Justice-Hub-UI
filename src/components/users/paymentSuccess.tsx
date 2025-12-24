@@ -8,23 +8,17 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import {
-  CheckCircle,
-  Calendar,
-  Clock,
-  CreditCard,
-
-} from "lucide-react";
+import { CheckCircle, Calendar, Clock, CreditCard } from "lucide-react";
 import { useEffect, useState } from "react";
 import axiosinstance from "@/utils/api/axios/axios.instance";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { store } from "@/store/redux/store";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
 export default function Component() {
   const { token } = store.getState().Auth;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,14 +40,13 @@ export default function Component() {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((data) => {
-          console.log("reciedfsvasdn", data.data);
-          const response = data?.data
+          const response = data?.data;
           setPaymentDetails({
-            amount:response?.amount,
-            lawyerName:response?.lawyer,
-            date:response?.date,
-            time:response?.slot,
-            sessionId:sessionId,
+            amount: response?.amount,
+            lawyerName: response?.lawyer,
+            date: response?.date,
+            time: response?.slot,
+            sessionId: sessionId,
           });
         })
         .catch((error: any) => {
@@ -85,7 +78,7 @@ export default function Component() {
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-600">Lawyer</span>
               <span className="text-sm font-semibold">
-                {paymentDetails.lawyerName|| "N/A"}
+                {paymentDetails.lawyerName || "N/A"}
               </span>
             </div>
 
@@ -123,7 +116,7 @@ export default function Component() {
                 </span>
               </div>
               <Badge variant="secondary" className="text-lg font-bold">
-                ₹ {paymentDetails.amount|| "N/A"}
+                ₹ {paymentDetails.amount || "N/A"}
               </Badge>
             </div>
 
@@ -167,9 +160,14 @@ export default function Component() {
               Go to Home
             </Button>
 
-            <Button onClick={()=>{
+            <Button
+              onClick={() => {
                 navigate("/client/appointments");
-            }} className="w-full">Continue to Dashboard</Button>
+              }}
+              className="w-full"
+            >
+              Continue to Dashboard
+            </Button>
           </div>
 
           {/* <div className="text-center text-xs text-gray-500 pt-4">

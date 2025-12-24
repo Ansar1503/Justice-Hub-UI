@@ -21,7 +21,6 @@ import {
 import { loadStripe } from "@stripe/stripe-js";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 import { store } from "@/store/redux/store";
-import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAvailabilityData } from "../../hooks/useavailabilt";
 import { EnhancedAvailabilityCalendar } from "./Calendar";
@@ -30,6 +29,7 @@ import type { Casetype } from "@/types/types/Case";
 import type { CaseTypestype } from "@/types/types/CaseType";
 import { FetchAmountPayable } from "@/utils/api/services/clientServices";
 import { slotSettings } from "@/types/types/SlotTypes";
+import { toast } from "sonner";
 
 interface FollowUpBookingModalEnhancedProps {
   caseTypes: CaseTypestype[];
@@ -160,6 +160,7 @@ export function FollowUpBookingModalEnhanced({
 
       stripe?.redirectToCheckout({ sessionId: response.data.id });
     } catch (e: any) {
+      console.log(e);
       toast.error(e.response?.data?.error || "Stripe payment failed.");
     } finally {
       onSubmitEnd();
@@ -195,6 +196,7 @@ export function FollowUpBookingModalEnhanced({
       toast.success("Follow-up booked successfully!");
       navigate("/client/appointments");
     } catch (e: any) {
+      console.log(e);
       toast.error(e.response?.data?.error || "Wallet payment failed.");
     } finally {
       onSubmitEnd();

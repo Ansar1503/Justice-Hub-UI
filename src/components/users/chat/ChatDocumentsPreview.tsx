@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 interface ChatDocumentsPreviewProps {
   isOpen: boolean;

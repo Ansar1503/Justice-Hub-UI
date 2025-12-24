@@ -35,7 +35,7 @@ import {
 } from "@/types/types/LoginResponseTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { Review } from "@/types/types/Review";
 import { FetchLawyerResponseType } from "@/types/types/LawyerTypes";
 

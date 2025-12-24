@@ -14,7 +14,7 @@ import { SpecializationsType } from "@/types/types/SpecializationType";
 import { useFetchAllSpecializations } from "@/store/tanstack/Queries/SpecializationQueries";
 import { SelectComponent } from "@/components/SelectComponent";
 import PaginationComponent from "@/components/pagination";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {
   useDeleteSpecialization,
   useSpecializationMutation,

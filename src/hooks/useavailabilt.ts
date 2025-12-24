@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosinstance from "@/utils/api/axios/axios.instance";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 interface TimeRange {
   start: string;

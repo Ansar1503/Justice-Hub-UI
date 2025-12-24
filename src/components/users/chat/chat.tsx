@@ -40,7 +40,7 @@ import moment from "moment-timezone";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import ChatDetailsModal from "./chatDetails.modal";
 import ChatDocumentsPreview from "./ChatDocumentsPreview";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { sendFiles } from "@/utils/api/services/Chat";
 
 export type FileWithProgress = {

@@ -22,7 +22,7 @@ import type { CaseTypestype } from "@/types/types/CaseType";
 import { loadStripe } from "@stripe/stripe-js";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 import { store } from "@/store/redux/store";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { EnhancedAvailabilityCalendar } from "./Calendar";
 import { useAvailabilityData } from "../../hooks/useavailabilt";
@@ -71,12 +71,12 @@ export function BookingModalEnhanced({
     subscriptionDiscountAmount: number;
     followUpDiscountAmount: number;
   }>(null);
-  
+
   const [isPriceLoading, setIsPriceLoading] = useState(false);
-  
+
   const { data: availabilityData, isLoading: isLoadingAvailability } =
-  useAvailabilityData(lawyerId, currentMonth);
-  
+    useAvailabilityData(lawyerId, currentMonth);
+
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "stripe">(
     "stripe"
   );
@@ -213,6 +213,7 @@ export function BookingModalEnhanced({
       toast.success("Booking successful! Paid from wallet.");
       navigate("/client/appointments");
     } catch (error: any) {
+      console.log(error);
       toast.error(error.response?.data?.error || "Booking failed! Try again.");
     } finally {
       onSubmitEnd();

@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { store } from "@/store/redux/store";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import {
   useDeleteReview,
   useReportReview,

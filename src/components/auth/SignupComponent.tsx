@@ -6,7 +6,7 @@ import { AuthContext } from "../../context/AuthContextPovider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { validateSignupField } from "../../utils/validations/SignupFormValidation";
 import axiosinstance from "../../utils/api/axios/axios.instance";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 // import { useGoogleLogin } from "@react-oauth/google";
 // import { Button } from "../ui/button";
 // import { useGoogleSignupMutation } from "@/store/tanstack/mutations";

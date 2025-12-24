@@ -11,7 +11,7 @@ import { ChatDisputesData, Disputes } from "@/types/types/Disputes";
 import { AlertTriangle, Flag, Trash2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBlockUser } from "@/store/tanstack/mutations";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useUpdateDisputeStatus } from "@/store/tanstack/mutations/DisputesMutation";
 import { useContext, useState } from "react";
 import { SocketContext } from "@/context/SocketProvider";

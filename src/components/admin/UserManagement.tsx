@@ -36,10 +36,10 @@ import {
 import { MoreHorizontal, Check, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserDetailsModal } from "@/components/admin/Modals/UserDetails.Modal";
-import { toast } from "react-toastify";
 import { Paginations } from "../ui/custom/Pagination";
 import { useBlockUser } from "@/store/tanstack/mutations";
 import SearchComponent from "../SearchComponent";
+import { toast } from "sonner";
 
 export function UserManagement() {
   const [activeTab, setActiveTab] = useState<"client" | "lawyer">("client");
