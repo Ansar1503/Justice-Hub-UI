@@ -40,8 +40,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("socket disconnected");
     });
     s.on(SocketEvents.CONNECTED_ERROR, (err: any) => {
-      toast.error(err);
-
       console.log("Socket connection error:", err);
       if (err?.message == "Token expired") {
         refreshTokenRequest();
