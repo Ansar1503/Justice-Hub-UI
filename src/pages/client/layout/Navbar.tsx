@@ -47,14 +47,14 @@ function Navbar() {
         {/* Desktop Menu */}
         <div id="properties" className="hidden md:flex gap-8 text-lg">
           <ul className="flex gap-8">
-            {!user && (
+            {/* {!user && (
               <li
                 className="hover:underline cursor-pointer"
                 onClick={() => navigate("/")}
               >
                 Home
               </li>
-            )}
+            )} */}
             {/* <li className="hover:underline cursor-pointer">Services</li> */}
             {location.pathname !== "/login" &&
               location.pathname !== "/signup" &&

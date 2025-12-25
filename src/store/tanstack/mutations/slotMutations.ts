@@ -23,8 +23,7 @@ export function UpdateScheduleSettingsMutation() {
   >({
     mutationFn: (payload: slotSettings) => updateScheduleSettings(payload),
     onSuccess: (data) => {
-      toast.success(data.message);
-      console.log("data", data);
+      toast.success("slot settings updated");
       queryClient.setQueryData(["schedule", "settings"], data.data);
     },
     onError: (error: any) => {
@@ -46,7 +45,7 @@ export function useUpdateAvailableSlots() {
   >({
     mutationFn: (payload: Availability) => updateAvailableSlots(payload),
     onSuccess: (data) => {
-      toast.success(data.message);
+      toast.success("availability updated");
       queryClient.setQueryData(["schedule", "availability"], data.data);
     },
     onError: (error: any) => {
@@ -68,7 +67,7 @@ export function useAddOverrideSlots() {
   >({
     mutationFn: (payload: OverrideDate[]) => addOverrideSlots(payload),
     onSuccess: (data) => {
-      toast.success(data.message);
+      toast.success("override dates added");
       queryClient.setQueryData(["schedule", "overrides"], data.data);
     },
     onError: (error: any) => {
@@ -90,7 +89,7 @@ export function useDeleteOverrideSlot() {
   >({
     mutationFn: (payload) => removeOverrideSlot(payload),
     onSuccess: (data) => {
-      toast.success(data.message);
+      toast.success("override dates deleted");
       queryClient.setQueryData(["schedule", "overrides"], data.data);
     },
     onError: (error: any) => {
