@@ -17,7 +17,7 @@ import {
 
 export function useInfiniteFetchChatforClient(search: string) {
   return useInfiniteQuery({
-    queryKey: ["client", "chatsessions"],
+    queryKey: ["client", "chatsessions",search],
     queryFn: ({ pageParam }) => fetchChatsForClientApi(pageParam, search),
     initialPageParam: 1,
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
