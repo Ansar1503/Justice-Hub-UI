@@ -297,7 +297,7 @@ export default function SessionsListing() {
               value={sortBy}
               onChange={(e) => {
                 setSortBy(e.target.value as SortField);
-                setSortOrder((s) => (s === "asc" ? "desc" : "asc"));
+                setSortOrder("asc");
                 setCurrentPage(1);
               }}
             >
