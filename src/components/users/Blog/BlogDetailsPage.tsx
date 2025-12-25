@@ -181,7 +181,7 @@ export function BlogDetailPage() {
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {blog.relatedBlogs?.map((relatedBlog) => (
-                <NavLink key={relatedBlog.id} to={`/blog/${relatedBlog.id}`}>
+                <NavLink key={relatedBlog.id} to={`/client/blogs/${relatedBlog.id}`}>
                   <BlogCard blog={relatedBlog} />
                 </NavLink>
               ))}

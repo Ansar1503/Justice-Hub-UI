@@ -42,10 +42,10 @@ export function BlogListingPage() {
               Expert Legal Insights
             </span>
           </div>
-          <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="text-5xl font-bold    mb-4 tracking-tight">
             Legal Knowledge Hub
           </h1>
-          <p className="text-xl text-white/80 max-w-2xl leading-relaxed">
+          <p className="text-xl  max-w-2xl leading-relaxed">
             Stay informed with expert articles on law, business compliance, and
             industry best practices
           </p>
