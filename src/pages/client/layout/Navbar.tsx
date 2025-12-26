@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
 import { AuthContext } from "../../../context/AuthContextPovider";
@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 // import { LogOut } from "@/store/redux/client/ClientSlice";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
 import NotificationComponent from "@/components/NotificationPopover";
+import { useFetchClientData } from "@/store/tanstack/queries";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -24,12 +25,16 @@ function Navbar() {
     dispatch(signOut());
     navigate("/login");
   };
+  const { data: clientData } = useFetchClientData();
+  useEffect(() => {
+    if (clientData && clientData.is_blocked) {
+      handleLogout();
+    }
+  }, [clientData]);
   const location = useLocation();
-
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-
   return (
     <nav
       className={`p-4 transition-all duration-300 ${

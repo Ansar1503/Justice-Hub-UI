@@ -50,7 +50,10 @@ export function useLoginMutation() {
       dispatch(setUser(data.user));
       dispatch(setToken(data.accesstoken));
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+        exact: false,
+      });
       navigate(`/${data.user.role}/`);
     },
     onError: (error: any) => {

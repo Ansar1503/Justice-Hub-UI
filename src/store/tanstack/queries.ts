@@ -70,9 +70,9 @@ export function useFetchClientData() {
     queryKey: ["user", user?.user_id],
     queryFn: fetchClientData,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    refetchOnReconnect: true,
     staleTime: 1000 * 60 * 5,
-    retry: 1,
+    retry: 0,
     enabled:
       user && user?.role !== "admin" && user.user_id != null ? true : false,
   });

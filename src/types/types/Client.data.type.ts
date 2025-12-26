@@ -13,6 +13,7 @@ export type fetchClientDataType = {
   gender?: string;
   profile_image?: string;
   is_verified: boolean;
+  is_blocked: boolean;
   address: {
     city: string;
     locality: string;
