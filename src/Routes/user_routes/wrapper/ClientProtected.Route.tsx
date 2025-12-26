@@ -3,8 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 
 function ProtectedRoute() {
   const userData = useAppSelector((state) => state.Auth.user);
-  console.log("user",userData)
-  if (!userData) {
+  if (!userData || userData.is_blocked) {
     return <Navigate to="/login" />;
   }
   switch (userData.role) {
