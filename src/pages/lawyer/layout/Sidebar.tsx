@@ -41,7 +41,7 @@ export default function Sidebar() {
     { path: `/${user?.role}/sessions`, label: "Sessions", icon: Calendar1Icon },
     {
       path: `/${user?.role}/chats`,
-      label: "Sessions",
+      label: "Chats",
       icon: IoChatbubblesOutline,
     },
     {
