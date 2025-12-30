@@ -133,7 +133,7 @@ function ChatsPage() {
         if (data?.success && data.updatedChat) {
           // console.log("data,dat", data);
           queryClient.setQueryData(
-            ["client", "chatsessions"],
+            ["client", "chatsessions", search],
             (oldData: any) => {
               if (!oldData) return oldData;
 
@@ -213,37 +213,40 @@ function ChatsPage() {
             };
           }
         );
-        queryClient.setQueryData(["client", "chatsessions"], (oldData: any) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            pages: oldData?.pages?.map((page: any) => {
-              // console.log("pages.data", page.data);
-              return {
-                ...page,
-                data: page.data?.map((session: any) => {
-                  // console.log("sessiondi", session._id);
-                  // console.log("lastmessage", data.lastMessage);
-                  if (!data.lastMessage) {
-                    return {
-                      ...session,
-                      lastMessage: null,
-                    };
-                  }
-                  if (session._id === data.lastMessage?.session_id) {
-                    // console.log("sessssion,", session);
-                    // console.log("new sessio ndata", data);
-                    return {
-                      ...session,
-                      lastMessage: data?.lastMessage,
-                    };
-                  }
-                  return session;
-                }),
-              };
-            }),
-          };
-        });
+        queryClient.setQueryData(
+          ["client", "chatsessions", search],
+          (oldData: any) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              pages: oldData?.pages?.map((page: any) => {
+                // console.log("pages.data", page.data);
+                return {
+                  ...page,
+                  data: page.data?.map((session: any) => {
+                    // console.log("sessiondi", session._id);
+                    // console.log("lastmessage", data.lastMessage);
+                    if (!data.lastMessage) {
+                      return {
+                        ...session,
+                        lastMessage: null,
+                      };
+                    }
+                    if (session._id === data.lastMessage?.session_id) {
+                      // console.log("sessssion,", session);
+                      // console.log("new sessio ndata", data);
+                      return {
+                        ...session,
+                        lastMessage: data?.lastMessage,
+                      };
+                    }
+                    return session;
+                  }),
+                };
+              }),
+            };
+          }
+        );
         setUnreadCounts((prev) => ({
           ...prev,
           [data?.messageId || ""]: 0,
@@ -258,21 +261,24 @@ function ChatsPage() {
       console.log("Socket error:", err);
     });
     s.on(SocketEvents.CHANGE_CHAT_NAME_EVENT, (data: any) => {
-      queryClient.setQueryData(["client", "chatsessions"], (oldData: any) => {
-        if (!oldData) return oldData;
+      queryClient.setQueryData(
+        ["client", "chatsessions", search],
+        (oldData: any) => {
+          if (!oldData) return oldData;
 
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            data: page.data.map((session: any) =>
-              session._id === data._id
-                ? { ...session, name: data?.name }
-                : session
-            ),
-          })),
-        };
-      });
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => ({
+              ...page,
+              data: page.data.map((session: any) =>
+                session._id === data._id
+                  ? { ...session, name: data?.name }
+                  : session
+              ),
+            })),
+          };
+        }
+      );
       setSelectedSession((prev) =>
         prev && prev._id === data?._id ? { ...prev, name: data?.name } : prev
       );
@@ -302,7 +308,7 @@ function ChatsPage() {
           }
         );
         queryClient.setQueryData(
-          ["client", "chatsessions"],
+          ["client", "chatsessions", search],
           (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
             // console.log("newMessage", newMessage);
             if (!oldData) return oldData;
@@ -445,29 +451,43 @@ function ChatsPage() {
             }
           );
           queryClient.setQueryData(
-            ["client", "chatsessions"],
+            ["client", "chatsessions", search],
             (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
               if (!oldData) return oldData;
+
+              const isCurrentSession =
+                selectedSessionRef.current?._id === newMessage?.session_id;
 
               return {
                 ...oldData,
                 pages: oldData.pages.map((page) => {
-                  // console.log("afterOldData Page", page);
+                  if (!page?.data) return page;
+
+                  const updatedChat = page.data.find(
+                    (chat) => chat._id === newMessage?.session_id
+                  );
+                  if (!updatedChat) return page;
+                  const updatedChatWithMessage = {
+                    ...updatedChat,
+                    lastMessage: newMessage,
+                    updatedAt: new Date().toISOString(),
+                  };
+                  if (!isCurrentSession) {
+                    return {
+                      ...page,
+                      data: page.data.map((chat) =>
+                        chat._id === newMessage.session_id
+                          ? updatedChatWithMessage
+                          : chat
+                      ),
+                    };
+                  }
+                  const remainingChats = page.data.filter(
+                    (chat) => chat._id !== newMessage.session_id
+                  );
                   return {
                     ...page,
-                    data: page?.data?.map((data) => {
-                      if (data?._id == newMessage?.session_id) {
-                        return {
-                          ...data,
-                          lastMessage: newMessage,
-                          updatedAt: new Date().toString(),
-                        };
-                      } else {
-                        return {
-                          ...data,
-                        };
-                      }
-                    }),
+                    data: [updatedChatWithMessage, ...remainingChats],
                   };
                 }),
               };
