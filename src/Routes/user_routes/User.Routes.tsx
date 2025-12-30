@@ -11,6 +11,7 @@ import EmailverificationError from "@/pages/errors/EmailverificationError";
 import Emailverificationsuccesspage from "@/pages/client/Emailverificationsuccesspage";
 import OtpPage from "@/pages/client/OtpPage";
 import ForgotPasswordPage from "@/pages/client/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/client/ResetPasswordPage";
 
 function UserRoutes() {
   return (
@@ -20,6 +21,7 @@ function UserRoutes() {
         <Route path="/signup" element={<UserSignup />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/otp" element={<OtpPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/email-validation-error"
           element={<EmailverificationError />}
