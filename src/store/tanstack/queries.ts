@@ -1,4 +1,5 @@
 import {
+  FetchAllPayments,
   FetchClientDashboardData,
   fetchClientData,
   fetchLawyerDetails,
@@ -63,6 +64,10 @@ import {
 } from "@/types/types/LawyerTypes";
 import { FrontendAdminDashboard } from "@/types/types/AdminDashboardType";
 import axiosinstance from "@/utils/api/axios/axios.instance";
+import {
+  PaymentBaseType,
+  PaymentfetchPayload,
+} from "@/types/types/PaymentType";
 
 export function useFetchClientData() {
   const { user } = store.getState().Auth;
@@ -400,5 +405,20 @@ export function useAdminDashboard(startDate?: string, endDate?: string) {
       return res.data;
     },
     staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useFetchAllPayments(payload: PaymentfetchPayload) {
+  return useQuery<{
+    data: PaymentBaseType[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }>({
+    queryKey: ["client", "payments", payload],
+    queryFn: () => FetchAllPayments(payload),
+    retry: 1,
+    enabled: payload?.page ? true : false,
+    staleTime: 1000 * 60 * 5,
   });
 }

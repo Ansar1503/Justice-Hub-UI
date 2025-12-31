@@ -36,6 +36,7 @@ export const ClientRoutes = {
   profile: "/profile",
   Basic: "/basic",
   dashboard: "/dashboard",
+  payments: "/payments",
 };
 
 export const SpecializationRoutes = {

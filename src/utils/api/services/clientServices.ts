@@ -18,6 +18,7 @@ import {
   profileQueries,
 } from "@/utils/constants/RouteConstants";
 import { Appointment } from "@/types/types/AppointmentsType";
+import { PaymentfetchPayload } from "@/types/types/PaymentType";
 
 export async function fetchClientData() {
   const response = await axiosinstance.get(`/api/client/profile`);
@@ -285,6 +286,16 @@ export async function reportReview(payload: {
 export async function FetchClientDashboardData() {
   const response = await axiosinstance.get(
     CommonQueies.api + ClientRoutes.base + ClientRoutes.dashboard
+  );
+  return response.data;
+}
+
+export async function FetchAllPayments(params: PaymentfetchPayload) {
+  const response = await axiosinstance.get(
+    CommonQueies.api + ClientRoutes.base + ClientRoutes.payments,
+    {
+      params,
+    }
   );
   return response.data;
 }

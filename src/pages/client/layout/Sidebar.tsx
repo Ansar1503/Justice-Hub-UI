@@ -1,4 +1,5 @@
 import {
+  Bitcoin,
   Calendar,
   Calendar1,
   CalendarSync,
@@ -41,6 +42,11 @@ export default function Sidebar() {
       path: `/${user?.role}/chats`,
       label: "Chats",
       icon: IoChatbubblesOutline,
+    },
+    {
+      path: `/${user?.role}/payments/`,
+      label: "Payments",
+      icon: Bitcoin,
     },
     {
       path: `/${user?.role}/subscription`,
