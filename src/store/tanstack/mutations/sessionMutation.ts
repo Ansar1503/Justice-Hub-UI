@@ -24,8 +24,8 @@ export function useCancelSessionByLawyer() {
     },
     onError: (error: any) => {
       const message =
-        error.response.data || "Something went wrong please try again later!";
-      error.message = message;
+        error.response.data?.error ||
+        "Something went wrong please try again later!";
       toast.error(message);
     },
   });
@@ -43,8 +43,8 @@ export function useCancelSessionByClient() {
     },
     onError: (error: any) => {
       const message =
-        error.response.data || "Something went wrong please try again later!";
-      error.message = message;
+        error.response.data?.error ||
+        "Something went wrong please try again later!";
       toast.error(message);
     },
   });
@@ -66,7 +66,8 @@ export function useStartSession() {
 
     onError: (error: any) => {
       const message =
-        error.response.data || "Something went wrong please try again later!";
+        error.response.data?.error ||
+        "Something went wrong please try again later!";
       toast.error(message);
     },
   });
@@ -108,9 +109,8 @@ export function useEndSession() {
     },
     onError: (error: any) => {
       const message =
-        error.response.data.error ||
+        error.response.data?.error ||
         "Something went wrong please try again later!";
-      error.message = message;
       toast.error(message);
     },
   });
@@ -133,8 +133,9 @@ export function useAddSessionSummary() {
     },
     onError: (err: any) => {
       const message =
-        err.response.data || "Something went wrong please try again later!";
-      err.message = message;
+        typeof err?.response?.data?.error === "string"
+          ? err?.response?.data?.error
+          : "Something went wrong please try again later!";
       toast.error(message);
     },
   });

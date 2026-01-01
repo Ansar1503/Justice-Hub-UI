@@ -8,7 +8,6 @@ export interface CallLogs {
   client_left_at?: Date;
   lawyer_joined_at?: Date;
   lawyer_left_at?: Date;
-  end_reason?: string;
   callDuration?: number;
   status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
   createdAt?: Date;

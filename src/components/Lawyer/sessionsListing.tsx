@@ -200,7 +200,6 @@ export default function SessionsListing() {
         title: "Session Started",
         type: "session",
       };
-      console.log("new ntofiication", notificationData);
       if (!socket.connected) {
         console.warn("Socket not yet connected. Waiting...");
         socket.connect();

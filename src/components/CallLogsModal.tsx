@@ -81,8 +81,6 @@ export default function CallLogsModal({
                   <TableHead>Total Duration</TableHead>
                   <TableHead>Client Duration</TableHead>
                   <TableHead>Lawyer Duration</TableHead>
-                  <TableHead>End Reason</TableHead>
-                  {/* <TableHead className="text-end">Actions</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -109,18 +107,15 @@ export default function CallLogsModal({
                         {getDurationFromStartAndEndDate(
                           log?.client_joined_at,
                           log?.client_left_at
-                        )} mins
+                        )}{" "}
+                        mins
                       </TableCell>
                       <TableCell>
                         {getDurationFromStartAndEndDate(
                           log?.lawyer_joined_at,
                           log?.lawyer_left_at
-                        )} mins
-                      </TableCell>
-                      <TableCell>
-                        {log?.status === "ongoing"
-                          ? "session ongoing"
-                          : log?.end_reason || "N/A"}
+                        )}{" "}
+                        mins
                       </TableCell>
                       {/* <TableCell>
                         <Badge variant={"outline"} className="bg-green-400">
