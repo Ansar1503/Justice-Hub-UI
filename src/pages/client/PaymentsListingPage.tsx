@@ -64,7 +64,7 @@ export default function PaymentsListingPage() {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency,
-    }).format(amount / 100);
+    }).format(amount);
   };
 
   return (
@@ -164,7 +164,7 @@ export default function PaymentsListingPage() {
                             <div className="flex items-center gap-3">
                               <div className="size-1.5 rounded-full bg-primary/40 group-hover:bg-primary transition-colors" />
                               <span className="text-foreground/90">
-                                {payment.id}
+                                {payment.id?.slice(0, 14)}
                               </span>
                             </div>
                           </TableCell>
@@ -209,24 +209,6 @@ export default function PaymentsListingPage() {
                             >
                               {payment.status}
                             </Badge>
-                          </TableCell>
-                          <TableCell className="px-6 text-right">
-                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="size-7 hover:bg-secondary/80 text-muted-foreground hover:text-foreground"
-                              >
-                                <ExternalLink className="size-3.5" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="size-7 hover:bg-secondary/80 text-muted-foreground hover:text-foreground"
-                              >
-                                <MoreHorizontal className="size-3.5" />
-                              </Button>
-                            </div>
                           </TableCell>
                         </TableRow>
                       ))
