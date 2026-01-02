@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
+import { useCalllogsMutation } from "@/store/tanstack/mutations/CalllogsMutations";
+import { useNavigate } from "react-router-dom";
 // import { useEndSession } from "@/store/tanstack/mutations/sessionMutation";
 
 export default function ZegoVideoCall({
-  // sessionId,
+  sessionId,
   roomID,
   userID,
   userName,
@@ -18,9 +20,19 @@ export default function ZegoVideoCall({
   token: string;
 }) {
   // console.log("zegocloud");
+  console.log({
+    role: "LAWYER or CLIENT",
+    AppId,
+    roomID,
+    userID,
+    token,
+  });
+
+  const { mutateAsync: startCall } = useCalllogsMutation();
   // const { mutateAsync: endSessionMutate } = useEndSession();
   const containerRef = useRef(null);
   const zegoInstanceRef = useRef<any>(null);
+  const navigate = useNavigate();
   // const navigate = useNavigate();
   useEffect(() => {
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
@@ -47,7 +59,21 @@ export default function ZegoVideoCall({
       onLeaveRoom() {
         handleLeaveRoom();
       },
+      onJoinRoom() {
+        handleJoinRoom();
+      },
+      onReturnToHomeScreenClicked() {
+        navigate(-1);
+      },
     });
+    async function handleJoinRoom() {
+      try {
+        await startCall({ roomId: roomID, sessionId });
+      } catch (error) {
+        console.log("error", error);
+        navigate(-1);
+      }
+    }
     async function handleLeaveRoom() {}
     return () => {
       if (zegoInstanceRef.current) {

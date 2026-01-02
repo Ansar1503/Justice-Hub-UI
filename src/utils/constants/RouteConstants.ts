@@ -31,6 +31,10 @@ export const profileQueries = {
   },
 };
 
+export const CalllogsRoute = {
+  base: "/calls",
+};
+
 export const ClientRoutes = {
   base: "client",
   profile: "/profile",

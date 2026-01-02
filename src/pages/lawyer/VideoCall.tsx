@@ -8,10 +8,10 @@ export default function VideoCall() {
   //   console.log("user", user);
   //   console.log("id", id);
   const { id } = useParams();
-  console.log("id", id);
-  console.log("appId", AppId);
-  console.log("roomId", roomId);
-  console.log("token", token);
+  // console.log("id", id);
+  // console.log("appId", AppId);
+  // console.log("roomId", roomId);
+  // console.log("token", token);
   if (!user || !user.user_id || !AppId || !roomId || !token || !id) return;
   return (
     <div className="h-screen w-screen">
