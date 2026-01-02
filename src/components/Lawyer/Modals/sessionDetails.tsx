@@ -88,7 +88,7 @@ export default function SessionDetailModal({
   };
 
   const sessionStartable = () => {
-    return true;
+    // return true;
     const currentDate = new Date();
     const sessionDate = new Date(session?.appointmentDetails?.date);
     const [h, m] = session?.appointmentDetails.time
@@ -111,7 +111,7 @@ export default function SessionDetailModal({
   };
 
   const sessionJoinable = () => {
-    return true;
+    // return true;
     const currentDate = new Date();
     const sessionDate = new Date(session?.appointmentDetails?.date);
     const [h, m] = session?.appointmentDetails?.time

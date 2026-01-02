@@ -177,7 +177,7 @@ export default function SessionDetailModal({
 
   // Session status checks
   const sessionStartable = useMemo(() => {
-    return true;
+    // return true;
     if (!session || !session.room_id) return false;
 
     const currentDate = new Date();
@@ -197,7 +197,7 @@ export default function SessionDetailModal({
   }, [session]);
 
   const sessionCancelable = useMemo(() => {
-    return true;
+    // return true;
     if (!session || session.status !== "upcoming") return false;
 
     const currentDate = new Date();
