@@ -16,6 +16,7 @@ function AdminRoutes() {
   return (
     <Routes>
       <Route element={<Protected />}>
+        <Route index element={<AdminDashboard />} />
         <Route path="/users" element={<UserManagementPage />} />
         <Route path="/lawyer-verification" element={<LawyerVerification />} />
         <Route path="/sessions" element={<Sessions />} />
@@ -24,7 +25,6 @@ function AdminRoutes() {
         <Route path="/disputes/review" element={<ReviewDisputes />} />
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/casesmanagement" element={<CaseManagement />} />
-        <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="settings/commission" element={<CommissionPage />} />
         <Route path="/subscriptions" element={<Subscriptions />} />
       </Route>
