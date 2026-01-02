@@ -199,8 +199,7 @@ function ChatsPage() {
               ...oldData,
               pages: oldData.pages.map((page: any, index: number) => {
                 if (index === oldData.pages.length - 1) {
-                  // console.log("data", page?.data);
-                  // console.log("response  ::: 000", data);
+                  console.log("data", page?.data);
                   return {
                     ...page,
                     data: page.data.filter(

@@ -13,3 +13,15 @@ export const addCallLogs = async (payload: {
   );
   return response.data;
 };
+
+export const endCallLogs = async (payload: {
+  sessionId: string;
+  roomId: string;
+}) => {
+  const { user } = store.getState().Auth;
+  const response = await axiosinstance.put(
+    `${CommonQueies.api}${user?.role}${CalllogsRoute.base}`,
+    payload
+  );
+  return response.data;
+};
