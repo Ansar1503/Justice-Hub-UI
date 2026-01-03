@@ -12,7 +12,7 @@ function ProtectedRoute() {
     case "lawyer":
       return <Navigate to="/lawyer/" />;
     case "admin":
-      return <Navigate to="/admin/dashboard" />;
+      return <Navigate to="/admin/" />;
     default:
       return <Navigate to="/login" />;
   }

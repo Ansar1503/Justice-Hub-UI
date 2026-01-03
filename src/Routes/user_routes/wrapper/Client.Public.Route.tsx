@@ -2,7 +2,6 @@ import { useAppSelector } from "@/store/redux/Hook";
 import { Navigate, Outlet } from "react-router-dom";
 
 function PublicRoute() {
-  // console.log('pbulic client')
   const userData = useAppSelector((state) => state.Auth.user);
   if (!userData) {
     return <Outlet />;
@@ -14,7 +13,7 @@ function PublicRoute() {
     case "lawyer":
       return <Navigate to="/lawyer/" />;
     case "admin":
-      return <Navigate to="/admin/dashboard" />;
+      return <Navigate to="/admin/" />;
     default:
       return <Navigate to="/login" />;
   }

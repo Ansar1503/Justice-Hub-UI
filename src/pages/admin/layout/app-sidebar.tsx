@@ -29,12 +29,12 @@ const navdata = {
     // 🆕 Dashboard Section
     {
       title: "Dashboard",
-      url: "/admin/dashboard",
+      url: "/admin/",
       icon: LayoutDashboard,
       items: [
         {
           title: "Overview",
-          url: "/admin/dashboard",
+          url: "/admin/",
         },
       ],
     },
