@@ -20,7 +20,7 @@ function LoginComponent() {
     email: "",
     password: "",
   });
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [validation, setValidation] = useState<Record<string, string>>({});
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -107,10 +107,11 @@ function LoginComponent() {
           <button
             type="submit"
             disabled={isPending}
-            className={`relative w-full py-2 mt-4 text-white rounded-lg transition overflow-hidden ${isPending
-              ? "bg-blue-400 dark:bg-gray-600 cursor-not-allowed"
-              : "bg-blue-700 dark:bg-black hover:bg-blue-500 dark:hover:bg-gray-800"
-              }
+            className={`relative w-full py-2 mt-4 text-white rounded-lg transition overflow-hidden ${
+              isPending
+                ? "bg-blue-400 dark:bg-gray-600 cursor-not-allowed"
+                : "bg-blue-700 dark:bg-black hover:bg-blue-500 dark:hover:bg-gray-800"
+            }
 `}
           >
             {isPending ? "Logging In..." : "Login"}
@@ -148,15 +149,14 @@ function LoginComponent() {
             if (!credential) return;
 
             try {
-              const response = await axiosinstance.post(
-                `/api/user/google`,
-                { credential }
-              );
-              const data = response.data as LoginResponse
+              const response = await axiosinstance.post(`/api/user/google`, {
+                credential,
+              });
+              const data = response.data as LoginResponse;
               dispatch(setUser(data.user));
               dispatch(setToken(data.accesstoken));
               toast.success(data.message);
-              const QueryClient = useQueryClient()
+              const QueryClient = useQueryClient();
               QueryClient.invalidateQueries({ queryKey: ["user"] });
               navigate(`/${data.user.role}/`);
             } catch (err) {
@@ -165,7 +165,6 @@ function LoginComponent() {
           }}
           onError={() => toast.error("Google auth error")}
         />
-
 
         {/* Bottom Links */}
         <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -179,7 +178,10 @@ function LoginComponent() {
             </button>
           </p>
           <p className="mt-2">
-            <button className="text-red-500 dark:text-red-400 hover:underline">
+            <button
+              className="text-red-500 dark:text-red-400 hover:underline"
+              onClick={() => navigate("/forgot-password")}
+            >
               Forgot Password?
             </button>
           </p>
