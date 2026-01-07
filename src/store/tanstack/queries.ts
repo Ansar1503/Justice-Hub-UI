@@ -202,6 +202,9 @@ export function useFetchSlotsforClients(id: string, date: Date) {
     queryFn: () => fetchSlotsforClients(id, date),
     retry: 1,
     enabled: Boolean(id && date),
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: 1000 * 60 * 1,
   });
 }
 

@@ -111,7 +111,8 @@ export async function fetchSlotsforClients(
   ResponseType & { data: { isAvailable: boolean; slots: string[] | [] } }
 > {
   const response = await axiosinstance.get(
-    `/api/client/lawyers/slots/${lawyer_id}?date=${date}`
+    `/api/client/lawyers/slots/${lawyer_id}?date=${date.toISOString()}`,
+    { headers: { "Cache-Control": "no-cache" } }
   );
   return response.data;
 }
