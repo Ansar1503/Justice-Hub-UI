@@ -48,6 +48,7 @@ import {
   useAddOverrideSlots,
   useDeleteOverrideSlot,
 } from "@/store/tanstack/mutations/slotMutations";
+import { Input } from "../ui/input";
 
 export default function OverrideDates() {
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
@@ -63,7 +64,7 @@ export default function OverrideDates() {
     maxDaysInAdvance: "30",
     autoConfirm: false,
   });
-  console.log("overrideDates", overrideDates);
+
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -120,39 +121,39 @@ export default function OverrideDates() {
     fetchData();
   }, [slotSettingsData, refetch]);
 
-  const timeOptions = useMemo(() => {
-    const duration = Number(slotSettings?.slotDuration);
+  // const timeOptions = useMemo(() => {
+  //   const duration = Number(slotSettings?.slotDuration);
 
-    if (!duration || duration <= 0) {
-      const times = [];
-      for (let hour = 0; hour < 24; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-          const timeString = `${hour.toString().padStart(2, "0")}:${minute
-            .toString()
-            .padStart(2, "0")}`;
-          times.push(timeString);
-        }
-      }
-      return times;
-    }
+  //   if (!duration || duration <= 0) {
+  //     const times = [];
+  //     for (let hour = 0; hour < 24; hour++) {
+  //       for (let minute = 0; minute < 60; minute += 30) {
+  //         const timeString = `${hour.toString().padStart(2, "0")}:${minute
+  //           .toString()
+  //           .padStart(2, "0")}`;
+  //         times.push(timeString);
+  //       }
+  //     }
+  //     return times;
+  //   }
 
-    const times = [];
-    const totalMinutesInDay = 24 * 60;
+  //   const times = [];
+  //   const totalMinutesInDay = 24 * 60;
 
-    for (let minutes = 0; minutes < totalMinutesInDay; minutes += duration) {
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
+  //   for (let minutes = 0; minutes < totalMinutesInDay; minutes += duration) {
+  //     const hours = Math.floor(minutes / 60);
+  //     const mins = minutes % 60;
 
-      if (hours < 24) {
-        const timeString = `${hours.toString().padStart(2, "0")}:${mins
-          .toString()
-          .padStart(2, "0")}`;
-        times.push(timeString);
-      }
-    }
+  //     if (hours < 24) {
+  //       const timeString = `${hours.toString().padStart(2, "0")}:${mins
+  //         .toString()
+  //         .padStart(2, "0")}`;
+  //       times.push(timeString);
+  //     }
+  //   }
 
-    return times;
-  }, [slotSettings?.slotDuration]);
+  //   return times;
+  // }, [slotSettings?.slotDuration]);
 
   const formatTime = useCallback((time24: string) => {
     const [hours, minutes] = time24.split(":");
@@ -163,17 +164,33 @@ export default function OverrideDates() {
   }, []);
 
   const validateTimeRanges = useCallback(
-    (ranges: { start: string; end: string }[]): boolean => {
+    (ranges: { start: string; end: string }[], date: Date): boolean => {
+      const now = new Date();
+      const bufferMinutes = 5;
+
       for (const range of ranges) {
         if (!range.start || !range.end) return false;
 
         const [startHour, startMin] = range.start.split(":").map(Number);
         const [endHour, endMin] = range.end.split(":").map(Number);
+
         const startMinutes = startHour * 60 + startMin;
         const endMinutes = endHour * 60 + endMin;
 
         if (startMinutes >= endMinutes) return false;
+
+        const isToday = date.toDateString() === now.toDateString();
+
+        if (isToday) {
+          const nowMinutes =
+            now.getHours() * 60 + now.getMinutes() + bufferMinutes;
+
+          if (startMinutes < nowMinutes) {
+            return false;
+          }
+        }
       }
+
       return true;
     },
     []
@@ -212,11 +229,17 @@ export default function OverrideDates() {
       return;
     }
 
-    if (!isUnavailable && !validateTimeRanges(timeRanges)) {
-      toast.error(
-        "Please ensure all time ranges have valid start and end times, with start time before end time."
-      );
-      return;
+    if (!isUnavailable) {
+      for (const date of selectedDates) {
+        if (!validateTimeRanges(timeRanges, date)) {
+          toast.error(
+            isToday(date)
+              ? "Selected time must be at least 5 minutes from now"
+              : "Please ensure all time ranges have valid start and end times"
+          );
+          return;
+        }
+      }
     }
 
     setIsSubmitting(true);
@@ -258,11 +281,28 @@ export default function OverrideDates() {
     (index: number, field: "start" | "end", value: string) => {
       setTimeRanges((prev) => {
         const newTimeRanges = [...prev];
-        newTimeRanges[index][field] = value;
+        if (field === "start") {
+          const duration = Number(slotSettings?.slotDuration || 0);
+          const [startHour, startMin] = value.split(":").map(Number);
+          const startMinutes = startHour * 60 + startMin;
+          const endMinutes = startMinutes + duration;
+          const endHour = Math.floor(endMinutes / 60);
+          const endMin = endMinutes % 60;
+          const endTime = `${endHour.toString().padStart(2, "0")}:${endMin
+            .toString()
+            .padStart(2, "0")}`;
+
+          newTimeRanges[index] = {
+            start: value,
+            end: endTime,
+          };
+        } else {
+          newTimeRanges[index][field] = value;
+        }
         return newTimeRanges;
       });
     },
-    []
+    [slotSettings?.slotDuration]
   );
 
   const handleDateSelect = useCallback(
@@ -322,7 +362,7 @@ export default function OverrideDates() {
     const days = eachDayOfInterval({ start, end });
     return { monthStart: start, monthEnd: end, monthDays: days };
   }, [currentMonth]);
-  console.log("selectedDates", selectedDates);
+
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   return (
@@ -566,43 +606,27 @@ export default function OverrideDates() {
 
                 {timeRanges.map((range, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <Select
+                    <Input
+                      type="time"
                       value={range.start}
-                      onValueChange={(value) =>
-                        updateTimeRange(index, "start", value)
+                      onChange={(e) =>
+                        updateTimeRange(index, "start", e.target.value)
                       }
-                    >
-                      <SelectTrigger className="w-[120px] bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
-                        <SelectValue placeholder="Start time" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                        {timeOptions.map((time) => (
-                          <SelectItem key={`start-${time}`} value={time}>
-                            {formatTime(time)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      className="w-[120px] border rounded px-2 py-1
+             bg-white dark:bg-gray-800"
+                    />
 
                     <span>-</span>
 
-                    <Select
+                    <Input
+                      type="time"
                       value={range.end}
-                      onValueChange={(value) =>
-                        updateTimeRange(index, "end", value)
+                      onChange={(e) =>
+                        updateTimeRange(index, "end", e.target.value)
                       }
-                    >
-                      <SelectTrigger className="w-[120px] bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
-                        <SelectValue>{formatTime(range.end)}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                        {timeOptions.map((time) => (
-                          <SelectItem key={`end-${time}`} value={time}>
-                            {formatTime(time)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      className="w-[120px] border rounded px-2 py-1
+             bg-white dark:bg-gray-800"
+                    />
 
                     {timeRanges.length > 1 && (
                       <Button
