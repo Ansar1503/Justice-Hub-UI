@@ -25,6 +25,10 @@ type Props = {
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 };
+function formatMsToMinutes(ms?: number) {
+  if (!ms || ms <= 0) return "0.00";
+  return (ms / (1000 * 60)).toFixed(2);
+}
 
 function getDurationFromStartAndEndDate(
   startDate: Date | undefined,
@@ -101,8 +105,9 @@ export default function CallLogsModal({
                           : "N/A"}
                       </TableCell>
                       <TableCell>
-                        {log.callDuration ? log?.callDuration : "0"} mins
+                        {formatMsToMinutes(log.callDuration)} mins
                       </TableCell>
+
                       <TableCell>
                         {getDurationFromStartAndEndDate(
                           log?.client_joined_at,
