@@ -186,7 +186,7 @@ export default function SessionDetailModal({
       sessionDate.getTime() + session?.appointmentDetails?.duration * 60000
     );
     return (
-      currentDate.getMinutes() + 5 >= sessionDate.getMinutes() &&
+      currentDate.getTime() >= sessionDate.getTime() - 5 * 60 * 1000 &&
       currentDate < sessionEnd &&
       session?.status == "ongoing"
     );

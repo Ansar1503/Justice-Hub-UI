@@ -100,7 +100,7 @@ export default function SessionDetailModal({
     );
     return (
       session?.status === "upcoming" &&
-      currentDate.getMinutes() + 5 >= sessionDate.getMinutes() &&
+      currentDate.getTime() >= sessionDate.getTime() - 5 * 60 * 1000 &&
       currentDate < sessionEnd &&
       !session?.room_id
     );
@@ -117,9 +117,10 @@ export default function SessionDetailModal({
     const sessionEnd = new Date(
       sessionDate.getTime() + session.appointmentDetails.duration * 60000
     );
+    const fiveMinutes = 5 * 60 * 1000;
     return (
       session?.status === "ongoing" &&
-      currentDate.getMinutes() + 5 >= sessionDate.getMinutes() &&
+      currentDate.getTime() >= sessionDate.getTime() - fiveMinutes &&
       currentDate < sessionEnd &&
       session?.room_id
     );
