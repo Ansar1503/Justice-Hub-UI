@@ -291,7 +291,6 @@ function ChatsPage() {
           ["user", "chatMessages", selectedSessionRef.current?._id],
           (oldData: any) => {
             if (!oldData) return oldData;
-
             return {
               ...oldData,
               pages: oldData.pages.map((page: any, index: number) => {
@@ -309,17 +308,13 @@ function ChatsPage() {
         queryClient.setQueryData(
           ["client", "chatsessions", search],
           (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
-            // console.log("newMessage", newMessage);
             if (!oldData) return oldData;
-            // console.log("oldData", oldData);
             return {
               ...oldData,
               pages: oldData.pages.map((page) => {
-                // console.log("afterOldData Page", page);
                 return {
                   ...page,
                   data: page?.data?.map((data) => {
-                    // console.log("afterOldData", data);
                     if (data?._id == newMessage?.session_id) {
                       return {
                         ...data,

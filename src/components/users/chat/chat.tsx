@@ -860,9 +860,9 @@ function Chat({
                 }}
                 max={5}
                 placeholder={
-                  ["upcoming", "ongoing"].includes(
+                  (["upcoming", "ongoing"].includes(
                     selectedSession?.sessionDetails?.status
-                  )
+                  ) && !isSessionOver)
                     ? "Type your message..."
                     : "This session is not active"
                 }
