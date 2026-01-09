@@ -1,7 +1,3 @@
-"use client";
-
-import type React from "react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   Calendar,
@@ -32,16 +28,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@radix-ui/react-progress";
+// import { Input } from "@/components/ui/input";
+// import { Progress } from "@radix-ui/react-progress";
 import { useRef, useState, useCallback, useMemo } from "react";
-import { toast } from "sonner";
-import {
-  useDocumentUpdateMutation,
-  useRemoveFile,
-} from "@/store/tanstack/mutations/DocumentMutation";
-import { useFetchSessionDocuments } from "@/store/tanstack/queries";
-import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
+// import { toast } from "sonner";
+// import {
+//   useDocumentUpdateMutation,
+//   useRemoveFile,
+// } from "@/store/tanstack/mutations/DocumentMutation";
+// import { useFetchSessionDocuments } from "@/store/tanstack/queries";
+// import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import FeedbackModal from "./Feedback";
 import { SessionDataType } from "@/types/types/sessionType";
@@ -57,17 +53,17 @@ interface SessionDetailModalProps {
 }
 
 // Constants
-const ALLOWED_FILE_TYPES = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-];
+// const ALLOWED_FILE_TYPES = [
+//   "application/pdf",
+//   "application/msword",
+//   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+//   "image/jpeg",
+//   "image/jpg",
+//   "image/png",
+// ];
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const MAX_FILES = 3;
+// const MAX_FILE_SIZE = 10 * 1024 * 1024;
+// const MAX_FILES = 3;
 
 const STATUS_CONFIG = {
   completed: {
@@ -107,26 +103,26 @@ export default function SessionDetailModal({
   onEndSession,
   onCancelSession,
 }: SessionDetailModalProps) {
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  // const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  // const [uploadProgress, setUploadProgress] = useState(0);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: sessionDocumentsData } = useFetchSessionDocuments(
-    session?.id || ""
-  );
-  const sessionDocuments = sessionDocumentsData;
+  // const { data: sessionDocumentsData } = useFetchSessionDocuments(
+  //   session?.id || ""
+  // );
+  // const sessionDocuments = sessionDocumentsData;
   // console.log("session Documents : : ", sessionDocuments);
-  const { mutateAsync: uploadDocuments, isPending: documentUploading } =
-    useDocumentUpdateMutation();
+  // const { mutateAsync: uploadDocuments, isPending: documentUploading } =
+  //   useDocumentUpdateMutation();
 
-  const { mutateAsync: removeFile, isPending: fileRemoving } = useRemoveFile(
-    sessionDocuments?.session_id || ""
-  );
+  // const { mutateAsync: removeFile, isPending: fileRemoving } = useRemoveFile(
+  //   sessionDocuments?.session_id || ""
+  // );
 
   // Utility functions
   const formatDate = useCallback((dateString: string) => {
@@ -154,33 +150,33 @@ export default function SessionDetailModal({
   }, []);
 
   // Validation functions
-  const validateFile = useCallback((file: File): boolean => {
-    const fileType = file.type;
-    const fileName = file.name.toLowerCase();
-    const isAllowedType =
-      ALLOWED_FILE_TYPES.includes(fileType) ||
-      fileName.endsWith(".doc") ||
-      fileName.endsWith(".docx");
+  // const validateFile = useCallback((file: File): boolean => {
+  //   const fileType = file.type;
+  //   const fileName = file.name.toLowerCase();
+  //   const isAllowedType =
+  //     ALLOWED_FILE_TYPES.includes(fileType) ||
+  //     fileName.endsWith(".doc") ||
+  //     fileName.endsWith(".docx");
 
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("File size should be less than 10MB");
-      return false;
-    }
+  //   if (file.size > MAX_FILE_SIZE) {
+  //     toast.error("File size should be less than 10MB");
+  //     return false;
+  //   }
 
-    if (!isAllowedType) {
-      toast.error("Only PDF, DOC, DOCX, JPG, PNG, JPEG files are allowed");
-      return false;
-    }
+  //   if (!isAllowedType) {
+  //     toast.error("Only PDF, DOC, DOCX, JPG, PNG, JPEG files are allowed");
+  //     return false;
+  //   }
 
-    return true;
-  }, []);
+  //   return true;
+  // }, []);
 
   // Session status checks
   const sessionStartable = useMemo(() => {
     // return true;
     if (!session || !session.room_id) return false;
 
-    const currentDate = new Date();
+    const currentDate = new Date(new Date());
     const sessionDate = new Date(session?.appointmentDetails?.date);
     const [h, m] = session?.appointmentDetails?.time
       ? session.appointmentDetails.time.split(":").map(Number)
@@ -190,7 +186,7 @@ export default function SessionDetailModal({
       sessionDate.getTime() + session?.appointmentDetails?.duration * 60000
     );
     return (
-      currentDate >= sessionDate &&
+      currentDate.getMinutes() + 5 >= sessionDate.getMinutes() &&
       currentDate < sessionEnd &&
       session?.status == "ongoing"
     );
@@ -200,7 +196,7 @@ export default function SessionDetailModal({
     // return true;
     if (!session || session.status !== "upcoming") return false;
 
-    const currentDate = new Date();
+    const currentDate = new Date(new Date());
     const sessionDate = new Date(session?.appointmentDetails?.date);
     const [h, m] = session.appointmentDetails?.time
       ? session.appointmentDetails.time.split(":").map(Number)
@@ -222,66 +218,66 @@ export default function SessionDetailModal({
   }, []);
 
   // File handling
-  const handleFileInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newFiles = Array.from(e.target.files || []);
-      const totalFiles = uploadedFiles.length + newFiles.length;
+  // const handleFileInputChange = useCallback(
+  //   (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     const newFiles = Array.from(e.target.files || []);
+  //     const totalFiles = uploadedFiles.length + newFiles.length;
 
-      if (totalFiles > MAX_FILES) {
-        toast.info(`Only ${MAX_FILES} files can be uploaded`);
-        return;
-      }
+  //     if (totalFiles > MAX_FILES) {
+  //       toast.info(`Only ${MAX_FILES} files can be uploaded`);
+  //       return;
+  //     }
 
-      const validFiles = newFiles.filter(validateFile);
-      if (validFiles.length !== newFiles.length) return;
+  //     const validFiles = newFiles.filter(validateFile);
+  //     if (validFiles.length !== newFiles.length) return;
 
-      setUploadedFiles((prev) => [...prev, ...validFiles]);
-    },
-    [uploadedFiles.length, validateFile]
-  );
+  //     setUploadedFiles((prev) => [...prev, ...validFiles]);
+  //   },
+  //   [uploadedFiles.length, validateFile]
+  // );
 
-  const handleRemoveFile = useCallback(
-    (index: number) => {
-      const newFiles = uploadedFiles.filter((_, i) => i != index);
-      setUploadedFiles(newFiles);
+  // const handleRemoveFile = useCallback(
+  //   (index: number) => {
+  //     const newFiles = uploadedFiles.filter((_, i) => i != index);
+  //     setUploadedFiles(newFiles);
 
-      const dataTransfer = new DataTransfer();
-      newFiles.forEach((file) => dataTransfer.items.add(file));
+  //     const dataTransfer = new DataTransfer();
+  //     newFiles.forEach((file) => dataTransfer.items.add(file));
 
-      if (fileInputRef.current) {
-        fileInputRef.current.files = dataTransfer.files;
-      }
-    },
-    [uploadedFiles]
-  );
+  //     if (fileInputRef.current) {
+  //       fileInputRef.current.files = dataTransfer.files;
+  //     }
+  //   },
+  //   [uploadedFiles]
+  // );
 
-  const handleRemoveFileAsync = async (id: string) => {
-    await removeFile(id);
-  };
+  // const handleRemoveFileAsync = async (id: string) => {
+  //   await removeFile(id);
+  // };
 
-  const handleUploadDocuments = useCallback(async () => {
-    if (!session || uploadedFiles.length === 0) return;
+  // const handleUploadDocuments = useCallback(async () => {
+  //   if (!session || uploadedFiles.length === 0) return;
 
-    const formData = new FormData();
-    uploadedFiles.forEach((file) => formData.append("documents", file));
-    formData.append("session_id", session.id);
+  //   const formData = new FormData();
+  //   uploadedFiles.forEach((file) => formData.append("documents", file));
+  //   formData.append("session_id", session.id);
 
-    setUploadProgress(0);
+  //   setUploadProgress(0);
 
-    try {
-      await uploadDocuments({
-        payload: formData,
-        setProgress: setUploadProgress,
-      });
+  //   try {
+  //     await uploadDocuments({
+  //       payload: formData,
+  //       setProgress: setUploadProgress,
+  //     });
 
-      setUploadedFiles([]);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (error: any) {
-      toast.error("Failed to upload documents", error);
-    }
-  }, [session, uploadedFiles, uploadDocuments]);
+  //     setUploadedFiles([]);
+  //     if (fileInputRef.current) {
+  //       fileInputRef.current.value = "";
+  //     }
+  //   } catch (error: any) {
+  //     toast.error("Failed to upload documents", error);
+  //   }
+  // }, [session, uploadedFiles, uploadDocuments]);
 
   // Action handlers
   const handleStartSession = useCallback(() => {
@@ -309,11 +305,8 @@ export default function SessionDetailModal({
   }, [session, onCancelSession, onClose]);
 
   const handleClose = useCallback(() => {
-    if (!documentUploading) {
-      onClose();
-      setUploadedFiles([]);
-    }
-  }, [documentUploading, onClose]);
+    onClose();
+  }, [onClose]);
 
   if (!isOpen || !session) return null;
   // console.log("session", session);
@@ -496,7 +489,7 @@ export default function SessionDetailModal({
             </div>
 
             {/* Upload Documents */}
-            <div>
+            {/* <div>
               {(!sessionDocuments ||
                 sessionDocuments?.document?.length === 0) &&
                 sessionCancelable && (
@@ -569,7 +562,7 @@ export default function SessionDetailModal({
                   </p>
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Follow-up Information */}
             {session?.follow_up_suggested && (
@@ -597,7 +590,7 @@ export default function SessionDetailModal({
             <Button
               variant="outline"
               onClick={handleClose}
-              disabled={documentUploading}
+              // disabled={documentUploading}
             >
               Close
             </Button>
@@ -608,7 +601,7 @@ export default function SessionDetailModal({
                     <Button
                       variant="destructive"
                       onClick={() => setShowCancelConfirm(true)}
-                      disabled={documentUploading}
+                      // disabled={documentUploading}
                     >
                       Cancel Session
                     </Button>
@@ -622,7 +615,7 @@ export default function SessionDetailModal({
                     <Button
                       onClick={() => setShowStartConfirm(true)}
                       className="bg-green-600 hover:bg-green-700"
-                      disabled={documentUploading}
+                      // disabled={documentUploading}
                     >
                       <Video className="h-4 w-4 mr-2" />
                       Join Session
@@ -630,7 +623,7 @@ export default function SessionDetailModal({
                   )}
                   <Button
                     variant="destructive"
-                    disabled={documentUploading}
+                    // disabled={documentUploading}
                     onClick={() => setShowEndConfirm(true)}
                   >
                     End Session

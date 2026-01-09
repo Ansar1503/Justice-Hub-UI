@@ -31,8 +31,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useFetchSessionDocuments } from "@/store/tanstack/queries";
-import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
+// import { useFetchSessionDocuments } from "@/store/tanstack/queries";
+// import { SessionDocumentsPreview } from "@/components/sessionDocumentsPreview";
 import { SessionDataType } from "@/types/types/sessionType";
 
 interface SessionDetailModalProps {
@@ -61,10 +61,10 @@ export default function SessionDetailModal({
   const [joinVideoRoom, setJoinVideoRoom] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
-  const { data: sessionDocumentsData } = useFetchSessionDocuments(
-    session?.id || ""
-  );
-  const sessionDocuments = sessionDocumentsData;
+  // const { data: sessionDocumentsData } = useFetchSessionDocuments(
+  //   session?.id || ""
+  // );
+  // const sessionDocuments = sessionDocumentsData;
 
   // const navigate = useNavigate();
   // console.log("session", sessionDocuments);
@@ -98,13 +98,9 @@ export default function SessionDetailModal({
     const sessionEnd = new Date(
       sessionDate.getTime() + session?.appointmentDetails?.duration * 60000
     );
-    // console.log("currentdata", currentDate);
-    // console.log("sessionDate", sessionDate);
-    // console.log("sessionEnd", sessionEnd);
-    // console.log("status", session?.status);
     return (
-      session?.status === "ongoing" &&
-      currentDate >= sessionDate &&
+      session?.status === "upcoming" &&
+      currentDate.getMinutes() + 5 >= sessionDate.getMinutes() &&
       currentDate < sessionEnd &&
       !session?.room_id
     );
@@ -123,9 +119,9 @@ export default function SessionDetailModal({
     );
     return (
       session?.status === "ongoing" &&
-      currentDate >= sessionDate &&
+      currentDate.getMinutes() + 5 >= sessionDate.getMinutes() &&
       currentDate < sessionEnd &&
-      !session?.room_id
+      session?.room_id
     );
   };
 
@@ -386,7 +382,7 @@ export default function SessionDetailModal({
             </div>
 
             {/* Documents */}
-            {sessionDocuments &&
+            {/* {sessionDocuments &&
               sessionDocuments.session_id == session?.id &&
               sessionDocuments?.document?.map((sdoc) => (
                 <SessionDocumentsPreview
@@ -396,7 +392,7 @@ export default function SessionDetailModal({
                   type={sdoc.type}
                   url={sdoc?.url}
                 />
-              ))}
+              ))} */}
             {/* Follow-up Information */}
             {session.follow_up_suggested && (
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
