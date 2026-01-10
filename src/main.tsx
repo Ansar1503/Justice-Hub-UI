@@ -27,13 +27,6 @@ declare global {
 }
 
 window.__TANSTACK_QUERY_CLIENT__ = queryClient;
-declare global {
-  interface Window {
-    __TANSTACK_QUERY_CLIENT__: import("@tanstack/query-core").QueryClient;
-  }
-}
-
-window.__TANSTACK_QUERY_CLIENT__ = queryClient;
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
@@ -41,7 +34,9 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <AuthContextProvider>
           <ThemeProvider>
-            <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+            <GoogleOAuthProvider
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+            >
               <QueryClientProvider client={queryClient}>
                 <SocketProvider>
                   <LawyerVerificationProvider>
