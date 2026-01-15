@@ -109,9 +109,9 @@ export async function fetchSlotsforClients(
   date: Date
 ): Promise<
   ResponseType & { data: { isAvailable: boolean; slots: string[] | [] } }
-> {
+> { 
   const response = await axiosinstance.get(
-    `/api/client/lawyers/slots/${lawyer_id}?date=${date.toISOString()}`,
+    `/api/client/lawyers/slots/${lawyer_id}?date=${date}`,
     { headers: { "Cache-Control": "no-cache" } }
   );
   return response.data;

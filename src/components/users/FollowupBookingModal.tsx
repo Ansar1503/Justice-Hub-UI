@@ -94,7 +94,7 @@ export function FollowUpBookingModalEnhanced({
       const { token } = store.getState().Auth;
       try {
         const response = await axiosinstance.get(
-          `/api/client/cases/caseTypes/ids`,
+          `/api/client/cases/caseTypes/ids/${lawyerId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             params: { caseTypeIds: caseTypes.map((c) => c.id) },
