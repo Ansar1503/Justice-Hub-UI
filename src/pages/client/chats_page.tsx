@@ -288,28 +288,38 @@ function ChatsPage() {
         (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
           if (!oldData) return oldData;
 
+          let movedSession: any = null;
+
+          const pages = oldData.pages.map((page) => {
+            const remaining = page.data.filter((session) => {
+              if (session._id === newMessage.session_id) {
+                movedSession = {
+                  ...session,
+                  lastMessage: newMessage,
+                  updatedAt: newMessage.createdAt,
+                };
+                return false;
+              }
+              return true;
+            });
+
+            return {
+              ...page,
+              data: remaining,
+            };
+          });
+
+          if (!movedSession) return oldData;
+
           return {
             ...oldData,
-            pages: oldData.pages.map((page) => {
-              const updatedData = page.data.map((session) =>
-                session._id === newMessage.session_id
-                  ? {
-                      ...session,
-                      lastMessage: newMessage,
-                      updatedAt: newMessage.createdAt,
-                    }
-                  : session
-              );
-
-              return {
-                ...page,
-                data: updatedData.sort(
-                  (a, b) =>
-                    new Date(b.updatedAt).getTime() -
-                    new Date(a.updatedAt).getTime()
-                ),
-              };
-            }),
+            pages: [
+              {
+                ...pages[0],
+                data: [movedSession, ...pages[0].data],
+              },
+              ...pages.slice(1),
+            ],
           };
         }
       );
