@@ -190,28 +190,10 @@ function ChatsPage() {
         messageId: string;
         sessionId: string;
       }) => {
-        // console.log("deleting message ....");
-        queryClient.setQueryData(
-          ["user", "chatMessages", selectedSessionRef.current._id],
-          (oldData: any) => {
-            if (!oldData) return oldData;
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page: any, index: number) => {
-                if (index === oldData.pages.length - 1) {
-                  console.log("data", page?.data);
-                  return {
-                    ...page,
-                    data: page.data.filter(
-                      (msg: any) => msg.id !== data?.messageId
-                    ),
-                  };
-                }
-                return page;
-              }),
-            };
-          }
-        );
+        queryClient.invalidateQueries({
+          queryKey: ["user", "chatMessages"],
+          exact: false,
+        });
         queryClient.setQueryData(
           ["client", "chatsessions", search],
           (oldData: any) => {
@@ -283,56 +265,54 @@ function ChatsPage() {
       );
     });
     s.on(SocketEvents.MESSAGE_RECEIVED_EVENT, (newMessage: ChatMessage) => {
-      if (
-        selectedSessionRef.current &&
-        newMessage.session_id === selectedSessionRef.current?._id
-      ) {
-        queryClient.setQueryData(
-          ["user", "chatMessages", selectedSessionRef.current?._id],
-          (oldData: any) => {
-            if (!oldData) return oldData;
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page: any, index: number) => {
-                if (index === oldData.pages.length - 1) {
-                  return {
-                    ...page,
-                    data: [...page.data, newMessage],
-                  };
-                }
-                return page;
-              }),
-            };
-          }
-        );
-        queryClient.setQueryData(
-          ["client", "chatsessions", search],
-          (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
-            if (!oldData) return oldData;
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page) => {
+      queryClient.setQueryData(
+        ["user", "chatMessages", selectedSessionRef.current?._id],
+        (oldData: any) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any, index: number) => {
+              if (index === oldData.pages.length - 1) {
                 return {
                   ...page,
-                  data: page?.data?.map((data) => {
-                    if (data?._id == newMessage?.session_id) {
-                      return {
-                        ...data,
-                        lastMessage: newMessage,
-                        updatedAt: newMessage?.createdAt,
-                      };
-                    } else {
-                      return {
-                        ...data,
-                      };
-                    }
-                  }),
+                  data: [...page.data, newMessage],
                 };
-              }),
-            };
-          }
-        );
-      }
+              }
+              return page;
+            }),
+          };
+        }
+      );
+      queryClient.setQueryData(
+        ["client", "chatsessions", search],
+        (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => {
+              const updatedData = page.data.map((session) =>
+                session._id === newMessage.session_id
+                  ? {
+                      ...session,
+                      lastMessage: newMessage,
+                      updatedAt: newMessage.createdAt,
+                    }
+                  : session
+              );
+
+              return {
+                ...page,
+                data: updatedData.sort(
+                  (a, b) =>
+                    new Date(b.updatedAt).getTime() -
+                    new Date(a.updatedAt).getTime()
+                ),
+              };
+            }),
+          };
+        }
+      );
 
       if (newMessage.senderId !== currentUserId) {
         setUnreadCounts((prev) => ({
