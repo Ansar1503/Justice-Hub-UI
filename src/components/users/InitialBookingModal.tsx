@@ -155,7 +155,7 @@ export function BookingModalEnhanced({
         "/api/client/lawyer/slots/checkout-session/",
         {
           lawyer_id: lawyerId,
-          date: date?.toISOString(),
+          date: date,
           timeSlot,
           reason,
           duration: slotSettings?.slotDuration,

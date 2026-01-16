@@ -152,7 +152,7 @@ export function FollowUpBookingModalEnhanced({
         "/api/client/lawyer/slots/checkout-session/follow-up",
         {
           lawyer_id: lawyerId,
-          date: date?.toISOString(),
+          date: date,
           timeSlot,
           reason,
           duration: slotSettings?.slotDuration,
