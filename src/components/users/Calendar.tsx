@@ -45,6 +45,7 @@ export function EnhancedAvailabilityCalendar({
   onMonthChange,
   scheduleSettings,
 }: EnhancedAvailabilityCalendarProps) {
+  console.log("availability data",availabilityData)
   const availabilityMap = useMemo(() => {
     const map = new Map<string, DateAvailability>();
     if (availabilityData) {
@@ -54,6 +55,7 @@ export function EnhancedAvailabilityCalendar({
     }
     return map;
   }, [availabilityData]);
+  console.log("availability map",availabilityMap)
   const [currentMonth, setCurrentMonth] = useState<Date>(
     fromMonth || new Date(),
   );
