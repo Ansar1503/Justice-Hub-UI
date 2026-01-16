@@ -45,7 +45,7 @@ export function EnhancedAvailabilityCalendar({
   onMonthChange,
   scheduleSettings,
 }: EnhancedAvailabilityCalendarProps) {
-  console.log("availability data",availabilityData)
+  console.log("availability data", availabilityData);
   const availabilityMap = useMemo(() => {
     const map = new Map<string, DateAvailability>();
     if (availabilityData) {
@@ -55,7 +55,7 @@ export function EnhancedAvailabilityCalendar({
     }
     return map;
   }, [availabilityData]);
-  console.log("availability map",availabilityMap)
+  console.log("availability map", availabilityMap);
   const [currentMonth, setCurrentMonth] = useState<Date>(
     fromMonth || new Date(),
   );
@@ -85,7 +85,7 @@ export function EnhancedAvailabilityCalendar({
   };
 
   const getAvailabilityForDate = (date: Date) => {
-    const isoDate = formatDateToISO(date);
+    const isoDate = formatLocalDate(date);
     return availabilityMap.get(isoDate);
   };
 
@@ -137,6 +137,11 @@ export function EnhancedAvailabilityCalendar({
     month: "long",
     year: "numeric",
   });
+
+  const formatLocalDate = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate(),
+    ).padStart(2, "0")}`;
 
   return (
     <TooltipProvider>
