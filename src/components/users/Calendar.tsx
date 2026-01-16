@@ -55,7 +55,7 @@ export function EnhancedAvailabilityCalendar({
     return map;
   }, [availabilityData]);
   const [currentMonth, setCurrentMonth] = useState<Date>(
-    fromMonth || new Date()
+    fromMonth || new Date(),
   );
   const limit = !isNaN(Number(scheduleSettings?.maxDaysInAdvance))
     ? Number(scheduleSettings?.maxDaysInAdvance)
@@ -104,7 +104,7 @@ export function EnhancedAvailabilityCalendar({
   const handlePrevMonth = () => {
     const newMonth = new Date(
       currentMonth.getFullYear(),
-      currentMonth.getMonth() - 1
+      currentMonth.getMonth() - 1,
     );
     setCurrentMonth(newMonth);
     onMonthChange(newMonth);
@@ -113,7 +113,7 @@ export function EnhancedAvailabilityCalendar({
   const handleNextMonth = () => {
     const newMonth = new Date(
       currentMonth.getFullYear(),
-      currentMonth.getMonth() + 1
+      currentMonth.getMonth() + 1,
     );
     setCurrentMonth(newMonth);
     onMonthChange(newMonth);
@@ -210,15 +210,15 @@ export function EnhancedAvailabilityCalendar({
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => onSelect(isSelected ? undefined : date)}
-                    disabled={isDisabled}
+                    disabled={isDisabled || !availability?.isAvailable}
                     className={cn(
                       "aspect-square rounded-lg border-2 flex flex-col items-center justify-center text-sm font-medium transition-all relative",
                       isSelected
                         ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
                         : isAvailable
-                        ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950 text-foreground hover:border-emerald-400 dark:hover:border-emerald-600 cursor-pointer"
-                        : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-muted-foreground cursor-not-allowed opacity-50",
-                      isDisabled && "opacity-30 cursor-not-allowed"
+                          ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950 text-foreground hover:border-emerald-400 dark:hover:border-emerald-600 cursor-pointer"
+                          : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-muted-foreground cursor-not-allowed opacity-50",
+                      isDisabled && "opacity-30 cursor-not-allowed",
                     )}
                   >
                     <span>{date.getDate()}</span>
