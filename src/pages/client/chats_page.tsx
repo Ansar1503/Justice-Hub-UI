@@ -201,7 +201,6 @@ function ChatsPage() {
             return {
               ...oldData,
               pages: oldData?.pages?.map((page: any) => {
-                // console.log("pages.data", page.data);
                 return {
                   ...page,
                   data: page.data?.map((session: any) => {
