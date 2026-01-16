@@ -264,26 +264,25 @@ function ChatsPage() {
       );
     });
     s.on(SocketEvents.MESSAGE_RECEIVED_EVENT, (newMessage: ChatMessage) => {
-      if (selectedSessionRef.current?._id === newMessage.session_id) {
-        queryClient.setQueryData(
-          ["user", "chatMessages", selectedSessionRef.current?._id],
-          (oldData: any) => {
-            if (!oldData) return oldData;
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page: any, index: number) => {
-                if (index === oldData.pages.length - 1) {
-                  return {
-                    ...page,
-                    data: [...page.data, newMessage],
-                  };
-                }
-                return page;
-              }),
-            };
-          }
-        );
-      }
+      queryClient.setQueryData(
+        ["user", "chatMessages", newMessage.session_id],
+        (oldData: any) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any, index: number) => {
+              if (index === oldData.pages.length - 1) {
+                return {
+                  ...page,
+                  data: [...page.data, newMessage],
+                };
+              }
+              return page;
+            }),
+          };
+        }
+      );
+
       queryClient.setQueryData(
         ["client", "chatsessions", search],
         (oldData: { pages: { data: any[] }[]; pageParams: number[] }) => {
