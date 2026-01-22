@@ -213,6 +213,7 @@ export default function LawyerAppointmentListing() {
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
+                <option value="rejected">Rejected</option>
               </select>
               <Filter className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>
