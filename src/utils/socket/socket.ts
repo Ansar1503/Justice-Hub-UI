@@ -7,7 +7,7 @@ export const getSocket = (token: string): Socket => {
     socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:8000", {
       auth: { token: `bearer ${token}` },
       withCredentials: true,
-      reconnectionAttempts: 4,
+      reconnectionAttempts: 3,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       timeout: 10000,
