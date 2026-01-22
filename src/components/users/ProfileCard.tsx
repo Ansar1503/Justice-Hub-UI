@@ -39,7 +39,7 @@ function ProfileCard() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && !data) {
+    if (!isLoading && data === null) {
       dispatch(signOut());
     }
   }, [data, isLoading, dispatch]);
@@ -56,7 +56,7 @@ function ProfileCard() {
         setLawyerData({
           rejectReason: data?.rejectReason || "",
           verification_status: data.lawyerVerfication,
-        })
+        }),
       );
     }
   }, [data?.lawyerVerfication, data?.rejectReason, dispatch]);
