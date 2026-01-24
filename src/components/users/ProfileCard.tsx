@@ -39,7 +39,7 @@ function ProfileCard() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && data === null) {
+    if (!isLoading && !data) {
       dispatch(signOut());
     }
   }, [data, isLoading, dispatch]);
