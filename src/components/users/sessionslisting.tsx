@@ -353,7 +353,7 @@ export default function SessionsListing() {
                           </div>
                           <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                             <Clock className="h-3 w-3" />
-                            {time} ({session?.appointmentDetails?.duration} min)
+                            {session?.appointmentDetails?.time} ({session?.appointmentDetails?.duration} min)
                           </div>
                         </div>
                       </td>
