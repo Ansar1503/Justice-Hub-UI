@@ -98,7 +98,7 @@ export default function LawyersCard({
           className="w-full group-hover:shadow-md transition-all"
           variant="default"
           onClick={() => {
-            navigate(`/client/lawyers/${lawyer.id}`);
+            navigate(`/lawyers/${lawyer.id}`);
           }}
         >
           View Profile

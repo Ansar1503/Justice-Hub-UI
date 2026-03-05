@@ -11,6 +11,8 @@ import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
 import NotificationComponent from "@/components/NotificationPopover";
 import { useFetchClientData } from "@/store/tanstack/queries";
+import axiosinstance from "@/utils/api/axios/axios.instance";
+import { persistor } from "@/store/redux/store";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -20,10 +22,18 @@ function Navbar() {
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.Auth.user);
   const dispatch = useAppDispatch();
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // dispatch(LogOut());
-    dispatch(signOut());
-    navigate("/login");
+    try {
+      await axiosinstance.post("/api/user/logout");
+    } catch (error) {
+      console.log("logout error ", error);
+    } finally {
+      console.log("loggin out .....");
+      dispatch(signOut());
+      navigate("/login");
+      await persistor.purge();
+    }
   };
   const { data: clientData } = useFetchClientData();
   useEffect(() => {
@@ -31,7 +41,7 @@ function Navbar() {
       handleLogout();
     }
   }, [clientData]);
-  const location = useLocation();
+  // const location = useLocation();
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -61,18 +71,15 @@ function Navbar() {
               </li>
             )} */}
             {/* <li className="hover:underline cursor-pointer">Services</li> */}
-            {location.pathname !== "/login" &&
-              location.pathname !== "/signup" &&
-              location.pathname !== "/" && (
-                <>
-                  <NavLink to="/client/lawyers">
-                    <li className="hover:underline cursor-pointer">Lawyers</li>
-                  </NavLink>
-                  <NavLink to="/client/blogs">
-                    <li className="hover:underline cursor-pointer">Blogs</li>
-                  </NavLink>
-                </>
-              )}
+
+            <>
+              <NavLink to="/lawyers">
+                <li className="hover:underline cursor-pointer">Lawyers</li>
+              </NavLink>
+              {/* <NavLink to="/client/blogs">
+                <li className="hover:underline cursor-pointer">Blogs</li>
+              </NavLink> */}
+            </>
 
             {/* <li className="hover:underline cursor-pointer">About Us</li> */}
           </ul>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import {
   useFetchLawyerDetails,
@@ -27,7 +27,7 @@ export default function LawyerProfile() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [lawyerAvailablity, setLawyerAvailability] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
   const lawyerDetailsCache = queryClient.getQueryData(["lawyerDetails", id]);
@@ -75,11 +75,12 @@ export default function LawyerProfile() {
 
   const { data: slotDetails, refetch: fetchSlots } = useFetchSlotsforClients(
     id || "",
-    selectedDate
+    selectedDate,
   );
   useEffect(() => {
     fetchSlots();
   }, [selectedDate, fetchSlots]);
+  const { token } = store.getState().Auth;
   useEffect(() => {
     const { token } = store.getState().Auth;
     async function deleteSession() {
@@ -88,7 +89,7 @@ export default function LawyerProfile() {
         `/api/client/lawyer/slots/session/${sessionId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       refetchslotSettings();
       fetchSlots();
@@ -98,7 +99,7 @@ export default function LawyerProfile() {
 
   const slotDetailsData = slotDetails?.data;
   const { data: caseTypes } = useFechCaseTypeByPractice(
-    lawyerDetails?.practice_areas?.map((p: PracticeAreaType) => p.id)
+    lawyerDetails?.practice_areas?.map((p: PracticeAreaType) => p.id),
   );
   useEffect(() => {
     if (slotDetailsData && Object.keys(slotDetailsData).length > 0) {
@@ -151,39 +152,61 @@ export default function LawyerProfile() {
               isLoading={isLoading}
             >
               <div className="flex flex-col gap-2 mt-4 w-full md:w-auto">
-                <BookingModalEnhanced
-                  lawyerId={id || ""}
-                  lawyerAvailablity={lawyerAvailablity}
-                  timeSlots={timeSlots}
-                  slotSettings={slotSettings}
-                  caseTypes={caseTypes || []}
-                  walletBalance={walletBalance}
-                  consultationFee={lawyerDetails?.consultation_fee || 0}
-                  onSubmitStart={() => setIsSubmitting(true)}
-                  onSubmitEnd={() => setIsSubmitting(false)}
-                  onDateChange={handleDateChange}
-                >
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white">
-                    Book New Case
+                {token ? (
+                  <BookingModalEnhanced
+                    lawyerId={id || ""}
+                    lawyerAvailablity={lawyerAvailablity}
+                    timeSlots={timeSlots}
+                    slotSettings={slotSettings}
+                    caseTypes={caseTypes || []}
+                    walletBalance={walletBalance}
+                    consultationFee={lawyerDetails?.consultation_fee || 0}
+                    onSubmitStart={() => setIsSubmitting(true)}
+                    onSubmitEnd={() => setIsSubmitting(false)}
+                    onDateChange={handleDateChange}
+                  >
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white">
+                      Book New Case
+                    </Button>
+                  </BookingModalEnhanced>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      if (!token) navigate(`/login?redirect=/lawyers/${id}`);
+                    }}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:text-white"
+                  >
+                    Login to Book New Case
                   </Button>
-                </BookingModalEnhanced>
+                )}
 
-                <FollowUpBookingModalEnhanced
-                  caseTypes={caseTypes || []}
-                  lawyerId={id || ""}
-                  lawyerAvailablity={lawyerAvailablity}
-                  timeSlots={timeSlots}
-                  slotSettings={slotSettings}
-                  walletBalance={walletBalance}
-                  consultationFee={lawyerDetails?.consultation_fee || 0}
-                  onSubmitStart={() => setIsSubmitting(true)}
-                  onSubmitEnd={() => setIsSubmitting(false)}
-                  onDateChange={handleDateChange}
-                >
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white">
-                    Book Follow-Up
+                {token ? (
+                  <FollowUpBookingModalEnhanced
+                    caseTypes={caseTypes || []}
+                    lawyerId={id || ""}
+                    lawyerAvailablity={lawyerAvailablity}
+                    timeSlots={timeSlots}
+                    slotSettings={slotSettings}
+                    walletBalance={walletBalance}
+                    consultationFee={lawyerDetails?.consultation_fee || 0}
+                    onSubmitStart={() => setIsSubmitting(true)}
+                    onSubmitEnd={() => setIsSubmitting(false)}
+                    onDateChange={handleDateChange}
+                  >
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white">
+                      Book Follow-Up
+                    </Button>
+                  </FollowUpBookingModalEnhanced>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      if (!token) navigate(`/login?redirect=/lawyers/${id}`);
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                  >
+                    Login to Book Follow-Up
                   </Button>
-                </FollowUpBookingModalEnhanced>
+                )}
               </div>
             </LawyerProfileHeader>
 

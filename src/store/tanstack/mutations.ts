@@ -1,5 +1,3 @@
-import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
-import { useAppDispatch } from "@/store/redux/Hook";
 import {
   confirmAppointment,
   LawyerVerification,
@@ -34,27 +32,20 @@ import {
   ResponseType,
 } from "@/types/types/LoginResponseTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Review } from "@/types/types/Review";
 import { FetchLawyerResponseType } from "@/types/types/LawyerTypes";
 
 export function useLoginMutation() {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   return useMutation<LoginResponse, Error, LoginPayload>({
     mutationFn: loginUser,
-    onSuccess: (data) => {
+    onSuccess: () => {
       // console.log("data", data);
-      dispatch(setUser(data.user));
-      dispatch(setToken(data.accesstoken));
-      toast.success(data.message);
       queryClient.invalidateQueries({
         queryKey: ["user"],
         exact: false,
       });
-      navigate(`/${data.user.role}/`);
     },
     onError: (error: any) => {
       const message = error.response?.data?.error || "Login failed. Try again.";
@@ -197,7 +188,7 @@ export function useLawyerVerification() {
           ...old,
           rejectReason: data?.rejectReason,
           lawyerVerfication: data?.verification_status,
-        })
+        }),
       );
     },
     onError: (error: any) => {
@@ -364,7 +355,7 @@ export function useUpdateReview() {
           pages: oldData.pages.map((page: any) => ({
             ...page,
             data: page.data.map((review: any) =>
-              review.id === data?.id ? { ...review, ...data } : review
+              review.id === data?.id ? { ...review, ...data } : review,
             ),
           })),
         };

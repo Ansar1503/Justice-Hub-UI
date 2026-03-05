@@ -10,8 +10,8 @@ import CaseDetailsPage from "@/pages/client/CaseDetailsPage";
 import ClientDashboard from "@/pages/client/Dashboard";
 import AppointmentsPage from "@/pages/client/AppointmentsPage";
 import ClientProfile from "@/pages/client/ClientProfile";
-import LawyerDirectory from "@/pages/client/LawyersListing";
-import LawyersPage from "@/pages/client/LawyerProfile";
+// import LawyerDirectory from "@/pages/client/LawyersListing";
+// import LawyersPage from "@/pages/client/LawyerProfile";
 import ChatsPage from "@/pages/client/chats_page";
 import SubscriptionPage from "@/pages/client/SubscriptionPage";
 import BlogsPage from "@/pages/client/BlogsPage";
@@ -25,8 +25,6 @@ function ClientRoutes() {
         <Route index element={<ClientProfile />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/sessions" element={<SessionPage />} />
-        <Route path="/lawyers" element={<LawyerDirectory />} />
-        <Route path="/lawyers/:id" element={<LawyersPage />} />
         <Route path="/chats/:id?" element={<ChatsPage />} />
         <Route path="/session/join/:id" element={<VideoCall />} />
         <Route path="/reviews" element={<ReviewPage />} />

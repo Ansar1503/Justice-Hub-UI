@@ -143,7 +143,7 @@ export async function fetchAllSpecializations(
   const { limit, page, search } = payload;
   const response = await axiosinstance.get(
     CommonQueies.api +
-      user?.role +
+      (user?.role || "client") +
       SpecializationRoutes.base +
       CommonQueies.pageQuery +
       page +

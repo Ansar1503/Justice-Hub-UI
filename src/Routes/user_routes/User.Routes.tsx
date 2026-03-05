@@ -12,6 +12,8 @@ import Emailverificationsuccesspage from "@/pages/client/Emailverificationsucces
 import OtpPage from "@/pages/client/OtpPage";
 import ForgotPasswordPage from "@/pages/client/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/client/ResetPasswordPage";
+import LawyerDirectory from "@/pages/client/LawyersListing";
+import LawyersPage from "@/pages/client/LawyerProfile";
 
 function UserRoutes() {
   return (
@@ -31,6 +33,9 @@ function UserRoutes() {
           element={<Emailverificationsuccesspage />}
         />
       </Route>
+
+      <Route path="/lawyers" element={<LawyerDirectory />} />
+      <Route path="/lawyers/:id" element={<LawyersPage />} />
 
       <Route path="/" element={<Home />} />
 

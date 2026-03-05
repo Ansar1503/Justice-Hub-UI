@@ -43,7 +43,6 @@ export default function ReviewPage() {
     lawyer_id: string;
     lawyer_name: string;
   }>({ lawyer_id: "", lawyer_name: "", session_id: "" });
-  console.log("feedbackModalData", feedbackModalData);
   const { data: reviewData } = useFetchReviewsListClientOrLawyer({
     limit: itemsPerPage,
     page: currentPage,

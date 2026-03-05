@@ -1,17 +1,17 @@
 // import { useAppDispatch, useAppSelector } from "@/Redux/Hook";
 import { validateSigninField } from "@/utils/validations/SigninFormValidation";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 // import { jwtDecode } from "jwt-decode"
 import { motion } from "framer-motion";
 import { useLoginMutation } from "@/store/tanstack/mutations";
 import axiosinstance from "@/utils/api/axios/axios.instance";
-import { useDispatch } from "react-redux";
 import { setToken, setUser } from "@/store/redux/auth/Auth.Slice";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { LoginResponse } from "@/types/types/LoginResponseTypes";
+import { useAppDispatch } from "@/store/redux/Hook";
 // import { setToken, setUser } from "@/Redux/Auth/Auth.Slice";
 
 function LoginComponent() {
@@ -20,7 +20,10 @@ function LoginComponent() {
     email: "",
     password: "",
   });
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const [validation, setValidation] = useState<Record<string, string>>({});
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -43,7 +46,7 @@ function LoginComponent() {
         if (errorMessage) {
           errors[field] = errorMessage;
         }
-      }
+      },
     );
     setValidation(errors);
     if (Object.keys(errors).length <= 0) {
@@ -53,7 +56,12 @@ function LoginComponent() {
       };
 
       try {
-        await mutateAsync(postData);
+        const data = await mutateAsync(postData);
+        console.log({ redirect, role: data.user.role });
+        dispatch(setUser(data.user));
+        dispatch(setToken(data.accesstoken));
+        toast.success(data.message);
+        navigate(redirect || `/${data.user.role}/`, { replace: true });
       } catch (error) {
         console.log("error while login", error);
       }
@@ -156,9 +164,9 @@ function LoginComponent() {
               dispatch(setUser(data.user));
               dispatch(setToken(data.accesstoken));
               toast.success(data.message);
-              const QueryClient = useQueryClient();
-              QueryClient.invalidateQueries({ queryKey: ["user"] });
-              navigate(`/${data.user.role}/`);
+              queryClient.invalidateQueries({ queryKey: ["user"] });
+              console.log({ redirect, role: data.user.role });
+              navigate(redirect || `/${data.user.role}/`, { replace: true });
             } catch (err) {
               console.log("Google login failed", err);
             }

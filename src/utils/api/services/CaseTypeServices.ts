@@ -63,7 +63,7 @@ export async function DeleteCasetype(id: string) {
 export async function FetchAllCasetype() {
   const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    CommonQueies.api + user?.role + CasetypeRoutes.base
+    CommonQueies.api + (user?.role || "client") + CasetypeRoutes.base
   );
   return response.data;
 }
@@ -72,7 +72,7 @@ export async function FetchCasetypeByPractice(payload: string[] | undefined) {
   const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
     CommonQueies.api +
-      user?.role +
+      (user?.role || "client") +
       CasetypeRoutes.base +
       PracticeAreaRoutes.base,
     { params: { pids: payload } }

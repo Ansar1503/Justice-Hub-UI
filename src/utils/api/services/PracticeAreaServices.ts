@@ -65,7 +65,7 @@ export async function deletePracticeArea(id: string) {
 export async function fetchPracticeAreasbySpecIds(query: string[] | []) {
   const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    CommonQueies.api + user?.role + PracticeAreaRoutes.base,
+    CommonQueies.api + (user?.role || "client") + PracticeAreaRoutes.base,
     {
       params: { specIds: query },
     }
