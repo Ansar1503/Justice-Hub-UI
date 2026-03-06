@@ -13,6 +13,7 @@ import { Bell, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationComponent from "@/components/NotificationPopover";
 import { persistor } from "@/store/redux/store";
+import axiosinstance from "@/utils/api/axios/axios.instance";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -26,10 +27,16 @@ function Navbar() {
   const dispatch = useAppDispatch();
   const handleLogout = async () => {
     // dispatch(LogOut());
-    dispatch(signOut());
-    await persistor.flush();
-    await persistor.purge();
-    window.location.reload();
+    try {
+      await axiosinstance.post("/api/user/logout");
+    } catch (error) {
+      console.log("logout error ", error);
+    } finally {
+      console.log("loggin out .....");
+      dispatch(signOut());
+      navigate("/login");
+      await persistor.purge();
+    }
   };
 
   const toggleDropdown = () => {

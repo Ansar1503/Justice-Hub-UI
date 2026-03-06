@@ -19,11 +19,15 @@ import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import LawyerVerificationDetails from "../Lawyer/LawyerVerificationComponent";
 import { LawyerProfessionalDetailsForm } from "../Lawyer/ProfessionalDetailsComponent";
+import axiosinstance from "@/utils/api/axios/axios.instance";
+import { persistor } from "@/store/redux/store";
+import { useNavigate } from "react-router-dom";
 
 function ProfileCard() {
   const verificationContext = useContext(LawyerVerificationContext);
   const { user } = useAppSelector((state) => state.Auth);
   const { data, isLoading } = useFetchClientData();
+  const navigate = useNavigate();
   const { data: profileImage } = useFetchProfileImage();
   // console.log("profile image", profileImage);
   const dispatch = useAppDispatch();
@@ -40,7 +44,7 @@ function ProfileCard() {
 
   useEffect(() => {
     if (!isLoading && !data) {
-      dispatch(signOut());
+      handleLogout();
     }
   }, [data, isLoading, dispatch]);
 
@@ -49,7 +53,19 @@ function ProfileCard() {
       dispatch(setProfileImage(data.profile_image));
     }
   }, [data?.profile_image, dispatch]);
-
+  const handleLogout = async () => {
+    // dispatch(LogOut());
+    try {
+      await axiosinstance.post("/api/user/logout");
+    } catch (error) {
+      console.log("logout error ", error);
+    } finally {
+      console.log("loggin out .....");
+      dispatch(signOut());
+      navigate("/login");
+      await persistor.purge();
+    }
+  };
   useEffect(() => {
     if (data?.lawyerVerfication) {
       dispatch(

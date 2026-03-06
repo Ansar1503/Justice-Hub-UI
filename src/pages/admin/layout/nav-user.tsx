@@ -28,6 +28,8 @@ import { useAppDispatch } from "@/store/redux/Hook";
 import { signOut } from "@/store/redux/auth/Auth.Slice";
 // import { LogOut as LogOutAction } from "@/store/redux/client/ClientSlice";
 import { useNavigate } from "react-router-dom";
+import axiosinstance from "@/utils/api/axios/axios.instance";
+import { persistor } from "@/store/redux/store";
 
 export function NavUser({
   user,
@@ -41,6 +43,19 @@ export function NavUser({
   const { isMobile } = useSidebar();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const handleLogout = async () => {
+    // dispatch(LogOut());
+    try {
+      await axiosinstance.post("/api/user/logout");
+    } catch (error) {
+      console.log("logout error ", error);
+    } finally {
+      console.log("loggin out .....");
+      dispatch(signOut());
+      navigate("/login");
+      await persistor.purge();
+    }
+  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -112,8 +127,7 @@ export function NavUser({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  dispatch(signOut());
-                  navigate("/login");
+                  handleLogout();
                 }}
               >
                 <LogOut className="h-4 w-4" />

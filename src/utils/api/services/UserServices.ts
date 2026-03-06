@@ -1,5 +1,6 @@
+import { signOut } from "@/store/redux/auth/Auth.Slice";
+import { persistor, store } from "@/store/redux/store";
 import axiosinstance from "@/utils/api/axios/axios.instance";
-import persistStore from "redux-persist/es/persistStore";
 
 export async function loginUser(credentials: {
   email: string;
@@ -26,9 +27,18 @@ export async function refreshTokenRequest() {
     store.dispatch(setToken(newToken));
   } catch (error) {
     console.log("error:in refresh function ", error);
-    const { store } = await import("@/store/redux/store");
-    const { signOut } = await import("@/store/redux/auth/Auth.Slice");
-    store.dispatch(signOut());
-    persistStore(store).purge();
+    handleLogout();
   }
 }
+const handleLogout = async () => {
+  // dispatch(LogOut());
+  try {
+    await axiosinstance.post("/api/user/logout");
+  } catch (error) {
+    console.log("logout error ", error);
+  } finally {
+    console.log("loggin out .....");
+    store.dispatch(signOut());
+    await persistor.purge();
+  }
+};

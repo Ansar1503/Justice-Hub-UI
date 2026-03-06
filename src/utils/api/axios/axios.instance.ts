@@ -1,5 +1,6 @@
 // import { store } from "@/Redux/store";
-import { store } from "@/store/redux/store";
+import { signOut } from "@/store/redux/auth/Auth.Slice";
+import { persistor, store } from "@/store/redux/store";
 import axios, { AxiosInstance, AxiosError } from "axios";
 import persistStore from "redux-persist/es/persistStore";
 
@@ -18,7 +19,18 @@ axiosinstance.interceptors.request.use((config) => {
   }
   return config;
 });
-
+const handleLogout = async () => {
+  // dispatch(LogOut());
+  try {
+    await axiosinstance.post("/api/user/logout");
+  } catch (error) {
+    console.log("logout error ", error);
+  } finally {
+    console.log("loggin out .....");
+    store.dispatch(signOut());
+    await persistor.purge();
+  }
+};
 axiosinstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -38,10 +50,7 @@ axiosinstance.interceptors.response.use(
         }
       } catch (refresherror) {
         console.log("refresh error", refresherror);
-        const { store } = await import("@/store/redux/store");
-        const { signOut } = await import("@/store/redux/auth/Auth.Slice");
-        store.dispatch(signOut());
-        persistStore(store).purge();
+        handleLogout();
         return Promise.reject(refresherror);
       }
     }
