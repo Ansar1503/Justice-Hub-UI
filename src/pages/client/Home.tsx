@@ -8,6 +8,7 @@ import PracticeAreas from "@/components/users/Home/PracticalAreas";
 import CTASection from "@/components/users/Home/CTASection";
 import { useAppSelector } from "@/store/redux/Hook";
 import { Navigate } from "react-router-dom";
+import FindLawyerSection from "@/components/users/Home/FindLawyerSection";
 function Home() {
   const user = useAppSelector((state) => state.Auth.user);
 
@@ -22,6 +23,7 @@ function Home() {
       <>
         <Hero />
         <IntroSection />
+        <FindLawyerSection />
         <FeaturesSection />
         <WhyChooseUs />
         <PracticeAreas />
