@@ -92,12 +92,12 @@ function Navbar() {
               </nav>
               <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2">
                 <button
-                  onClick={() => navigate("/client/blogs")}
+                  onClick={() => navigate("/blogs")}
                   className={cn(
                     "relative px-5 py-2 text-sm font-semibold tracking-wide uppercase transition-colors duration-200",
                     "text-nav-link hover:text-nav-link-hover",
                     "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:bg-primary after:transition-all after:duration-300",
-                    isActive("/client/blogs")
+                    isActive("/blogs")
                       ? "text-nav-link-active after:w-full"
                       : "after:w-0 hover:after:w-full",
                   )}

@@ -26,7 +26,7 @@ export function BlogDetailPage() {
       <div className="min-h-screen bg-background">
         <div className="mx-auto px-4 py-12 sm:px-6 lg:px-8">
           <NavLink
-            to="/client/blogs"
+            to="/blogs"
             className="mb-8 inline-flex items-center gap-2 text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -50,7 +50,7 @@ export function BlogDetailPage() {
       <header className="border-b border-border bg-card">
         <div className="mx-auto  px-4 py-6 sm:px-6 lg:px-8">
           <NavLink
-            to="/client/blogs"
+            to="/blogs"
             className="mb-4 inline-flex items-center gap-2 text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />

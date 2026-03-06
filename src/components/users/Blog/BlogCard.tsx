@@ -87,7 +87,7 @@ export function BlogCard({ blog }: BlogCardProps) {
               </div>
 
               <NavLink
-                to={`/client/blogs/${blog.id}`}
+                to={`/blogs/${blog.id}`}
                 className="group/link inline-flex items-center gap-2 text-primary hover:text-primary-light font-semibold text-sm transition-all hover:gap-3"
                 aria-label="Read article"
               >

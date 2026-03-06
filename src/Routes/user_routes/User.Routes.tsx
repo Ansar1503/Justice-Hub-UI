@@ -14,7 +14,8 @@ import ForgotPasswordPage from "@/pages/client/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/client/ResetPasswordPage";
 import LawyerDirectory from "@/pages/client/LawyersListing";
 import LawyersPage from "@/pages/client/LawyerProfile";
-
+import BlogsPage from "@/pages/client/BlogsPage";
+import BlogDetails from "@/pages/client/BlogDetails";
 function UserRoutes() {
   return (
     <Routes>
@@ -36,7 +37,8 @@ function UserRoutes() {
 
       <Route path="/lawyers" element={<LawyerDirectory />} />
       <Route path="/lawyers/:id" element={<LawyersPage />} />
-
+      <Route path="/blogs" element={<BlogsPage />} />
+      <Route path="/blogs/:id" element={<BlogDetails />} />
       <Route path="/" element={<Home />} />
 
       <Route path="/client/*" element={<ClientRoutes />} />

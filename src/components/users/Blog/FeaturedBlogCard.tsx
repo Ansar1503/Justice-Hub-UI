@@ -89,7 +89,7 @@ export function FeaturedBlogCard({ blog }: FeaturedBlogCardProps) {
               </div>
 
               <NavLink
-                to={`/client/blogs/${blog.id}`}
+                to={`/blogs/${blog.id}`}
                 className="group/link inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-light text-primary-foreground rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:gap-3"
                 aria-label="Read full article"
               >
