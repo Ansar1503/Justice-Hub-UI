@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
 import { AuthContext } from "../../../context/AuthContextPovider";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { UserEnum } from "../../../types/enums/user.enums";
 import { useAppDispatch, useAppSelector } from "@/store/redux/Hook";
 // import { LogOut } from "@/store/redux/client/ClientSlice";
@@ -13,6 +13,7 @@ import NotificationComponent from "@/components/NotificationPopover";
 import { useFetchClientData } from "@/store/tanstack/queries";
 import axiosinstance from "@/utils/api/axios/axios.instance";
 import { persistor } from "@/store/redux/store";
+import { cn } from "@/lib/utils";
 
 function Navbar() {
   const { theme, toggle_theme } = useContext(ThemeContext);
@@ -42,6 +43,7 @@ function Navbar() {
     }
   }, [clientData]);
   // const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -73,12 +75,36 @@ function Navbar() {
             {/* <li className="hover:underline cursor-pointer">Services</li> */}
 
             <>
-              <NavLink to="/lawyers">
-                <li className="hover:underline cursor-pointer">Lawyers</li>
-              </NavLink>
-              {/* <NavLink to="/client/blogs">
-                <li className="hover:underline cursor-pointer">Blogs</li>
-              </NavLink> */}
+              <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2">
+                <button
+                  onClick={() => navigate("/lawyers")}
+                  className={cn(
+                    "relative px-5 py-2 text-sm font-semibold tracking-wide uppercase transition-colors duration-200",
+                    "text-nav-link hover:text-nav-link-hover",
+                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:bg-primary after:transition-all after:duration-300",
+                    isActive("/lawyers")
+                      ? "text-nav-link-active after:w-full"
+                      : "after:w-0 hover:after:w-full",
+                  )}
+                >
+                  Lawyers
+                </button>
+              </nav>
+              <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2">
+                <button
+                  onClick={() => navigate("/client/blogs")}
+                  className={cn(
+                    "relative px-5 py-2 text-sm font-semibold tracking-wide uppercase transition-colors duration-200",
+                    "text-nav-link hover:text-nav-link-hover",
+                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:bg-primary after:transition-all after:duration-300",
+                    isActive("/client/blogs")
+                      ? "text-nav-link-active after:w-full"
+                      : "after:w-0 hover:after:w-full",
+                  )}
+                >
+                  Blogs
+                </button>
+              </nav>
             </>
 
             {/* <li className="hover:underline cursor-pointer">About Us</li> */}
