@@ -74,38 +74,25 @@ function Navbar() {
             )} */}
             {/* <li className="hover:underline cursor-pointer">Services</li> */}
 
-            <>
-              <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2">
+            <nav className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 gap-1 rounded-full border border-nav-border bg-secondary/50 px-1.5 py-1">
+              {[
+                { label: "Lawyers", path: "/lawyers" },
+                { label: "Blogs", path: "/blogs" },
+              ].map(({ label, path }) => (
                 <button
-                  onClick={() => navigate("/lawyers")}
+                  key={path}
+                  onClick={() => navigate(path)}
                   className={cn(
-                    "relative px-5 py-2 text-sm font-semibold tracking-wide uppercase transition-colors duration-200",
-                    "text-nav-link hover:text-nav-link-hover",
-                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:bg-primary after:transition-all after:duration-300",
-                    isActive("/lawyers")
-                      ? "text-nav-link-active after:w-full"
-                      : "after:w-0 hover:after:w-full",
+                    "relative px-5 py-1.5 text-sm font-semibold tracking-wide uppercase rounded-full transition-all duration-200",
+                    isActive(path)
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-nav-link hover:text-nav-link-hover hover:bg-accent",
                   )}
                 >
-                  Lawyers
+                  {label}
                 </button>
-              </nav>
-              <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2">
-                <button
-                  onClick={() => navigate("/blogs")}
-                  className={cn(
-                    "relative px-5 py-2 text-sm font-semibold tracking-wide uppercase transition-colors duration-200",
-                    "text-nav-link hover:text-nav-link-hover",
-                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:bg-primary after:transition-all after:duration-300",
-                    isActive("/blogs")
-                      ? "text-nav-link-active after:w-full"
-                      : "after:w-0 hover:after:w-full",
-                  )}
-                >
-                  Blogs
-                </button>
-              </nav>
-            </>
+              ))}
+            </nav>
 
             {/* <li className="hover:underline cursor-pointer">About Us</li> */}
           </ul>
