@@ -1,6 +1,6 @@
 import { ArrowLeft, Heart } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useFetchBlogDetailsById } from "@/store/tanstack/Queries/BlogQuery";
 import { BlogCard } from "./BlogCard";
 import { useToggleBlogLikeMutation } from "@/store/tanstack/mutations/BlogMutations";
@@ -12,8 +12,9 @@ export function BlogDetailPage() {
   const { data: blog } = useFetchBlogDetailsById(id);
   const isLiked = blog?.likes.some((like) => like.userId === user?.user_id);
   const { mutateAsync: toggleLike } = useToggleBlogLikeMutation();
+  const navigate = useNavigate();
   const handleToggleLike = async () => {
-    if (!user?.user_id) return;
+    if (!user?.user_id) navigate("/login");
     try {
       await toggleLike(id!);
     } catch (error) {
@@ -181,7 +182,10 @@ export function BlogDetailPage() {
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {blog.relatedBlogs?.map((relatedBlog) => (
-                <NavLink key={relatedBlog.id} to={`/client/blogs/${relatedBlog.id}`}>
+                <NavLink
+                  key={relatedBlog.id}
+                  to={`/client/blogs/${relatedBlog.id}`}
+                >
                   <BlogCard blog={relatedBlog} />
                 </NavLink>
               ))}
