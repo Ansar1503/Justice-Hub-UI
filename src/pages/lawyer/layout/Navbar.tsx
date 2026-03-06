@@ -67,8 +67,8 @@ function Navbar() {
           </div>
 
           {/* Desktop Menu */}
-          <div id="properties" className="hidden md:flex gap-8 text-lg">
-            <ul className="flex gap-8">
+          {/* <div id="properties" className="hidden md:flex gap-8 text-lg"> */}
+            {/* <ul className="flex gap-8"> */}
               {/* <li
                 className="hover:underline cursor-pointer"
                 onClick={() => navigate("/")}
@@ -79,8 +79,8 @@ function Navbar() {
               <li className="hover:underline cursor-pointer">Lawyers</li>
               <li className="hover:underline cursor-pointer">Blogs</li>
               <li className="hover:underline cursor-pointer">About Us</li> */}
-            </ul>
-          </div>
+            {/* </ul> */}
+          {/* </div> */}
 
           {/* Buttons & Mobile Menu Toggle */}
           <div className="flex items-center gap-4">
