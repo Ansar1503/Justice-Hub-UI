@@ -129,9 +129,8 @@ export async function FetchBlogsByClient(
   params: unknown,
   payload: FetchBlogsByClientType
 ) {
-  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `${CommonQueies.api}${user?.role}${BlogRoute.base}${BlogRoute.users}${CommonQueies.cursorQuery}${params}${CommonQueies.searchQuery}${payload.search}${BlogRoute.sortBy}${payload.sortBy}`
+    `${CommonQueies.api}client${BlogRoute.base}${BlogRoute.users}${CommonQueies.cursorQuery}${params}${CommonQueies.searchQuery}${payload.search}${BlogRoute.sortBy}${payload.sortBy}`
   );
   return response.data;
 }

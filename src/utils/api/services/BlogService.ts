@@ -59,9 +59,8 @@ export async function ToggleBlogStatus(id: string) {
 }
 
 export async function fetchBlogDetailsById(blogId: string | undefined) {
-  const { user } = store.getState().Auth;
   const response = await axiosinstance.get(
-    `${CommonQueies.api}${user?.role}${BlogRoute.base}${BlogRoute.users}${CommonQueies.params}${blogId}`
+    `${CommonQueies.api}client${BlogRoute.base}${BlogRoute.users}${CommonQueies.params}${blogId}`
   );
   return response.data;
 }
