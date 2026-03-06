@@ -72,16 +72,16 @@ function Navbar() {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-3 border border-nav-border bg-brand-secondary/50 px-2 py-1 rounded-full absolute left-1/2 -translate-x-1/2">
+        <div className="hidden md:flex items-center gap-2 border border-border bg-muted px-2 py-1 rounded-full absolute left-1/2 -translate-x-1/2 shadow-soft">
           {navItems.map((item) => (
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                "px-4 py-1.5 text-sm font-semibold uppercase rounded-full transition",
+                "px-4 py-1.5 text-sm font-semibold uppercase rounded-full transition-all duration-200",
                 isActive(item.path)
-                  ? "bg-brand-primary text-primary-foreground shadow-sm"
-                  : "hover:bg-brand-secondary",
+                  ? "bg-primary text-primary-foreground shadow-soft"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
               )}
             >
               {item.label}
