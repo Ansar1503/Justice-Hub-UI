@@ -68,13 +68,11 @@ export function useInfiniteFetchAllNotifications(enabled: boolean) {
 export function useInfiniteFetchBlogsForClients(
   payload: FetchBlogsByClientType
 ) {
-  const { user } = store.getState().Auth;
   return useInfiniteQuery<infiniteFetchBlogsByClient, any>({
     queryKey: ["blogs", payload],
     initialPageParam: 1,
     queryFn: ({ pageParam }) => FetchBlogsByClient(pageParam, payload),
     getNextPageParam: (lastPage: any) => lastPage?.nextCursor ?? undefined,
-    enabled: Boolean(user?.user_id),
     staleTime: 60_000,
     refetchOnWindowFocus: false,
     retryDelay: 30000,
