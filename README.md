@@ -1,50 +1,62 @@
-# React + TypeScript + Vite
+# ⚖️ Justice Hub - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
- 
-Currently, two official plugins are available:
+## 🚀 Overview
+Justice Hub is a platform that connects users with legal professionals like lawyers and chartered accountants. It allows users to search, filter, and book consultations seamlessly through a clean and interactive interface.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🔗 Live Demo: [Add your deployed frontend link here]
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 📸 Screenshots
 
-- Configure the top-level `parserOptions` property like this:
+### 🏠 Home Page
+![Home](<img width="1915" height="933" alt="Screenshot 2026-03-26 123450" src="https://github.com/user-attachments/assets/4c61e3d1-4916-4d12-86e1-5bb93b0282e7" />
+)
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 🔍 Lawyer Listing & Filters
+![Lawyers](docs/screenshots/lawyers.png)(<img width="1899" height="920" alt="Screenshot 2026-03-26 123459" src="https://github.com/user-attachments/assets/90142f07-7d4d-4837-8e11-66a6997effaf" />
+)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 📅 Booking Page
+![Booking](docs/screenshots/booking.png)
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### 💬 Chat Interface
+![Chat](docs/screenshots/chat.png)
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+---
+
+## ✨ Features
+
+- 🔍 Search and filter lawyers
+- 📅 Book consultation slots
+- 💬 Real-time chat system
+- 👤 User profile management
+- 🔐 Authentication & authorization
+- 📱 Responsive UI
+
+---
+
+## 🛠 Tech Stack
+
+- React
+- Redux / Context API
+- Tailwind CSS / Custom Styling
+- Axios
+- React Router
+
+---
+
+## ⚙️ Setup Instructions
+
+```bash
+# Clone the repository
+git clone https://github.com/Ansar1503/Justice-Hub-UI.git
+
+# Navigate to project folder
+cd Justice-Hub-UI
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
