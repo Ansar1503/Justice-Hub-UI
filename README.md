@@ -10,12 +10,11 @@ Justice Hub is a platform that connects users with legal professionals like lawy
 ## 📸 Screenshots
 
 ### 🏠 Home Page
-![Home](<img width="1915" height="933" alt="Screenshot 2026-03-26 123450" src="https://github.com/user-attachments/assets/4c61e3d1-4916-4d12-86e1-5bb93b0282e7" />
-)
+![Home]<img width="1915" height="933" alt="Screenshot 2026-03-26 123450" src="https://github.com/user-attachments/assets/2c7ec76e-6d37-4843-8f04-1d699e690139" />
+
 
 ### 🔍 Lawyer Listing & Filters
-![Lawyers](docs/screenshots/lawyers.png)(<img width="1899" height="920" alt="Screenshot 2026-03-26 123459" src="https://github.com/user-attachments/assets/90142f07-7d4d-4837-8e11-66a6997effaf" />
-)
+![Lawyers]()
 
 ### 📅 Booking Page
 ![Booking](docs/screenshots/booking.png)
