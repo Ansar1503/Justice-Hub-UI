@@ -10,13 +10,15 @@ The frontend is designed with scalability, clean architecture principles, and us
 * ⚖️ **Lawyer**
 * 🛠 **Admin**
 
-🔗 **Live Demo:** [*[Add your deployed frontend link here]*](https://justiceui2.vercel.app/)
+🔗 **Live Demo:** [*[Live Link]*](https://justiceui2.vercel.app/)
 
 ---
 
 ## 📸 Screenshots
 
 ### 🏠 Home Page
+
+<img width="1920" height="4787" alt="screencapture-justiceui2-vercel-app-2026-03-26-15_51_31" src="https://github.com/user-attachments/assets/258212e0-aa42-4dee-8aa5-9c0b96c4ea59" />
 
 * Clean landing with search & onboarding experience
 * Highlights platform value and services
@@ -167,7 +169,7 @@ Contributions are welcome! Feel free to fork the repo and submit a pull request.
 ## 📬 Contact
 
 For queries or collaboration:
-📧 *[Add your email or contact link]*
+📧 *muhammedansarma3@gmail.com*
 
 ---
 
