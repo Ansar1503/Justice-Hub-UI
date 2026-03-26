@@ -40,6 +40,7 @@ The frontend is designed with scalability, clean architecture principles, and us
 
 ### 💬 Chat & Communication
 <img width="1912" height="899" alt="Screenshot 2026-03-26 104117" src="https://github.com/user-attachments/assets/87e2c232-52a7-4ff3-9147-30ad470fa305" />
+<img width="1913" height="914" alt="Screenshot 2026-03-26 160420" src="https://github.com/user-attachments/assets/9cbf95f5-9b73-4556-b0d4-9274cb482407" />
 
 * Real-time messaging
 * File sharing & conversation tracking
