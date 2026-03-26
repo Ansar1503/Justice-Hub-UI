@@ -18,7 +18,7 @@ The frontend is designed with scalability, clean architecture principles, and us
 
 ### 🏠 Home Page
 
-<img width="1920" height="4787" alt="screencapture-justiceui2-vercel-app-2026-03-26-15_51_31" src="https://github.com/user-attachments/assets/258212e0-aa42-4dee-8aa5-9c0b96c4ea59" />
+<img width="60%" align="center" alt="screencapture-justiceui2-vercel-app-2026-03-26-15_51_31" src="https://github.com/user-attachments/assets/258212e0-aa42-4dee-8aa5-9c0b96c4ea59" />
 
 * Clean landing with search & onboarding experience
 * Highlights platform value and services
@@ -31,11 +31,15 @@ The frontend is designed with scalability, clean architecture principles, and us
 * View detailed lawyer profiles
 
 ### 📅 Booking & Appointments
+<p align="center"><img width="50%" alt="Screenshot 2026-03-26 102730" src="https://github.com/user-attachments/assets/a4969f2e-4c33-49cc-b0a3-900621d0934b" />
+  <img width="50%" alt="Screenshot 2026-03-26 104233" src="https://github.com/user-attachments/assets/f7603c7b-f9a5-4aa3-b567-5e0d6a6404f3" />
 
+</p>
 * Dynamic slot selection
 * Real-time availability
 
 ### 💬 Chat & Communication
+<img width="1912" height="899" alt="Screenshot 2026-03-26 104117" src="https://github.com/user-attachments/assets/87e2c232-52a7-4ff3-9147-30ad470fa305" />
 
 * Real-time messaging
 * File sharing & conversation tracking
