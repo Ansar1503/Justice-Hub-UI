@@ -24,8 +24,8 @@ The frontend is designed with scalability, clean architecture principles, and us
 * Highlights platform value and services
 
 ### 🔍 Lawyer Discovery
-<p align="center"><img width="1920" height="1412" alt="screencapture-justiceui2-vercel-app-lawyers-2026-03-26-15_53_20" src="https://github.com/user-attachments/assets/325dcff3-0138-4d2f-a0ef-08171f89b28e" />
-<img width="1919" height="752" alt="Screenshot 2026-03-26 102719" src="https://github.com/user-attachments/assets/bb11b362-4e42-4b9a-abe2-b0315abb24b4" />
+<p align="center"><img width="50%" alt="screencapture-justiceui2-vercel-app-lawyers-2026-03-26-15_53_20" src="https://github.com/user-attachments/assets/325dcff3-0138-4d2f-a0ef-08171f89b28e" />
+<img width="50%" alt="Screenshot 2026-03-26 102719" src="https://github.com/user-attachments/assets/bb11b362-4e42-4b9a-abe2-b0315abb24b4" />
 </p>
 * Advanced filtering & sorting
 * View detailed lawyer profiles
