@@ -116,6 +116,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      date-fns:
+        specifier: ^4.2.1
+        version: 4.2.1
       dayjs:
         specifier: ^1.11.18
         version: 1.11.20
@@ -124,7 +127,7 @@ importers:
         version: 12.39.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       justice-hub:
         specifier: 'file:'
-        version: file:(@types/node@22.19.19)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(date-fns@3.6.0)(tailwindcss@3.4.19)(typescript@5.7.3)
+        version: file:(@types/node@22.19.19)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(date-fns@4.2.1)(tailwindcss@3.4.19)(typescript@5.7.3)
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
@@ -151,7 +154,7 @@ importers:
         version: 18.3.1
       react-day-picker:
         specifier: ^8.10.1
-        version: 8.10.2(date-fns@3.6.0)(react@18.3.1)
+        version: 8.10.2(date-fns@4.2.1)(react@18.3.1)
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
@@ -2028,8 +2031,8 @@ packages:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
     engines: {node: '>= 12'}
 
-  date-fns@3.6.0:
-    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
+  date-fns@4.2.1:
+    resolution: {integrity: sha512-37RhSdxaG1suen6VDCza6rNrQfooyQh57HFVPwQGEq2QWliVLzPQZ8Oa017weOu+HZCnzI7N3Pf/wyoBKfEqrA==}
 
   dayjs@1.11.20:
     resolution: {integrity: sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==}
@@ -5454,7 +5457,7 @@ snapshots:
 
   data-uri-to-buffer@4.0.1: {}
 
-  date-fns@3.6.0: {}
+  date-fns@4.2.1: {}
 
   dayjs@1.11.20: {}
 
@@ -6040,7 +6043,7 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  justice-hub@file:(@types/node@22.19.19)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(date-fns@3.6.0)(tailwindcss@3.4.19)(typescript@5.7.3):
+  justice-hub@file:(@types/node@22.19.19)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(date-fns@4.2.1)(tailwindcss@3.4.19)(typescript@5.7.3):
     dependencies:
       '@heroicons/react': 2.2.0(react@18.3.1)
       '@radix-ui/react-accordion': 1.2.12(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -6088,7 +6091,7 @@ snapshots:
       next-themes: 0.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       passport: 0.7.0
       react: 18.3.1
-      react-day-picker: 8.10.2(date-fns@3.6.0)(react@18.3.1)
+      react-day-picker: 8.10.2(date-fns@4.2.1)(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
       react-hot-toast: 2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-icons: 5.6.0(react@18.3.1)
@@ -6490,9 +6493,9 @@ snapshots:
       iconv-lite: 0.7.2
       unpipe: 1.0.0
 
-  react-day-picker@8.10.2(date-fns@3.6.0)(react@18.3.1):
+  react-day-picker@8.10.2(date-fns@4.2.1)(react@18.3.1):
     dependencies:
-      date-fns: 3.6.0
+      date-fns: 4.2.1
       react: 18.3.1
 
   react-dom@18.3.1(react@18.3.1):
